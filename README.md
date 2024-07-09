@@ -1,3 +1,3 @@
 # light
 
-Cross-platform, cross-graphics-api, high-performance and modern game-engine.
+Monorepo for a cross-platform, cross-graphics-api, high-performance, modular, and modern game-engine.
