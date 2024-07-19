@@ -1,0 +1,9 @@
+[settings]
+arch=x86_64
+os=Linux
+compiler=clang
+compiler.version=17
+compiler.cppstd=gnu17
+compiler.libcxx=libstdc++11
+build_type=Release
+
