@@ -32,11 +32,10 @@ steps:
   - cp ./tools/conan/profiles/linux_clang_amd64 $(conan profile path default)
 
   - conan remote add light https://artifactory.light7734.com/artifactory/api/conan/conan
-  - conan install . --output-folder=build -r light --build=missing
+  - conan install . -r light --build=missing
+  - conan build .
 
-  - cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-  - cmake --build ./build/
-  - ./build/modules/light/light
+  - build/Release/modules/light
 
 ---
 kind: pipeline
@@ -73,11 +72,10 @@ steps:
   - cp ./tools/conan/profiles/linux_gcc_amd64 $(conan profile path default)
 
   - conan remote add light https://artifactory.light7734.com/artifactory/api/conan/conan
-  - conan install . --output-folder=build -r light --build=missing
+  - conan install . -r light --build=missing
+  - conan build .
 
-  - cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-  - cmake --build ./build/
-  - ./build/modules/light/light
+  - build/Release/modules/light
 
 ---
 kind: pipeline
