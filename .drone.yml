@@ -11,6 +11,10 @@ volumes:
   host:
     path: /var/run/docker.sock
 
+volumes:
+- name: py
+  temp: {}
+
 services:
   - name: docker
     image: docker:dind
@@ -40,7 +44,7 @@ steps:
   - name: setup_conan
     image: ubuntu_amd64:latest
     volumes:
-    - name: python_env
+    - name: py
       path: /opt/venv/
     pull: if-not-exists
     environment:
@@ -52,6 +56,9 @@ steps:
   - name: echo_info
     image: ubuntu_amd64:latest
     pull: if-not-exists
+    volumes:
+    - name: py
+      path: /opt/venv/
     commands:
       - . /opt/venv/bin/activate
       - pip --version
@@ -67,6 +74,9 @@ steps:
   - name: build_gcc
     image: ubuntu_amd64:latest
     pull: if-not-exists
+    volumes:
+    - name: py
+      path: /opt/venv/
     commands:
       - rm -rv ./build
       - export CC=$(which gcc)
@@ -82,6 +92,9 @@ steps:
   - name: build_clang
     image: ubuntu_amd64:latest
     pull: if-not-exists
+    volumes:
+    - name: py
+      path: /opt/venv/
     commands:
       - rm -rv ./build
       - export CC=$(which clang)
@@ -105,6 +118,7 @@ steps:
     pull: if-not-exists
     commands:
       - echp "[TODO] Implement tests"
+      - ./build/Release/modules/light/light
 
   - name: report_coverage
     image: ubuntu_amd64:latest
