@@ -67,7 +67,6 @@ steps:
       - clang --version
       - clang++ --version
       - clang-tidy --version
-      - clang-format --version
 
   - name: build_gcc
     image: ubuntu_amd64:latest
