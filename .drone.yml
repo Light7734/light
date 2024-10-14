@@ -75,7 +75,7 @@ steps:
     - name: py
       path: /opt/venv/
     commands:
-      - rm -rv ./build
+      - rm -rvf ./build
       - export CC=$(which gcc)
       - export CXX=$(which g++)
 
@@ -93,7 +93,7 @@ steps:
     - name: py
       path: /opt/venv/
     commands:
-      - rm -rv ./build
+      - rm -rvf ./build
       - export CC=$(which clang)
       - export CXX=$(which clang++)
 
