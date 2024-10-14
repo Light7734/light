@@ -13,5 +13,4 @@ RUN apt-get install -y \
     python3.12-venv
     
 RUN python3 -m venv /opt/venv
-RUN . /opt/venv/bin/activate
-RUN pip install conan==2.5.0
+RUN . /opt/venv/bin/activate && pip install conan==2.5.0
