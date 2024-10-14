@@ -11,6 +11,9 @@ volumes:
   host:
     path: /var/run/docker.sock
 
+workspace:
+  path: /opt
+
 services:
   - name: docker
     image: docker:dind
