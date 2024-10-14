@@ -9,11 +9,14 @@ platform:
 workspace:
   path: /opt
 
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+
 steps:
   - name: setup_image
     image: docker:latest
-    services:
-      - docker:dind
     commands:
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
 
