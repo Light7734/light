@@ -19,7 +19,7 @@ volumes:
 
 - name: conan
   host:
-    path: $HOME/.conan2/
+    path: /root/.conan2/
 
 
 services:
@@ -68,7 +68,7 @@ steps:
     - name: py
       path: /opt/venv/
     - name: conan
-      path: $HOME/.conan2
+      path: /root/.conan2
 
     commands:
       - . /opt/venv/bin/activate
@@ -90,7 +90,7 @@ steps:
     - name: py
       path: /opt/venv/
     - name: conan
-      path: $HOME/.conan2
+      path: /root/.conan2
 
     commands:
       - . /opt/venv/bin/activate
