@@ -2,6 +2,9 @@ kind: pipeline
 type: docker
 name: linux_amd64
 
+environment:
+  CONAN_REVISIONS_ENABLED: "1"
+
 platform:
   os: linux
   arch: amd64
@@ -39,18 +42,6 @@ steps:
     commands:
       - docker images
 
-  - name: setup_conan
-    image: ubuntu_amd64:latest
-    volumes:
-    - name: py
-      path: /opt/venv/
-    pull: if-not-exists
-    environment:
-      CONAN_REVISIONS_ENABLED: "1"
-    commands:
-      - . /opt/venv/bin/activate
-      - pip install conan==2.5.0
-
   - name: echo_info
     image: ubuntu_amd64:latest
     pull: if-not-exists
@@ -75,6 +66,7 @@ steps:
     - name: py
       path: /opt/venv/
     commands:
+      - . /opt/venv/bin/activate
       - rm -rvf ./build
       - export CC=$(which gcc)
       - export CXX=$(which g++)
@@ -93,6 +85,7 @@ steps:
     - name: py
       path: /opt/venv/
     commands:
+      - . /opt/venv/bin/activate
       - rm -rvf ./build
       - export CC=$(which clang)
       - export CXX=$(which clang++)
