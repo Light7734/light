@@ -17,7 +17,7 @@ services:
     privileged: true
     volumes:
       - name: dockersock
-        path: /var/run/docker.sock
+        path: /var/run/
 
 steps:
   - name: setup_image
