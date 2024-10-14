@@ -10,23 +10,21 @@ workspace:
   path: /opt
 
 steps:
-  - name: install_dependencies
-    image: ubuntu:latest
+  - name: setup_image
+    image: docker:latest
     commands:
-      - apt update
-      - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
+      - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
 
   - name: setup_conan
-    image: ubuntu:latest
+    image: ubuntu_amd64 
     environment:
       CONAN_REVISIONS_ENABLED: "1"
     commands:
-      - python3 -m venv /opt/venv
       - . /opt/venv/bin/activate
       - pip install conan==2.5.0
 
   - name: echo_info
-    image: ubuntu:latest
+    image: ubuntu_amd64
     commands:
       - pip --version
       - python --version
@@ -39,7 +37,7 @@ steps:
       - clang-format --version
 
   - name: build_gcc
-    image: ubuntu:latest
+    image: ubuntu_amd64
     commands:
       - rm -rv ./build
       - export CC=$(which gcc)
@@ -53,7 +51,7 @@ steps:
       - ./build/Release/modules/light/light
 
   - name: build_clang
-    image: ubuntu:latest
+    image: ubuntu_amd64
     commands:
       - rm -rv ./build
       - export CC=$(which clang)
@@ -67,16 +65,16 @@ steps:
       - ./build/Release/modules/light/light
 
   - name: static_analysis
-    image: ubuntu:latest
+    image: ubuntu_amd64
     commands:
       - echo "[TODO] Implement static analysis"
 
   - name: run_tests
-    image: ubuntu:latest
+    image: ubuntu_amd64
     commands:
       - echp "[TODO] Implement tests"
 
   - name: report_coverage
-    image: ubuntu:latest
+    image: ubuntu_amd64
     commands:
       - echp "[TODO] Implement coverage report"
