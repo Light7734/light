@@ -37,7 +37,10 @@ steps:
       - sleep 5
 
   - name: list_images
-    image: docker:latest
+    volumes:
+    - name: dockersock
+      path: /var/run
+    image: docker:dind
     commands:
       - docker images
 
