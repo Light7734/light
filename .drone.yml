@@ -32,7 +32,7 @@ steps:
   - conan install . --build=missing
   - conan build .
 
-  - ./build/Release/modules/light
+  - ./build/Release/modules/light/light
 
 ---
 kind: pipeline
@@ -69,7 +69,7 @@ steps:
   - conan install . --build=missing
   - conan build .
 
-  - ./build/Release/modules/light
+  - ./build/Release/modules/light/light
 
 ---
 kind: pipeline
