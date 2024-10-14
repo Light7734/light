@@ -55,8 +55,9 @@ steps:
     image: ubuntu_amd64:latest
     pull: if-not-exists
     commands:
+      - . /opt/venv/bin/activate
       - pip --version
-      - python --version
+      - python3 --version
       - conan --version
       - gcc --version
       - g++ --version
