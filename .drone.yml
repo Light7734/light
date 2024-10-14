@@ -39,10 +39,16 @@ steps:
 
   - name: list_images
     image: docker:dind
+    volumes:
+    - name: dockersock
+      path: /var/run
     commands:
       - docker images
 
   - name: setup_conan
+    volumes:
+    - name: dockersock
+      path: /var/run
     image: ubuntu_amd64
     environment:
       CONAN_REVISIONS_ENABLED: "1"
