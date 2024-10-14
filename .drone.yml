@@ -31,6 +31,16 @@ steps:
       - until docker info; do echo "Waiting for Docker daemon..."; sleep 1; done
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
 
+  - name: wait_for_image
+    image: alpine
+    commands:
+      - sleep 5
+
+  - name: list_images
+    image: docker:latest
+    commands:
+      - docker images
+
   - name: setup_conan
     image: ubuntu_amd64 
     environment:
