@@ -9,16 +9,24 @@ platform:
 workspace:
   path: /opt
 
+volumes:
+- name: dockersock
+  temp: {}
+
 services:
-  - name: docker
-    image: docker:dind
-    privileged: true
+- name: docker
+  image: docker:dind
+  privileged: true
+  volumes:
+  - name: dockersock
+    path: /var/run
 
 steps:
   - name: setup_image
-    image: docker:latest
-    depends_on:
-      - docker
+    image: docker:dind
+    volumes:
+    - name: dockersock
+      path: /var/run
     commands:
       - until docker info; do echo "Waiting for Docker daemon..."; sleep 1; done
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
