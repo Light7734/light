@@ -10,8 +10,6 @@ volumes:
 - name: dockersock
   host:
     path: /var/run/docker.sock
-
-volumes:
 - name: py
   temp: {}
 
