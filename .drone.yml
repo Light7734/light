@@ -101,11 +101,11 @@ steps:
     image: ubuntu_amd64:latest
     pull: if-not-exists
     commands:
-      - echp "[TODO] Implement tests"
+      - echo "[TODO] Implement tests"
       - ./build/Release/modules/light/light
 
   - name: report_coverage
     image: ubuntu_amd64:latest
     pull: if-not-exists
     commands:
-      - echp "[TODO] Implement coverage report"
+      - echo "[TODO] Implement coverage report"
