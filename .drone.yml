@@ -1,7 +1,15 @@
+volumes:
+  - name: apt_cache
+    temp: {}
+  - name: shared_data
+    temp: {}
+
 steps:
   - &install_dependencies
     name: install_dependencies
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - apt update
       - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
@@ -9,6 +17,8 @@ steps:
   - &setup_conan
     name: setup_conan
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     environment:
       CONAN_REVISIONS_ENABLED: "1"
     commands:
@@ -19,6 +29,8 @@ steps:
   - &echo_info
     name: echo_info
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - pip --version
       - python --version
@@ -33,6 +45,8 @@ steps:
   - &build_gcc
     name: build_gcc
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - rm -rv ./build
       - export CC=$(which gcc)
@@ -48,6 +62,8 @@ steps:
   - &build_clang
     name: build_clang
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - rm -rv ./build
       - export CC=$(which clang)
@@ -63,18 +79,24 @@ steps:
   - &static_analysis
     name: static_analysis
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - echo "[TODO] Implement static analysis"
 
   - &run_tests
     name: run_tests
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - echp "[TODO] Implement tests"
 
   - &report_coverage
     name: report_coverage
     image: ubuntu:latest
+    volumes:
+      - shared_data:/opt/data
     commands:
       - echp "[TODO] Implement coverage report"
 
@@ -95,3 +117,4 @@ steps:
   - *build_clang
   - *report_coverage
   - *run_tests
+
