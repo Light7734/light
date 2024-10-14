@@ -1,103 +1,97 @@
+steps:
+  - &install_dependencies&
+    name: install_dependencies
+    image: ubuntu:latest
+    commands:
+      - apt update
+      - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
+
+  - &setup_conan
+    name: setup_conan
+    image: ubuntu:latest
+    environment:
+      CONAN_REVISIONS_ENABLED: "1"
+    commands:
+      - python3 -m venv /opt/venv
+      - . /opt/venv/bin/activate
+      - pip install conan==2.5.0
+
+  - &echo_info
+    name: echo_info
+    image: ubuntu:latest
+    commands:
+      - pip --version
+      - python --version
+      - conan --version
+      - gcc --version
+      - g++ --version
+      - clang --version
+      - clang++ --version
+      - clang-tidy --version
+      - clang-format --version
+
+  - &build_gcc
+    name: build_gcc
+    image: ubuntu:latest
+    commands:
+      - rm -rv ./build
+      - export CC=$(which gcc)
+      - export CXX=$(which g++)
+
+      - conan profile detect
+      - cp ./tools/conan/profiles/linux_gcc_amd64 $(conan profile path default)
+      - conan install . --build=missing
+      - conan build .
+
+      - ./build/Release/modules/light/light
+
+  - &build_clang
+    name: build_clang
+    image: ubuntu:latest
+    commands:
+      - rm -rv ./build
+      - export CC=$(which clang)
+      - export CXX=$(which clang++)
+
+      - conan profile detect
+      - cp ./tools/conan/profiles/linux_clang_amd64 $(conan profile path default)
+      - conan install . --build=missing
+      - conan build .
+
+      - ./build/Release/modules/light/light
+
+  - &static_analysis
+    name: static_analysis
+    image: ubuntu:latest
+    commands:
+      - echo "[TODO] Implement static analysis"
+
+  - &run_tests
+    name: run_tests
+    image: ubuntu:latest
+    commands:
+      - echp "[TODO] Implement tests"
+
+  - &report_coverage
+    name: report_coverage
+    image: ubuntu:latest
+    commands:
+      - echp "[TODO] Implement coverage report"
+
 kind: pipeline
 type: docker
-name: build_linux_clang_amd64
+name: linux_amd64
 
 platform:
   os: linux
   arch: amd64
 
 steps:
-- name: build
-  image: ubuntu:latest
-  commands:
-  - apt update
-  - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
-
-  - python3 -m venv /opt/venv
-  - . /opt/venv/bin/activate
-  - pip --version
-  - python --version
-
-  - pip install conan==2.5.0
-  - conan --version
-
-  - export CONAN_REVISIONS_ENABLED=1
-  - export CC=$(which clang)
-  - export CXX=$(which clang++)
-
-  - conan profile detect
-  - cp ./tools/conan/profiles/linux_clang_amd64 $(conan profile path default)
-
-  # - conan remote add light https://artifactory.light7734.com/artifactory/api/conan/conan
-  - conan install . --build=missing
-  - conan build .
-
-  - ./build/Release/modules/light/light
-
----
-kind: pipeline
-type: docker
-name: build_linux_gcc_amd64
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: build
-  image: ubuntu:latest
-  commands:
-  - apt update
-  - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
-
-  - python3 -m venv /opt/venv
-  - . /opt/venv/bin/activate
-  - pip --version
-  - python --version
-
-  - pip install conan==2.5.0
-  - conan --version
-
-  - export CONAN_REVISIONS_ENABLED=1
-  - export CC=$(which gcc)
-  - export CXX=$(which g++)
-
-  - conan profile detect
-  - cp ./tools/conan/profiles/linux_gcc_amd64 $(conan profile path default)
-
-  # - conan remote add light https://artifactory.light7734.com/artifactory/api/conan/conan
-  - conan install . --build=missing
-  - conan build .
-
-  - ./build/Release/modules/light/light
-
----
-kind: pipeline
-type: docker
-name: static_analysis
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: analysis
-  image: ubuntu:latest
-  commands:
-    - echo "[TODO] Implement static analysis"
-
----
-kind: pipeline
-type: docker
-name: code_coverage
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: analysis
-  image: ubuntu:latest
-  commands:
-    - echo "[TODO] Implement code coverage"
-
+  - *install_dependencies
+  - *setup_conan
+  - *echo_info
+  - *static_analysis
+  - *build_gcc
+  - *build_clang
+  - *report_coverage
+  - *run_tests
