@@ -6,13 +6,10 @@ platform:
   os: linux
   arch: amd64
 
-workspace:
-  path: /opt
-
 volumes:
-  - name: dockersock
-    host:
-      path: /var/run/
+- name: dockersock
+  host:
+    path: /var/run/docker.sock
 
 services:
 - name: docker
@@ -24,13 +21,13 @@ services:
 
 steps:
   - name: setup_image
-    image: docker:dind
+    image: docker
     volumes:
     - name: dockersock
-      path: /var/run
+      path: /var/run/docker.sock
     commands:
       - until docker info; do echo "Waiting for Docker daemon..."; sleep 1; done
-      - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
+      - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64
 
   - name: wait_for_image
     image: alpine
@@ -46,10 +43,8 @@ steps:
       - docker images
 
   - name: setup_conan
-    volumes:
-    - name: dockersock
-      path: /var/run
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     environment:
       CONAN_REVISIONS_ENABLED: "1"
     commands:
@@ -57,7 +52,8 @@ steps:
       - pip install conan==2.5.0
 
   - name: echo_info
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     commands:
       - pip --version
       - python --version
@@ -70,7 +66,8 @@ steps:
       - clang-format --version
 
   - name: build_gcc
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     commands:
       - rm -rv ./build
       - export CC=$(which gcc)
@@ -84,7 +81,8 @@ steps:
       - ./build/Release/modules/light/light
 
   - name: build_clang
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     commands:
       - rm -rv ./build
       - export CC=$(which clang)
@@ -98,16 +96,19 @@ steps:
       - ./build/Release/modules/light/light
 
   - name: static_analysis
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     commands:
       - echo "[TODO] Implement static analysis"
 
   - name: run_tests
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     commands:
       - echp "[TODO] Implement tests"
 
   - name: report_coverage
-    image: ubuntu_amd64
+    image: ubuntu_amd64:latest
+    pull: if-not-exists
     commands:
       - echp "[TODO] Implement coverage report"
