@@ -1,5 +1,5 @@
 steps:
-  - &install_dependencies&
+  - &install_dependencies
     name: install_dependencies
     image: ubuntu:latest
     commands:
