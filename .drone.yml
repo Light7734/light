@@ -10,8 +10,9 @@ workspace:
   path: /opt
 
 volumes:
-- name: dockersock
-  temp: {}
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
 
 services:
 - name: docker
@@ -23,10 +24,7 @@ services:
 
 steps:
   - name: setup_image
-    image: docker:dind
-    volumes:
-    - name: dockersock
-      path: /var/run
+    image: docker:latest
     commands:
       - until docker info; do echo "Waiting for Docker daemon..."; sleep 1; done
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
@@ -37,18 +35,12 @@ steps:
       - sleep 5
 
   - name: list_images
-    volumes:
-    - name: dockersock
-      path: /var/run
     image: docker:dind
     commands:
       - docker images
 
   - name: setup_conan
-    volumes:
-    - name: dockersock
-      path: /var/run
-    image: ubuntu_amd64 
+    image: ubuntu_amd64
     environment:
       CONAN_REVISIONS_ENABLED: "1"
     commands:
