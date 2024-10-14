@@ -10,13 +10,13 @@ workspace:
   path: /opt
 
 steps:
-    name: install_dependencies
+  - name: install_dependencies
     image: ubuntu:latest
     commands:
       - apt update
       - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
 
-    name: setup_conan
+  - name: setup_conan
     image: ubuntu:latest
     environment:
       CONAN_REVISIONS_ENABLED: "1"
@@ -25,7 +25,7 @@ steps:
       - . /opt/venv/bin/activate
       - pip install conan==2.5.0
 
-    name: echo_info
+  - name: echo_info
     image: ubuntu:latest
     commands:
       - pip --version
@@ -38,7 +38,7 @@ steps:
       - clang-tidy --version
       - clang-format --version
 
-    name: build_gcc
+  - name: build_gcc
     image: ubuntu:latest
     commands:
       - rm -rv ./build
@@ -52,7 +52,7 @@ steps:
 
       - ./build/Release/modules/light/light
 
-    name: build_clang
+  - name: build_clang
     image: ubuntu:latest
     commands:
       - rm -rv ./build
@@ -66,17 +66,17 @@ steps:
 
       - ./build/Release/modules/light/light
 
-    name: static_analysis
+  - name: static_analysis
     image: ubuntu:latest
     commands:
       - echo "[TODO] Implement static analysis"
 
-    name: run_tests
+  - name: run_tests
     image: ubuntu:latest
     commands:
       - echp "[TODO] Implement tests"
 
-    name: report_coverage
+  - name: report_coverage
     image: ubuntu:latest
     commands:
       - echp "[TODO] Implement coverage report"
