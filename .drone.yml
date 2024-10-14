@@ -18,7 +18,7 @@ steps:
     - name: dockersock
       path: /var/run/docker.sock
     commands:
-      - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64
+      - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
 
   - name: wait_for_image
     image: alpine
