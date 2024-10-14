@@ -18,7 +18,6 @@ steps:
     - name: dockersock
       path: /var/run/docker.sock
     commands:
-      - until docker info; do echo "Waiting for Docker daemon..."; sleep 1; done
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64
 
   - name: wait_for_image
