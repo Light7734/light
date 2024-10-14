@@ -50,6 +50,7 @@ steps:
 
     commands:
       - . /opt/venv/bin/activate
+      - whoami
       - uname -a
       - pip --version
       - python3 --version
