@@ -11,9 +11,6 @@ volumes:
   host:
     path: /var/run/docker.sock
 
-workspace:
-  path: /opt
-
 services:
   - name: docker
     image: docker:dind
@@ -42,6 +39,9 @@ steps:
 
   - name: setup_conan
     image: ubuntu_amd64:latest
+    volumes:
+    - name: python_env
+      path: /opt/venv/
     pull: if-not-exists
     environment:
       CONAN_REVISIONS_ENABLED: "1"
