@@ -13,8 +13,14 @@ volumes:
 - name: dockersock
   host:
     path: /var/run/docker.sock
+
 - name: py
   temp: {}
+
+- name: conan
+  host:
+    path: $HOME/.conan2/
+
 
 services:
   - name: docker
@@ -41,6 +47,7 @@ steps:
     volumes:
     - name: py
       path: /opt/venv/
+
     commands:
       - . /opt/venv/bin/activate
       - uname -a
@@ -59,6 +66,9 @@ steps:
     volumes:
     - name: py
       path: /opt/venv/
+    - name: conan
+      path: $HOME/.conan2
+
     commands:
       - . /opt/venv/bin/activate
       - rm -rvf ./build
@@ -78,6 +88,9 @@ steps:
     volumes:
     - name: py
       path: /opt/venv/
+    - name: conan
+      path: $HOME/.conan2
+
     commands:
       - . /opt/venv/bin/activate
       - rm -rvf ./build
