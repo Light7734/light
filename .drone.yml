@@ -17,6 +17,8 @@ services:
 steps:
   - name: setup_image
     image: docker:latest
+    depends_on:
+      - docker
     commands:
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
 
