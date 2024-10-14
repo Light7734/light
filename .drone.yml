@@ -31,7 +31,7 @@ services:
         path: /var/run/
 
 steps:
-  - name: build_image
+  - name: build image
     image: docker:latest
     volumes:
     - name: dockersock
@@ -62,7 +62,7 @@ steps:
       - clang++ --version
       - clang-tidy --version
 
-  - name: build_gcc
+  - name: build gcc
     image: ubuntu_amd64:latest
     pull: if-not-exists
     volumes:
@@ -77,14 +77,15 @@ steps:
       - export CC=$(which gcc)
       - export CXX=$(which g++)
 
-      - conan profile detect -e
-      - cp ./tools/conan/profiles/linux_gcc_amd64 $(conan profile path default)
-      - conan install . --build=missing
+      - conan install . --build=missing \
+        --profile:build=./tools/conan/profiles/linux_gcc_amd64 \
+        --profile:host=./tools/conan/profiles/linux_gcc_amd64
+
       - conan build .
 
       - ./build/Release/modules/light/light
 
-  - name: build_clang
+  - name: build clang
     image: ubuntu_amd64:latest
     pull: if-not-exists
     volumes:
@@ -99,27 +100,28 @@ steps:
       - export CC=$(which clang)
       - export CXX=$(which clang++)
 
-      - conan profile detect -e
-      - cp ./tools/conan/profiles/linux_clang_amd64 $(conan profile path default)
-      - conan install . --build=missing
+      - conan install . --build=missing \
+        --profile:build=./tools/conan/profiles/linux_clang_amd64 \
+        --profile:host=./tools/conan/profiles/linux_clang_amd64
+
       - conan build .
 
       - ./build/Release/modules/light/light
 
-  - name: static_analysis
+  - name: static analysis
     image: ubuntu_amd64:latest
     pull: if-not-exists
     commands:
       - echo "[TODO] Implement static analysis"
 
-  - name: run_tests
+  - name: run tests
     image: ubuntu_amd64:latest
     pull: if-not-exists
     commands:
       - echo "[TODO] Implement tests"
       - ./build/Release/modules/light/light
 
-  - name: report_coverage
+  - name: report coverage
     image: ubuntu_amd64:latest
     pull: if-not-exists
     commands:
