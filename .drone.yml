@@ -1,12 +1,10 @@
 steps:
-  - &install_dependencies
     name: install_dependencies
     image: ubuntu:latest
     commands:
       - apt update
       - apt-get install -y build-essential cmake clang clang-tidy gcc g++ python3 python3-pip python3.12-venv
 
-  - &setup_conan
     name: setup_conan
     image: ubuntu:latest
     environment:
@@ -16,7 +14,6 @@ steps:
       - . /opt/venv/bin/activate
       - pip install conan==2.5.0
 
-  - &echo_info
     name: echo_info
     image: ubuntu:latest
     commands:
@@ -30,7 +27,6 @@ steps:
       - clang-tidy --version
       - clang-format --version
 
-  - &build_gcc
     name: build_gcc
     image: ubuntu:latest
     commands:
@@ -45,7 +41,6 @@ steps:
 
       - ./build/Release/modules/light/light
 
-  - &build_clang
     name: build_clang
     image: ubuntu:latest
     commands:
@@ -60,19 +55,16 @@ steps:
 
       - ./build/Release/modules/light/light
 
-  - &static_analysis
     name: static_analysis
     image: ubuntu:latest
     commands:
       - echo "[TODO] Implement static analysis"
 
-  - &run_tests
     name: run_tests
     image: ubuntu:latest
     commands:
       - echp "[TODO] Implement tests"
 
-  - &report_coverage
     name: report_coverage
     image: ubuntu:latest
     commands:
@@ -85,16 +77,6 @@ name: linux_amd64
 platform:
   os: linux
   arch: amd64
-
-steps:
-  - *install_dependencies
-  - *setup_conan
-  - *echo_info
-  - *static_analysis
-  - *build_gcc
-  - *build_clang
-  - *report_coverage
-  - *run_tests
 
 workspace:
   path: /opt
