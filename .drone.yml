@@ -76,7 +76,7 @@ steps:
       - export CC=$(which gcc)
       - export CXX=$(which g++)
 
-      - conan profile detect
+      - conan profile detect -e
       - cp ./tools/conan/profiles/linux_gcc_amd64 $(conan profile path default)
       - conan install . --build=missing
       - conan build .
@@ -98,7 +98,7 @@ steps:
       - export CC=$(which clang)
       - export CXX=$(which clang++)
 
-      - conan profile detect
+      - conan profile detect -e
       - cp ./tools/conan/profiles/linux_clang_amd64 $(conan profile path default)
       - conan install . --build=missing
       - conan build .
