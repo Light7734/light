@@ -21,7 +21,7 @@ services:
 
 steps:
   - name: setup_image
-    image: docker:dind
+    image: docker:latest
     volumes:
     - name: dockersock
       path: /var/run/docker.sock
