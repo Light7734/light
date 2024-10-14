@@ -11,14 +11,6 @@ volumes:
   host:
     path: /var/run/docker.sock
 
-services:
-- name: docker
-  image: docker:dind
-  privileged: true
-  volumes:
-  - name: dockersock
-    path: /var/run
-
 steps:
   - name: setup_image
     image: docker
@@ -35,10 +27,10 @@ steps:
       - sleep 5
 
   - name: list_images
-    image: docker:dind
+    image: docker
     volumes:
     - name: dockersock
-      path: /var/run
+      path: /var/run/docker.sock
     commands:
       - docker images
 
