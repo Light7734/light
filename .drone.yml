@@ -78,7 +78,7 @@ steps:
       - export CXX=$(which g++)
 
       - conan install . --build=missing -pr='./tools/conan/profiles/linux_gcc_amd64'
-      - conan build .
+      - conan build . -pr='./tools/conan/profiles/linux_gcc_amd64'
 
       - ./build/Release/modules/light/light
 
@@ -98,7 +98,7 @@ steps:
       - export CXX=$(which clang++)
 
       - conan install . --build=missing -pr='./tools/conan/profiles/linux_clang_amd64'
-      - conan build .
+      - conan build . -pr='./tools/conan/profiles/linux_clang_amd64'
 
       - ./build/Release/modules/light/light
 
