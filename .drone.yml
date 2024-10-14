@@ -31,7 +31,7 @@ services:
         path: /var/run/
 
 steps:
-  - name: setup_environment
+  - name: build_image
     image: docker:latest
     volumes:
     - name: dockersock
@@ -41,7 +41,7 @@ steps:
       - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
       - docker images
 
-  - name: log_info
+  - name: environment info
     image: ubuntu_amd64:latest
     pull: if-not-exists
     volumes:
@@ -55,6 +55,7 @@ steps:
       - pip --version
       - python3 --version
       - conan --version
+      - cmake --version
       - gcc --version
       - g++ --version
       - clang --version
