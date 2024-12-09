@@ -76,9 +76,8 @@ steps:
       - rm -rvf ./build
       - export CC=$(which gcc)
       - export CXX=$(which g++)
-      - export CONAN_PROFILE="$(pwd)/tools/conan/profiles/linux_gcc_amd64"
 
-      - conan install . --build=missing -pr=$${CONAN_PROFILE}
+      - conan install . --build=missing -pr"$(pwd)/tools/conan/profiles/linux_gcc_amd64"
       - conan build . -pr=$${CONAN_PROFILE}
 
       - ./build/Release/modules/light/light
@@ -97,9 +96,8 @@ steps:
       - rm -rvf ./build
       - export CC=$(which clang)
       - export CXX=$(which clang++)
-      - export CONAN_PROFILE="$(pwd)/tools/conan/profiles/linux_gcc_amd64"
 
-      - conan install . --build=missing -pr=$$CONAN_PROFILE
+      - conan install . --build=missing -pr"$(pwd)/tools/conan/profiles/linux_clang_amd64"
       - conan build . -pr=$${CONAN_PROFILE}
 
       - ./build/Release/modules/light/light
