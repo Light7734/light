@@ -1,3 +1,3 @@
-add_subdirectory(universal_pch)
+add_subdirectory(pch)
 
-add_subdirectory(light)
+add_subdirectory(engine)

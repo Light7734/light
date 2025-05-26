@@ -2,121 +2,12 @@ kind: pipeline
 type: docker
 name: linux_amd64
 
-environment:
-  CONAN_REVISIONS_ENABLED: "1"
-
 platform:
   os: linux
   arch: amd64
 
-volumes:
-- name: dockersock
-  host:
-    path: /var/run/docker.sock
-
-- name: py
-  temp: {}
-
-- name: conan
-  host:
-    path: /root/.conan2/
-
-
-services:
-  - name: docker
-    image: docker:dind
-    privileged: true
-    volumes:
-      - name: dockersock
-        path: /var/run/
-
 steps:
-  - name: build image
-    image: docker:latest
-    volumes:
-    - name: dockersock
-      path: /var/run/docker.sock
-    commands:
-      - until docker info; do echo "Waiting for Docker daemon..."; sleep 1; done
-      - docker build -t ubuntu_amd64 -f ./tools/docker/linux_amd64 .
-      - docker images
-
-  - name: environment info
-    image: ubuntu_amd64:latest
+  - name: clang format
+    image: alpine_amd64__clang_format
     pull: if-not-exists
-    volumes:
-    - name: py
-      path: /opt/venv/
-
-    commands:
-      - . /opt/venv/bin/activate
-      - whoami
-      - uname -a
-      - pip --version
-      - python3 --version
-      - conan --version
-      - cmake --version
-      - gcc --version
-      - g++ --version
-      - clang --version
-      - clang++ --version
-      - clang-tidy --version
-
-  - name: build gcc
-    image: ubuntu_amd64:latest
-    pull: if-not-exists
-    volumes:
-    - name: py
-      path: /opt/venv/
-    - name: conan
-      path: /root/.conan2
-
-    commands:
-      - . /opt/venv/bin/activate
-      - rm -rvf ./build
-      - export CC=$(which gcc)
-      - export CXX=$(which g++)
-
-      - conan install . --build=missing --profile:build="$(pwd)/tools/conan/profiles/linux_gcc_amd64" --profile:host="$(pwd)/tools/conan/profiles/linux_gcc_amd64"
-      - conan build . --profile:build="$(pwd)/tools/conan/profiles/linux_gcc_amd64" --profile:host="$(pwd)/tools/conan/profiles/linux_gcc_amd64"
-
-      - ./build/Release/modules/light/light
-
-  - name: build clang
-    image: ubuntu_amd64:latest
-    pull: if-not-exists
-    volumes:
-    - name: py
-      path: /opt/venv/
-    - name: conan
-      path: /root/.conan2
-
-    commands:
-      - . /opt/venv/bin/activate
-      - rm -rvf ./build
-      - export CC=$(which clang)
-      - export CXX=$(which clang++)
-
-      - conan install . --build=missing --profile:build="$(pwd)/tools/conan/profiles/linux_clang_amd64" --profile:host="$(pwd)/tools/conan/profiles/linux_clang_amd64"
-      - conan build . --profile:build="$(pwd)/tools/conan/profiles/linux_clang_amd64" --profile:host="$(pwd)/tools/conan/profiles/linux_clang_amd64"
-
-      - ./build/Release/modules/light/light
-
-  - name: static analysis
-    image: ubuntu_amd64:latest
-    pull: if-not-exists
-    commands:
-      - echo "[TODO] Implement static analysis"
-
-  - name: run tests
-    image: ubuntu_amd64:latest
-    pull: if-not-exists
-    commands:
-      - echo "[TODO] Implement tests"
-      - ./build/Release/modules/light/light
-
-  - name: report coverage
-    image: ubuntu_amd64:latest
-    pull: if-not-exists
-    commands:
-      - echo "[TODO] Implement coverage report"
+    commands: $(git rev-parse --show-toplevel)/tools/ci/alpine_amd64/script.sh

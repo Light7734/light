@@ -19,7 +19,7 @@ public:
 
 	[[nodiscard]] auto what() const noexcept -> const char * override
 	{
-		return "Idk fuck all";
+		return "";
 	}
 
 private:
@@ -28,4 +28,5 @@ private:
 
 template<typename T>
 using Expected = std::expected<T, Error>;
+
 } // namespace lt

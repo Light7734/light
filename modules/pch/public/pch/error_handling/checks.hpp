@@ -1,7 +1,7 @@
 #pragma once
 
-#include <universal_pch/error_handling/types.hpp>
-#include <universal_pch/module_configs.hpp>
+#include <pch/error_handling/types.hpp>
+#include <pch/module_configs.hpp>
 
 namespace lt {
 

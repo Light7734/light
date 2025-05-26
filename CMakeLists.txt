@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project("light" LANGUAGES CXX)
 
 include(tools/cmake/preliminary.cmake)
+include(tools/cmake/module_macros.cmake)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_option(ENABLE_SANITIZERS "Enables fsan sanitizers")
