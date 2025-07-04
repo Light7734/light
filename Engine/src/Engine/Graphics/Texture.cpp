@@ -3,8 +3,8 @@
 #include "OpenGL/glTexture.hpp"
 
 #ifdef LIGHT_PLATFORM_WINDOWS
-	#include "DirectX/dxTexture.hpp"
 	#include "DirectX/dxSharedContext.hpp"
+	#include "DirectX/dxTexture.hpp"
 #endif
 
 #include "GraphicsContext.hpp"
@@ -22,7 +22,7 @@ Ref<Texture> Texture::Create(unsigned int width, unsigned int height, unsigned i
 		return CreateRef<dxTexture>(width, height, components, pixels, std::static_pointer_cast<dxSharedContext>(sharedContext), filePath);)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }

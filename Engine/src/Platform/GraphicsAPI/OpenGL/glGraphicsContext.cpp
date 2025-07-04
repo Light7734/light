@@ -37,8 +37,8 @@ void glGraphicsContext::LogDebugData()
 	LOG(info, "________________________________________");
 	LOG(info, "GraphicsContext::");
 	LOG(info, "        API     : OpenGL");
-	LOG(info, "        Version : {}", glGetString(GL_VERSION));
-	LOG(info, "        Renderer: {}", glGetString(GL_RENDERER));
+	// LOG(info, "        Version : {}", glGetString(GL_VERSION));
+	// LOG(info, "        Renderer: {}", glGetString(GL_RENDERER));
 	LOG(info, "________________________________________");
 }
 

@@ -23,7 +23,7 @@ Ref<Shader> Shader::Create(BasicFileHandle vertexFile, BasicFileHandle pixelFile
 		return CreateRef<dxShader>(vertexFile, pixelFile, std::static_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }

@@ -22,7 +22,7 @@ Scope<Blender> Blender::Create(Ref<SharedContext> sharedContext)
 		return CreateScope<dxBlender>(std::static_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 	}
 }
 

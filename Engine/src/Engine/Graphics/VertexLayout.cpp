@@ -3,8 +3,8 @@
 #include "OpenGL/glVertexLayout.hpp"
 
 #ifdef LIGHT_PLATFORM_WINDOWS
-	#include "DirectX/dxVertexLayout.hpp"
 	#include "DirectX/dxSharedContext.hpp"
+	#include "DirectX/dxVertexLayout.hpp"
 #endif
 
 #include "GraphicsContext.hpp"
@@ -22,7 +22,7 @@ Ref<VertexLayout> VertexLayout::Create(Ref<VertexBuffer> vertexBuffer, Ref<Shade
 		return CreateRef<dxVertexLayout>(shader, elements, std::static_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }

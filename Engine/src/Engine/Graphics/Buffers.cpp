@@ -24,7 +24,7 @@ Scope<ConstantBuffer> ConstantBuffer::Create(ConstantBufferIndex index, unsigned
 		return CreateScope<dxConstantBuffer>(index, size, std::static_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }
@@ -42,7 +42,7 @@ Ref<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int stride, uns
 		return CreateRef<dxVertexBuffer>(vertices, stride, count, std::static_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }
@@ -60,7 +60,7 @@ Ref<IndexBuffer> IndexBuffer::Create(unsigned int* indices, unsigned int count, 
 		return CreateRef<dxIndexBuffer>(indices, count, std::dynamic_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }

@@ -22,7 +22,7 @@ Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification& specificati
 		return CreateRef<dxFramebuffer>(specification, std::static_pointer_cast<dxSharedContext>(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }

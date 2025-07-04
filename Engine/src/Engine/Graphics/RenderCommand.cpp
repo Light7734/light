@@ -22,7 +22,7 @@ Scope<RenderCommand> RenderCommand::Create(GLFWwindow* windowHandle, Ref<SharedC
 		return CreateScope<dxRenderCommand>((std::static_pointer_cast<dxSharedContext>)(sharedContext));)
 
 	default:
-		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "Invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 }

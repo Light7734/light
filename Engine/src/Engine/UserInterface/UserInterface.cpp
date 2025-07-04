@@ -3,8 +3,8 @@
 #include "OpenGL/glUserInterface.hpp"
 
 #ifdef LIGHT_PLATFORM_WINDOWS
-	#include "DirectX/dxUserInterface.hpp"
 	#include "DirectX/dxSharedContext.hpp"
+	#include "DirectX/dxUserInterface.hpp"
 #endif
 
 #include "Events/CharEvent.hpp"
@@ -36,7 +36,7 @@ Scope<UserInterface> UserInterface::Create(GLFWwindow* windowHandle, Ref<SharedC
 		break;
 
 	default:
-		ASSERT(false, "UserInterface::Create: invalid/unsupported 'GraphicsAPI' {}", GraphicsContext::GetGraphicsAPI());
+		ASSERT(false, "UserInterface::Create: invalid/unsupported 'GraphicsAPI' {}", static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI()));
 		return nullptr;
 	}
 

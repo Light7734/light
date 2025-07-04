@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.0)
+
 
 project(Light)
 set(CMAKE_CXX_STANDARD 20)

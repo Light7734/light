@@ -24,10 +24,10 @@ glException::glException(unsigned int source, unsigned int type, unsigned int id
 	LOG(critical, "        Source  : {}", Stringifier::glDebugMsgSource(source));
 	LOG(critical, "        Type    : {}", Stringifier::glDebugMsgType(type));
 	LOG(critical, "        ID      : {}", id);
-	LOG(critical, "        Vendor  : {}", glGetString(GL_VENDOR));
-	LOG(critical, "        Renderer: {}", glGetString(GL_RENDERER));
-	LOG(critical, "        Version : {}", glGetString(GL_VERSION));
-	LOG(critical, "        critical, SVersion: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	// LOG(critical, "        Vendor  : {}", glGetString(GL_VENDOR));
+	// LOG(critical, "        Renderer: {}", glGetString(GL_RENDERER));
+	// LOG(critical, "        Version : {}", glGetString(GL_VERSION));
+	// LOG(critical, "        critical, SVersion: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
 	LOG(critical, "        {}", msg);
 	LOG(critical, "________________________________________");
 }
