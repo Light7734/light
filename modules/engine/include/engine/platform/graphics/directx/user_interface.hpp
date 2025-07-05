@@ -15,12 +15,14 @@ class dxUserInterface: public UserInterface
 {
 public:
 	dxUserInterface() = default;
+
 	~dxUserInterface();
 
 	void platform_implementation(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 	    override;
 
 	void begin() override;
+
 	void end() override;
 
 	void log_debug_data() override;

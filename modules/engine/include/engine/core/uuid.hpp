@@ -6,13 +6,6 @@ namespace Light {
 
 class UUID
 {
-private:
-	static std::mt19937_64 s_Engine;
-	static std::uniform_int_distribution<uint64_t> s_UniformDistribution;
-
-private:
-	uint64_t m_uuid;
-
 public:
 	UUID(uint64_t uuid = -1);
 
@@ -20,6 +13,13 @@ public:
 	{
 		return m_uuid;
 	}
+
+private:
+	static std::mt19937_64 s_engine;
+
+	static std::uniform_int_distribution<uint64_t> s_distribution;
+
+	uint64_t m_uuid;
 };
 
 } // namespace Light

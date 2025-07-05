@@ -8,9 +8,6 @@ namespace Light {
 
 class SetCharEvent: public Event
 {
-private:
-	const unsigned int m_character;
-
 public:
 	SetCharEvent(unsigned int character): m_character(character)
 	{
@@ -27,8 +24,13 @@ public:
 		ss << "CharSet: " << m_character;
 		return ss.str();
 	}
-	event_type(SetChar)
-	event_category(InputEventCategory | KeyboardEventCategory)
+
+
+	event_type(SetChar);
+	event_category(InputEventCategory | KeyboardEventCategory);
+
+private:
+	const unsigned int m_character;
 };
 
 } // namespace Light

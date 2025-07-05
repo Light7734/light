@@ -13,39 +13,36 @@ struct ScopeProfileResult
 	uint32_t threadID;
 };
 
-// #todo: add event categories
-// #todo: use ofstream in a separate thread
-class Instrumentor /* singleton */
+class Instrumentor
 {
-private:
-	static Instrumentor *s_Context;
-
-private:
-	std::ofstream m_output_file_stream;
-
-	unsigned int m_current_session_count;
-
 public:
 	static Scope<Instrumentor> create();
 
 	static inline void begin_session(const std::string &outputPath)
 	{
-		s_Context->begin_session_impl(outputPath);
+		s_context->begin_session_impl(outputPath);
 	}
 	static inline void end_session()
 	{
-		s_Context->end_session_impl();
+		s_context->end_session_impl();
 	}
 
 	static inline void submit_scope_profile(const ScopeProfileResult &profileResult)
 	{
-		s_Context->submit_scope_profile_impl(profileResult);
+		s_context->submit_scope_profile_impl(profileResult);
 	}
 
 private:
+	static Instrumentor *s_context;
+
+	std::ofstream m_output_file_stream;
+
+	unsigned int m_current_session_count;
+
 	Instrumentor();
 
 	void begin_session_impl(const std::string &outputPath);
+
 	void end_session_impl();
 
 	void submit_scope_profile_impl(const ScopeProfileResult &profileResult);
@@ -53,13 +50,15 @@ private:
 
 class InstrumentorTimer
 {
-private:
-	ScopeProfileResult m_result;
-	std::chrono::time_point<std::chrono::steady_clock> m_start;
-
 public:
 	InstrumentorTimer(const std::string &scopeName);
+
 	~InstrumentorTimer();
+
+private:
+	ScopeProfileResult m_result;
+
+	std::chrono::time_point<std::chrono::steady_clock> m_start;
 };
 
 } // namespace Light

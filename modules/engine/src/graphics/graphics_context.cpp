@@ -15,7 +15,7 @@
 
 namespace Light {
 
-GraphicsContext *GraphicsContext::s_Context = nullptr;
+GraphicsContext *GraphicsContext::s_context = nullptr;
 
 GraphicsContext::~GraphicsContext()
 {
@@ -24,12 +24,12 @@ GraphicsContext::~GraphicsContext()
 Scope<GraphicsContext> GraphicsContext::create(GraphicsAPI api, GLFWwindow *windowHandle)
 {
 	// terminate 'GraphicsContext' dependent classes
-	if (s_Context)
+	if (s_context)
 	{
-		s_Context->m_renderer.reset();
-		s_Context->m_user_interface.reset();
+		s_context->m_renderer.reset();
+		s_context->m_user_interface.reset();
 
-		delete s_Context;
+		delete s_context;
 	}
 
 	// determine the default api
@@ -51,29 +51,29 @@ Scope<GraphicsContext> GraphicsContext::create(GraphicsAPI api, GLFWwindow *wind
 	// opengl
 	case GraphicsAPI::OpenGL:
 		scopeGfx = create_scope<glGraphicsContext>(windowHandle);
-		s_Context = scopeGfx.get();
+		s_context = scopeGfx.get();
 		break;
 	// directx
 	case GraphicsAPI::DirectX:
-		lt_win(scopeGfx = create_scope<dxGraphicsContext>(windowHandle); s_Context = scopeGfx.get();
+		lt_win(scopeGfx = create_scope<dxGraphicsContext>(windowHandle); s_context = scopeGfx.get();
 		       break;)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    Stringifier::graphics_api_to_string(api)
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          Stringifier::graphics_api_to_string(api)
+		      );
 		return nullptr;
 	}
 
 	// create 'GraphicsContext' dependent classes
-	s_Context->m_user_interface = UserInterface::create(windowHandle, s_Context->m_shared_context);
-	s_Context->m_renderer = renderer::create(windowHandle, s_Context->m_shared_context);
+	s_context->m_user_interface = UserInterface::create(windowHandle, s_context->m_shared_context);
+	s_context->m_renderer = renderer::create(windowHandle, s_context->m_shared_context);
 
 	// check
-	lt_assert(s_Context->m_user_interface, "Failed to create UserInterface");
-	lt_assert(s_Context->m_renderer, "Failed to create renderer");
+	lt_assert(s_context->m_user_interface, "Failed to create UserInterface");
+	lt_assert(s_context->m_renderer, "Failed to create renderer");
 
 	return std::move(scopeGfx);
 }

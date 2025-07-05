@@ -11,7 +11,7 @@
 
 namespace Light {
 
-Application *Application::s_Context = nullptr;
+Application *Application::s_context = nullptr;
 
 Application::Application()
     : m_instrumentor(nullptr)
@@ -19,8 +19,8 @@ Application::Application()
     , m_input(nullptr)
     , m_window(nullptr)
 {
-	lt_assert(!s_Context, "Repeated singleton construction");
-	s_Context = this;
+	lt_assert(!s_context, "Repeated singleton construction");
+	s_context = this;
 
 	m_logger = logger::create();
 	log_debug_data();
@@ -108,7 +108,7 @@ void Application::game_loop()
 
 void Application::quit()
 {
-	s_Context->m_window->close();
+	s_context->m_window->close();
 }
 
 void Application::on_event(const Event &event)

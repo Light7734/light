@@ -9,26 +9,19 @@
 namespace Light {
 
 class Entity;
-
 class Framebuffer;
 
 class Scene
 {
-private:
-	friend class Entity;
-	friend class SceneSerializer;
-	friend class SceneHierarchyPanel;
-
-private:
-	entt::registry m_registry;
-
 public:
 	Scene();
+
 	~Scene();
 
 	void on_create();
 
 	void on_update(float deltaTime);
+
 	void on_render(const Ref<Framebuffer> &targetFrameBuffer = nullptr);
 
 	Entity create_entity(
@@ -39,6 +32,12 @@ public:
 	Entity get_entity_by_tag(const std::string &tag);
 
 private:
+	friend class Entity;
+	friend class SceneSerializer;
+	friend class SceneHierarchyPanel;
+
+	entt::registry m_registry;
+
 	Entity create_entity_with_uuid(
 	    const std::string &name,
 	    UUID uuid,

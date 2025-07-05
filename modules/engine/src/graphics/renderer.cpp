@@ -12,7 +12,7 @@
 
 namespace Light {
 
-renderer *renderer::s_Context = nullptr;
+renderer *renderer::s_context = nullptr;
 
 renderer::renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
     : m_quad_renderer(LT_MAX_QUAD_RENDERER_VERTICES, sharedContext)
@@ -25,8 +25,8 @@ renderer::renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
     , m_target_framebuffer(nullptr)
     , m_should_clear_backbuffer(false)
 {
-	lt_assert(!s_Context, "An instance of 'renderer' already exists, do not construct this class!");
-	s_Context = this;
+	lt_assert(!s_context, "An instance of 'renderer' already exists, do not construct this class!");
+	s_context = this;
 
 	m_view_projection_buffer = ConstantBuffer::create(
 	    ConstantBufferIndex::ViewProjection,
@@ -67,7 +67,11 @@ void renderer::draw_quad_impl(
 }
 
 /* tint */
-void renderer::draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint)
+void renderer::draw_quad_impl(
+    const glm::vec3 &position,
+    const glm::vec2 &size,
+    const glm::vec4 &tint
+)
 {
 	draw_quad(
 	    glm::translate(glm::mat4(1.0f), position)
@@ -77,7 +81,11 @@ void renderer::draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, 
 }
 
 /* texture */
-void renderer::draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture)
+void renderer::draw_quad_impl(
+    const glm::vec3 &position,
+    const glm::vec2 &size,
+    Ref<Texture> texture
+)
 {
 	draw_quad(
 	    glm::translate(glm::mat4(1.0f), position)
@@ -147,13 +155,20 @@ void renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
 	// advance
 	if (!m_texture_renderer.advance())
 	{
-		lt_log(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
+		lt_log(
+		    warn,
+		    "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}",
+		    LT_MAX_TEXTURE_RENDERER_VERTICES
 		);
 		flush_scene();
 	}
 }
 
-void renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
+void renderer::draw_quad_impl(
+    const glm::mat4 &transform,
+    const glm::vec4 &tint,
+    Ref<Texture> texture
+)
 {
 	// #todo: implement a proper binding
 	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
@@ -186,7 +201,10 @@ void renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint,
 	// advance
 	if (!m_tinted_texture_renderer.advance())
 	{
-		lt_log(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
+		lt_log(
+		    warn,
+		    "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}",
+		    LT_MAX_TEXTURE_RENDERER_VERTICES
 		);
 		flush_scene();
 	}
@@ -203,7 +221,7 @@ void renderer::end_frame()
 	m_render_command->swap_buffers();
 	m_render_command->clear_back_buffer(
 	    m_default_framebuffer_camera ? m_default_framebuffer_camera->GetBackgroundColor() :
-	                                 glm::vec4(0.0f)
+	                                   glm::vec4(0.0f)
 	);
 
 	m_default_framebuffer_camera = nullptr;

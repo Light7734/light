@@ -8,10 +8,8 @@ namespace Light {
 
 struct CameraComponent
 {
-	SceneCamera camera;
-	bool isPrimary;
-
 	CameraComponent() = default;
+
 	CameraComponent(const CameraComponent &) = default;
 
 	CameraComponent(SceneCamera _camera, bool _isPrimary = false)
@@ -24,6 +22,10 @@ struct CameraComponent
 	{
 		return camera;
 	}
+
+	SceneCamera camera;
+
+	bool isPrimary;
 };
 
 } // namespace Light

@@ -11,6 +11,13 @@ class dxSharedContext;
 
 class dxBlender: public Blender
 {
+public:
+	dxBlender(Ref<dxSharedContext> sharedContext);
+
+	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
+
+	void disable() override;
+
 private:
 	Ref<dxSharedContext> m_context;
 
@@ -19,12 +26,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11BlendState> m_blend_state;
 
 	D3D11_BLEND_DESC m_desc;
-
-public:
-	dxBlender(Ref<dxSharedContext> sharedContext);
-
-	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
-	void disable() override;
 };
 
 } // namespace Light

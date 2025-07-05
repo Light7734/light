@@ -6,7 +6,7 @@
 
 namespace Light {
 
-ResourceManager *ResourceManager::s_Context = nullptr;
+ResourceManager *ResourceManager::s_context = nullptr;
 
 Scope<ResourceManager> ResourceManager::create()
 {
@@ -15,8 +15,8 @@ Scope<ResourceManager> ResourceManager::create()
 
 ResourceManager::ResourceManager(): m_shaders {}, m_textures {}
 {
-	lt_assert(!s_Context, "Repeated singleton construction");
-	s_Context = this;
+	lt_assert(!s_context, "Repeated singleton construction");
+	s_context = this;
 }
 
 void ResourceManager::load_shader_impl(
@@ -26,13 +26,13 @@ void ResourceManager::load_shader_impl(
 )
 {
 	// check
-	lt_assert(s_Context, "Uninitliazed singleton");
+	lt_assert(s_context, "Uninitliazed singleton");
 	lt_assert(!vertexPath.empty(), "Empty 'vertexPath'");
 	lt_assert(!pixelPath.empty(), "Empty 'pixelPath'");
 
 	// load files
-	basic_file_handle vertexFile = FileManager::read_text_file(vertexPath);
-	basic_file_handle pixelFile = FileManager::read_text_file(pixelPath);
+	BasicFileHandle vertexFile = FileManager::read_text_file(vertexPath);
+	BasicFileHandle pixelFile = FileManager::read_text_file(pixelPath);
 
 	// check
 	lt_assert(vertexFile.is_valid(), "Failed to read vertex file: {}", vertexPath);
@@ -54,17 +54,17 @@ void ResourceManager::load_texture_impl(
     unsigned int desiredComponents /* = 4u */
 )
 {
-	lt_assert(s_Context, "Uninitliazed singleton");
+	lt_assert(s_context, "Uninitliazed singleton");
 
 	// load file
-	image_file_handle imgFile = FileManager::read_image_file(path, desiredComponents);
+	ImageFileHandle imgFile = FileManager::read_image_file(path, desiredComponents);
 
 	// create texture
 	m_textures[name] = Ref<Texture>(Texture::create(
 	    imgFile.get_width(),
 	    imgFile.get_height(),
 	    imgFile.get_components(),
-	    imgFile.GetData(),
+	    imgFile.get_data(),
 	    GraphicsContext::get_shared_context(),
 	    path
 	));

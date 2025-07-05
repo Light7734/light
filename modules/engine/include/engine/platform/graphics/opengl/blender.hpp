@@ -7,14 +7,15 @@ namespace Light {
 
 class glBlender: public Blender
 {
-private:
-	std::unordered_map<BlendFactor, unsigned int> m_factor_map;
-
 public:
 	glBlender();
 
 	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
+
 	void disable() override;
+
+private:
+	std::unordered_map<BlendFactor, unsigned int> m_factor_map;
 };
 
 } // namespace Light

@@ -2,7 +2,7 @@
 
 namespace Light {
 
-Instrumentor *Instrumentor::s_Context = nullptr;
+Instrumentor *Instrumentor::s_context = nullptr;
 
 Scope<Instrumentor> Instrumentor::create()
 {
@@ -13,10 +13,10 @@ Instrumentor::Instrumentor(): m_current_session_count(0u)
 {
 	// #todo: maintenance
 	lt_assert(
-	    !s_Context,
+	    !s_context,
 	    "An instance of 'Instrumentor' already exists, do not construct this class!"
 	);
-	s_Context = this;
+	s_context = this;
 }
 
 void Instrumentor::begin_session_impl(const std::string &outputPath)

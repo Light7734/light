@@ -7,9 +7,8 @@ namespace Light {
 
 struct NativeScriptComponent
 {
-	NativeScript *instance;
-
 	NativeScript *(*CreateInstance)();
+
 	void (*DestroyInstance)(NativeScriptComponent *);
 
 	template<typename t>
@@ -23,6 +22,8 @@ struct NativeScriptComponent
 			nsc->instance = nullptr;
 		};
 	}
+
+	NativeScript *instance;
 };
 
 } // namespace Light

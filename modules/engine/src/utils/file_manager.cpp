@@ -4,7 +4,7 @@
 
 namespace Light {
 
-basic_file_handle::basic_file_handle(
+BasicFileHandle::BasicFileHandle(
     uint8_t *data,
     uint32_t size,
     const std::string &path,
@@ -19,7 +19,7 @@ basic_file_handle::basic_file_handle(
 {
 }
 
-void basic_file_handle::release()
+void BasicFileHandle::release()
 {
 	delete m_data;
 	m_data = nullptr;
@@ -27,7 +27,7 @@ void basic_file_handle::release()
 }
 
 
-basic_file_handle FileManager::read_text_file(const std::string &path)
+BasicFileHandle FileManager::read_text_file(const std::string &path)
 {
 	// parse path info
 	std::string name = path.substr(0, path.find('.') + -1);
@@ -57,10 +57,10 @@ basic_file_handle FileManager::read_text_file(const std::string &path)
 	file.read(reinterpret_cast<char *>(data), size);
 
 	file.close();
-	return basic_file_handle(data, size, path, name, extension);
+	return BasicFileHandle(data, size, path, name, extension);
 }
 
-image_file_handle FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
+ImageFileHandle FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
 {
 	// parse path info
 	std::string name = path.substr(0, path.find('.') + -1);
@@ -86,7 +86,7 @@ image_file_handle FileManager::read_image_file(const std::string &path, int32_t 
 		    fetchedComponents,
 		    desiredComponents);
 
-	return image_file_handle(
+	return ImageFileHandle(
 	    pixels,
 	    width * height,
 	    path,
@@ -99,7 +99,7 @@ image_file_handle FileManager::read_image_file(const std::string &path, int32_t 
 	);
 }
 
-void image_file_handle::release()
+void ImageFileHandle::release()
 {
 	stbi_image_free(reinterpret_cast<void *>(m_data));
 	m_data = nullptr;

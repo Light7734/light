@@ -19,16 +19,16 @@ public:
 		GEOMETRY = 3
 	};
 
-public:
 	static Ref<Shader> create(
-	    basic_file_handle vertexFile,
-	    basic_file_handle pixelFile,
+	    BasicFileHandle vertexFile,
+	    BasicFileHandle pixelFile,
 	    Ref<SharedContext> sharedContext
 	);
 
 	virtual ~Shader() = default;
 
 	virtual void bind() = 0;
+
 	virtual void un_bind() = 0;
 
 protected:

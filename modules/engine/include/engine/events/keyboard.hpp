@@ -8,9 +8,6 @@ namespace Light {
 
 class KeyPressedEvent: public Event
 {
-private:
-	const int m_key;
-
 public:
 	KeyPressedEvent(int key): m_key(key)
 	{
@@ -27,15 +24,17 @@ public:
 		ss << "KeyPressed: " << m_key;
 		return ss.str();
 	}
-	event_type(KeyPressed)
-	event_category(InputEventCategory | KeyboardEventCategory)
+
+	event_type(KeyPressed);
+
+	event_category(InputEventCategory | KeyboardEventCategory);
+
+private:
+	const int m_key;
 };
 
 class KeyRepeatEvent: public Event
 {
-private:
-	const int m_key;
-
 public:
 	KeyRepeatEvent(int key): m_key(key)
 	{
@@ -52,15 +51,15 @@ public:
 		ss << "KeyRepeated: " << m_key;
 		return ss.str();
 	}
-	event_type(KeyRepeated)
-	event_category(InputEventCategory | KeyboardEventCategory)
+	event_type(KeyRepeated);
+	event_category(InputEventCategory | KeyboardEventCategory);
+
+private:
+	const int m_key;
 };
 
 class KeyReleasedEvent: public Event
 {
-private:
-	const int m_key;
-
 public:
 	KeyReleasedEvent(int key): m_key(key)
 	{
@@ -77,8 +76,12 @@ public:
 		ss << "KeyReleased: " << m_key;
 		return ss.str();
 	}
-	event_type(KeyReleased)
-	event_category(InputEventCategory | KeyboardEventCategory)
+
+	event_type(KeyReleased);
+	event_category(InputEventCategory | KeyboardEventCategory);
+
+private:
+	const int m_key;
 };
 
 } // namespace Light

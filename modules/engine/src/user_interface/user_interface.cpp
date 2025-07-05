@@ -16,7 +16,7 @@
 
 namespace Light {
 
-UserInterface *UserInterface::s_Context = nullptr;
+UserInterface *UserInterface::s_context = nullptr;
 
 Scope<UserInterface> UserInterface::create(
     GLFWwindow *windowHandle,
@@ -52,11 +52,11 @@ UserInterface::UserInterface()
       )
 {
 	lt_assert(
-	    !s_Context,
+	    !s_context,
 	    "UserInterface::UserInterface: an instance of 'UserInterface' already exists, do not "
 	    "construct this class!"
 	);
-	s_Context = this;
+	s_context = this;
 }
 
 void UserInterface::init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
@@ -129,7 +129,7 @@ void UserInterface::dockspace_begin()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("Dockspace", (bool *)0, s_Context->m_dockspace_flags);
+	ImGui::Begin("Dockspace", (bool *)0, s_context->m_dockspace_flags);
 	ImGui::PopStyleVar(3);
 
 	ImGuiStyle &style = ImGui::GetStyle();

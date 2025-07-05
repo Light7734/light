@@ -17,11 +17,6 @@ struct WindowProperties
 
 class Window
 {
-protected:
-	Scope<GraphicsContext> m_graphics_context;
-	WindowProperties m_properties;
-	bool b_Closed;
-
 public:
 	static Scope<Window> create(std::function<void(Event &)> callback);
 
@@ -30,15 +25,15 @@ public:
 	}
 
 	Window(const Window &) = delete;
+
 	Window &operator=(const Window &) = delete;
 
 	virtual ~Window() = default;
 
-	/* events */
 	virtual void poll_events() = 0;
+
 	virtual void on_event(const Event &event) = 0;
 
-	//======================================== SETTERS ========================================//
 	virtual void set_properties(
 	    const WindowProperties &properties,
 	    bool affectVisibility = false
@@ -47,18 +42,17 @@ public:
 	virtual void set_title(const std::string &title) = 0;
 
 	virtual void set_size(const glm::uvec2 &size, bool additive = false) = 0; // pass 0 for width or
-	                                                                         // height for single
-	                                                                         // dimension resizing
+	                                                                          // height for single
+	                                                                          // dimension resizing
 
 	inline void close()
 	{
 		b_Closed = true;
 	}
 	virtual void set_v_sync(bool vsync, bool toggle = false) = 0;
-	virtual void set_visibility(bool visible, bool toggle = false) = 0;
-	//======================================== SETTERS ========================================//
 
-	//============================== GETTERS ==============================//
+	virtual void set_visibility(bool visible, bool toggle = false) = 0;
+
 	inline GraphicsContext *GetGfxContext() const
 	{
 		return m_graphics_context.get();
@@ -91,9 +85,13 @@ public:
 	{
 		return m_properties.visible;
 	}
-	//============================== GETTERS ==============================//
 
 protected:
+	Scope<GraphicsContext> m_graphics_context;
+
+	WindowProperties m_properties;
+
+	bool b_Closed;
 };
 
 } // namespace Light

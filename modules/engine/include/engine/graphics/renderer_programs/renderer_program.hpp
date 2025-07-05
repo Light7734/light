@@ -8,7 +8,8 @@ class OrthographicCamera;
 
 class RendererProgram
 {
-	virtual void map()   = 0;
+	virtual void map() = 0;
+
 	virtual void un_map() = 0;
 
 	virtual void bind() = 0;

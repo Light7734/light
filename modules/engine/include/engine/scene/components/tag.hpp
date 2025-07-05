@@ -6,9 +6,8 @@ namespace Light {
 
 struct TagComponent
 {
-	std::string tag = "Unnamed";
-
 	TagComponent() = default;
+
 	TagComponent(const TagComponent &) = default;
 
 	TagComponent(const std::string &_tag): tag(_tag)
@@ -19,10 +18,13 @@ struct TagComponent
 	{
 		return tag;
 	}
+
 	operator const std::string &() const
 	{
 		return tag;
 	}
+
+	std::string tag = "Unnamed";
 };
 
 } // namespace Light

@@ -11,10 +11,6 @@ namespace Light {
 
 struct TransformComponent
 {
-	glm::vec3 translation;
-	glm::vec3 scale;
-	glm::vec3 rotation;
-
 	TransformComponent(const TransformComponent &) = default;
 
 	TransformComponent(
@@ -39,6 +35,12 @@ struct TransformComponent
 	{
 		return get_transform();
 	}
+
+	glm::vec3 translation;
+
+	glm::vec3 scale;
+
+	glm::vec3 rotation;
 };
 
 } // namespace Light

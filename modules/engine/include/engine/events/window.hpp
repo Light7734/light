@@ -14,15 +14,14 @@ public:
 	{
 		return "WindowClosedEvent";
 	}
-	event_type(WindowClosed)
-	event_category(WindowEventCategory)
+
+	event_type(WindowClosed);
+
+	event_category(WindowEventCategory);
 };
 
 class WindowMovedEvent: public Event
 {
-private:
-	const glm::ivec2 m_position;
-
 public:
 	WindowMovedEvent(int x, int y): m_position(x, y)
 	{
@@ -40,15 +39,17 @@ public:
 		return ss.str();
 		;
 	}
-	event_type(WindowMoved)
-	event_category(WindowEventCategory)
+
+	event_type(WindowMoved);
+
+	event_category(WindowEventCategory);
+
+private:
+	const glm::ivec2 m_position;
 };
 
 class WindowResizedEvent: public Event
 {
-private:
-	const glm::uvec2 m_size;
-
 public:
 	WindowResizedEvent(unsigned int width, unsigned int height): m_size(width, height)
 	{
@@ -65,8 +66,13 @@ public:
 		ss << "WindowResized: " << m_size.x << ", " << m_size.y;
 		return ss.str();
 	}
-	event_type(WindowResized)
-	event_category(WindowEventCategory)
+
+	event_type(WindowResized);
+
+	event_category(WindowEventCategory);
+
+private:
+	const glm::uvec2 m_size;
 };
 
 class WindowLostFocusEvent: public Event
@@ -76,8 +82,9 @@ public:
 	{
 		return "WindowLostFocus";
 	}
-	event_type(WindowLostFocus)
-	event_category(WindowEventCategory)
+
+	event_type(WindowLostFocus);
+	event_category(WindowEventCategory);
 };
 
 class WindowGainFocusEvent: public Event
@@ -87,8 +94,9 @@ public:
 	{
 		return "WindowGainFocus";
 	}
-	event_type(WindowGainFocus)
-	event_category(WindowEventCategory)
+
+	event_type(WindowGainFocus);
+	event_category(WindowEventCategory);
 };
 
 } // namespace Light

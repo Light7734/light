@@ -8,7 +8,7 @@
 
 namespace Light {
 
-Input *Input::s_Context = nullptr;
+Input *Input::s_context = nullptr;
 
 Scope<Input> Input::create()
 {
@@ -25,10 +25,10 @@ Input::Input()
     , m_game_events(true)
 {
 	lt_assert(
-	    !s_Context,
+	    !s_context,
 	    "Input::Input: an instance of 'Input' already exists, do not construct this class!"
 	);
-	s_Context = this;
+	s_context = this;
 
 	restart_input_state();
 }

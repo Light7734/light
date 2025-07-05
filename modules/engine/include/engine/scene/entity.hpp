@@ -9,10 +9,6 @@ namespace Light {
 
 class Entity
 {
-private:
-	entt::entity m_handle;
-	Scene *m_scene;
-
 public:
 	Entity(entt::entity handle = entt::null, Scene *registry = nullptr);
 
@@ -56,6 +52,10 @@ public:
 	{
 		return (uint32_t)m_handle;
 	}
+
+private:
+	entt::entity m_handle;
+	Scene *m_scene;
 };
 
 } // namespace Light

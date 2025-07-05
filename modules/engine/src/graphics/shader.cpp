@@ -11,8 +11,8 @@
 namespace Light {
 
 Ref<Shader> Shader::create(
-    basic_file_handle vertexFile,
-    basic_file_handle pixelFile,
+    BasicFileHandle vertexFile,
+    BasicFileHandle pixelFile,
     Ref<SharedContext> sharedContext
 )
 {

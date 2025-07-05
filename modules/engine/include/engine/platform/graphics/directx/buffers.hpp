@@ -9,17 +9,8 @@ namespace Light {
 
 class dxSharedContext;
 
-//========== CONSTANT_BUFFER ==========//
 class dxConstantBuffer: public ConstantBuffer
 {
-private:
-	Ref<dxSharedContext> m_context;
-
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
-	D3D11_MAPPED_SUBRESOURCE m_map;
-
-	unsigned int m_index;
-
 public:
 	dxConstantBuffer(
 	    ConstantBufferIndex index,
@@ -30,20 +21,21 @@ public:
 	void bind() override;
 
 	void *map() override;
-	void un_map() override;
-};
 
-//========== VERTEX_BUFFER  ==========//
-class dxVertexBuffer: public VertexBuffer
-{
+	void un_map() override;
+
 private:
 	Ref<dxSharedContext> m_context;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
+
 	D3D11_MAPPED_SUBRESOURCE m_map;
 
-	unsigned int m_stride;
+	unsigned int m_index;
+};
 
+class dxVertexBuffer: public VertexBuffer
+{
 public:
 	dxVertexBuffer(
 	    float *vertices,
@@ -51,29 +43,42 @@ public:
 	    unsigned int count,
 	    Ref<dxSharedContext> sharedContext
 	);
+
 	~dxVertexBuffer();
 
 	void bind() override;
+
 	void un_bind() override;
 
 	void *map() override;
-	void un_map() override;
-};
 
-//========== INDEX_BUFFER  ==========//
-class dxIndexBuffer: public IndexBuffer
-{
+	void un_map() override;
+
 private:
 	Ref<dxSharedContext> m_context;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
 
+	D3D11_MAPPED_SUBRESOURCE m_map;
+
+	unsigned int m_stride;
+};
+
+class dxIndexBuffer: public IndexBuffer
+{
 public:
 	dxIndexBuffer(unsigned int *indices, unsigned int count, Ref<dxSharedContext> sharedContext);
+
 	~dxIndexBuffer();
 
 	void bind() override;
+
 	void un_bind() override;
+
+private:
+	Ref<dxSharedContext> m_context;
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
 };
 
 } // namespace Light

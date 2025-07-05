@@ -7,12 +7,13 @@ namespace Light {
 
 struct UUIDComponent
 {
-	UUID uuid;
-
 	UUIDComponent(UUID _uuid): uuid(_uuid)
 	{
 	}
+
 	UUIDComponent(const UUIDComponent &) = default;
+
+	UUID uuid;
 };
 
 } // namespace Light

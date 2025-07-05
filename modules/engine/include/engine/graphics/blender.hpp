@@ -40,7 +40,7 @@ public:
 	static Scope<Blender> create(Ref<SharedContext> sharedContext);
 
 	virtual void enable(BlendFactor srcFactor, BlendFactor dstFactor) = 0;
-	virtual void disable()                                            = 0;
+	virtual void disable() = 0;
 
 protected:
 	Blender() = default;

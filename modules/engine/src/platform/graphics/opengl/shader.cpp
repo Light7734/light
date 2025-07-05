@@ -6,13 +6,13 @@
 
 namespace Light {
 
-glShader::glShader(basic_file_handle vertexFile, basic_file_handle pixelFile): m_shader_id(0u)
+glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_shader_id(0u)
 {
 	// create
 	m_shader_id = glCreateProgram();
 
-	std::string vertexSource(vertexFile.GetData(), vertexFile.GetData() + vertexFile.get_size());
-	std::string pixelSource(pixelFile.GetData(), pixelFile.GetData() + pixelFile.get_size());
+	std::string vertexSource(vertexFile.get_data(), vertexFile.get_data() + vertexFile.get_size());
+	std::string pixelSource(pixelFile.get_data(), pixelFile.get_data() + pixelFile.get_size());
 
 	unsigned int vertexShader = compile_shader(vertexSource, Shader::Stage::VERTEX);
 	unsigned int pixelShader = compile_shader(pixelSource, Shader::Stage::PIXEL);

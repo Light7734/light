@@ -5,52 +5,57 @@
 
 namespace Light {
 
-//========== CONSTANT_BUFFER ==========//
 class glConstantBuffer: public ConstantBuffer
 {
-private:
-	unsigned int m_buffer_id;
-	unsigned int m_index;
-
 public:
 	glConstantBuffer(ConstantBufferIndex index, unsigned int size);
+
 	~glConstantBuffer();
 
 	void bind() override;
 
 	void *map() override;
-	void un_map() override;
-};
 
-//========== VERTEX_BUFFER ==========//
-class glVertexBuffer: public VertexBuffer
-{
+	void un_map() override;
+
 private:
 	unsigned int m_buffer_id;
 
+	unsigned int m_index;
+};
+
+class glVertexBuffer: public VertexBuffer
+{
 public:
 	glVertexBuffer(float *vertices, unsigned int stride, unsigned int count);
+
 	~glVertexBuffer();
 
 	void bind() override;
+
 	void un_bind() override;
 
 	void *map() override;
-	void un_map() override;
-};
 
-//========== INDEX_BUFFER ==========//
-class glIndexBuffer: public IndexBuffer
-{
+	void un_map() override;
+
 private:
 	unsigned int m_buffer_id;
+};
 
+class glIndexBuffer: public IndexBuffer
+{
 public:
 	glIndexBuffer(unsigned int *indices, unsigned int count);
+
 	~glIndexBuffer();
 
 	void bind() override;
+
 	void un_bind() override;
+
+private:
+	unsigned int m_buffer_id;
 };
 
 } // namespace Light

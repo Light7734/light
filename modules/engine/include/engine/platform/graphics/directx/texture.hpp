@@ -11,13 +11,6 @@ class dxSharedContext;
 
 class dxTexture: public Texture
 {
-private:
-	Ref<dxSharedContext> m_context;
-
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture_2d;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_shader_resource_view;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler_state;
-
 public:
 	dxTexture(
 	    unsigned int width,
@@ -29,6 +22,15 @@ public:
 	);
 
 	void bind(unsigned int slot = 0u) override;
+
+private:
+	Ref<dxSharedContext> m_context;
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture_2d;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_shader_resource_view;
+
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler_state;
 };
 
 } // namespace Light

@@ -10,9 +10,7 @@ class Shader;
 class VertexBuffer;
 class IndexBuffer;
 class VertexLayout;
-
 class OrthographicCamera;
-
 class SharedContext;
 
 class TextureRendererProgram: RendererProgram
@@ -24,24 +22,12 @@ public:
 		glm::vec2 texcoord;
 	};
 
-private:
-	Ref<Shader> m_shader;
-	Ref<VertexBuffer> m_vertex_buffer;
-	Ref<IndexBuffer> m_index_buffer;
-	Ref<VertexLayout> m_vertex_layout;
-
-	TextureVertexData *m_map_current = nullptr;
-	TextureVertexData *m_map_end = nullptr;
-
-	unsigned int m_quad_count;
-	unsigned int m_max_vertices;
-
-public:
 	TextureRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
 
 	bool advance();
 
 	void map() override;
+
 	void un_map() override;
 
 	void bind() override;
@@ -60,6 +46,23 @@ public:
 	{
 		return sizeof(TextureVertexData);
 	}
+
+private:
+	Ref<Shader> m_shader;
+
+	Ref<VertexBuffer> m_vertex_buffer;
+
+	Ref<IndexBuffer> m_index_buffer;
+
+	Ref<VertexLayout> m_vertex_layout;
+
+	TextureVertexData *m_map_current = nullptr;
+
+	TextureVertexData *m_map_end = nullptr;
+
+	unsigned int m_quad_count;
+
+	unsigned int m_max_vertices;
 };
 
 } // namespace Light

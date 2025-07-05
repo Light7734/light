@@ -13,16 +13,17 @@ public:
 	SceneSerializer(const Ref<Scene> &scene);
 
 	void serialize(const std::string &filePath);
+
 	bool deserialize(const std::string &filePath);
 
 	void serialize_binary(const std::string &filePath);
+
 	bool deserialize_binary(const std::string &filePath);
 
 private:
-	void serialize_entity(YAML::Emitter &out, Entity entity);
-
-private:
 	Ref<Scene> m_scene;
+
+	void serialize_entity(YAML::Emitter &out, Entity entity);
 };
 
 

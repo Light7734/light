@@ -4,7 +4,7 @@
 
 namespace Light {
 
-logger *logger::s_Context = nullptr;
+logger *logger::s_context = nullptr;
 
 Scope<logger> logger::create()
 {
@@ -16,8 +16,8 @@ logger::logger()
     , m_file_logger(nullptr)
     , m_log_file_path(LT_LOG_FILE_LOCATION)
 {
-	lt_assert(!s_Context, "An instance of 'logger' already exists, do not construct this class!");
-	s_Context = this;
+	lt_assert(!s_context, "An instance of 'logger' already exists, do not construct this class!");
+	s_context = this;
 
 	// set spdlog pattern
 	// create loggers

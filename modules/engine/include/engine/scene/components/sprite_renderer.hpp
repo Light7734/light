@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/base/base.hpp>
+#include <glm/glm.hpp>
 
 namespace Light {
 
@@ -8,10 +9,8 @@ class Texture;
 
 struct SpriteRendererComponent
 {
-	Ref<Texture> texture;
-	glm::vec4 tint;
-
 	SpriteRendererComponent() = default;
+
 	SpriteRendererComponent(const SpriteRendererComponent &) = default;
 
 	SpriteRendererComponent(
@@ -27,6 +26,10 @@ struct SpriteRendererComponent
 	{
 		return texture;
 	}
+
+	Ref<Texture> texture;
+
+	glm::vec4 tint;
 };
 
 } // namespace Light

@@ -6,7 +6,6 @@ namespace Light {
 
 class VertexBuffer;
 class Shader;
-
 class SharedContext;
 
 enum class VertexElementType
@@ -42,9 +41,9 @@ public:
 	);
 
 	virtual ~VertexLayout() = default;
-	;
 
 	virtual void bind() = 0;
+
 	virtual void un_bind() = 0;
 
 protected:

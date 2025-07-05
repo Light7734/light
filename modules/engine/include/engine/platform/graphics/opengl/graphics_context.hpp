@@ -9,15 +9,14 @@ namespace Light {
 
 class glGraphicsContext: public GraphicsContext
 {
-private:
-	GLFWwindow *m_window_handle;
-
 public:
 	glGraphicsContext(GLFWwindow *windowHandle);
 
 	void log_debug_data() override;
 
 private:
+	GLFWwindow *m_window_handle;
+
 	void set_debug_message_callback();
 };
 

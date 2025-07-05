@@ -7,9 +7,6 @@ namespace Light {
 
 class Timer
 {
-private:
-	std::chrono::time_point<std::chrono::steady_clock> m_start;
-
 public:
 	Timer();
 
@@ -26,16 +23,13 @@ public:
 	{
 		m_start = std::chrono::steady_clock::now();
 	}
+
+private:
+	std::chrono::time_point<std::chrono::steady_clock> m_start;
 };
 
 class DeltaTimer
 {
-private:
-	Timer timer;
-
-	float m_previous_frame;
-	float m_delta_time;
-
 public:
 	DeltaTimer();
 
@@ -45,6 +39,13 @@ public:
 	{
 		return m_delta_time;
 	}
+
+private:
+	Timer timer;
+
+	float m_previous_frame;
+
+	float m_delta_time;
 };
 
 } // namespace Light
