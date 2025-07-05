@@ -32,19 +32,19 @@ private:
 	static Logger *s_Context;
 
 private:
-	Ref<spdlog::logger> m_EngineLogger, m_FileLogger;
-	std::string m_LogFilePath;
+	Ref<spdlog::logger> m_engine_logger, m_file_logger;
+	std::string m_log_file_path;
 
 public:
 	static Scope<Logger> Create();
 
 	static inline Ref<spdlog::logger> GetEngineLogger()
 	{
-		return s_Context->m_EngineLogger;
+		return s_Context->m_engine_logger;
 	}
 	static inline Ref<spdlog::logger> GetFileLogger()
 	{
-		return s_Context->m_FileLogger;
+		return s_Context->m_file_logger;
 	}
 
 	void LogDebugData();

@@ -8,7 +8,7 @@ namespace Light {
 class glTexture: public Texture
 {
 private:
-	unsigned int m_TextureID;
+	unsigned int m_texture_id;
 
 public:
 	glTexture(unsigned int width, unsigned int height, unsigned int components, unsigned char* pixels, const std::string& filePath);

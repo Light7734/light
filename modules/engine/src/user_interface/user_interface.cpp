@@ -45,7 +45,7 @@ Scope<UserInterface> UserInterface::Create(
 }
 
 UserInterface::UserInterface()
-    : m_DockspaceFlags(
+    : m_dockspace_flags(
           ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
           | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
           | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
@@ -129,7 +129,7 @@ void UserInterface::DockspaceBegin()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("Dockspace", (bool *)0, s_Context->m_DockspaceFlags);
+	ImGui::Begin("Dockspace", (bool *)0, s_Context->m_dockspace_flags);
 	ImGui::PopStyleVar(3);
 
 	ImGuiStyle &style = ImGui::GetStyle();

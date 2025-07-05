@@ -10,7 +10,7 @@ namespace Light {
 class glRenderCommand: public RenderCommand
 {
 private:
-	GLFWwindow *m_WindowHandle;
+	GLFWwindow *m_window_handle;
 
 public:
 	glRenderCommand(GLFWwindow *windowHandle);

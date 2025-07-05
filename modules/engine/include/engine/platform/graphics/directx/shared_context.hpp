@@ -10,44 +10,44 @@ namespace Light {
 class dxSharedContext: public SharedContext
 {
 private:
-	Microsoft::WRL::ComPtr<ID3D11Device> m_Device = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DeviceContext = nullptr;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Device> m_device = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext = nullptr;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swap_chain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_render_target_view = nullptr;
 
 public:
 	inline Microsoft::WRL::ComPtr<ID3D11Device> GetDevice()
 	{
-		return m_Device;
+		return m_device;
 	}
 	inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetDeviceContext()
 	{
-		return m_DeviceContext;
+		return m_deviceContext;
 	}
 	inline Microsoft::WRL::ComPtr<IDXGISwapChain> GetSwapChain()
 	{
-		return m_SwapChain;
+		return m_swap_chain;
 	}
 	inline Microsoft::WRL::ComPtr<ID3D11RenderTargetView> GetRenderTargetView()
 	{
-		return m_RenderTargetView;
+		return m_render_target_view;
 	}
 
 	inline Microsoft::WRL::ComPtr<ID3D11Device> &GetDeviceRef()
 	{
-		return m_Device;
+		return m_device;
 	}
 	inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> &GetDeviceContextRef()
 	{
-		return m_DeviceContext;
+		return m_deviceContext;
 	}
 	inline Microsoft::WRL::ComPtr<IDXGISwapChain> &GetSwapChainRef()
 	{
-		return m_SwapChain;
+		return m_swap_chain;
 	}
 	inline Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &GetRenderTargetViewRef()
 	{
-		return m_RenderTargetView;
+		return m_render_target_view;
 	}
 };
 

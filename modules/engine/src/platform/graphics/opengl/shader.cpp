@@ -6,10 +6,10 @@
 
 namespace Light {
 
-glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_ShaderID(0u)
+glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_shader_id(0u)
 {
 	// create
-	m_ShaderID = glCreateProgram();
+	m_shader_id = glCreateProgram();
 
 	std::string vertexSource(vertexFile.GetData(), vertexFile.GetData() + vertexFile.GetSize());
 	std::string pixelSource(pixelFile.GetData(), pixelFile.GetData() + pixelFile.GetSize());
@@ -18,11 +18,11 @@ glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_Sha
 	unsigned int pixelShader = CompileShader(pixelSource, Shader::Stage::PIXEL);
 
 	// attach shaders
-	glAttachShader(m_ShaderID, vertexShader);
-	glAttachShader(m_ShaderID, pixelShader);
+	glAttachShader(m_shader_id, vertexShader);
+	glAttachShader(m_shader_id, pixelShader);
 
 	// link shader program
-	glLinkProgram(m_ShaderID);
+	glLinkProgram(m_shader_id);
 
 	// delete shaders (free memory)
 	glDeleteShader(vertexShader);
@@ -31,12 +31,12 @@ glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_Sha
 
 glShader::~glShader()
 {
-	glDeleteProgram(m_ShaderID);
+	glDeleteProgram(m_shader_id);
 }
 
 void glShader::Bind()
 {
-	glUseProgram(m_ShaderID);
+	glUseProgram(m_shader_id);
 }
 
 void glShader::UnBind()

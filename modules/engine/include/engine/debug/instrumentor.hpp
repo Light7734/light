@@ -21,9 +21,9 @@ private:
 	static Instrumentor *s_Context;
 
 private:
-	std::ofstream m_OutputFileStream;
+	std::ofstream m_output_file_stream;
 
-	unsigned int m_CurrentSessionCount;
+	unsigned int m_current_session_count;
 
 public:
 	static Scope<Instrumentor> Create();
@@ -54,8 +54,8 @@ private:
 class InstrumentorTimer
 {
 private:
-	ScopeProfileResult m_Result;
-	std::chrono::time_point<std::chrono::steady_clock> m_Start;
+	ScopeProfileResult m_result;
+	std::chrono::time_point<std::chrono::steady_clock> m_start;
 
 public:
 	InstrumentorTimer(const std::string &scopeName);

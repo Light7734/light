@@ -11,14 +11,14 @@ private:
 	static std::uniform_int_distribution<uint64_t> s_UniformDistribution;
 
 private:
-	uint64_t m_UUID;
+	uint64_t m_uuid;
 
 public:
 	UUID(uint64_t uuid = -1);
 
 	operator uint64_t() const
 	{
-		return m_UUID;
+		return m_uuid;
 	}
 };
 

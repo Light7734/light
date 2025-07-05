@@ -12,15 +12,15 @@ class dxSharedContext;
 class dxFramebuffer: public Framebuffer
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	FramebufferSpecification m_Specification;
+	FramebufferSpecification m_specification;
 
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_ColorAttachment;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_DepthStencilAttachment;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_ShaderResourceView;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_render_target_view;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_color_attachment;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depth_stencil_attachment;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_shader_resource_view;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depth_stencil_view;
 
 public:
 	dxFramebuffer(
@@ -30,7 +30,7 @@ public:
 
 	inline void *GetColorAttachment() override
 	{
-		return (void *)m_ShaderResourceView.Get();
+		return (void *)m_shader_resource_view.Get();
 	}
 
 	void BindAsTarget(const glm::vec4 &clearColor) override;

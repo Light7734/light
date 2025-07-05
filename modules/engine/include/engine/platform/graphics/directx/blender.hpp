@@ -12,13 +12,13 @@ class dxSharedContext;
 class dxBlender: public Blender
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	const std::unordered_map<BlendFactor, D3D11_BLEND> m_FactorMap;
+	const std::unordered_map<BlendFactor, D3D11_BLEND> m_factor_map;
 
-	Microsoft::WRL::ComPtr<ID3D11BlendState> m_BlendState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> m_blend_state;
 
-	D3D11_BLEND_DESC m_Desc;
+	D3D11_BLEND_DESC m_desc;
 
 public:
 	dxBlender(Ref<dxSharedContext> sharedContext);

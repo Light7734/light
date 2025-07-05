@@ -24,19 +24,19 @@ public:
 	void OnUserInterfaceUpdate();
 
 private:
-	std::filesystem::path m_CurrentDirectory;
-	const std::filesystem::path m_AssetsPath;
+	std::filesystem::path m_current_directory;
+	const std::filesystem::path m_assets_path;
 
 	// TODO: Save configuration
-	uint32_t m_FileSize = 128u;
-	uint32_t m_FilePadding = 8u;
+	uint32_t m_file_size = 128u;
+	uint32_t m_file_padding = 8u;
 
-	Ref<Scene> m_ActiveScene;
+	Ref<Scene> m_active_scene;
 
-	Ref<Texture> m_DirectoryTexture;
-	Ref<Texture> m_SceneTexture;
-	Ref<Texture> m_ImageTexture;
-	Ref<Texture> m_TextTexture;
+	Ref<Texture> m_directory_texture;
+	Ref<Texture> m_scene_texture;
+	Ref<Texture> m_image_texture;
+	Ref<Texture> m_text_texture;
 };
 
 } // namespace Light

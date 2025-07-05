@@ -14,7 +14,7 @@ Scope<LayerStack> LayerStack::Create()
 	return MakeScope<LayerStack>(new LayerStack());
 }
 
-LayerStack::LayerStack(): m_Layers {}, m_Begin(), m_End()
+LayerStack::LayerStack(): m_layers {}, m_begin(), m_end()
 {
 	ASSERT(!s_Context, "An instance of 'LayerStack' already exists, do not construct this class!")
 	s_Context = this;
@@ -22,16 +22,16 @@ LayerStack::LayerStack(): m_Layers {}, m_Begin(), m_End()
 
 LayerStack::~LayerStack()
 {
-	for (Layer *layer : m_Layers)
+	for (Layer *layer : m_layers)
 		delete layer;
 }
 
 void LayerStack::AttachLayerImpl(Layer *layer)
 {
 	// #todo: handle attaching layer inside a for loop
-	m_Layers.push_back(layer);
-	m_Begin = m_Layers.begin();
-	m_End = m_Layers.end();
+	m_layers.push_back(layer);
+	m_begin = m_layers.begin();
+	m_end = m_layers.end();
 
 	LOG(trace, "Attached [{}]", layer->GetName());
 }
@@ -39,9 +39,9 @@ void LayerStack::AttachLayerImpl(Layer *layer)
 void LayerStack::DetachLayerImpl(Layer *layer)
 {
 	// #todo: handle detaching layer inside a for loop
-	m_Layers.erase(std::find(m_Layers.begin(), m_Layers.end(), layer));
-	m_Begin = m_Layers.begin();
-	m_End = m_Layers.end();
+	m_layers.erase(std::find(m_layers.begin(), m_layers.end(), layer));
+	m_begin = m_layers.begin();
+	m_end = m_layers.end();
 
 	LOG(trace, "Detached [{}]", layer->GetName());
 }

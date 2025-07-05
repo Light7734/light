@@ -8,7 +8,7 @@ namespace Light {
 class PropertiesPanel: public Panel
 {
 private:
-	Entity m_EntityContext;
+	Entity m_entity_context;
 
 public:
 	PropertiesPanel() = default;

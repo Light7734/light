@@ -14,9 +14,9 @@ class dxSharedContext;
 class dxVertexLayout: public VertexLayout
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_InputLayout;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_input_layout;
 
 public:
 	dxVertexLayout(

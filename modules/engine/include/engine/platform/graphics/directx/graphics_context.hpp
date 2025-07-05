@@ -12,9 +12,9 @@ namespace Light {
 class dxGraphicsContext: public GraphicsContext
 {
 private:
-	GLFWwindow *m_WindowHandle;
+	GLFWwindow *m_window_handle;
 
-	Microsoft::WRL::ComPtr<ID3D11Debug> m_DebugInterface;
+	Microsoft::WRL::ComPtr<ID3D11Debug> m_debug_interface;
 
 public:
 	dxGraphicsContext(GLFWwindow *windowHandle);

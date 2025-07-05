@@ -10,7 +10,7 @@ namespace Light {
 class glGraphicsContext: public GraphicsContext
 {
 private:
-	GLFWwindow *m_WindowHandle;
+	GLFWwindow *m_window_handle;
 
 public:
 	glGraphicsContext(GLFWwindow *windowHandle);

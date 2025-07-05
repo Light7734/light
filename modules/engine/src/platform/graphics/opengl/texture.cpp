@@ -11,16 +11,16 @@ glTexture::glTexture(
     const std::string &filePath
 )
     : Texture(filePath)
-    , m_TextureID(NULL)
+    , m_texture_id(NULL)
 {
 	// create texture
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_texture_id);
 
 	// set texture parameters
-	glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(m_texture_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTextureParameteri(m_texture_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTextureParameteri(m_texture_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(m_texture_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// determine formats
 	unsigned int format = components == 4u ? GL_RGBA :
@@ -58,18 +58,18 @@ glTexture::glTexture(
 
 glTexture::~glTexture()
 {
-	glDeleteTextures(1, &m_TextureID);
+	glDeleteTextures(1, &m_texture_id);
 }
 
 void glTexture::Bind(unsigned int slot /* = 0u */)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, m_TextureID);
+	glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
 void *glTexture::GetTexture()
 {
-	return (void *)(intptr_t)m_TextureID;
+	return (void *)(intptr_t)m_texture_id;
 }
 
 } // namespace Light

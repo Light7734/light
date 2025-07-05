@@ -6,13 +6,13 @@
 
 namespace Light {
 
-glRenderCommand::glRenderCommand(GLFWwindow *windowHandle): m_WindowHandle(windowHandle)
+glRenderCommand::glRenderCommand(GLFWwindow *windowHandle): m_window_handle(windowHandle)
 {
 }
 
 void glRenderCommand::SwapBuffers()
 {
-	glfwSwapBuffers(m_WindowHandle);
+	glfwSwapBuffers(m_window_handle);
 }
 
 void glRenderCommand::ClearBackBuffer(const glm::vec4 &clearColor)

@@ -29,12 +29,12 @@ private:
 	static GraphicsContext* s_Context;
 
 private:
-	Scope<UserInterface> m_UserInterface;
-	Scope<Renderer> m_Renderer;
+	Scope<UserInterface> m_user_interface;
+	Scope<Renderer> m_renderer;
 
 protected:
-	GraphicsAPI m_GraphicsAPI;
-	Ref<SharedContext> m_SharedContext = nullptr;
+	GraphicsAPI m_graphics_api;
+	Ref<SharedContext> m_shared_context = nullptr;
 
 public:
 	static Scope<GraphicsContext> Create(GraphicsAPI api, GLFWwindow* windowHandle);
@@ -46,11 +46,11 @@ public:
 
 	virtual void LogDebugData() = 0;
 
-	static inline GraphicsAPI GetGraphicsAPI() { return s_Context->m_GraphicsAPI; }
-	static inline Ref<SharedContext> GetSharedContext() { return s_Context->m_SharedContext; }
+	static inline GraphicsAPI GetGraphicsAPI() { return s_Context->m_graphics_api; }
+	static inline Ref<SharedContext> GetSharedContext() { return s_Context->m_shared_context; }
 
-	inline Renderer* GetRenderer() { return m_Renderer.get(); }
-	inline UserInterface* GetUserInterface() { return m_UserInterface.get(); }
+	inline Renderer* GetRenderer() { return m_renderer.get(); }
+	inline UserInterface* GetUserInterface() { return m_user_interface.get(); }
 
 protected:
 	GraphicsContext() = default;

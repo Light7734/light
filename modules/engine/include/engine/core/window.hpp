@@ -18,14 +18,14 @@ struct WindowProperties
 class Window
 {
 protected:
-	Scope<GraphicsContext> m_GraphicsContext;
-	WindowProperties m_Properties;
+	Scope<GraphicsContext> m_graphics_context;
+	WindowProperties m_properties;
 	bool b_Closed;
 
 public:
 	static Scope<Window> Create(std::function<void(Event &)> callback);
 
-	Window(): m_GraphicsContext(nullptr), m_Properties {}, b_Closed(false)
+	Window(): m_graphics_context(nullptr), m_properties {}, b_Closed(false)
 	{
 	}
 
@@ -61,22 +61,22 @@ public:
 	//============================== GETTERS ==============================//
 	inline GraphicsContext *GetGfxContext() const
 	{
-		return m_GraphicsContext.get();
+		return m_graphics_context.get();
 	}
 
 	inline const WindowProperties &GetProperties() const
 	{
-		return m_Properties;
+		return m_properties;
 	}
 
 	inline const std::string &GetTitle() const
 	{
-		return m_Properties.title;
+		return m_properties.title;
 	}
 
 	inline const glm::uvec2 &GetSize() const
 	{
-		return m_Properties.size;
+		return m_properties.size;
 	}
 
 	inline bool IsClosed() const
@@ -85,11 +85,11 @@ public:
 	}
 	inline bool IsVSync() const
 	{
-		return m_Properties.vsync;
+		return m_properties.vsync;
 	}
 	inline bool IsVisible() const
 	{
-		return m_Properties.visible;
+		return m_properties.visible;
 	}
 	//============================== GETTERS ==============================//
 

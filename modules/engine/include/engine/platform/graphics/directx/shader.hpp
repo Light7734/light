@@ -13,12 +13,12 @@ class dxSharedContext;
 class dxShader: public Shader
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_VertexShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertex_shader;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixel_shader;
 
-	Microsoft::WRL::ComPtr<ID3DBlob> m_VertexBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> m_vertex_blob;
 
 public:
 	dxShader(
@@ -33,7 +33,7 @@ public:
 
 	inline Microsoft::WRL::ComPtr<ID3DBlob> GetVertexBlob()
 	{
-		return m_VertexBlob;
+		return m_vertex_blob;
 	}
 };
 

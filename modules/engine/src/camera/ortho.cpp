@@ -10,26 +10,26 @@ OrthographicCamera::OrthographicCamera(
     float zoomLevel,
     const glm::vec4 &clearColor /* = glm::vec4(0.1f, 0.3f, 0.7f, 1.0f) */
 )
-    : m_Up(0.0f, 1.0f, 0.0f)
-    , m_Position(position)
-    , m_AspectRatio(aspectRatio)
-    , m_ZoomLevel(zoomLevel)
-    , m_ClearColor(clearColor)
+    : m_up(0.0f, 1.0f, 0.0f)
+    , m_position(position)
+    , m_aspect_ratio(aspectRatio)
+    , m_zoom_level(zoomLevel)
+    , m_clear_color(clearColor)
 {
 }
 
 void OrthographicCamera::CalculateView()
 {
-	m_View = glm::lookAt(glm::vec3(m_Position, 100.0f), glm::vec3(m_Position, 0.0f), m_Up);
+	m_view = glm::lookAt(glm::vec3(m_position, 100.0f), glm::vec3(m_position, 0.0f), m_up);
 }
 
 void OrthographicCamera::CalculateProjection()
 {
-	m_Projection = glm::ortho(
-	    -m_ZoomLevel * m_AspectRatio,
-	    +m_ZoomLevel * m_AspectRatio,
-	    -m_ZoomLevel,
-	    +m_ZoomLevel,
+	m_projection = glm::ortho(
+	    -m_zoom_level * m_aspect_ratio,
+	    +m_zoom_level * m_aspect_ratio,
+	    -m_zoom_level,
+	    +m_zoom_level,
 	    FLT_MAX,
 	    FLT_MIN
 	);
@@ -37,13 +37,13 @@ void OrthographicCamera::CalculateProjection()
 
 void OrthographicCamera::OnResize(const glm::vec2 &size)
 {
-	m_AspectRatio = size.x / size.y;
+	m_aspect_ratio = size.x / size.y;
 	CalculateProjection();
 }
 
 void OrthographicCamera::Move(const glm::vec2 &position)
 {
-	m_Position += position;
+	m_position += position;
 }
 
 } // namespace Light

@@ -21,13 +21,13 @@ public:
 
 	virtual void* GetTexture() = 0;
 
-	inline const std::string& GetFilePath() const { return m_FilePath; }
+	inline const std::string& GetFilePath() const { return m_file_path; }
 
 protected:
 	Texture(const std::string& filePath);
 
 protected:
-	std::string m_FilePath;
+	std::string m_file_path;
 };
 
 } // namespace Light

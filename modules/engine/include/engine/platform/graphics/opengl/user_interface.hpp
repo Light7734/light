@@ -10,7 +10,7 @@ namespace Light {
 class glUserInterface: public UserInterface
 {
 private:
-	GLFWwindow *m_WindowHandle;
+	GLFWwindow *m_window_handle;
 
 public:
 	glUserInterface() = default;

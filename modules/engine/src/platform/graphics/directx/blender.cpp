@@ -4,7 +4,7 @@
 namespace Light {
 
 dxBlender::dxBlender(Ref<dxSharedContext> sharedContext)
-    : m_Context(sharedContext), m_FactorMap { // constants
+    : m_context(sharedContext), m_factor_map { // constants
 	                                          { BlendFactor::ZERO, D3D11_BLEND_ZERO },
 	                                          { BlendFactor::ONE, D3D11_BLEND_ONE },
 
@@ -29,53 +29,53 @@ dxBlender::dxBlender(Ref<dxSharedContext> sharedContext)
 	                                          { BlendFactor::SRC1_ALPHA, D3D11_BLEND_SRC1_ALPHA },
 	                                          { BlendFactor::INVERSE_SRC1_ALPHA, D3D11_BLEND_INV_SRC1_ALPHA }
     }
-    , m_BlendState(nullptr)
-    , m_Desc {}
+    , m_blend_state(nullptr)
+    , m_desc {}
 {
 	// factor map
 	// blender desc
-	m_Desc = {};
+	m_desc = {};
 
-	m_Desc.RenderTarget[0].BlendEnable = true;
-	m_Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
-	m_Desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
-	m_Desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	m_Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
-	m_Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-	m_Desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	m_Desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_desc.RenderTarget[0].BlendEnable = true;
+	m_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
+	m_desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+	m_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	m_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+	m_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	m_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	m_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	// create blend state
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateBlendState(&m_Desc, &m_BlendState));
+	DXC(m_context->GetDevice()->CreateBlendState(&m_desc, &m_blend_state));
 }
 
 void dxBlender::Enable(BlendFactor srcFactor, BlendFactor dstFactor)
 {
 	// update desc
-	m_Desc.RenderTarget[0].BlendEnable = true;
-	m_Desc.RenderTarget[0].SrcBlend = m_FactorMap.at(srcFactor);
-	m_Desc.RenderTarget[0].DestBlend = m_FactorMap.at(dstFactor);
+	m_desc.RenderTarget[0].BlendEnable = true;
+	m_desc.RenderTarget[0].SrcBlend = m_factor_map.at(srcFactor);
+	m_desc.RenderTarget[0].DestBlend = m_factor_map.at(dstFactor);
 
 	// re-create blind state
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateBlendState(&m_Desc, &m_BlendState));
+	DXC(m_context->GetDevice()->CreateBlendState(&m_desc, &m_blend_state));
 
 	// bind blend state
-	m_Context->GetDeviceContext()->OMSetBlendState(m_BlendState.Get(), nullptr, 0x0000000f);
+	m_context->GetDeviceContext()->OMSetBlendState(m_blend_state.Get(), nullptr, 0x0000000f);
 }
 
 void dxBlender::Disable()
 {
 	// update desc
-	m_Desc.RenderTarget[0].BlendEnable = false;
+	m_desc.RenderTarget[0].BlendEnable = false;
 
 	// re-create blind state
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateBlendState(&m_Desc, &m_BlendState));
+	DXC(m_context->GetDevice()->CreateBlendState(&m_desc, &m_blend_state));
 
 	// bind blend state
-	m_Context->GetDeviceContext()->OMSetBlendState(m_BlendState.Get(), nullptr, 0xffffffff);
+	m_context->GetDeviceContext()->OMSetBlendState(m_blend_state.Get(), nullptr, 0xffffffff);
 }
 
 } // namespace Light

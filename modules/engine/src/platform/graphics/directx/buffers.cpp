@@ -10,10 +10,10 @@ dxConstantBuffer::dxConstantBuffer(
     unsigned int size,
     Ref<dxSharedContext> sharedContext
 )
-    : m_Context(sharedContext)
-    , m_Buffer(nullptr)
-    , m_Map {}
-    , m_Index(static_cast<int>(index))
+    : m_context(sharedContext)
+    , m_buffer(nullptr)
+    , m_map {}
+    , m_index(static_cast<int>(index))
 {
 	D3D11_BUFFER_DESC bDesc = {};
 
@@ -23,25 +23,25 @@ dxConstantBuffer::dxConstantBuffer(
 	bDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateBuffer(&bDesc, nullptr, &m_Buffer));
-	m_Context->GetDeviceContext()->VSSetConstantBuffers(m_Index, 1u, m_Buffer.GetAddressOf());
+	DXC(m_context->GetDevice()->CreateBuffer(&bDesc, nullptr, &m_buffer));
+	m_context->GetDeviceContext()->VSSetConstantBuffers(m_index, 1u, m_buffer.GetAddressOf());
 }
 
 void dxConstantBuffer::Bind()
 {
-	m_Context->GetDeviceContext()->VSSetConstantBuffers(m_Index, 1u, m_Buffer.GetAddressOf());
+	m_context->GetDeviceContext()->VSSetConstantBuffers(m_index, 1u, m_buffer.GetAddressOf());
 }
 
 void *dxConstantBuffer::Map()
 {
-	m_Context->GetDeviceContext()->VSSetConstantBuffers(m_Index, 1u, m_Buffer.GetAddressOf());
-	m_Context->GetDeviceContext()->Map(m_Buffer.Get(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &m_Map);
-	return m_Map.pData;
+	m_context->GetDeviceContext()->VSSetConstantBuffers(m_index, 1u, m_buffer.GetAddressOf());
+	m_context->GetDeviceContext()->Map(m_buffer.Get(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &m_map);
+	return m_map.pData;
 }
 
 void dxConstantBuffer::UnMap()
 {
-	m_Context->GetDeviceContext()->Unmap(m_Buffer.Get(), NULL);
+	m_context->GetDeviceContext()->Unmap(m_buffer.Get(), NULL);
 }
 //======================================== CONSTANT_BUFFER
 //========================================//
@@ -54,10 +54,10 @@ dxVertexBuffer::dxVertexBuffer(
     unsigned int count,
     Ref<dxSharedContext> sharedContext
 )
-    : m_Context(sharedContext)
-    , m_Buffer(nullptr)
-    , m_Map {}
-    , m_Stride(stride)
+    : m_context(sharedContext)
+    , m_buffer(nullptr)
+    , m_map {}
+    , m_stride(stride)
 {
 	// buffer desc
 	D3D11_BUFFER_DESC bDesc = {};
@@ -71,7 +71,7 @@ dxVertexBuffer::dxVertexBuffer(
 
 	// create buffer
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateBuffer(&bDesc, nullptr, &m_Buffer));
+	DXC(m_context->GetDevice()->CreateBuffer(&bDesc, nullptr, &m_buffer));
 }
 
 dxVertexBuffer::~dxVertexBuffer()
@@ -81,20 +81,20 @@ dxVertexBuffer::~dxVertexBuffer()
 
 void *dxVertexBuffer::Map()
 {
-	m_Context->GetDeviceContext()->Map(m_Buffer.Get(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &m_Map);
-	return m_Map.pData;
+	m_context->GetDeviceContext()->Map(m_buffer.Get(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &m_map);
+	return m_map.pData;
 }
 
 void dxVertexBuffer::UnMap()
 {
-	m_Context->GetDeviceContext()->Unmap(m_Buffer.Get(), NULL);
+	m_context->GetDeviceContext()->Unmap(m_buffer.Get(), NULL);
 }
 
 void dxVertexBuffer::Bind()
 {
 	static const unsigned int offset = 0u;
-	m_Context->GetDeviceContext()
-	    ->IASetVertexBuffers(0u, 1u, m_Buffer.GetAddressOf(), &m_Stride, &offset);
+	m_context->GetDeviceContext()
+	    ->IASetVertexBuffers(0u, 1u, m_buffer.GetAddressOf(), &m_stride, &offset);
 }
 
 void dxVertexBuffer::UnBind()
@@ -102,7 +102,7 @@ void dxVertexBuffer::UnBind()
 	static const unsigned int offset = 0u;
 	static ID3D11Buffer *buffer = nullptr;
 
-	m_Context->GetDeviceContext()->IASetVertexBuffers(0u, 1u, &buffer, &m_Stride, &offset);
+	m_context->GetDeviceContext()->IASetVertexBuffers(0u, 1u, &buffer, &m_stride, &offset);
 }
 //================================================== VERTEX_BUFFER
 //==================================================//
@@ -113,8 +113,8 @@ dxIndexBuffer::dxIndexBuffer(
     unsigned int count,
     Ref<dxSharedContext> sharedContext
 )
-    : m_Context(sharedContext)
-    , m_Buffer(nullptr)
+    : m_context(sharedContext)
+    , m_buffer(nullptr)
 {
 	// generate indices if not provided
 	bool hasIndices = !!indices;
@@ -159,7 +159,7 @@ dxIndexBuffer::dxIndexBuffer(
 
 	// create buffer
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateBuffer(&bDesc, &sDesc, &m_Buffer));
+	DXC(m_context->GetDevice()->CreateBuffer(&bDesc, &sDesc, &m_buffer));
 
 	// delete indices
 	if (!hasIndices)
@@ -173,7 +173,7 @@ dxIndexBuffer::~dxIndexBuffer()
 
 void dxIndexBuffer::Bind()
 {
-	m_Context->GetDeviceContext()->IASetIndexBuffer(m_Buffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+	m_context->GetDeviceContext()->IASetIndexBuffer(m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 }
 
 void dxIndexBuffer::UnBind()
@@ -181,7 +181,7 @@ void dxIndexBuffer::UnBind()
 	static const unsigned int offset = 0u;
 	static ID3D11Buffer *buffer = nullptr;
 
-	m_Context->GetDeviceContext()->IASetIndexBuffer(buffer, DXGI_FORMAT_R32_UINT, offset);
+	m_context->GetDeviceContext()->IASetIndexBuffer(buffer, DXGI_FORMAT_R32_UINT, offset);
 }
 //======================================== INDEX_BUFFER ========================================//
 

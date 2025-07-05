@@ -13,9 +13,9 @@ class WindowResizedEvent;
 class wWindow: public Window
 {
 private:
-	GLFWwindow *m_Handle;
+	GLFWwindow *m_handle;
 
-	std::function<void(Event &)> m_EventCallback;
+	std::function<void(Event &)> m_event_callback;
 
 public:
 	wWindow(std::function<void(Event &)> callback);

@@ -11,19 +11,19 @@ BasicFileHandle::BasicFileHandle(
     const std::string &name,
     const std::string &extension
 )
-    : m_Data(data)
-    , m_Size(size)
-    , m_Path(path)
-    , m_Name(name)
-    , m_Extension(extension)
+    : m_data(data)
+    , m_size(size)
+    , m_path(path)
+    , m_name(name)
+    , m_extension(extension)
 {
 }
 
 void BasicFileHandle::Release()
 {
-	delete m_Data;
-	m_Data = nullptr;
-	m_Size = 0ull;
+	delete m_data;
+	m_data = nullptr;
+	m_size = 0ull;
 }
 
 
@@ -101,9 +101,9 @@ ImageFileHandle FileManager::ReadImageFile(const std::string &path, int32_t desi
 
 void ImageFileHandle::Release()
 {
-	stbi_image_free(reinterpret_cast<void *>(m_Data));
-	m_Data = nullptr;
-	m_Size = 0ull;
+	stbi_image_free(reinterpret_cast<void *>(m_data));
+	m_data = nullptr;
+	m_size = 0ull;
 }
 
 

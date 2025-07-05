@@ -20,7 +20,7 @@ private:
 	friend class SceneHierarchyPanel;
 
 private:
-	entt::registry m_Registry;
+	entt::registry m_registry;
 
 public:
 	Scene();

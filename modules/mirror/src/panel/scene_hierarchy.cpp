@@ -7,28 +7,28 @@
 namespace Light {
 
 SceneHierarchyPanel::SceneHierarchyPanel()
-    : m_Context(nullptr)
-    , m_PropertiesPanelContext(nullptr)
-    , m_SelectionContext()
+    : m_context(nullptr)
+    , m_properties_panel_context(nullptr)
+    , m_selection_context()
 {
 }
 
 SceneHierarchyPanel::
     SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel /* = nullptr */)
-    : m_Context(context)
-    , m_PropertiesPanelContext(propertiesPanel)
+    : m_context(context)
+    , m_properties_panel_context(propertiesPanel)
 {
 }
 
 void SceneHierarchyPanel::OnUserInterfaceUpdate()
 {
-	if (m_Context)
+	if (m_context)
 	{
 		ImGui::Begin("Hierarchy");
 
-		for (auto entityID : m_Context->m_Registry.view<TagComponent>())
+		for (auto entityID : m_context->m_registry.view<TagComponent>())
 		{
-			Entity entity(static_cast<entt::entity>(entityID), m_Context.get());
+			Entity entity(static_cast<entt::entity>(entityID), m_context.get());
 			const std::string &tag = entity.GetComponent<TagComponent>();
 
 			DrawNode(entity, tag);
@@ -42,22 +42,22 @@ void SceneHierarchyPanel::
     SetContext(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel /* = nullptr */)
 {
 	if (propertiesPanel)
-		m_PropertiesPanelContext = propertiesPanel;
+		m_properties_panel_context = propertiesPanel;
 
-	m_Context = context;
+	m_context = context;
 }
 
 void SceneHierarchyPanel::DrawNode(Entity entity, const std::string &label)
 {
-	ImGuiTreeNodeFlags flags = (m_SelectionContext == entity ? ImGuiTreeNodeFlags_Selected : NULL)
+	ImGuiTreeNodeFlags flags = (m_selection_context == entity ? ImGuiTreeNodeFlags_Selected : NULL)
 	                           | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
 
 	bool expanded = ImGui::TreeNodeEx((void *)(uint64_t)(uint32_t)(entity), flags, label.c_str());
 
 	if (ImGui::IsItemClicked())
 	{
-		m_SelectionContext = entity;
-		m_PropertiesPanelContext->SetEntityContext(entity);
+		m_selection_context = entity;
+		m_properties_panel_context->SetEntityContext(entity);
 	}
 
 	if (expanded)

@@ -12,9 +12,9 @@ class PropertiesPanel;
 class SceneHierarchyPanel: public Panel
 {
 private:
-	Ref<Scene> m_Context;
-	Ref<PropertiesPanel> m_PropertiesPanelContext;
-	Entity m_SelectionContext;
+	Ref<Scene> m_context;
+	Ref<PropertiesPanel> m_properties_panel_context;
+	Entity m_selection_context;
 
 public:
 	SceneHierarchyPanel();

@@ -9,22 +9,22 @@ namespace Light {
 class KeyPressedEvent: public Event
 {
 private:
-	const int m_Key;
+	const int m_key;
 
 public:
-	KeyPressedEvent(int key): m_Key(key)
+	KeyPressedEvent(int key): m_key(key)
 	{
 	}
 
 	inline int GetKey() const
 	{
-		return m_Key;
+		return m_key;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "KeyPressed: " << m_Key;
+		ss << "KeyPressed: " << m_key;
 		return ss.str();
 	}
 	EVENT_TYPE(KeyPressed)
@@ -34,22 +34,22 @@ public:
 class KeyRepeatEvent: public Event
 {
 private:
-	const int m_Key;
+	const int m_key;
 
 public:
-	KeyRepeatEvent(int key): m_Key(key)
+	KeyRepeatEvent(int key): m_key(key)
 	{
 	}
 
 	inline int GetKey() const
 	{
-		return m_Key;
+		return m_key;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "KeyRepeated: " << m_Key;
+		ss << "KeyRepeated: " << m_key;
 		return ss.str();
 	}
 	EVENT_TYPE(KeyRepeated)
@@ -59,22 +59,22 @@ public:
 class KeyReleasedEvent: public Event
 {
 private:
-	const int m_Key;
+	const int m_key;
 
 public:
-	KeyReleasedEvent(int key): m_Key(key)
+	KeyReleasedEvent(int key): m_key(key)
 	{
 	}
 
 	inline int GetKey() const
 	{
-		return m_Key;
+		return m_key;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "KeyReleased: " << m_Key;
+		ss << "KeyReleased: " << m_key;
 		return ss.str();
 	}
 	EVENT_TYPE(KeyReleased)

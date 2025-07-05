@@ -8,10 +8,10 @@ namespace Light {
 class glFramebuffer: public Framebuffer
 {
 private:
-	FramebufferSpecification m_Specification;
+	FramebufferSpecification m_specification;
 
-	unsigned int m_BufferID;
-	unsigned int m_ColorAttachmentID, m_DepthStencilAttachmentID;
+	unsigned int m_buffer_id;
+	unsigned int m_color_attachment_id, m_depth_stencil_attachment_id;
 
 public:
 	glFramebuffer(const FramebufferSpecification &specification);
@@ -24,7 +24,7 @@ public:
 
 	inline void *GetColorAttachment() override
 	{
-		return (void *)m_ColorAttachmentID;
+		return (void *)m_color_attachment_id;
 	}
 };
 

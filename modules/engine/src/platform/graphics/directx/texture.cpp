@@ -12,10 +12,10 @@ dxTexture::dxTexture(
     const std::string &filePath
 )
     : Texture(filePath)
-    , m_Context(sharedContext)
-    , m_Texture2D(nullptr)
-    , m_ShaderResourceView(nullptr)
-    , m_SamplerState(nullptr)
+    , m_context(sharedContext)
+    , m_texture_2d(nullptr)
+    , m_shader_resource_view(nullptr)
+    , m_sampler_state(nullptr)
 {
 	// texture2d desc
 	D3D11_TEXTURE2D_DESC t2dDesc = {};
@@ -38,11 +38,11 @@ dxTexture::dxTexture(
 
 	// create texture
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateTexture2D(&t2dDesc, nullptr, &m_Texture2D));
-	m_Context->GetDeviceContext()
-	    ->UpdateSubresource(m_Texture2D.Get(), 0u, nullptr, pixels, width * 4u, 0u);
+	DXC(m_context->GetDevice()->CreateTexture2D(&t2dDesc, nullptr, &m_texture_2d));
+	m_context->GetDeviceContext()
+	    ->UpdateSubresource(m_texture_2d.Get(), 0u, nullptr, pixels, width * 4u, 0u);
 
-	m_Texture2D->GetDesc(&t2dDesc);
+	m_texture_2d->GetDesc(&t2dDesc);
 
 	// shader resource view desc
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -52,9 +52,9 @@ dxTexture::dxTexture(
 	srvDesc.Texture2D.MipLevels = -1;
 
 	// create shader resource view
-	m_Context->GetDevice()
-	    ->CreateShaderResourceView(m_Texture2D.Get(), &srvDesc, &m_ShaderResourceView);
-	m_Context->GetDeviceContext()->GenerateMips(m_ShaderResourceView.Get());
+	m_context->GetDevice()
+	    ->CreateShaderResourceView(m_texture_2d.Get(), &srvDesc, &m_shader_resource_view);
+	m_context->GetDeviceContext()->GenerateMips(m_shader_resource_view.Get());
 
 	// sampler desc
 	D3D11_SAMPLER_DESC sDesc = {};
@@ -67,14 +67,14 @@ dxTexture::dxTexture(
 	sDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	// create sampler
-	m_Context->GetDevice()->CreateSamplerState(&sDesc, &m_SamplerState);
+	m_context->GetDevice()->CreateSamplerState(&sDesc, &m_sampler_state);
 }
 
 void dxTexture::Bind(unsigned int slot /* = 0u */)
 {
-	m_Context->GetDeviceContext()->PSSetSamplers(slot, 1u, m_SamplerState.GetAddressOf());
-	m_Context->GetDeviceContext()
-	    ->PSSetShaderResources(slot, 1u, m_ShaderResourceView.GetAddressOf());
+	m_context->GetDeviceContext()->PSSetSamplers(slot, 1u, m_sampler_state.GetAddressOf());
+	m_context->GetDeviceContext()
+	    ->PSSetShaderResources(slot, 1u, m_shader_resource_view.GetAddressOf());
 }
 
 } // namespace Light

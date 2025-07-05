@@ -13,12 +13,12 @@ class dxSharedContext;
 class dxConstantBuffer: public ConstantBuffer
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
-	D3D11_MAPPED_SUBRESOURCE m_Map;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
+	D3D11_MAPPED_SUBRESOURCE m_map;
 
-	unsigned int m_Index;
+	unsigned int m_index;
 
 public:
 	dxConstantBuffer(
@@ -37,12 +37,12 @@ public:
 class dxVertexBuffer: public VertexBuffer
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
-	D3D11_MAPPED_SUBRESOURCE m_Map;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
+	D3D11_MAPPED_SUBRESOURCE m_map;
 
-	unsigned int m_Stride;
+	unsigned int m_stride;
 
 public:
 	dxVertexBuffer(
@@ -64,9 +64,9 @@ public:
 class dxIndexBuffer: public IndexBuffer
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
 
 public:
 	dxIndexBuffer(unsigned int *indices, unsigned int count, Ref<dxSharedContext> sharedContext);

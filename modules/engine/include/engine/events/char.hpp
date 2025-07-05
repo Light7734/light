@@ -9,22 +9,22 @@ namespace Light {
 class SetCharEvent: public Event
 {
 private:
-	const unsigned int m_Character;
+	const unsigned int m_character;
 
 public:
-	SetCharEvent(unsigned int character): m_Character(character)
+	SetCharEvent(unsigned int character): m_character(character)
 	{
 	}
 
 	inline int GetCharacter() const
 	{
-		return m_Character;
+		return m_character;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "CharSet: " << m_Character;
+		ss << "CharSet: " << m_character;
 		return ss.str();
 	}
 	EVENT_TYPE(SetChar)

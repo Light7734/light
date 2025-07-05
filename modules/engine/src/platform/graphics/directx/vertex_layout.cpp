@@ -9,8 +9,8 @@ dxVertexLayout::dxVertexLayout(
     const std::vector<std::pair<std::string, VertexElementType>> &elements,
     Ref<dxSharedContext> sharedContext
 )
-    : m_Context(sharedContext)
-    , m_InputLayout(nullptr)
+    : m_context(sharedContext)
+    , m_input_layout(nullptr)
 {
 	// occupy space for input elements
 	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementsDesc;
@@ -33,12 +33,12 @@ dxVertexLayout::dxVertexLayout(
 
 	// create input layout (vertex layout)
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateInputLayout(
+	DXC(m_context->GetDevice()->CreateInputLayout(
 	    &inputElementsDesc[0],
 	    inputElementsDesc.size(),
 	    dxpShader->GetVertexBlob().Get()->GetBufferPointer(),
 	    dxpShader->GetVertexBlob().Get()->GetBufferSize(),
-	    &m_InputLayout
+	    &m_input_layout
 	));
 }
 
@@ -49,12 +49,12 @@ dxVertexLayout::~dxVertexLayout()
 
 void dxVertexLayout::Bind()
 {
-	m_Context->GetDeviceContext()->IASetInputLayout(m_InputLayout.Get());
+	m_context->GetDeviceContext()->IASetInputLayout(m_input_layout.Get());
 }
 
 void dxVertexLayout::UnBind()
 {
-	m_Context->GetDeviceContext()->IASetInputLayout(nullptr);
+	m_context->GetDeviceContext()->IASetInputLayout(nullptr);
 }
 
 DXGI_FORMAT dxVertexLayout::GetDxgiFormat(VertexElementType type)

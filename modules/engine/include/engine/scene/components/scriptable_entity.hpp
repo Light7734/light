@@ -10,8 +10,8 @@ class NativeScript
 	friend class Scene;
 
 private:
-	Entity m_Entity;
-	unsigned int m_UniqueIdentifier = 0; // :#todo
+	Entity m_entity;
+	unsigned int m_unique_identifier = 0; // :#todo
 
 public:
 	NativeScript() = default;
@@ -19,13 +19,13 @@ public:
 
 	inline unsigned int GetUID() const
 	{
-		return m_UniqueIdentifier;
+		return m_unique_identifier;
 	}
 
 	template<typename T>
 	T &GetComponent()
 	{
-		return m_Entity.GetComponent<T>();
+		return m_entity.GetComponent<T>();
 	}
 
 protected:

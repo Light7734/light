@@ -18,7 +18,7 @@ struct glVertexElementDesc
 class glVertexLayout: public VertexLayout
 {
 private:
-	unsigned int m_ArrayID;
+	unsigned int m_array_id;
 
 public:
 	glVertexLayout(

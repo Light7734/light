@@ -15,8 +15,8 @@ private:
 	static ResourceManager *s_Context;
 
 private:
-	std::unordered_map<std::string, Ref<Shader>> m_Shaders;
-	std::unordered_map<std::string, Ref<Texture>> m_Textures;
+	std::unordered_map<std::string, Ref<Shader>> m_shaders;
+	std::unordered_map<std::string, Ref<Texture>> m_textures;
 
 public:
 	static Scope<ResourceManager> Create();
@@ -47,11 +47,11 @@ public:
 
 	static inline Ref<Shader> GetShader(const std::string &name)
 	{
-		return s_Context->m_Shaders[name];
+		return s_Context->m_shaders[name];
 	}
 	static inline Ref<Texture> GetTexture(const std::string &name)
 	{
-		return s_Context->m_Textures[name];
+		return s_Context->m_textures[name];
 	}
 
 private:

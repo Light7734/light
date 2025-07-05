@@ -14,15 +14,15 @@ private:
 	static Input *s_Context;
 
 private:
-	std::array<bool, 348> m_KeyboadKeys;
-	std::array<bool, 8> m_MouseButtons;
+	std::array<bool, 348> m_keyboad_keys;
+	std::array<bool, 8> m_mouse_buttons;
 
-	glm::vec2 m_MousePosition;
-	glm::vec2 m_MouseDelta;
-	float m_MouseWheelDelta;
+	glm::vec2 m_mouse_position;
+	glm::vec2 m_mouse_delta;
+	float m_mouse_wheel_delta;
 
-	bool m_UserInterfaceEvents;
-	bool m_GameEvents;
+	bool m_user_interface_events;
+	bool m_game_events;
 
 public:
 	static Scope<Input> Create();
@@ -38,27 +38,27 @@ public:
 
 	static inline bool GetKeyboardKey(int code)
 	{
-		return s_Context->m_KeyboadKeys[code];
+		return s_Context->m_keyboad_keys[code];
 	}
 	static inline bool GetMouseButton(int code)
 	{
-		return s_Context->m_MouseButtons[code];
+		return s_Context->m_mouse_buttons[code];
 	}
 
 	static inline const glm::vec2 &GetMousePosition(int code)
 	{
-		return s_Context->m_MousePosition;
+		return s_Context->m_mouse_position;
 	}
 
 	void OnEvent(const Event &inputEvent);
 
 	inline bool IsReceivingInputEvents() const
 	{
-		return m_UserInterfaceEvents;
+		return m_user_interface_events;
 	}
 	inline bool IsReceivingGameEvents() const
 	{
-		return m_GameEvents;
+		return m_game_events;
 	}
 
 private:

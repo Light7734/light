@@ -26,16 +26,16 @@ public:
 	};
 
 private:
-	Ref<Shader> m_Shader;
-	Ref<VertexBuffer> m_VertexBuffer;
-	Ref<IndexBuffer> m_IndexBuffer;
-	Ref<VertexLayout> m_VertexLayout;
+	Ref<Shader> m_shader;
+	Ref<VertexBuffer> m_vertex_buffer;
+	Ref<IndexBuffer> m_index_buffer;
+	Ref<VertexLayout> m_vertex_layout;
 
-	TintedTextureVertexData *m_MapCurrent = nullptr;
-	TintedTextureVertexData *m_MapEnd = nullptr;
+	TintedTextureVertexData *m_map_current = nullptr;
+	TintedTextureVertexData *m_map_end = nullptr;
 
-	unsigned int m_QuadCount;
-	unsigned int m_MaxVertices;
+	unsigned int m_quad_count;
+	unsigned int m_max_vertices;
 
 public:
 	TintedTextureRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
@@ -49,12 +49,12 @@ public:
 
 	inline TintedTextureVertexData *GetMapCurrent()
 	{
-		return m_MapCurrent;
+		return m_map_current;
 	}
 
 	inline unsigned int GetQuadCount() const
 	{
-		return m_QuadCount;
+		return m_quad_count;
 	}
 
 	inline constexpr unsigned int GetVertexSize() const

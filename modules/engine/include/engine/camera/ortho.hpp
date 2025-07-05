@@ -8,16 +8,16 @@ namespace Light {
 class OrthographicCamera
 {
 private:
-	glm::vec2 m_Position;
-	float m_AspectRatio;
-	float m_ZoomLevel;
+	glm::vec2 m_position;
+	float m_aspect_ratio;
+	float m_zoom_level;
 
-	const glm::vec3 m_Up;
+	const glm::vec3 m_up;
 
-	glm::mat4 m_Projection;
-	glm::mat4 m_View;
+	glm::mat4 m_projection;
+	glm::mat4 m_view;
 
-	glm::vec4 m_ClearColor;
+	glm::vec4 m_clear_color;
 
 public:
 	OrthographicCamera(
@@ -35,16 +35,16 @@ public:
 
 	inline const glm::mat4 &GetView() const
 	{
-		return m_View;
+		return m_view;
 	}
 	inline const glm::mat4 &GetProjection() const
 	{
-		return m_Projection;
+		return m_projection;
 	}
 
 	inline const glm::vec4 &GetClearColor() const
 	{
-		return m_ClearColor;
+		return m_clear_color;
 	}
 
 	// CAMERA_CONTROLLER //

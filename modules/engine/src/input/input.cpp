@@ -16,13 +16,13 @@ Scope<Input> Input::Create()
 }
 
 Input::Input()
-    : m_KeyboadKeys {}
-    , m_MouseButtons {}
-    , m_MousePosition {}
-    , m_MouseDelta {}
-    , m_MouseWheelDelta {}
-    , m_UserInterfaceEvents(true)
-    , m_GameEvents(true)
+    : m_keyboad_keys {}
+    , m_mouse_buttons {}
+    , m_mouse_position {}
+    , m_mouse_delta {}
+    , m_mouse_wheel_delta {}
+    , m_user_interface_events(true)
+    , m_game_events(true)
 {
 	ASSERT(
 	    !s_Context,
@@ -35,26 +35,26 @@ Input::Input()
 
 void Input::ReceiveUserInterfaceEventsImpl(bool receive, bool toggle /* = false */)
 {
-	m_UserInterfaceEvents = toggle ? !m_UserInterfaceEvents : receive;
+	m_user_interface_events = toggle ? !m_user_interface_events : receive;
 }
 
 void Input::ReceieveGameEventsImpl(bool receive, bool toggle /*= false*/)
 {
-	bool prev = m_GameEvents;
-	m_GameEvents = toggle ? !m_UserInterfaceEvents : receive;
+	bool prev = m_game_events;
+	m_game_events = toggle ? !m_user_interface_events : receive;
 
-	if (m_GameEvents != prev)
+	if (m_game_events != prev)
 		RestartInputState();
 }
 
 void Input::RestartInputState()
 {
-	m_KeyboadKeys.fill(false);
-	m_MouseButtons.fill(false);
+	m_keyboad_keys.fill(false);
+	m_mouse_buttons.fill(false);
 
-	m_MousePosition = glm::vec2(0.0f);
-	m_MouseDelta = glm::vec2(0.0f);
-	m_MouseWheelDelta = 0.0f;
+	m_mouse_position = glm::vec2(0.0f);
+	m_mouse_delta = glm::vec2(0.0f);
+	m_mouse_wheel_delta = 0.0f;
 }
 
 void Input::OnEvent(const Event &inputEvent)
@@ -67,13 +67,13 @@ void Input::OnEvent(const Event &inputEvent)
 	{
 		const MouseMovedEvent &event = (const MouseMovedEvent &)inputEvent;
 
-		if (m_GameEvents)
+		if (m_game_events)
 		{
-			m_MouseDelta = event.GetPosition() - m_MousePosition;
-			m_MousePosition = event.GetPosition();
+			m_mouse_delta = event.GetPosition() - m_mouse_position;
+			m_mouse_position = event.GetPosition();
 		}
 
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 			io.MousePos = ImVec2(event.GetX(), event.GetY());
 
 		return;
@@ -82,10 +82,10 @@ void Input::OnEvent(const Event &inputEvent)
 	{
 		const ButtonPressedEvent &event = (const ButtonPressedEvent &)inputEvent;
 
-		if (m_GameEvents)
-			m_MouseButtons[event.GetButton()] = true;
+		if (m_game_events)
+			m_mouse_buttons[event.GetButton()] = true;
 
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 			io.MouseDown[event.GetButton()] = true;
 
 		return;
@@ -94,10 +94,10 @@ void Input::OnEvent(const Event &inputEvent)
 	{
 		const ButtonReleasedEvent &event = (const ButtonReleasedEvent &)inputEvent;
 
-		if (m_GameEvents)
-			m_MouseButtons[event.GetButton()] = false;
+		if (m_game_events)
+			m_mouse_buttons[event.GetButton()] = false;
 
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 			io.MouseDown[event.GetButton()] = false;
 
 		return;
@@ -106,10 +106,10 @@ void Input::OnEvent(const Event &inputEvent)
 	{
 		const WheelScrolledEvent &event = (const WheelScrolledEvent &)inputEvent;
 
-		if (m_GameEvents)
-			m_MouseWheelDelta = event.GetOffset();
+		if (m_game_events)
+			m_mouse_wheel_delta = event.GetOffset();
 
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 			io.MouseWheel = event.GetOffset();
 
 		return;
@@ -119,10 +119,10 @@ void Input::OnEvent(const Event &inputEvent)
 	{
 		const KeyPressedEvent &event = (const KeyPressedEvent &)inputEvent;
 
-		if (m_GameEvents)
-			m_KeyboadKeys[event.GetKey()] = true;
+		if (m_game_events)
+			m_keyboad_keys[event.GetKey()] = true;
 
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 		{
 			io.KeysDown[event.GetKey()] = true;
 			// if (event.GetKey() == Key::BackSpace)
@@ -135,17 +135,17 @@ void Input::OnEvent(const Event &inputEvent)
 	{
 		const KeyReleasedEvent &event = (const KeyReleasedEvent &)inputEvent;
 
-		if (m_GameEvents)
-			m_KeyboadKeys[event.GetKey()] = false;
+		if (m_game_events)
+			m_keyboad_keys[event.GetKey()] = false;
 
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 			io.KeysDown[event.GetKey()] = false;
 
 		return;
 	}
 	case EventType::SetChar:
 	{
-		if (m_UserInterfaceEvents)
+		if (m_user_interface_events)
 		{
 			const SetCharEvent &event = (const SetCharEvent &)inputEvent;
 			io.AddInputCharacter(event.GetCharacter());

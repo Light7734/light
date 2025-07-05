@@ -9,8 +9,8 @@ namespace Light {
 class glConstantBuffer: public ConstantBuffer
 {
 private:
-	unsigned int m_BufferID;
-	unsigned int m_Index;
+	unsigned int m_buffer_id;
+	unsigned int m_index;
 
 public:
 	glConstantBuffer(ConstantBufferIndex index, unsigned int size);
@@ -26,7 +26,7 @@ public:
 class glVertexBuffer: public VertexBuffer
 {
 private:
-	unsigned int m_BufferID;
+	unsigned int m_buffer_id;
 
 public:
 	glVertexBuffer(float *vertices, unsigned int stride, unsigned int count);
@@ -43,7 +43,7 @@ public:
 class glIndexBuffer: public IndexBuffer
 {
 private:
-	unsigned int m_BufferID;
+	unsigned int m_buffer_id;
 
 public:
 	glIndexBuffer(unsigned int *indices, unsigned int count);

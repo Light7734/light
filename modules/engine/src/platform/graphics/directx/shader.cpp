@@ -9,10 +9,10 @@ dxShader::dxShader(
     BasicFileHandle pixelFile,
     Ref<dxSharedContext> sharedContext
 )
-    : m_Context(sharedContext)
-    , m_VertexShader(nullptr)
-    , m_PixelShader(nullptr)
-    , m_VertexBlob(nullptr)
+    : m_context(sharedContext)
+    , m_vertex_shader(nullptr)
+    , m_pixel_shader(nullptr)
+    , m_vertex_blob(nullptr)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> ps = nullptr, vsErr = nullptr, psErr = nullptr;
 
@@ -28,7 +28,7 @@ dxShader::dxShader(
 	    "vs_4_0",
 	    NULL,
 	    NULL,
-	    &m_VertexBlob,
+	    &m_vertex_blob,
 	    &vsErr
 	);
 	D3DCompile(
@@ -51,14 +51,14 @@ dxShader::dxShader(
 
 	// create shaders
 	HRESULT hr;
-	DXC(m_Context->GetDevice()->CreateVertexShader(
-	    m_VertexBlob->GetBufferPointer(),
-	    m_VertexBlob->GetBufferSize(),
+	DXC(m_context->GetDevice()->CreateVertexShader(
+	    m_vertex_blob->GetBufferPointer(),
+	    m_vertex_blob->GetBufferSize(),
 	    NULL,
-	    &m_VertexShader
+	    &m_vertex_shader
 	));
-	DXC(m_Context->GetDevice()
-	        ->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), NULL, &m_PixelShader));
+	DXC(m_context->GetDevice()
+	        ->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), NULL, &m_pixel_shader));
 }
 
 dxShader::~dxShader()
@@ -68,14 +68,14 @@ dxShader::~dxShader()
 
 void dxShader::Bind()
 {
-	m_Context->GetDeviceContext()->VSSetShader(m_VertexShader.Get(), nullptr, 0u);
-	m_Context->GetDeviceContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0u);
+	m_context->GetDeviceContext()->VSSetShader(m_vertex_shader.Get(), nullptr, 0u);
+	m_context->GetDeviceContext()->PSSetShader(m_pixel_shader.Get(), nullptr, 0u);
 }
 
 void dxShader::UnBind()
 {
-	m_Context->GetDeviceContext()->VSSetShader(nullptr, nullptr, 0u);
-	m_Context->GetDeviceContext()->PSSetShader(nullptr, nullptr, 0u);
+	m_context->GetDeviceContext()->VSSetShader(nullptr, nullptr, 0u);
+	m_context->GetDeviceContext()->PSSetShader(nullptr, nullptr, 0u);
 }
 
 } // namespace Light

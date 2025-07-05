@@ -15,28 +15,28 @@ namespace Light {
 Renderer *Renderer::s_Context = nullptr;
 
 Renderer::Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
-    : m_QuadRenderer(LT_MAX_QUAD_RENDERER_VERTICES, sharedContext)
-    , m_TextureRenderer(LT_MAX_TEXTURE_RENDERER_VERTICES, sharedContext)
-    , m_TintedTextureRenderer(LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES, sharedContext)
-    , m_ViewProjectionBuffer(nullptr)
-    , m_RenderCommand(nullptr)
-    , m_Blender(nullptr)
-    , m_DefaultFramebufferCamera(nullptr)
-    , m_TargetFramebuffer(nullptr)
-    , m_ShouldClearBackbuffer(false)
+    : m_quad_renderer(LT_MAX_QUAD_RENDERER_VERTICES, sharedContext)
+    , m_texture_renderer(LT_MAX_TEXTURE_RENDERER_VERTICES, sharedContext)
+    , m_tinted_texture_renderer(LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES, sharedContext)
+    , m_view_projection_buffer(nullptr)
+    , m_render_command(nullptr)
+    , m_blender(nullptr)
+    , m_default_framebuffer_camera(nullptr)
+    , m_target_framebuffer(nullptr)
+    , m_should_clear_backbuffer(false)
 {
 	ASSERT(!s_Context, "An instance of 'Renderer' already exists, do not construct this class!");
 	s_Context = this;
 
-	m_ViewProjectionBuffer = ConstantBuffer::Create(
+	m_view_projection_buffer = ConstantBuffer::Create(
 	    ConstantBufferIndex::ViewProjection,
 	    sizeof(glm::mat4),
 	    sharedContext
 	);
 
-	m_RenderCommand = RenderCommand::Create(windowHandle, sharedContext);
-	m_Blender = Blender::Create(sharedContext);
-	m_Blender->Enable(BlendFactor::SRC_ALPHA, BlendFactor::INVERSE_SRC_ALPHA);
+	m_render_command = RenderCommand::Create(windowHandle, sharedContext);
+	m_blender = Blender::Create(sharedContext);
+	m_blender->Enable(BlendFactor::SRC_ALPHA, BlendFactor::INVERSE_SRC_ALPHA);
 }
 
 Scope<Renderer> Renderer::Create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
@@ -46,7 +46,7 @@ Scope<Renderer> Renderer::Create(GLFWwindow *windowHandle, Ref<SharedContext> sh
 
 void Renderer::OnWindowResize(const WindowResizedEvent &event)
 {
-	m_RenderCommand->SetViewport(0u, 0u, event.GetSize().x, event.GetSize().y);
+	m_render_command->SetViewport(0u, 0u, event.GetSize().x, event.GetSize().y);
 }
 
 //======================================== DRAW_QUAD ========================================//
@@ -91,7 +91,7 @@ void Renderer::DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, Re
 void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint)
 {
 	// locals
-	QuadRendererProgram::QuadVertexData *bufferMap = m_QuadRenderer.GetMapCurrent();
+	QuadRendererProgram::QuadVertexData *bufferMap = m_quad_renderer.GetMapCurrent();
 
 	// top left
 	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
@@ -110,7 +110,7 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint)
 	bufferMap[3].tint = tint;
 
 	// advance
-	if (!m_QuadRenderer.Advance())
+	if (!m_quad_renderer.Advance())
 	{
 		LOG(warn, "Exceeded LT_MAX_QUAD_RENDERER_VERTICES: {}", LT_MAX_QUAD_RENDERER_VERTICES);
 		FlushScene();
@@ -126,7 +126,7 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, Ref<Texture> texture)
 	texture->Bind();
 
 	// locals
-	TextureRendererProgram::TextureVertexData *bufferMap = m_TextureRenderer.GetMapCurrent();
+	TextureRendererProgram::TextureVertexData *bufferMap = m_texture_renderer.GetMapCurrent();
 
 	// top left
 	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
@@ -145,7 +145,7 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, Ref<Texture> texture)
 	bufferMap[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
-	if (!m_TextureRenderer.Advance())
+	if (!m_texture_renderer.Advance())
 	{
 		LOG(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
 		);
@@ -160,7 +160,7 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint, R
 	texture->Bind();
 
 	// locals
-	TintedTextureRendererProgram::TintedTextureVertexData *bufferMap = m_TintedTextureRenderer
+	TintedTextureRendererProgram::TintedTextureVertexData *bufferMap = m_tinted_texture_renderer
 	                                                                       .GetMapCurrent();
 
 	// top left
@@ -184,7 +184,7 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint, R
 	bufferMap[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
-	if (!m_TintedTextureRenderer.Advance())
+	if (!m_tinted_texture_renderer.Advance())
 	{
 		LOG(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
 		);
@@ -200,13 +200,13 @@ void Renderer::BeginFrame()
 
 void Renderer::EndFrame()
 {
-	m_RenderCommand->SwapBuffers();
-	m_RenderCommand->ClearBackBuffer(
-	    m_DefaultFramebufferCamera ? m_DefaultFramebufferCamera->GetBackgroundColor() :
+	m_render_command->SwapBuffers();
+	m_render_command->ClearBackBuffer(
+	    m_default_framebuffer_camera ? m_default_framebuffer_camera->GetBackgroundColor() :
 	                                 glm::vec4(0.0f)
 	);
 
-	m_DefaultFramebufferCamera = nullptr;
+	m_default_framebuffer_camera = nullptr;
 }
 
 void Renderer::BeginSceneImpl(
@@ -216,89 +216,89 @@ void Renderer::BeginSceneImpl(
 )
 {
 	// determine the target frame buffer
-	m_TargetFramebuffer = targetFrameBuffer;
+	m_target_framebuffer = targetFrameBuffer;
 
 	if (targetFrameBuffer)
 		targetFrameBuffer->BindAsTarget(camera->GetBackgroundColor());
 	else
 	{
-		m_DefaultFramebufferCamera = camera;
-		m_RenderCommand->DefaultTargetFramebuffer();
+		m_default_framebuffer_camera = camera;
+		m_render_command->DefaultTargetFramebuffer();
 	}
 
 	// update view projection buffer
-	glm::mat4 *map = (glm::mat4 *)m_ViewProjectionBuffer->Map();
+	glm::mat4 *map = (glm::mat4 *)m_view_projection_buffer->Map();
 	map[0] = camera->GetProjection() * glm::inverse(cameraTransform);
-	m_ViewProjectionBuffer->UnMap();
+	m_view_projection_buffer->UnMap();
 
 	// map renderers
-	m_QuadRenderer.Map();
-	m_TextureRenderer.Map();
-	m_TintedTextureRenderer.Map();
+	m_quad_renderer.Map();
+	m_texture_renderer.Map();
+	m_tinted_texture_renderer.Map();
 }
 
 void Renderer::FlushScene()
 {
 	/* tinted texture renderer */
-	m_TintedTextureRenderer.UnMap();
-	if (m_TintedTextureRenderer.GetQuadCount())
+	m_tinted_texture_renderer.UnMap();
+	if (m_tinted_texture_renderer.GetQuadCount())
 	{
-		m_TintedTextureRenderer.Bind();
-		m_RenderCommand->DrawIndexed(m_TintedTextureRenderer.GetQuadCount() * 6u);
+		m_tinted_texture_renderer.Bind();
+		m_render_command->DrawIndexed(m_tinted_texture_renderer.GetQuadCount() * 6u);
 	}
 
 	/* quad renderer */
-	m_QuadRenderer.UnMap();
-	if (m_QuadRenderer.GetQuadCount())
+	m_quad_renderer.UnMap();
+	if (m_quad_renderer.GetQuadCount())
 	{
-		m_QuadRenderer.Bind();
-		m_RenderCommand->DrawIndexed(m_QuadRenderer.GetQuadCount() * 6u);
+		m_quad_renderer.Bind();
+		m_render_command->DrawIndexed(m_quad_renderer.GetQuadCount() * 6u);
 	}
 
 	/* texture renderer */
-	m_TextureRenderer.UnMap();
-	if (m_TextureRenderer.GetQuadCount())
+	m_texture_renderer.UnMap();
+	if (m_texture_renderer.GetQuadCount())
 	{
-		m_TextureRenderer.Bind();
-		m_RenderCommand->DrawIndexed(m_TextureRenderer.GetQuadCount() * 6u);
+		m_texture_renderer.Bind();
+		m_render_command->DrawIndexed(m_texture_renderer.GetQuadCount() * 6u);
 	}
 
-	m_QuadRenderer.Map();
-	m_TextureRenderer.Map();
-	m_TintedTextureRenderer.Map();
+	m_quad_renderer.Map();
+	m_texture_renderer.Map();
+	m_tinted_texture_renderer.Map();
 }
 
 void Renderer::EndSceneImpl()
 {
 	/* tinted texture renderer */
-	m_TintedTextureRenderer.UnMap();
-	if (m_TintedTextureRenderer.GetQuadCount())
+	m_tinted_texture_renderer.UnMap();
+	if (m_tinted_texture_renderer.GetQuadCount())
 	{
-		m_TintedTextureRenderer.Bind();
-		m_RenderCommand->DrawIndexed(m_TintedTextureRenderer.GetQuadCount() * 6u);
+		m_tinted_texture_renderer.Bind();
+		m_render_command->DrawIndexed(m_tinted_texture_renderer.GetQuadCount() * 6u);
 	}
 
 	/* quad renderer */
-	m_QuadRenderer.UnMap();
-	if (m_QuadRenderer.GetQuadCount())
+	m_quad_renderer.UnMap();
+	if (m_quad_renderer.GetQuadCount())
 	{
-		m_QuadRenderer.Bind();
-		m_RenderCommand->DrawIndexed(m_QuadRenderer.GetQuadCount() * 6u);
+		m_quad_renderer.Bind();
+		m_render_command->DrawIndexed(m_quad_renderer.GetQuadCount() * 6u);
 	}
 
 	/* texture renderer */
-	m_TextureRenderer.UnMap();
-	if (m_TextureRenderer.GetQuadCount())
+	m_texture_renderer.UnMap();
+	if (m_texture_renderer.GetQuadCount())
 	{
-		m_TextureRenderer.Bind();
-		m_RenderCommand->DrawIndexed(m_TextureRenderer.GetQuadCount() * 6u);
+		m_texture_renderer.Bind();
+		m_render_command->DrawIndexed(m_texture_renderer.GetQuadCount() * 6u);
 	}
 
 	// reset frame buffer
-	if (m_TargetFramebuffer)
+	if (m_target_framebuffer)
 	{
-		m_TargetFramebuffer = nullptr;
-		m_RenderCommand->DefaultTargetFramebuffer();
+		m_target_framebuffer = nullptr;
+		m_render_command->DefaultTargetFramebuffer();
 	}
 }
 

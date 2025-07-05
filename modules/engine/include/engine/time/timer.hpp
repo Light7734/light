@@ -8,7 +8,7 @@ namespace Light {
 class Timer
 {
 private:
-	std::chrono::time_point<std::chrono::steady_clock> m_Start;
+	std::chrono::time_point<std::chrono::steady_clock> m_start;
 
 public:
 	Timer();
@@ -16,7 +16,7 @@ public:
 	inline float GetElapsedTime() const
 	{
 		return (std::chrono::duration_cast<std::chrono::milliseconds>(
-		            std::chrono::steady_clock::now() - m_Start
+		            std::chrono::steady_clock::now() - m_start
 		       )
 		            .count())
 		       / 1000.;
@@ -24,7 +24,7 @@ public:
 
 	inline void Reset()
 	{
-		m_Start = std::chrono::steady_clock::now();
+		m_start = std::chrono::steady_clock::now();
 	}
 };
 
@@ -33,8 +33,8 @@ class DeltaTimer
 private:
 	Timer timer;
 
-	float m_PreviousFrame;
-	float m_DeltaTime;
+	float m_previous_frame;
+	float m_delta_time;
 
 public:
 	DeltaTimer();
@@ -43,7 +43,7 @@ public:
 
 	inline float GetDeltaTime() const
 	{
-		return m_DeltaTime;
+		return m_delta_time;
 	}
 };
 

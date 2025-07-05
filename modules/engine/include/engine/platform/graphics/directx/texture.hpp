@@ -12,11 +12,11 @@ class dxSharedContext;
 class dxTexture: public Texture
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture2D;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_ShaderResourceView;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_SamplerState;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture_2d;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_shader_resource_view;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler_state;
 
 public:
 	dxTexture(

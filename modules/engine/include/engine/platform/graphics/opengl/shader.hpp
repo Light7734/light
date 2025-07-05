@@ -9,7 +9,7 @@ namespace Light {
 class glShader: public Shader
 {
 private:
-	unsigned int m_ShaderID;
+	unsigned int m_shader_id;
 
 public:
 	glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile);

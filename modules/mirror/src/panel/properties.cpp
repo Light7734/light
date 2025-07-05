@@ -12,11 +12,11 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 {
 	ImGui::Begin("Properties");
 
-	if (m_EntityContext.IsValid())
+	if (m_entity_context.IsValid())
 	{
-		if (m_EntityContext.HasComponent<TagComponent>())
+		if (m_entity_context.HasComponent<TagComponent>())
 		{
-			auto &tagComponent = m_EntityContext.GetComponent<TagComponent>();
+			auto &tagComponent = m_entity_context.GetComponent<TagComponent>();
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
@@ -37,22 +37,22 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 			if (ImGui::Selectable(
 			        "SpriteRenderer",
 			        false,
-			        m_EntityContext.HasComponent<SpriteRendererComponent>() ?
+			        m_entity_context.HasComponent<SpriteRendererComponent>() ?
 			            ImGuiSelectableFlags_Disabled :
 			            NULL
 			    ))
-				m_EntityContext.AddComponent<SpriteRendererComponent>(
+				m_entity_context.AddComponent<SpriteRendererComponent>(
 				    Light::ResourceManager::GetTexture("awesomeface")
 				);
 
 			if (ImGui::Selectable(
 			        "Camera",
 			        false,
-			        m_EntityContext.HasComponent<CameraComponent>() ?
+			        m_entity_context.HasComponent<CameraComponent>() ?
 			            ImGuiSelectableFlags_Disabled :
 			            NULL
 			    ))
-				m_EntityContext.AddComponent<CameraComponent>();
+				m_entity_context.AddComponent<CameraComponent>();
 
 			ImGui::EndPopup();
 		}
@@ -60,7 +60,7 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 
 		DrawComponent<TransformComponent>(
 		    "Transform Component",
-		    m_EntityContext,
+		    m_entity_context,
 		    [&](auto &transformComponent) {
 			    DrawVec3Control("Translation", transformComponent.translation);
 		    }
@@ -68,7 +68,7 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 
 		DrawComponent<SpriteRendererComponent>(
 		    "SpriteRenderer Component",
-		    m_EntityContext,
+		    m_entity_context,
 		    [&](auto &spriteRendererComponent) {
 			    ImGui::ColorEdit4("Color", &spriteRendererComponent.tint[0]);
 		    }
@@ -76,7 +76,7 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 
 		DrawComponent<CameraComponent>(
 		    "Camera Component",
-		    m_EntityContext,
+		    m_entity_context,
 		    [&](auto &cameraComponent) {
 			    auto &camera = cameraComponent.camera;
 
@@ -147,7 +147,7 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 
 void PropertiesPanel::SetEntityContext(Entity entity)
 {
-	m_EntityContext = entity;
+	m_entity_context = entity;
 }
 
 void PropertiesPanel::DrawVec3Control(

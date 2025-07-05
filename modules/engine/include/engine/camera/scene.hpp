@@ -27,11 +27,11 @@ public:
 	};
 
 private:
-	OrthographicSpecification m_OrthographicSpecification;
-	PerspectiveSpecification m_PerspectiveSpecification;
-	float m_AspectRatio;
+	OrthographicSpecification m_orthographic_specification;
+	PerspectiveSpecification m_perspective_specification;
+	float m_aspect_ratio;
 
-	ProjectionType m_ProjectionType;
+	ProjectionType m_projection_type;
 
 public:
 	SceneCamera();
@@ -50,33 +50,33 @@ public:
 
 	inline float GetOrthographicSize() const
 	{
-		return m_OrthographicSpecification.size;
+		return m_orthographic_specification.size;
 	}
 	inline float GetOrthographicFarPlane() const
 	{
-		return m_OrthographicSpecification.farPlane;
+		return m_orthographic_specification.farPlane;
 	}
 	inline float GetOrthographicNearPlane() const
 	{
-		return m_OrthographicSpecification.nearPlane;
+		return m_orthographic_specification.nearPlane;
 	}
 
 	inline float GetPerspectiveVerticalFOV() const
 	{
-		return m_PerspectiveSpecification.verticalFOV;
+		return m_perspective_specification.verticalFOV;
 	}
 	inline float GetPerspectiveFarPlane() const
 	{
-		return m_PerspectiveSpecification.farPlane;
+		return m_perspective_specification.farPlane;
 	}
 	inline float GetPerspectiveNearPlane() const
 	{
-		return m_PerspectiveSpecification.nearPlane;
+		return m_perspective_specification.nearPlane;
 	}
 
 	inline ProjectionType GetProjectionType() const
 	{
-		return m_ProjectionType;
+		return m_projection_type;
 	}
 
 private:

@@ -12,7 +12,7 @@ void glUserInterface::PlatformImplementation(
     Ref<SharedContext> sharedContext
 )
 {
-	m_WindowHandle = windowHandle;
+	m_window_handle = windowHandle;
 
 	ImGui_ImplGlfw_InitForOpenGL(windowHandle, false);
 	ImGui_ImplOpenGL3_Init();
@@ -45,7 +45,7 @@ void glUserInterface::End()
 
 	ImGui::UpdatePlatformWindows();
 	ImGui::RenderPlatformWindowsDefault();
-	glfwMakeContextCurrent(m_WindowHandle);
+	glfwMakeContextCurrent(m_window_handle);
 }
 
 void glUserInterface::LogDebugData()

@@ -21,22 +21,22 @@ public:
 class WindowMovedEvent: public Event
 {
 private:
-	const glm::ivec2 m_Position;
+	const glm::ivec2 m_position;
 
 public:
-	WindowMovedEvent(int x, int y): m_Position(x, y)
+	WindowMovedEvent(int x, int y): m_position(x, y)
 	{
 	}
 
 	const glm::ivec2 &GetPosition() const
 	{
-		return m_Position;
+		return m_position;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "WindwoMoved: " << m_Position.x << ", " << m_Position.y;
+		ss << "WindwoMoved: " << m_position.x << ", " << m_position.y;
 		return ss.str();
 		;
 	}
@@ -47,22 +47,22 @@ public:
 class WindowResizedEvent: public Event
 {
 private:
-	const glm::uvec2 m_Size;
+	const glm::uvec2 m_size;
 
 public:
-	WindowResizedEvent(unsigned int width, unsigned int height): m_Size(width, height)
+	WindowResizedEvent(unsigned int width, unsigned int height): m_size(width, height)
 	{
 	}
 
 	const glm::uvec2 &GetSize() const
 	{
-		return m_Size;
+		return m_size;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "WindowResized: " << m_Size.x << ", " << m_Size.y;
+		ss << "WindowResized: " << m_size.x << ", " << m_size.y;
 		return ss.str();
 	}
 	EVENT_TYPE(WindowResized)

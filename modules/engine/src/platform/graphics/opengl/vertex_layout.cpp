@@ -8,7 +8,7 @@ glVertexLayout::glVertexLayout(
     Ref<VertexBuffer> buffer,
     const std::vector<std::pair<std::string, VertexElementType>> &elements
 )
-    : m_ArrayID(NULL)
+    : m_array_id(NULL)
 {
 	// check
 	ASSERT(
@@ -30,7 +30,7 @@ glVertexLayout::glVertexLayout(
 	}
 
 	// create vertex array
-	glCreateVertexArrays(1, &m_ArrayID);
+	glCreateVertexArrays(1, &m_array_id);
 
 	// bind buffer and array
 	buffer->Bind();
@@ -54,12 +54,12 @@ glVertexLayout::glVertexLayout(
 
 glVertexLayout::~glVertexLayout()
 {
-	glDeleteVertexArrays(1, &m_ArrayID);
+	glDeleteVertexArrays(1, &m_array_id);
 }
 
 void glVertexLayout::Bind()
 {
-	glBindVertexArray(m_ArrayID);
+	glBindVertexArray(m_array_id);
 }
 
 void glVertexLayout::UnBind()

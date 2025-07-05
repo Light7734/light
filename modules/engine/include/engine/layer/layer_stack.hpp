@@ -14,10 +14,10 @@ private:
 	static LayerStack *s_Context;
 
 private:
-	std::vector<Layer *> m_Layers;
+	std::vector<Layer *> m_layers;
 
-	std::vector<Layer *>::iterator m_Begin;
-	std::vector<Layer *>::iterator m_End;
+	std::vector<Layer *>::iterator m_begin;
+	std::vector<Layer *>::iterator m_end;
 
 public:
 	static Scope<LayerStack> Create();
@@ -42,24 +42,24 @@ public:
 
 	inline bool IsEmpty()
 	{
-		return m_Layers.empty();
+		return m_layers.empty();
 	}
 
 	std::vector<Layer *>::iterator begin()
 	{
-		return m_Layers.begin();
+		return m_layers.begin();
 	}
 	std::vector<Layer *>::iterator end()
 	{
-		return m_Layers.end();
+		return m_layers.end();
 	}
 	std::vector<Layer *>::reverse_iterator rbegin()
 	{
-		return m_Layers.rbegin();
+		return m_layers.rbegin();
 	}
 	std::vector<Layer *>::reverse_iterator rend()
 	{
-		return m_Layers.rend();
+		return m_layers.rend();
 	}
 
 private:

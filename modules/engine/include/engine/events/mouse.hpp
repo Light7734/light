@@ -10,31 +10,31 @@ namespace Light {
 class MouseMovedEvent: public Event
 {
 private:
-	const glm::vec2 m_Position;
+	const glm::vec2 m_position;
 
 public:
-	MouseMovedEvent(float x, float y): m_Position(x, y)
+	MouseMovedEvent(float x, float y): m_position(x, y)
 	{
 	}
 
 	inline const glm::vec2 &GetPosition() const
 	{
-		return m_Position;
+		return m_position;
 	}
 
 	inline float GetX() const
 	{
-		return m_Position.x;
+		return m_position.x;
 	}
 	inline float GetY() const
 	{
-		return m_Position.y;
+		return m_position.y;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "MouseMoved: " << m_Position.x << ", " << m_Position.y;
+		ss << "MouseMoved: " << m_position.x << ", " << m_position.y;
 		return ss.str();
 	}
 	EVENT_TYPE(MouseMoved)
@@ -44,22 +44,22 @@ public:
 class WheelScrolledEvent: public Event
 {
 private:
-	const float m_Offset;
+	const float m_offset;
 
 public:
-	WheelScrolledEvent(float offset): m_Offset(offset)
+	WheelScrolledEvent(float offset): m_offset(offset)
 	{
 	}
 
 	inline float GetOffset() const
 	{
-		return m_Offset;
+		return m_offset;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "WheelScrolled: " << m_Offset;
+		ss << "WheelScrolled: " << m_offset;
 		return ss.str();
 	}
 	EVENT_TYPE(WheelScrolled)
@@ -69,22 +69,22 @@ public:
 class ButtonPressedEvent: public Event
 {
 private:
-	const int m_Button;
+	const int m_button;
 
 public:
-	ButtonPressedEvent(int button): m_Button(button)
+	ButtonPressedEvent(int button): m_button(button)
 	{
 	}
 
 	inline int GetButton() const
 	{
-		return m_Button;
+		return m_button;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "ButtonPressed: " << m_Button;
+		ss << "ButtonPressed: " << m_button;
 		return ss.str();
 	}
 	EVENT_TYPE(ButtonPressed)
@@ -94,22 +94,22 @@ public:
 class ButtonReleasedEvent: public Event
 {
 private:
-	const int m_Button;
+	const int m_button;
 
 public:
-	ButtonReleasedEvent(int button): m_Button(button)
+	ButtonReleasedEvent(int button): m_button(button)
 	{
 	}
 
 	inline int GetButton() const
 	{
-		return m_Button;
+		return m_button;
 	}
 
 	virtual std::string GetInfoLog() const override
 	{
 		std::stringstream ss;
-		ss << "ButtonReleased: " << m_Button;
+		ss << "ButtonReleased: " << m_button;
 		return ss.str();
 	}
 	EVENT_TYPE(ButtonReleased)

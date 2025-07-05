@@ -18,7 +18,7 @@ private:
 	static UserInterface *s_Context;
 
 private:
-	ImGuiWindowFlags m_DockspaceFlags;
+	ImGuiWindowFlags m_dockspace_flags;
 
 public:
 	static Scope<UserInterface> Create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);

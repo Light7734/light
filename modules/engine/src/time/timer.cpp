@@ -2,19 +2,19 @@
 
 namespace Light {
 
-Timer::Timer(): m_Start(std::chrono::steady_clock::now())
+Timer::Timer(): m_start(std::chrono::steady_clock::now())
 {
 }
 
-DeltaTimer::DeltaTimer(): m_PreviousFrame(NULL), m_DeltaTime(60.0f / 1000.0f)
+DeltaTimer::DeltaTimer(): m_previous_frame(NULL), m_delta_time(60.0f / 1000.0f)
 {
 }
 
 void DeltaTimer::Update()
 {
 	float currentFrame = timer.GetElapsedTime();
-	m_DeltaTime = currentFrame - m_PreviousFrame;
-	m_PreviousFrame = currentFrame;
+	m_delta_time = currentFrame - m_previous_frame;
+	m_previous_frame = currentFrame;
 }
 
 } // namespace Light

@@ -4,7 +4,7 @@
 namespace Light {
 
 glBlender::glBlender()
-    : m_FactorMap { // constants
+    : m_factor_map { // constants
 	                { BlendFactor::ZERO, GL_ZERO },
 	                { BlendFactor::ONE, GL_ONE },
 
@@ -35,7 +35,7 @@ glBlender::glBlender()
 void glBlender::Enable(BlendFactor srcFactor, BlendFactor dstFactor)
 {
 	glEnable(GL_BLEND);
-	glBlendFunc(m_FactorMap.at(srcFactor), m_FactorMap.at(dstFactor));
+	glBlendFunc(m_factor_map.at(srcFactor), m_factor_map.at(dstFactor));
 }
 
 void glBlender::Disable()

@@ -13,7 +13,7 @@ Scope<ResourceManager> ResourceManager::Create()
 	return MakeScope(new ResourceManager());
 }
 
-ResourceManager::ResourceManager(): m_Shaders {}, m_Textures {}
+ResourceManager::ResourceManager(): m_shaders {}, m_textures {}
 {
 	ASSERT(!s_Context, "Repeated singleton construction");
 	s_Context = this;
@@ -39,7 +39,7 @@ void ResourceManager::LoadShaderImpl(
 	ASSERT(pixelFile.IsValid(), "Failed to read vertex file: {}", pixelPath);
 
 	// create shader
-	m_Shaders[name] = Ref<Shader>(
+	m_shaders[name] = Ref<Shader>(
 	    Shader::Create(vertexFile, pixelFile, GraphicsContext::GetSharedContext())
 	);
 
@@ -60,7 +60,7 @@ void ResourceManager::LoadTextureImpl(
 	ImageFileHandle imgFile = FileManager::ReadImageFile(path, desiredComponents);
 
 	// create texture
-	m_Textures[name] = Ref<Texture>(Texture::Create(
+	m_textures[name] = Ref<Texture>(Texture::Create(
 	    imgFile.GetWidth(),
 	    imgFile.GetHeight(),
 	    imgFile.GetComponents(),
@@ -75,13 +75,13 @@ void ResourceManager::LoadTextureImpl(
 
 void ResourceManager::ReleaseTextureImpl(const std::string &name)
 {
-	if (!m_Textures[name])
+	if (!m_textures[name])
 	{
 		LOG(warn, "Failed to find texture named: {}", name);
 		return;
 	}
 
-	m_Textures[name] = nullptr;
+	m_textures[name] = nullptr;
 }
 
 } // namespace Light

@@ -30,7 +30,7 @@ class WindowGainFocusEvent;
 class Layer
 {
 protected:
-	std::string m_LayerName;
+	std::string m_layer_name;
 
 public:
 	Layer(const std::string &name);
@@ -38,7 +38,7 @@ public:
 
 	inline const std::string &GetName() const
 	{
-		return m_LayerName;
+		return m_layer_name;
 	}
 
 	/* update */

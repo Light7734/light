@@ -15,13 +15,13 @@
 namespace Light {
 
 dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
-    : m_WindowHandle(windowHandle)
-    , m_DebugInterface(nullptr)
+    : m_window_handle(windowHandle)
+    , m_debug_interface(nullptr)
 {
 	// set 'GraphicsAPI';
-	m_GraphicsAPI = GraphicsAPI::DirectX;
+	m_graphics_api = GraphicsAPI::DirectX;
 
-	m_SharedContext = std::make_shared<dxSharedContext>();
+	m_shared_context = std::make_shared<dxSharedContext>();
 
 	// setup stuff
 	SetupDeviceAndSwapChain(windowHandle);
@@ -31,7 +31,7 @@ dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
 
 void dxGraphicsContext::SetupDeviceAndSwapChain(GLFWwindow *windowHandle)
 {
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_SharedContext);
+	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// swap chain desc
 	DXGI_SWAP_CHAIN_DESC sd = { 0 };
@@ -86,7 +86,7 @@ void dxGraphicsContext::SetupDeviceAndSwapChain(GLFWwindow *windowHandle)
 
 void dxGraphicsContext::SetupRenderTargets()
 {
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_SharedContext);
+	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// set primitive topology
 	context->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -107,7 +107,7 @@ void dxGraphicsContext::SetupRenderTargets()
 void dxGraphicsContext::SetupDebugInterface()
 {
 #ifdef LIGHT_DEBUG
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_SharedContext);
+	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	HRESULT hr;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debugInterface = nullptr;
@@ -134,7 +134,7 @@ void dxGraphicsContext::SetupDebugInterface()
 
 void dxGraphicsContext::LogDebugData()
 {
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_SharedContext);
+	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// locals
 	IDXGIDevice *DXGIDevice;

@@ -26,8 +26,8 @@ Scope<GraphicsContext> GraphicsContext::Create(GraphicsAPI api, GLFWwindow *wind
 	// terminate 'GraphicsContext' dependent classes
 	if (s_Context)
 	{
-		s_Context->m_Renderer.reset();
-		s_Context->m_UserInterface.reset();
+		s_Context->m_renderer.reset();
+		s_Context->m_user_interface.reset();
 
 		delete s_Context;
 	}
@@ -68,12 +68,12 @@ Scope<GraphicsContext> GraphicsContext::Create(GraphicsAPI api, GLFWwindow *wind
 	}
 
 	// create 'GraphicsContext' dependent classes
-	s_Context->m_UserInterface = UserInterface::Create(windowHandle, s_Context->m_SharedContext);
-	s_Context->m_Renderer = Renderer::Create(windowHandle, s_Context->m_SharedContext);
+	s_Context->m_user_interface = UserInterface::Create(windowHandle, s_Context->m_shared_context);
+	s_Context->m_renderer = Renderer::Create(windowHandle, s_Context->m_shared_context);
 
 	// check
-	ASSERT(s_Context->m_UserInterface, "Failed to create UserInterface");
-	ASSERT(s_Context->m_Renderer, "Failed to create Renderer");
+	ASSERT(s_Context->m_user_interface, "Failed to create UserInterface");
+	ASSERT(s_Context->m_renderer, "Failed to create Renderer");
 
 	return std::move(scopeGfx);
 }

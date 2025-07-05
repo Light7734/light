@@ -22,7 +22,7 @@ private:
 	void SerializeEntity(YAML::Emitter &out, Entity entity);
 
 private:
-	Ref<Scene> m_Scene;
+	Ref<Scene> m_scene;
 };
 
 

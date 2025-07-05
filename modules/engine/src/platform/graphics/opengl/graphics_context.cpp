@@ -14,10 +14,10 @@
 
 namespace Light {
 
-glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_WindowHandle(windowHandle)
+glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(windowHandle)
 {
 	// set 'GraphicsAPI'
-	m_GraphicsAPI = GraphicsAPI::OpenGL;
+	m_graphics_api = GraphicsAPI::OpenGL;
 
 	// make context current
 	glfwMakeContextCurrent(windowHandle);

@@ -20,34 +20,34 @@ public:
 	// getters
 	inline uint8_t *GetData()
 	{
-		return m_Data;
+		return m_data;
 	}
 	inline uint32_t GetSize()
 	{
-		return m_Size;
+		return m_size;
 	}
 
 	inline const std::string &GetPath()
 	{
-		return m_Path;
+		return m_path;
 	}
 	inline const std::string &GetName()
 	{
-		return m_Name;
+		return m_name;
 	}
 	inline const std::string &GetExtension()
 	{
-		return m_Extension;
+		return m_extension;
 	}
 
 	inline const std::string &GetNameWithExtension()
 	{
-		return m_Name + '.' + m_Extension;
+		return m_name + '.' + m_extension;
 	}
 
 	inline bool IsValid() const
 	{
-		return !!m_Data;
+		return !!m_data;
 	}
 
 	// operators
@@ -58,11 +58,11 @@ public:
 
 protected:
 	// made protected for custom Free():
-	uint8_t *m_Data;
-	uint32_t m_Size;
+	uint8_t *m_data;
+	uint32_t m_size;
 
 private:
-	const std::string m_Path, m_Name, m_Extension;
+	const std::string m_path, m_name, m_extension;
 };
 
 class ImageFileHandle: public BasicFileHandle
@@ -80,10 +80,10 @@ public:
 	    uint32_t desiredComponents
 	)
 	    : BasicFileHandle(data, size, path, name, extension)
-	    , m_Width(width)
-	    , m_Height(height)
-	    , m_Components(components)
-	    , m_DesiredComponents(desiredComponents)
+	    , m_width(width)
+	    , m_height(height)
+	    , m_components(components)
+	    , m_desired_components(desiredComponents)
 	{
 	}
 
@@ -92,23 +92,23 @@ public:
 	// getters
 	inline uint32_t GetWidth() const
 	{
-		return m_Width;
+		return m_width;
 	}
 	inline uint32_t GetHeight() const
 	{
-		return m_Height;
+		return m_height;
 	}
 	inline uint32_t GetComponents() const
 	{
-		return m_Components;
+		return m_components;
 	}
 	inline uint32_t GetDesiredComponents() const
 	{
-		return m_DesiredComponents;
+		return m_desired_components;
 	}
 
 private:
-	uint32_t m_Width, m_Height, m_Components, m_DesiredComponents;
+	uint32_t m_width, m_height, m_components, m_desired_components;
 };
 
 class FileManager

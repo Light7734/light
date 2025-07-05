@@ -5,53 +5,53 @@ namespace Light {
 
 //==================== CONSTANT_BUFFER ====================//
 glConstantBuffer::glConstantBuffer(ConstantBufferIndex index, unsigned int size)
-    : m_BufferID(NULL)
-    , m_Index(static_cast<int>(index))
+    : m_buffer_id(NULL)
+    , m_index(static_cast<int>(index))
 {
-	glCreateBuffers(1, &m_BufferID);
-	glNamedBufferData(m_BufferID, size, nullptr, GL_DYNAMIC_DRAW);
+	glCreateBuffers(1, &m_buffer_id);
+	glNamedBufferData(m_buffer_id, size, nullptr, GL_DYNAMIC_DRAW);
 
 	Bind();
 }
 
 glConstantBuffer::~glConstantBuffer()
 {
-	glDeleteBuffers(1, &m_BufferID);
+	glDeleteBuffers(1, &m_buffer_id);
 }
 
 void glConstantBuffer::Bind()
 {
-	glBindBufferBase(GL_UNIFORM_BUFFER, m_Index, m_BufferID);
+	glBindBufferBase(GL_UNIFORM_BUFFER, m_index, m_buffer_id);
 }
 
 void *glConstantBuffer::Map()
 {
-	void *map = glMapNamedBuffer(m_BufferID, GL_WRITE_ONLY);
+	void *map = glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
 	return map;
 }
 
 void glConstantBuffer::UnMap()
 {
-	glUnmapNamedBuffer(m_BufferID);
+	glUnmapNamedBuffer(m_buffer_id);
 }
 //==================== CONSTANT_BUFFER ====================//
 
 //==================== VERTEX_BUFFER ====================//
 glVertexBuffer::glVertexBuffer(float *vertices, unsigned int stride, unsigned int count)
-    : m_BufferID(NULL)
+    : m_buffer_id(NULL)
 {
-	glCreateBuffers(1, &m_BufferID);
-	glNamedBufferData(m_BufferID, stride * count, vertices, GL_DYNAMIC_DRAW);
+	glCreateBuffers(1, &m_buffer_id);
+	glNamedBufferData(m_buffer_id, stride * count, vertices, GL_DYNAMIC_DRAW);
 }
 
 glVertexBuffer::~glVertexBuffer()
 {
-	glDeleteBuffers(1, &m_BufferID);
+	glDeleteBuffers(1, &m_buffer_id);
 }
 
 void glVertexBuffer::Bind()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_buffer_id);
 }
 
 void glVertexBuffer::UnBind()
@@ -61,17 +61,17 @@ void glVertexBuffer::UnBind()
 
 void *glVertexBuffer::Map()
 {
-	return glMapNamedBuffer(m_BufferID, GL_WRITE_ONLY);
+	return glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
 }
 
 void glVertexBuffer::UnMap()
 {
-	glUnmapNamedBuffer(m_BufferID);
+	glUnmapNamedBuffer(m_buffer_id);
 }
 //==================== VERTEX_BUFFER ====================//
 
 //==================== INDEX_BUFFER ====================//
-glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_BufferID(NULL)
+glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_buffer_id(NULL)
 {
 	// generate indices if not provided
 	bool hasIndices = !!indices;
@@ -103,8 +103,8 @@ glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_Buffe
 	}
 
 	// create buffer
-	glCreateBuffers(1, &m_BufferID);
-	glNamedBufferData(m_BufferID, count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	glCreateBuffers(1, &m_buffer_id);
+	glNamedBufferData(m_buffer_id, count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	// delete indices
 	if (!hasIndices)
@@ -113,12 +113,12 @@ glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_Buffe
 
 glIndexBuffer::~glIndexBuffer()
 {
-	glDeleteBuffers(1, &m_BufferID);
+	glDeleteBuffers(1, &m_buffer_id);
 }
 
 void glIndexBuffer::Bind()
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer_id);
 }
 
 void glIndexBuffer::UnBind()

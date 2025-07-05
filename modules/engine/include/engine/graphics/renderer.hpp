@@ -31,20 +31,20 @@ private:
 	static Renderer *s_Context;
 
 	// renderer programs
-	QuadRendererProgram m_QuadRenderer;
-	TextureRendererProgram m_TextureRenderer;
-	TintedTextureRendererProgram m_TintedTextureRenderer;
+	QuadRendererProgram m_quad_renderer;
+	TextureRendererProgram m_texture_renderer;
+	TintedTextureRendererProgram m_tinted_texture_renderer;
 
 	// constant buffers
-	Scope<ConstantBuffer> m_ViewProjectionBuffer;
+	Scope<ConstantBuffer> m_view_projection_buffer;
 
-	Scope<RenderCommand> m_RenderCommand;
-	Scope<Blender> m_Blender;
+	Scope<RenderCommand> m_render_command;
+	Scope<Blender> m_blender;
 
-	Camera *m_DefaultFramebufferCamera;
-	Ref<Framebuffer> m_TargetFramebuffer;
+	Camera *m_default_framebuffer_camera;
+	Ref<Framebuffer> m_target_framebuffer;
 
-	bool m_ShouldClearBackbuffer;
+	bool m_should_clear_backbuffer;
 
 public:
 	static Scope<Renderer> Create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);

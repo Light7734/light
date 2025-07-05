@@ -44,7 +44,7 @@ Ref<Texture> Texture::Create(
 	}
 }
 
-Texture::Texture(const std::string &filePath): m_FilePath(filePath)
+Texture::Texture(const std::string &filePath): m_file_path(filePath)
 {
 }
 

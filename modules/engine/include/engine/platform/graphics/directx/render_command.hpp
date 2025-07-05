@@ -12,7 +12,7 @@ class dxSharedContext;
 class dxRenderCommand: public RenderCommand
 {
 private:
-	Ref<dxSharedContext> m_Context;
+	Ref<dxSharedContext> m_context;
 
 public:
 	dxRenderCommand(Ref<dxSharedContext> sharedContext);

@@ -8,7 +8,7 @@ namespace Light {
 class glBlender: public Blender
 {
 private:
-	std::unordered_map<BlendFactor, unsigned int> m_FactorMap;
+	std::unordered_map<BlendFactor, unsigned int> m_factor_map;
 
 public:
 	glBlender();

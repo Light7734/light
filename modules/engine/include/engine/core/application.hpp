@@ -19,14 +19,14 @@ private:
 	static Application *s_Context;
 
 private:
-	Scope<Logger> m_Logger;
-	Scope<Instrumentor> m_Instrumentor;
-	Scope<LayerStack> m_LayerStack;
-	Scope<Input> m_Input;
-	Scope<ResourceManager> m_ResourceManager;
+	Scope<Logger> m_logger;
+	Scope<Instrumentor> m_instrumentor;
+	Scope<LayerStack> m_layer_stack;
+	Scope<Input> m_input;
+	Scope<ResourceManager> m_resource_manager;
 
 protected:
-	Scope<Window> m_Window;
+	Scope<Window> m_window;
 
 public:
 	Application(const Application &) = delete;

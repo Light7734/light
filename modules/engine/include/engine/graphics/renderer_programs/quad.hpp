@@ -25,16 +25,16 @@ public:
 	};
 
 private:
-	Ref<Shader> m_Shader;
-	Ref<VertexBuffer> m_VertexBuffer;
-	Ref<IndexBuffer> m_IndexBuffer;
-	Ref<VertexLayout> m_VertexLayout;
+	Ref<Shader> m_shader;
+	Ref<VertexBuffer> m_vertex_buffer;
+	Ref<IndexBuffer> m_index_buffer;
+	Ref<VertexLayout> m_vertex_layout;
 
-	QuadVertexData *m_MapCurrent = nullptr;
-	QuadVertexData *m_MapEnd = nullptr;
+	QuadVertexData *m_map_current = nullptr;
+	QuadVertexData *m_map_end = nullptr;
 
-	unsigned int m_QuadCount = 0u;
-	unsigned int m_MaxVertices = 0u;
+	unsigned int m_quad_count = 0u;
+	unsigned int m_max_vertices = 0u;
 
 public:
 	QuadRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
@@ -48,11 +48,11 @@ public:
 
 	inline QuadVertexData *GetMapCurrent()
 	{
-		return m_MapCurrent;
+		return m_map_current;
 	}
 	inline unsigned int GetQuadCount() const
 	{
-		return m_QuadCount;
+		return m_quad_count;
 	}
 	inline constexpr unsigned int GetVertexSize() const
 	{

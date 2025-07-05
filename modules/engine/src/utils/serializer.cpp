@@ -72,7 +72,7 @@ static YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v)
 	return out;
 }
 
-SceneSerializer::SceneSerializer(const Ref<Scene> &scene): m_Scene(scene)
+SceneSerializer::SceneSerializer(const Ref<Scene> &scene): m_scene(scene)
 {
 }
 
@@ -83,9 +83,9 @@ void SceneSerializer::Serialize(const std::string &filePath)
 	out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-	for (auto [entityID, storage] : m_Scene->m_Registry.storage())
+	for (auto [entityID, storage] : m_scene->m_registry.storage())
 	{
-		Entity entity = { static_cast<entt::entity>(entityID), m_Scene.get() };
+		Entity entity = { static_cast<entt::entity>(entityID), m_scene.get() };
 		if (!entity.IsValid())
 			return;
 
@@ -134,7 +134,7 @@ bool SceneSerializer::Deserialize(const std::string &filePath)
 
 			LOG(trace, "Deserialized entity '{}' : '{}'", uuid, name);
 
-			Entity deserializedEntity = m_Scene->CreateEntityWithUUID(name, uuid);
+			Entity deserializedEntity = m_scene->CreateEntityWithUUID(name, uuid);
 
 			TagComponent gg = deserializedEntity.GetComponent<TagComponent>();
 			LOG(trace, gg.tag);
