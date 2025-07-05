@@ -10,7 +10,7 @@ glFramebuffer::glFramebuffer(const FramebufferSpecification &specification)
     , m_color_attachment_id(NULL)
     , m_depth_stencil_attachment_id(NULL)
 {
-	Resize({ specification.width, specification.height });
+	resize({ specification.width, specification.height });
 }
 
 glFramebuffer::~glFramebuffer()
@@ -20,7 +20,7 @@ glFramebuffer::~glFramebuffer()
 	// glDeleteTextures(1, &m_depth_stencil_attachment_id);
 }
 
-void glFramebuffer::BindAsTarget(const glm::vec4 &clearColor)
+void glFramebuffer::bind_as_target(const glm::vec4 &clearColor)
 {
 	// #todo: use viewport instead of default x=0, y=0
 	glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_id);
@@ -30,12 +30,12 @@ void glFramebuffer::BindAsTarget(const glm::vec4 &clearColor)
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void glFramebuffer::BindAsResource()
+void glFramebuffer::bind_as_resource()
 {
-	LOG(err, "NO_IMPLEMENT!");
+	lt_log(err, "NO_IMPLEMENT!");
 }
 
-void glFramebuffer::Resize(const glm::uvec2 &size)
+void glFramebuffer::resize(const glm::uvec2 &size)
 {
 	if (m_buffer_id)
 	{
@@ -85,7 +85,7 @@ void glFramebuffer::Resize(const glm::uvec2 &size)
 	// m_specification.width, m_specification.height); 	glFramebufferTexture2D(GL_FRAMEBUFFER,
 	// GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depth_stencil_attachment_id, 0);
 
-	ASSERT(
+	lt_assert(
 	    (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE),
 	    "Framebuffer is incomplete"
 	);

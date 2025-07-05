@@ -21,7 +21,7 @@ dxVertexLayout::dxVertexLayout(
 	{
 		inputElementsDesc.emplace_back(D3D11_INPUT_ELEMENT_DESC { element.first.c_str(),
 		                                                          NULL,
-		                                                          GetDxgiFormat(element.second),
+		                                                          get_dxgi_format(element.second),
 		                                                          0u,
 		                                                          D3D11_APPEND_ALIGNED_ELEMENT,
 		                                                          D3D11_INPUT_PER_VERTEX_DATA,
@@ -29,35 +29,35 @@ dxVertexLayout::dxVertexLayout(
 	}
 
 	Ref<dxShader> dxpShader = std::dynamic_pointer_cast<dxShader>(shader);
-	ASSERT(dxpShader, "Failed to cast 'Shader' to 'dxShader'");
+	lt_assert(dxpShader, "Failed to cast 'Shader' to 'dxShader'");
 
 	// create input layout (vertex layout)
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateInputLayout(
+	dxc(m_context->get_device()->CreateInputLayout(
 	    &inputElementsDesc[0],
 	    inputElementsDesc.size(),
-	    dxpShader->GetVertexBlob().Get()->GetBufferPointer(),
-	    dxpShader->GetVertexBlob().Get()->GetBufferSize(),
+	    dxpShader->get_vertex_blob().Get()->GetBufferPointer(),
+	    dxpShader->get_vertex_blob().Get()->GetBufferSize(),
 	    &m_input_layout
 	));
 }
 
 dxVertexLayout::~dxVertexLayout()
 {
-	UnBind();
+	un_bind();
 }
 
-void dxVertexLayout::Bind()
+void dxVertexLayout::bind()
 {
-	m_context->GetDeviceContext()->IASetInputLayout(m_input_layout.Get());
+	m_context->get_device_context()->IASetInputLayout(m_input_layout.Get());
 }
 
-void dxVertexLayout::UnBind()
+void dxVertexLayout::un_bind()
 {
-	m_context->GetDeviceContext()->IASetInputLayout(nullptr);
+	m_context->get_device_context()->IASetInputLayout(nullptr);
 }
 
-DXGI_FORMAT dxVertexLayout::GetDxgiFormat(VertexElementType type)
+DXGI_FORMAT dxVertexLayout::get_dxgi_format(VertexElementType type)
 {
 	switch (type)
 	{
@@ -89,7 +89,7 @@ DXGI_FORMAT dxVertexLayout::GetDxgiFormat(VertexElementType type)
 	case Light::VertexElementType::Float3: return DXGI_FORMAT_R32G32B32_FLOAT;
 	case Light::VertexElementType::Float4: return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-	default: ASSERT(false, "Invalid 'VertexElementType'"); return DXGI_FORMAT_UNKNOWN;
+	default: lt_assert(false, "Invalid 'VertexElementType'"); return DXGI_FORMAT_UNKNOWN;
 	}
 }
 

@@ -11,7 +11,7 @@ glConstantBuffer::glConstantBuffer(ConstantBufferIndex index, unsigned int size)
 	glCreateBuffers(1, &m_buffer_id);
 	glNamedBufferData(m_buffer_id, size, nullptr, GL_DYNAMIC_DRAW);
 
-	Bind();
+	bind();
 }
 
 glConstantBuffer::~glConstantBuffer()
@@ -19,18 +19,18 @@ glConstantBuffer::~glConstantBuffer()
 	glDeleteBuffers(1, &m_buffer_id);
 }
 
-void glConstantBuffer::Bind()
+void glConstantBuffer::bind()
 {
 	glBindBufferBase(GL_UNIFORM_BUFFER, m_index, m_buffer_id);
 }
 
-void *glConstantBuffer::Map()
+void *glConstantBuffer::map()
 {
 	void *map = glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
 	return map;
 }
 
-void glConstantBuffer::UnMap()
+void glConstantBuffer::un_map()
 {
 	glUnmapNamedBuffer(m_buffer_id);
 }
@@ -49,22 +49,22 @@ glVertexBuffer::~glVertexBuffer()
 	glDeleteBuffers(1, &m_buffer_id);
 }
 
-void glVertexBuffer::Bind()
+void glVertexBuffer::bind()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer_id);
 }
 
-void glVertexBuffer::UnBind()
+void glVertexBuffer::un_bind()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-void *glVertexBuffer::Map()
+void *glVertexBuffer::map()
 {
 	return glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
 }
 
-void glVertexBuffer::UnMap()
+void glVertexBuffer::un_map()
 {
 	glUnmapNamedBuffer(m_buffer_id);
 }
@@ -80,8 +80,8 @@ glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_buffe
 		// check
 		if (count % 6 != 0)
 		{
-			LOG(warn, "'indices' can only be null if count is multiple of 6");
-			LOG(warn, "Adding {} to 'count' -> {}", (6 - (count % 6)), count + (6 - (count % 6)));
+			lt_log(warn, "'indices' can only be null if count is multiple of 6");
+			lt_log(warn, "Adding {} to 'count' -> {}", (6 - (count % 6)), count + (6 - (count % 6)));
 			count = count + (6 - (count % 6));
 		}
 
@@ -116,12 +116,12 @@ glIndexBuffer::~glIndexBuffer()
 	glDeleteBuffers(1, &m_buffer_id);
 }
 
-void glIndexBuffer::Bind()
+void glIndexBuffer::bind()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer_id);
 }
 
-void glIndexBuffer::UnBind()
+void glIndexBuffer::un_bind()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 }

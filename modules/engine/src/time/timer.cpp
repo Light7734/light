@@ -10,9 +10,9 @@ DeltaTimer::DeltaTimer(): m_previous_frame(NULL), m_delta_time(60.0f / 1000.0f)
 {
 }
 
-void DeltaTimer::Update()
+void DeltaTimer::update()
 {
-	float currentFrame = timer.GetElapsedTime();
+	float currentFrame = timer.get_elapsed_time();
 	m_delta_time = currentFrame - m_previous_frame;
 	m_previous_frame = currentFrame;
 }

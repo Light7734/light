@@ -7,49 +7,49 @@ dxRenderCommand::dxRenderCommand(Ref<dxSharedContext> sharedContext): m_context(
 {
 }
 
-void dxRenderCommand::SwapBuffers()
+void dxRenderCommand::swap_buffers()
 {
 #ifdef LIGHT_DEBUG
 	HRESULT hr;
-	if (FAILED(hr = m_context->GetSwapChain()->Present(1u, 0u)))
+	if (FAILED(hr = m_context->get_swap_chain()->Present(1u, 0u)))
 	{
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{
-			LOG(critical, "dxRenderCommand::SwapBuffers: DeviceRemoved:");
-			LOG(critical, "        {}", m_context->GetDevice()->GetDeviceRemovedReason());
+			lt_log(critical, "dxRenderCommand::swap_buffers: DeviceRemoved:");
+			lt_log(critical, "        {}", m_context->get_device()->GetDeviceRemovedReason());
 			throw dxException(hr, __FILE__, __LINE__);
 		}
 	}
 #else
-	m_context->GetSwapChain()->Present(0u, 0u);
+	m_context->get_swap_chain()->Present(0u, 0u);
 #endif
 }
 
-void dxRenderCommand::ClearBackBuffer(const glm::vec4 &clearColor)
+void dxRenderCommand::clear_back_buffer(const glm::vec4 &clearColor)
 {
-	m_context->GetDeviceContext()->ClearRenderTargetView(
-	    m_context->GetRenderTargetView().Get(),
+	m_context->get_device_context()->ClearRenderTargetView(
+	    m_context->get_render_target_view().Get(),
 	    &clearColor[0]
 	);
 }
 
-void dxRenderCommand::Draw(unsigned int count)
+void dxRenderCommand::draw(unsigned int count)
 {
-	m_context->GetDeviceContext()->Draw(count, 0u);
+	m_context->get_device_context()->draw(count, 0u);
 }
 
-void dxRenderCommand::DrawIndexed(unsigned int count)
+void dxRenderCommand::draw_indexed(unsigned int count)
 {
-	m_context->GetDeviceContext()->DrawIndexed(count, 0u, 0u);
+	m_context->get_device_context()->draw_indexed(count, 0u, 0u);
 }
 
-void dxRenderCommand::DefaultTargetFramebuffer()
+void dxRenderCommand::default_target_framebuffer()
 {
-	m_context->GetDeviceContext()
-	    ->OMSetRenderTargets(1, m_context->GetRenderTargetView().GetAddressOf(), nullptr);
+	m_context->get_device_context()
+	    ->OMSetRenderTargets(1, m_context->get_render_target_view().GetAddressOf(), nullptr);
 }
 
-void dxRenderCommand::SetViewport(
+void dxRenderCommand::set_viewport(
     unsigned int x,
     unsigned int y,
     unsigned int width,
@@ -57,7 +57,7 @@ void dxRenderCommand::SetViewport(
 )
 {
 	// #todo: maybe call this somewhere else??
-	SetResolution(width, height);
+	set_resolution(width, height);
 
 	// create viewport
 	D3D11_VIEWPORT viewport;
@@ -72,34 +72,34 @@ void dxRenderCommand::SetViewport(
 	viewport.MaxDepth = 1.0f;
 
 	// set viewport
-	m_context->GetDeviceContext()->RSSetViewports(1u, &viewport);
+	m_context->get_device_context()->RSSetViewports(1u, &viewport);
 }
 
-void dxRenderCommand::SetResolution(unsigned int width, unsigned int height)
+void dxRenderCommand::set_resolution(unsigned int width, unsigned int height)
 {
 	HRESULT hr;
 
 	// remove render target
 	ID3D11RenderTargetView *nullViews[] = { nullptr };
-	m_context->GetDeviceContext()->OMSetRenderTargets(1u, nullViews, nullptr);
-	m_context->GetRenderTargetViewRef().Reset();
+	m_context->get_device_context()->OMSetRenderTargets(1u, nullViews, nullptr);
+	m_context->GetRenderTargetViewRef().reset();
 
 	// resize buffer
-	DXC(m_context->GetSwapChain()
+	dxc(m_context->get_swap_chain()
 	        ->ResizeBuffers(0u, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, NULL));
 
 	// create render target
 	Microsoft::WRL::ComPtr<ID3D11Resource> backBuffer = nullptr;
-	DXC(m_context->GetSwapChain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
-	DXC(m_context->GetDevice()->CreateRenderTargetView(
+	dxc(m_context->get_swap_chain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
+	dxc(m_context->get_device()->CreateRenderTargetView(
 	    backBuffer.Get(),
 	    nullptr,
 	    &m_context->GetRenderTargetViewRef()
 	));
 
 	// set render target
-	m_context->GetDeviceContext()
-	    ->OMSetRenderTargets(1u, m_context->GetRenderTargetView().GetAddressOf(), nullptr);
+	m_context->get_device_context()
+	    ->OMSetRenderTargets(1u, m_context->get_render_target_view().GetAddressOf(), nullptr);
 }
 
 } // namespace Light

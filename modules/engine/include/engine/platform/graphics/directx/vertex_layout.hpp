@@ -26,11 +26,11 @@ public:
 	);
 	~dxVertexLayout();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 
 private:
-	DXGI_FORMAT GetDxgiFormat(VertexElementType type);
+	DXGI_FORMAT get_dxgi_format(VertexElementType type);
 };
 
 } // namespace Light

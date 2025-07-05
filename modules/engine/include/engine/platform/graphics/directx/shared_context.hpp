@@ -16,19 +16,19 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_render_target_view = nullptr;
 
 public:
-	inline Microsoft::WRL::ComPtr<ID3D11Device> GetDevice()
+	inline Microsoft::WRL::ComPtr<ID3D11Device> get_device()
 	{
 		return m_device;
 	}
-	inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetDeviceContext()
+	inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> get_device_context()
 	{
 		return m_deviceContext;
 	}
-	inline Microsoft::WRL::ComPtr<IDXGISwapChain> GetSwapChain()
+	inline Microsoft::WRL::ComPtr<IDXGISwapChain> get_swap_chain()
 	{
 		return m_swap_chain;
 	}
-	inline Microsoft::WRL::ComPtr<ID3D11RenderTargetView> GetRenderTargetView()
+	inline Microsoft::WRL::ComPtr<ID3D11RenderTargetView> get_render_target_view()
 	{
 		return m_render_target_view;
 	}

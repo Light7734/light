@@ -5,8 +5,8 @@
 namespace Light {
 
 dxShader::dxShader(
-    BasicFileHandle vertexFile,
-    BasicFileHandle pixelFile,
+    basic_file_handle vertexFile,
+    basic_file_handle pixelFile,
     Ref<dxSharedContext> sharedContext
 )
     : m_context(sharedContext)
@@ -16,11 +16,11 @@ dxShader::dxShader(
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> ps = nullptr, vsErr = nullptr, psErr = nullptr;
 
-	// compile shaders (we don't use DXC here because if D3DCompile fails it throws a dxException
+	// compile shaders (we don't use dxc here because if d3_d_compile fails it throws a dxException
 	// without logging the vsErr/psErr
-	D3DCompile(
+	d3_d_compile(
 	    vertexFile.GetData(),
-	    vertexFile.GetSize(),
+	    vertexFile.get_size(),
 	    NULL,
 	    nullptr,
 	    nullptr,
@@ -31,9 +31,9 @@ dxShader::dxShader(
 	    &m_vertex_blob,
 	    &vsErr
 	);
-	D3DCompile(
+	d3_d_compile(
 	    pixelFile.GetData(),
-	    pixelFile.GetSize(),
+	    pixelFile.get_size(),
 	    NULL,
 	    nullptr,
 	    nullptr,
@@ -46,36 +46,36 @@ dxShader::dxShader(
 	);
 
 	// check
-	ASSERT(!vsErr.Get(), "Vertex shader compile error: {}", (char *)vsErr->GetBufferPointer());
-	ASSERT(!psErr.Get(), "Pixels shader compile error: {}", (char *)psErr->GetBufferPointer());
+	lt_assert(!vsErr.Get(), "Vertex shader compile error: {}", (char *)vsErr->GetBufferPointer());
+	lt_assert(!psErr.Get(), "Pixels shader compile error: {}", (char *)psErr->GetBufferPointer());
 
 	// create shaders
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateVertexShader(
+	dxc(m_context->get_device()->CreateVertexShader(
 	    m_vertex_blob->GetBufferPointer(),
 	    m_vertex_blob->GetBufferSize(),
 	    NULL,
 	    &m_vertex_shader
 	));
-	DXC(m_context->GetDevice()
+	dxc(m_context->get_device()
 	        ->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), NULL, &m_pixel_shader));
 }
 
 dxShader::~dxShader()
 {
-	UnBind();
+	un_bind();
 }
 
-void dxShader::Bind()
+void dxShader::bind()
 {
-	m_context->GetDeviceContext()->VSSetShader(m_vertex_shader.Get(), nullptr, 0u);
-	m_context->GetDeviceContext()->PSSetShader(m_pixel_shader.Get(), nullptr, 0u);
+	m_context->get_device_context()->VSSetShader(m_vertex_shader.Get(), nullptr, 0u);
+	m_context->get_device_context()->PSSetShader(m_pixel_shader.Get(), nullptr, 0u);
 }
 
-void dxShader::UnBind()
+void dxShader::un_bind()
 {
-	m_context->GetDeviceContext()->VSSetShader(nullptr, nullptr, 0u);
-	m_context->GetDeviceContext()->PSSetShader(nullptr, nullptr, 0u);
+	m_context->get_device_context()->VSSetShader(nullptr, nullptr, 0u);
+	m_context->get_device_context()->PSSetShader(nullptr, nullptr, 0u);
 }
 
 } // namespace Light

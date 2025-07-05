@@ -19,135 +19,135 @@ Application::Application()
     , m_input(nullptr)
     , m_window(nullptr)
 {
-	ASSERT(!s_Context, "Repeated singleton construction");
+	lt_assert(!s_Context, "Repeated singleton construction");
 	s_Context = this;
 
-	m_logger = Logger::Create();
-	LogDebugData();
+	m_logger = logger::create();
+	log_debug_data();
 
-	m_instrumentor = Instrumentor::Create();
-	m_instrumentor->BeginSession("Logs/ProfileResults_Startup.json");
+	m_instrumentor = Instrumentor::create();
+	m_instrumentor->begin_session("Logs/ProfileResults_Startup.json");
 
-	m_layer_stack = LayerStack::Create();
-	m_input = Input::Create();
+	m_layer_stack = LayerStack::create();
+	m_input = Input::create();
 
-	m_resource_manager = ResourceManager::Create();
+	m_resource_manager = ResourceManager::create();
 
-	m_window = Window::Create(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+	m_window = Window::create(std::bind(&Application::on_event, this, std::placeholders::_1));
 }
 
 Application::~Application()
 {
-	LOG(trace, "Application::~Application()");
-	m_instrumentor->EndSession(); // ProfileResults_Termination //
+	lt_log(trace, "Application::~Application()");
+	m_instrumentor->end_session(); // ProfileResults_Termination //
 }
 
-void Application::GameLoop()
+void Application::game_loop()
 {
 	// check
-	ASSERT(!m_layer_stack->IsEmpty(), "LayerStack is empty");
+	lt_assert(!m_layer_stack->is_empty(), "layer_stack is empty");
 
 	// log debug data
-	m_logger->LogDebugData();
-	m_window->GetGfxContext()->LogDebugData();
-	m_window->GetGfxContext()->GetUserInterface()->LogDebugData();
+	m_logger->log_debug_data();
+	m_window->GetGfxContext()->log_debug_data();
+	m_window->GetGfxContext()->GetUserInterface()->log_debug_data();
 
 	// reveal window
-	m_window->SetVisibility(true);
+	m_window->set_visibility(true);
 
-	m_instrumentor->EndSession(); // ProfileResults_GameLoop //
-	m_instrumentor->BeginSession("Logs/ProfileResults_GameLoop.json");
+	m_instrumentor->end_session(); // ProfileResults_GameLoop //
+	m_instrumentor->begin_session("Logs/ProfileResults_GameLoop.json");
 
 	/* game loop */
 	DeltaTimer deltaTimer;
-	while (!m_window->IsClosed())
+	while (!m_window->is_closed())
 	{
 		{
 			// update layers
-			LT_PROFILE_SCOPE("GameLoop::Update");
+			lt_profile_scope("game_loop::update");
 
 			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->OnUpdate(deltaTimer.GetDeltaTime());
+				(*it)->on_update(deltaTimer.get_delta_time());
 		}
 
 		{
 			// render layers
-			LT_PROFILE_SCOPE("GameLoop::Render");
-			m_window->GetGfxContext()->GetRenderer()->BeginFrame();
+			lt_profile_scope("game_loop::Render");
+			m_window->GetGfxContext()->GetRenderer()->begin_frame();
 
 			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->OnRender();
+				(*it)->on_render();
 
-			m_window->GetGfxContext()->GetRenderer()->EndFrame();
+			m_window->GetGfxContext()->GetRenderer()->end_frame();
 		}
 
 		{
 			// render user interface
-			LT_PROFILE_SCOPE("GameLoop::UserInterface");
-			m_window->GetGfxContext()->GetUserInterface()->Begin();
+			lt_profile_scope("game_loop::UserInterface");
+			m_window->GetGfxContext()->GetUserInterface()->begin();
 
 			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->OnUserInterfaceUpdate();
+				(*it)->on_user_interface_update();
 
-			m_window->GetGfxContext()->GetUserInterface()->End();
+			m_window->GetGfxContext()->GetUserInterface()->end();
 		}
 
 		{
 			// poll events
-			LT_PROFILE_SCOPE("GameLoop::Events");
-			m_window->PollEvents();
+			lt_profile_scope("game_loop::Events");
+			m_window->poll_events();
 		}
 
 		/// update delta time
-		deltaTimer.Update();
+		deltaTimer.update();
 	}
 
-	m_instrumentor->EndSession(); // ProfileResults_GameLoop //
-	m_instrumentor->BeginSession("Logs/ProfileResults_Termination.json");
+	m_instrumentor->end_session(); // ProfileResults_GameLoop //
+	m_instrumentor->begin_session("Logs/ProfileResults_Termination.json");
 }
 
-void Application::Quit()
+void Application::quit()
 {
-	s_Context->m_window->Close();
+	s_Context->m_window->close();
 }
 
-void Application::OnEvent(const Event &event)
+void Application::on_event(const Event &event)
 {
 	// window
-	if (event.HasCategory(WindowEventCategory))
+	if (event.has_category(WindowEventCategory))
 	{
-		m_window->OnEvent(event);
+		m_window->on_event(event);
 
-		if (event.GetEventType() == EventType::WindowResized)
-			m_window->GetGfxContext()->GetRenderer()->OnWindowResize(
+		if (event.get_event_type() == EventType::WindowResized)
+			m_window->GetGfxContext()->GetRenderer()->on_window_resize(
 			    (const WindowResizedEvent &)event
 			);
 	}
 
 	// input
-	if (event.HasCategory(InputEventCategory))
+	if (event.has_category(InputEventCategory))
 	{
-		m_input->OnEvent(event);
+		m_input->on_event(event);
 
-		if (!m_input->IsReceivingGameEvents()) // return if the event is an input event and 'Input'
-		                                       // has disabled the game events
+		if (!m_input->is_receiving_game_events()) // return if the event is an input event and
+		                                          // 'Input' has disabled the game events
 			return;
 	}
 
 	/* layers */
 	for (auto it = m_layer_stack->rbegin(); it != m_layer_stack->rend(); it++)
-		if ((*it)->OnEvent(event))
+		if ((*it)->on_event(event))
 			return;
 }
 
-void Application::LogDebugData()
+void Application::log_debug_data()
 {
 	// #todo: log more information
-	LOG(info, "________________________________________");
-	LOG(info, "Platform::");
-	LOG(info, "        OS: {}", LT_BUILD_PLATFORM);
-	LOG(info, "       DIR: {}", std::filesystem::current_path().generic_string());
-	LOG(info, "________________________________________");
+	lt_log(info, "________________________________________");
+	lt_log(info, "Platform::");
+	lt_log(info, "        OS: {}", LT_BUILD_PLATFORM);
+	lt_log(info, "       DIR: {}", std::filesystem::current_path().generic_string());
+	lt_log(info, "________________________________________");
 }
 
 } // namespace Light

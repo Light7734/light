@@ -68,7 +68,7 @@ std::string Stringifier::spdlogLevel(unsigned int level)
 //==================== SPDLOG ====================//
 
 //==================== GRAPHICS_API ====================//
-std::string Stringifier::GraphicsAPIToString(GraphicsAPI api)
+std::string Stringifier::graphics_api_to_string(GraphicsAPI api)
 {
 	switch (api)
 	{

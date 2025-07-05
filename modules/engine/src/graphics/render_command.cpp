@@ -10,25 +10,25 @@
 
 namespace Light {
 
-Scope<RenderCommand> RenderCommand::Create(
+Scope<RenderCommand> RenderCommand::create(
     GLFWwindow *windowHandle,
     Ref<SharedContext> sharedContext
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateScope<glRenderCommand>(windowHandle);
+	case GraphicsAPI::OpenGL: return create_scope<glRenderCommand>(windowHandle);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateScope<dxRenderCommand>(
+		lt_win(return create_scope<dxRenderCommand>(
 		                  (std::static_pointer_cast<dxSharedContext>)(sharedContext)
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}

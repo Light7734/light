@@ -22,16 +22,16 @@ private:
 
 public:
 	dxShader(
-	    BasicFileHandle vertexFile,
-	    BasicFileHandle pixelFile,
+	    basic_file_handle vertexFile,
+	    basic_file_handle pixelFile,
 	    Ref<dxSharedContext> sharedContext
 	);
 	~dxShader();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 
-	inline Microsoft::WRL::ComPtr<ID3DBlob> GetVertexBlob()
+	inline Microsoft::WRL::ComPtr<ID3DBlob> get_vertex_blob()
 	{
 		return m_vertex_blob;
 	}

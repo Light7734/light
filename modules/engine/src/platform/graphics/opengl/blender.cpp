@@ -32,13 +32,13 @@ glBlender::glBlender()
 {
 }
 
-void glBlender::Enable(BlendFactor srcFactor, BlendFactor dstFactor)
+void glBlender::enable(BlendFactor srcFactor, BlendFactor dstFactor)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(m_factor_map.at(srcFactor), m_factor_map.at(dstFactor));
 }
 
-void glBlender::Disable()
+void glBlender::disable()
 {
 	glDisable(GL_BLEND);
 }

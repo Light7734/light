@@ -4,22 +4,22 @@ namespace Light {
 
 Instrumentor *Instrumentor::s_Context = nullptr;
 
-Scope<Instrumentor> Instrumentor::Create()
+Scope<Instrumentor> Instrumentor::create()
 {
-	return MakeScope<Instrumentor>(new Instrumentor);
+	return make_scope<Instrumentor>(new Instrumentor);
 }
 
 Instrumentor::Instrumentor(): m_current_session_count(0u)
 {
 	// #todo: maintenance
-	ASSERT(
+	lt_assert(
 	    !s_Context,
 	    "An instance of 'Instrumentor' already exists, do not construct this class!"
 	);
 	s_Context = this;
 }
 
-void Instrumentor::BeginSessionImpl(const std::string &outputPath)
+void Instrumentor::begin_session_impl(const std::string &outputPath)
 {
 	std::filesystem::create_directory(outputPath.substr(0, outputPath.find_last_of('/') + 1));
 
@@ -27,10 +27,10 @@ void Instrumentor::BeginSessionImpl(const std::string &outputPath)
 	m_output_file_stream << "{\"traceEvents\":[";
 }
 
-void Instrumentor::EndSessionImpl()
+void Instrumentor::end_session_impl()
 {
 	if (m_current_session_count == 0u)
-		LOG(warn, "0 profiling for the ended session");
+		lt_log(warn, "0 profiling for the ended session");
 
 	m_current_session_count = 0u;
 
@@ -39,7 +39,7 @@ void Instrumentor::EndSessionImpl()
 	m_output_file_stream.close();
 }
 
-void Instrumentor::SubmitScopeProfileImpl(const ScopeProfileResult &profileResult)
+void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileResult)
 {
 	if (m_current_session_count++ == 0u)
 		m_output_file_stream << "{";
@@ -74,7 +74,7 @@ InstrumentorTimer::~InstrumentorTimer()
 	                        .count()
 	                    - m_result.start;
 
-	Instrumentor::SubmitScopeProfile(m_result);
+	Instrumentor::submit_scope_profile(m_result);
 }
 
 } // namespace Light

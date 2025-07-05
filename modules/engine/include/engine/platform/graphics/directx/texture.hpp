@@ -28,7 +28,7 @@ public:
 	    const std::string &filePath
 	);
 
-	void Bind(unsigned int slot = 0u) override;
+	void bind(unsigned int slot = 0u) override;
 };
 
 } // namespace Light

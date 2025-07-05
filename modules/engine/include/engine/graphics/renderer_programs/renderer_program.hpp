@@ -8,10 +8,10 @@ class OrthographicCamera;
 
 class RendererProgram
 {
-	virtual void Map()   = 0;
-	virtual void UnMap() = 0;
+	virtual void map()   = 0;
+	virtual void un_map() = 0;
 
-	virtual void Bind() = 0;
+	virtual void bind() = 0;
 };
 
 } // namespace Light

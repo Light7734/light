@@ -16,19 +16,19 @@ public:
 	{
 	}
 
-	inline int GetKey() const
+	inline int get_key() const
 	{
 		return m_key;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "KeyPressed: " << m_key;
 		return ss.str();
 	}
-	EVENT_TYPE(KeyPressed)
-	EVENT_CATEGORY(InputEventCategory | KeyboardEventCategory)
+	event_type(KeyPressed)
+	event_category(InputEventCategory | KeyboardEventCategory)
 };
 
 class KeyRepeatEvent: public Event
@@ -41,19 +41,19 @@ public:
 	{
 	}
 
-	inline int GetKey() const
+	inline int get_key() const
 	{
 		return m_key;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "KeyRepeated: " << m_key;
 		return ss.str();
 	}
-	EVENT_TYPE(KeyRepeated)
-	EVENT_CATEGORY(InputEventCategory | KeyboardEventCategory)
+	event_type(KeyRepeated)
+	event_category(InputEventCategory | KeyboardEventCategory)
 };
 
 class KeyReleasedEvent: public Event
@@ -66,19 +66,19 @@ public:
 	{
 	}
 
-	inline int GetKey() const
+	inline int get_key() const
 	{
 		return m_key;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "KeyReleased: " << m_key;
 		return ss.str();
 	}
-	EVENT_TYPE(KeyReleased)
-	EVENT_CATEGORY(InputEventCategory | KeyboardEventCategory)
+	event_type(KeyReleased)
+	event_category(InputEventCategory | KeyboardEventCategory)
 };
 
 } // namespace Light

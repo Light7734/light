@@ -8,13 +8,13 @@
 
 namespace Light {
 
-void PropertiesPanel::OnUserInterfaceUpdate()
+void PropertiesPanel::on_user_interface_update()
 {
 	ImGui::Begin("Properties");
 
-	if (m_entity_context.IsValid())
+	if (m_entity_context.is_valid())
 	{
-		if (m_entity_context.HasComponent<TagComponent>())
+		if (m_entity_context.has_component<TagComponent>())
 		{
 			auto &tagComponent = m_entity_context.GetComponent<TagComponent>();
 
@@ -37,18 +37,18 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 			if (ImGui::Selectable(
 			        "SpriteRenderer",
 			        false,
-			        m_entity_context.HasComponent<SpriteRendererComponent>() ?
+			        m_entity_context.has_component<SpriteRendererComponent>() ?
 			            ImGuiSelectableFlags_Disabled :
 			            NULL
 			    ))
 				m_entity_context.AddComponent<SpriteRendererComponent>(
-				    Light::ResourceManager::GetTexture("awesomeface")
+				    Light::ResourceManager::get_texture("awesomeface")
 				);
 
 			if (ImGui::Selectable(
 			        "Camera",
 			        false,
-			        m_entity_context.HasComponent<CameraComponent>() ?
+			        m_entity_context.has_component<CameraComponent>() ?
 			            ImGuiSelectableFlags_Disabled :
 			            NULL
 			    ))
@@ -58,15 +58,15 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 		}
 		ImGui::PopItemWidth();
 
-		DrawComponent<TransformComponent>(
+		draw_component<TransformComponent>(
 		    "Transform Component",
 		    m_entity_context,
 		    [&](auto &transformComponent) {
-			    DrawVec3Control("Translation", transformComponent.translation);
+			    draw_vec3_control("Translation", transformComponent.translation);
 		    }
 		);
 
-		DrawComponent<SpriteRendererComponent>(
+		draw_component<SpriteRendererComponent>(
 		    "SpriteRenderer Component",
 		    m_entity_context,
 		    [&](auto &spriteRendererComponent) {
@@ -74,13 +74,13 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 		    }
 		);
 
-		DrawComponent<CameraComponent>(
+		draw_component<CameraComponent>(
 		    "Camera Component",
 		    m_entity_context,
 		    [&](auto &cameraComponent) {
 			    auto &camera = cameraComponent.camera;
 
-			    SceneCamera::ProjectionType projectionType = camera.GetProjectionType();
+			    SceneCamera::ProjectionType projectionType = camera.get_projection_type();
 			    const char *projectionTypesString[] = { "Orthographic", "Perspective" };
 
 			    if (ImGui::BeginCombo("ProjectionType", projectionTypesString[(int)projectionType]))
@@ -91,7 +91,7 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 					    if (ImGui::Selectable(projectionTypesString[i], isSelected))
 					    {
 						    projectionType = (SceneCamera::ProjectionType)i;
-						    camera.SetProjectionType(projectionType);
+						    camera.set_projection_type(projectionType);
 					    }
 
 					    if (isSelected)
@@ -105,36 +105,36 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 			    {
 				    float orthoSize, nearPlane, farPlane;
 
-				    orthoSize = camera.GetOrthographicSize();
-				    nearPlane = camera.GetOrthographicNearPlane();
-				    farPlane = camera.GetOrthographicFarPlane();
+				    orthoSize = camera.get_orthographic_size();
+				    nearPlane = camera.get_orthographic_near_plane();
+				    farPlane = camera.get_orthographic_far_plane();
 
 				    if (ImGui::DragFloat("Orthographic Size", &orthoSize))
-					    camera.SetOrthographicSize(orthoSize);
+					    camera.set_orthographic_size(orthoSize);
 
 				    if (ImGui::DragFloat("Near Plane", &nearPlane))
-					    camera.SetOrthographicNearPlane(nearPlane);
+					    camera.set_orthographic_near_plane(nearPlane);
 
 				    if (ImGui::DragFloat("Far Plane", &farPlane))
-					    camera.SetOrthographicFarPlane(farPlane);
+					    camera.set_orthographic_far_plane(farPlane);
 			    }
 
 			    else // perspective
 			    {
 				    float verticalFOV, nearPlane, farPlane;
 
-				    verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
-				    nearPlane = camera.GetPerspectiveNearPlane();
-				    farPlane = camera.GetPerspectiveFarPlane();
+				    verticalFOV = glm::degrees(camera.get_perspective_vertical_fov());
+				    nearPlane = camera.get_perspective_near_plane();
+				    farPlane = camera.get_perspective_far_plane();
 
 				    if (ImGui::DragFloat("Vertical FOV", &verticalFOV))
-					    camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
+					    camera.set_perspective_vertical_fov(glm::radians(verticalFOV));
 
 				    if (ImGui::DragFloat("Near Plane", &nearPlane))
-					    camera.SetPerspectiveNearPlane(nearPlane);
+					    camera.set_perspective_near_plane(nearPlane);
 
 				    if (ImGui::DragFloat("Far Plane", &farPlane))
-					    camera.SetPerspectiveFarPlane(farPlane);
+					    camera.set_perspective_far_plane(farPlane);
 			    }
 
 			    ImGui::Separator();
@@ -145,12 +145,12 @@ void PropertiesPanel::OnUserInterfaceUpdate()
 	ImGui::End();
 }
 
-void PropertiesPanel::SetEntityContext(Entity entity)
+void PropertiesPanel::set_entity_context(Entity entity)
 {
 	m_entity_context = entity;
 }
 
-void PropertiesPanel::DrawVec3Control(
+void PropertiesPanel::draw_vec3_control(
     const std::string &label,
     glm::vec3 &values,
     float resetValue /*= 0.0f*/,
@@ -220,13 +220,13 @@ void PropertiesPanel::DrawVec3Control(
 
 
 template<typename ComponentType, typename UIFunction>
-void PropertiesPanel::DrawComponent(
+void PropertiesPanel::draw_component(
     const std::string &name,
     Entity entity,
     UIFunction userInterfaceFunction
 )
 {
-	if (!entity.HasComponent<ComponentType>())
+	if (!entity.has_component<ComponentType>())
 		return;
 
 	auto &component = entity.GetComponent<ComponentType>();
@@ -252,7 +252,7 @@ void PropertiesPanel::DrawComponent(
 		if (ImGui::BeginPopup("ComponentSettings"))
 		{
 			if (ImGui::Selectable("Remove component"))
-				entity.RemoveComponent<ComponentType>();
+				entity.remove_component<ComponentType>();
 
 			ImGui::EndPopup();
 		}

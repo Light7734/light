@@ -10,25 +10,25 @@ namespace Light {
 
 FailedAssertion::FailedAssertion(const char *file, int line)
 {
-	LOG(critical, "Assertion failed in: {} (line {})", file, line);
+	lt_log(critical, "Assertion failed in: {} (line {})", file, line);
 }
 
 glException::glException(unsigned int source, unsigned int type, unsigned int id, const char *msg)
 {
 	// #todo: improve
-	LOG(critical, "________________________________________");
-	LOG(critical, "glException::glException::");
-	// LOG(critical, "        Severity: {}",
+	lt_log(critical, "________________________________________");
+	lt_log(critical, "glException::glException::");
+	// lt_log(critical, "        Severity: {}",
 	// Stringifier::glDebugMsgSeverity(GL_DEBUG_SEVERITY_HIGH));
-	LOG(critical, "        Source  : {}", Stringifier::glDebugMsgSource(source));
-	LOG(critical, "        Type    : {}", Stringifier::glDebugMsgType(type));
-	LOG(critical, "        ID      : {}", id);
-	// LOG(critical, "        Vendor  : {}", glGetString(GL_VENDOR));
-	// LOG(critical, "        Renderer: {}", glGetString(GL_RENDERER));
-	// LOG(critical, "        Version : {}", glGetString(GL_VERSION));
-	// LOG(critical, "        critical, SVersion: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
-	LOG(critical, "        {}", msg);
-	LOG(critical, "________________________________________");
+	lt_log(critical, "        Source  : {}", Stringifier::glDebugMsgSource(source));
+	lt_log(critical, "        Type    : {}", Stringifier::glDebugMsgType(type));
+	lt_log(critical, "        ID      : {}", id);
+	// lt_log(critical, "        Vendor  : {}", glGetString(GL_VENDOR));
+	// lt_log(critical, "        renderer: {}", glGetString(GL_RENDERER));
+	// lt_log(critical, "        Version : {}", glGetString(GL_VERSION));
+	// lt_log(critical, "        critical, SVersion: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	lt_log(critical, "        {}", msg);
+	lt_log(critical, "________________________________________");
 }
 
 #ifdef LIGHT_PLATFORM_WINDOWS
@@ -46,11 +46,11 @@ dxException::dxException(long hr, const char *file, int line)
 	);
 
 	// #todo: improve
-	LOG(critical, "________________________________________");
-	LOG(critical, "dxException::dxException::");
-	LOG(critical, "        File: {}, Line: {}", file, line);
-	LOG(critical, "        {}", message);
-	LOG(critical, "________________________________________");
+	lt_log(critical, "________________________________________");
+	lt_log(critical, "dxException::dxException::");
+	lt_log(critical, "        File: {}, Line: {}", file, line);
+	lt_log(critical, "        {}", message);
+	lt_log(critical, "________________________________________");
 
 	LocalFree(message);
 }

@@ -22,23 +22,23 @@ public:
 		return m_position;
 	}
 
-	inline float GetX() const
+	inline float get_x() const
 	{
 		return m_position.x;
 	}
-	inline float GetY() const
+	inline float get_y() const
 	{
 		return m_position.y;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "MouseMoved: " << m_position.x << ", " << m_position.y;
 		return ss.str();
 	}
-	EVENT_TYPE(MouseMoved)
-	EVENT_CATEGORY(InputEventCategory | MouseEventCategory)
+	event_type(MouseMoved)
+	event_category(InputEventCategory | MouseEventCategory)
 };
 
 class WheelScrolledEvent: public Event
@@ -51,19 +51,19 @@ public:
 	{
 	}
 
-	inline float GetOffset() const
+	inline float get_offset() const
 	{
 		return m_offset;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "WheelScrolled: " << m_offset;
 		return ss.str();
 	}
-	EVENT_TYPE(WheelScrolled)
-	EVENT_CATEGORY(InputEventCategory | MouseEventCategory)
+	event_type(WheelScrolled)
+	event_category(InputEventCategory | MouseEventCategory)
 };
 
 class ButtonPressedEvent: public Event
@@ -76,19 +76,19 @@ public:
 	{
 	}
 
-	inline int GetButton() const
+	inline int get_button() const
 	{
 		return m_button;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "ButtonPressed: " << m_button;
 		return ss.str();
 	}
-	EVENT_TYPE(ButtonPressed)
-	EVENT_CATEGORY(InputEventCategory | MouseEventCategory)
+	event_type(ButtonPressed)
+	event_category(InputEventCategory | MouseEventCategory)
 };
 
 class ButtonReleasedEvent: public Event
@@ -101,19 +101,19 @@ public:
 	{
 	}
 
-	inline int GetButton() const
+	inline int get_button() const
 	{
 		return m_button;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "ButtonReleased: " << m_button;
 		return ss.str();
 	}
-	EVENT_TYPE(ButtonReleased)
-	EVENT_CATEGORY(InputEventCategory | MouseEventCategory)
+	event_type(ButtonReleased)
+	event_category(InputEventCategory | MouseEventCategory)
 };
 
 } // namespace Light

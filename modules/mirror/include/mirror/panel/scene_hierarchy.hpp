@@ -11,21 +11,22 @@ class PropertiesPanel;
 
 class SceneHierarchyPanel: public Panel
 {
-private:
-	Ref<Scene> m_context;
-	Ref<PropertiesPanel> m_properties_panel_context;
-	Entity m_selection_context;
-
 public:
 	SceneHierarchyPanel();
 	SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel = nullptr);
 
-	void OnUserInterfaceUpdate();
+	void on_user_interface_update();
 
-	void SetContext(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel = nullptr);
+	void set_context(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel = nullptr);
 
 private:
-	void DrawNode(Entity entity, const std::string &label);
+	void draw_node(Entity entity, const std::string &label);
+
+	Ref<Scene> m_context;
+
+	Ref<PropertiesPanel> m_properties_panel_context;
+
+	Entity m_selection_context;
 };
 
 } // namespace Light

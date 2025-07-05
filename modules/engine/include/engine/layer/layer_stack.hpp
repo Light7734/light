@@ -20,27 +20,27 @@ private:
 	std::vector<Layer *>::iterator m_end;
 
 public:
-	static Scope<LayerStack> Create();
+	static Scope<LayerStack> create();
 
 	~LayerStack();
 
 	// #todo: is this needed?
-	template<typename T, typename... Args>
-	static inline void EmplaceLayer(Args &&...args)
+	template<typename t, typename... Args>
+	static inline void emplace_layer(Args &&...args)
 	{
-		s_Context->AttachLayerImpl(new T((args)...));
+		s_Context->attach_layer_impl(new t((args)...));
 	}
 
-	static inline void AttachLayer(Layer *layer)
+	static inline void attach_layer(Layer *layer)
 	{
-		s_Context->AttachLayerImpl(layer);
+		s_Context->attach_layer_impl(layer);
 	}
-	static inline void DetachLayer(Layer *layer)
+	static inline void detach_layer(Layer *layer)
 	{
-		s_Context->DetachLayerImpl(layer);
+		s_Context->detach_layer_impl(layer);
 	}
 
-	inline bool IsEmpty()
+	inline bool is_empty()
 	{
 		return m_layers.empty();
 	}
@@ -65,8 +65,8 @@ public:
 private:
 	LayerStack();
 
-	void AttachLayerImpl(Layer *layer);
-	void DetachLayerImpl(Layer *layer);
+	void attach_layer_impl(Layer *layer);
+	void detach_layer_impl(Layer *layer);
 };
 
 } // namespace Light

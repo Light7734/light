@@ -16,9 +16,9 @@ extern "C"
 
 namespace Light {
 
-Scope<Window> Window::Create(std::function<void(Event &)> callback)
+Scope<Window> Window::create(std::function<void(Event &)> callback)
 {
-	return CreateScope<wWindow>(callback);
+	return create_scope<wWindow>(callback);
 }
 
 wWindow::wWindow(std::function<void(Event &)> callback)
@@ -26,7 +26,7 @@ wWindow::wWindow(std::function<void(Event &)> callback)
     , m_event_callback(callback)
 {
 	// init glfw
-	ASSERT(glfwInit(), "wWindow::wWindow: failed to initialize 'glfw'");
+	lt_assert(glfwInit(), "wWindow::wWindow: failed to initialize 'glfw'");
 
 	// create window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -35,15 +35,15 @@ wWindow::wWindow(std::function<void(Event &)> callback)
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	m_handle = glfwCreateWindow(1u, 1u, "", nullptr, nullptr);
-	ASSERT(m_handle, "wWindow::wWindow: glfwCreateWindow: failed to create 'GLFWwindow'");
+	lt_assert(m_handle, "wWindow::wWindow: glfwCreateWindow: failed to create 'GLFWwindow'");
 
 	// bind event stuff
 	glfwSetWindowUserPointer(m_handle, &m_event_callback);
-	BindGlfwEvents();
+	bind_glfw_events();
 
 	// create graphics context
-	m_graphics_context = GraphicsContext::Create(GraphicsAPI::DirectX, m_handle);
-	ASSERT(m_graphics_context, "wWindow::wWindow: failed to create 'GraphicsContext'");
+	m_graphics_context = GraphicsContext::create(GraphicsAPI::DirectX, m_handle);
+	lt_assert(m_graphics_context, "wWindow::wWindow: failed to create 'GraphicsContext'");
 }
 
 wWindow::~wWindow()
@@ -51,30 +51,30 @@ wWindow::~wWindow()
 	glfwDestroyWindow(m_handle);
 }
 
-void wWindow::PollEvents()
+void wWindow::poll_events()
 {
 	glfwPollEvents();
 }
 
-void wWindow::OnEvent(const Event &event)
+void wWindow::on_event(const Event &event)
 {
-	switch (event.GetEventType())
+	switch (event.get_event_type())
 	{
 	/* closed */
 	case EventType::WindowClosed: b_Closed = true; break;
 
 	/* resized */
-	case EventType::WindowResized: OnWindowResize((const WindowResizedEvent &)event); break;
+	case EventType::WindowResized: on_window_resize((const WindowResizedEvent &)event); break;
 	}
 }
 
-void wWindow::OnWindowResize(const WindowResizedEvent &event)
+void wWindow::on_window_resize(const WindowResizedEvent &event)
 {
-	m_properties.size = event.GetSize();
+	m_properties.size = event.get_size();
 }
 
 void wWindow::
-    SetProperties(const WindowProperties &properties, bool overrideVisiblity /* = false */)
+    set_properties(const WindowProperties &properties, bool overrideVisiblity /* = false */)
 {
 	// save the visibility status and re-assign if 'overrideVisibility' is false
 	bool visible = overrideVisiblity ? properties.visible : m_properties.visible;
@@ -82,20 +82,20 @@ void wWindow::
 	m_properties.visible = visible;
 
 	// set properties
-	SetTitle(properties.title);
-	SetSize(properties.size);
-	SetVSync(properties.vsync);
-	SetVisibility(visible);
+	set_title(properties.title);
+	set_size(properties.size);
+	set_v_sync(properties.vsync);
+	set_visibility(visible);
 }
 
-void wWindow::SetTitle(const std::string &title)
+void wWindow::set_title(const std::string &title)
 {
 	m_properties.title = title;
 
 	glfwSetWindowTitle(m_handle, m_properties.title.c_str());
 }
 
-void wWindow::SetSize(const glm::uvec2 &size, bool additive /* = false */)
+void wWindow::set_size(const glm::uvec2 &size, bool additive /* = false */)
 {
 	m_properties.size.x = size.x == 0u ? m_properties.size.x :
 	                      additive     ? m_properties.size.x + size.x :
@@ -108,14 +108,14 @@ void wWindow::SetSize(const glm::uvec2 &size, bool additive /* = false */)
 	glfwSetWindowSize(m_handle, size.x, size.y);
 }
 
-void wWindow::SetVSync(bool vsync, bool toggle /* = false */)
+void wWindow::set_v_sync(bool vsync, bool toggle /* = false */)
 {
 	m_properties.vsync = toggle ? !m_properties.vsync : vsync;
 
 	glfwSwapInterval(m_properties.vsync);
 }
 
-void wWindow::SetVisibility(bool visible, bool toggle)
+void wWindow::set_visibility(bool visible, bool toggle)
 {
 	m_properties.visible = toggle ? !m_properties.visible : visible;
 
@@ -125,7 +125,7 @@ void wWindow::SetVisibility(bool visible, bool toggle)
 		glfwHideWindow(m_handle);
 }
 
-void wWindow::BindGlfwEvents()
+void wWindow::bind_glfw_events()
 {
 	//============================== MOUSE_EVENTS ==============================//
 	/* cursor position */

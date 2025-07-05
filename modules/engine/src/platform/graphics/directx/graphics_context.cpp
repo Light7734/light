@@ -24,12 +24,12 @@ dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
 	m_shared_context = std::make_shared<dxSharedContext>();
 
 	// setup stuff
-	SetupDeviceAndSwapChain(windowHandle);
-	SetupRenderTargets();
-	SetupDebugInterface();
+	setup_device_and_swap_chain(windowHandle);
+	setup_render_targets();
+	setup_debug_interface();
 }
 
-void dxGraphicsContext::SetupDeviceAndSwapChain(GLFWwindow *windowHandle)
+void dxGraphicsContext::setup_device_and_swap_chain(GLFWwindow *windowHandle)
 {
 	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
@@ -68,7 +68,7 @@ void dxGraphicsContext::SetupDeviceAndSwapChain(GLFWwindow *windowHandle)
 #endif
 
 	// create device and swap chain
-	DXC(D3D11CreateDeviceAndSwapChain(
+	dxc(D3D11CreateDeviceAndSwapChain(
 	    nullptr,
 	    D3D_DRIVER_TYPE_HARDWARE,
 	    NULL,
@@ -84,37 +84,37 @@ void dxGraphicsContext::SetupDeviceAndSwapChain(GLFWwindow *windowHandle)
 	));
 }
 
-void dxGraphicsContext::SetupRenderTargets()
+void dxGraphicsContext::setup_render_targets()
 {
 	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// set primitive topology
-	context->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->get_device_context()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// create render target view
 	Microsoft::WRL::ComPtr<ID3D11Resource> backBuffer;
 
-	DXC(context->GetSwapChain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
-	DXC(context->GetDevice()
+	dxc(context->get_swap_chain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
+	dxc(context->get_device()
 	        ->CreateRenderTargetView(backBuffer.Get(), nullptr, &context->GetRenderTargetViewRef())
 	);
 
 	// set render target view
-	context->GetDeviceContext()
-	    ->OMSetRenderTargets(1u, context->GetRenderTargetView().GetAddressOf(), nullptr);
+	context->get_device_context()
+	    ->OMSetRenderTargets(1u, context->get_render_target_view().GetAddressOf(), nullptr);
 }
 
-void dxGraphicsContext::SetupDebugInterface()
+void dxGraphicsContext::setup_debug_interface()
 {
 #ifdef LIGHT_DEBUG
 	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	HRESULT hr;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debugInterface = nullptr;
-	DXC(context->GetDevice()->QueryInterface(__uuidof(ID3D11Debug), &debugInterface));
+	dxc(context->get_device()->QueryInterface(__uuidof(ID3D11Debug), &debugInterface));
 
 	Microsoft::WRL::ComPtr<ID3D11InfoQueue> infoQueue = nullptr;
-	DXC(debugInterface->QueryInterface(__uuidof(ID3D11InfoQueue), &infoQueue));
+	dxc(debugInterface->QueryInterface(__uuidof(ID3D11InfoQueue), &infoQueue));
 
 	infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
 	infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
@@ -128,11 +128,11 @@ void dxGraphicsContext::SetupDebugInterface()
 	filter.DenyList.NumIDs = _countof(hide);
 	filter.DenyList.pIDList = hide;
 	infoQueue->AddStorageFilterEntries(&filter);
-	infoQueue->Release();
+	infoQueue->release();
 #endif
 }
 
-void dxGraphicsContext::LogDebugData()
+void dxGraphicsContext::log_debug_data()
 {
 	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
@@ -141,7 +141,7 @@ void dxGraphicsContext::LogDebugData()
 	IDXGIAdapter *DXGIAdapter;
 	DXGI_ADAPTER_DESC DXGIAdapterDesc;
 
-	context->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)&DXGIDevice);
+	context->get_device()->QueryInterface(__uuidof(IDXGIDevice), (void **)&DXGIDevice);
 	DXGIDevice->GetAdapter(&DXGIAdapter);
 	DXGIAdapter->GetDesc(&DXGIAdapterDesc);
 
@@ -152,14 +152,14 @@ void dxGraphicsContext::LogDebugData()
 	std::string adapterDesc(ch);
 
 	// release memory
-	DXGIDevice->Release();
-	DXGIAdapter->Release();
+	DXGIDevice->release();
+	DXGIAdapter->release();
 
 	// #todo: log more information
-	LOG(info, "________________________________________");
-	LOG(info, "dxGraphicsContext:");
-	LOG(info, "        Renderer: {}", adapterDesc);
-	LOG(info, "________________________________________");
+	lt_log(info, "________________________________________");
+	lt_log(info, "dxGraphicsContext:");
+	lt_log(info, "        renderer: {}", adapterDesc);
+	lt_log(info, "________________________________________");
 }
 
 } // namespace Light

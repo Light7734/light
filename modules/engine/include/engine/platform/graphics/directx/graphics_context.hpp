@@ -19,12 +19,12 @@ private:
 public:
 	dxGraphicsContext(GLFWwindow *windowHandle);
 
-	virtual void LogDebugData() override;
+	virtual void log_debug_data() override;
 
 private:
-	void SetupDeviceAndSwapChain(GLFWwindow *windowHandle);
-	void SetupRenderTargets();
-	void SetupDebugInterface();
+	void setup_device_and_swap_chain(GLFWwindow *windowHandle);
+	void setup_render_targets();
+	void setup_debug_interface();
 };
 
 } // namespace Light

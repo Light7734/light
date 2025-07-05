@@ -17,15 +17,15 @@ private:
 public:
 	dxRenderCommand(Ref<dxSharedContext> sharedContext);
 
-	virtual void SwapBuffers() override;
-	virtual void ClearBackBuffer(const glm::vec4 &clearColor) override;
+	virtual void swap_buffers() override;
+	virtual void clear_back_buffer(const glm::vec4 &clearColor) override;
 
-	virtual void Draw(unsigned int count) override;
-	virtual void DrawIndexed(unsigned int count) override;
+	virtual void draw(unsigned int count) override;
+	virtual void draw_indexed(unsigned int count) override;
 
-	virtual void DefaultTargetFramebuffer() override;
+	virtual void default_target_framebuffer() override;
 
-	virtual void SetViewport(
+	virtual void set_viewport(
 	    unsigned int x,
 	    unsigned int y,
 	    unsigned int width,
@@ -33,7 +33,7 @@ public:
 	) override;
 
 private:
-	void SetResolution(unsigned int width, unsigned int height);
+	void set_resolution(unsigned int width, unsigned int height);
 };
 
 } // namespace Light

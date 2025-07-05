@@ -11,11 +11,11 @@ glVertexLayout::glVertexLayout(
     : m_array_id(NULL)
 {
 	// check
-	ASSERT(
+	lt_assert(
 	    std::dynamic_pointer_cast<glVertexBuffer>(buffer),
 	    "Failed to cast 'VertexBuffer' to 'glVertexBuffer'"
 	);
-	ASSERT(!elements.empty(), "'elements' is empty");
+	lt_assert(!elements.empty(), "'elements' is empty");
 
 	// local
 	std::vector<glVertexElementDesc> elementsDesc;
@@ -25,7 +25,7 @@ glVertexLayout::glVertexLayout(
 	// extract elements desc
 	for (const auto &element : elements)
 	{
-		elementsDesc.push_back(GetElementDesc(element.second, stride));
+		elementsDesc.push_back(get_element_desc(element.second, stride));
 		stride += elementsDesc.back().typeSize * elementsDesc.back().count;
 	}
 
@@ -33,8 +33,8 @@ glVertexLayout::glVertexLayout(
 	glCreateVertexArrays(1, &m_array_id);
 
 	// bind buffer and array
-	buffer->Bind();
-	Bind();
+	buffer->bind();
+	bind();
 
 	// enable vertex attributes
 	unsigned int index = 0u;
@@ -57,17 +57,17 @@ glVertexLayout::~glVertexLayout()
 	glDeleteVertexArrays(1, &m_array_id);
 }
 
-void glVertexLayout::Bind()
+void glVertexLayout::bind()
 {
 	glBindVertexArray(m_array_id);
 }
 
-void glVertexLayout::UnBind()
+void glVertexLayout::un_bind()
 {
 	glBindVertexArray(NULL);
 }
 
-glVertexElementDesc glVertexLayout::GetElementDesc(VertexElementType type, unsigned int offset)
+glVertexElementDesc glVertexLayout::get_element_desc(VertexElementType type, unsigned int offset)
 {
 	switch (type)
 	{
@@ -99,7 +99,7 @@ glVertexElementDesc glVertexLayout::GetElementDesc(VertexElementType type, unsig
 	case VertexElementType::Float3: return { GL_FLOAT, 3u, sizeof(GLfloat), offset };
 	case VertexElementType::Float4: return { GL_FLOAT, 4u, sizeof(GLfloat), offset };
 
-	default: ASSERT(false, "Invalid 'VertexElementType'"); return {};
+	default: lt_assert(false, "Invalid 'VertexElementType'"); return {};
 	}
 }
 

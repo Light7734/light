@@ -42,82 +42,82 @@ public:
 	}
 
 	/* update */
-	virtual void OnUpdate(float deltaTime)
+	virtual void on_update(float deltaTime)
 	{
 	}
-	virtual void OnUserInterfaceUpdate()
-	{
-	}
-
-	virtual void OnRender()
+	virtual void on_user_interface_update()
 	{
 	}
 
-	bool OnEvent(const Event &event);
+	virtual void on_render()
+	{
+	}
+
+	bool on_event(const Event &event);
 
 protected:
 	/* mouse */
 	// cursor
-	virtual bool OnMouseMoved(const MouseMovedEvent &event)
+	virtual bool on_mouse_moved(const MouseMovedEvent &event)
 	{
 		return false;
 	}
 	// button
-	virtual bool OnButtonPressed(const ButtonPressedEvent &event)
+	virtual bool on_button_pressed(const ButtonPressedEvent &event)
 	{
 		return false;
 	}
-	virtual bool OnButtonReleased(const ButtonReleasedEvent &event)
+	virtual bool on_button_released(const ButtonReleasedEvent &event)
 	{
 		return false;
 	}
 	// wheel
-	virtual bool OnWheelScrolled(const WheelScrolledEvent &event)
+	virtual bool on_wheel_scrolled(const WheelScrolledEvent &event)
 	{
 		return false;
 	}
 
 	/* keyboard */
 	// key
-	virtual bool OnKeyPressed(const KeyPressedEvent &event)
+	virtual bool on_key_pressed(const KeyPressedEvent &event)
 	{
 		return false;
 	}
-	virtual bool OnKeyRepeat(const KeyRepeatEvent &event)
+	virtual bool on_key_repeat(const KeyRepeatEvent &event)
 	{
 		return false;
 	}
-	virtual bool OnKeyReleased(const KeyReleasedEvent &event)
+	virtual bool on_key_released(const KeyReleasedEvent &event)
 	{
 		return false;
 	}
 	// char
-	virtual bool OnSetChar(const SetCharEvent &event)
+	virtual bool on_set_char(const SetCharEvent &event)
 	{
 		return false;
 	}
 
 	/* window */
 	// termination
-	virtual bool OnWindowClosed(const WindowClosedEvent &event)
+	virtual bool on_window_closed(const WindowClosedEvent &event)
 	{
 		return false;
 	}
 	// size/position
-	virtual bool OnWindowResized(const WindowResizedEvent &event)
+	virtual bool on_window_resized(const WindowResizedEvent &event)
 	{
 		return false;
 	}
-	virtual bool OnWindowMoved(const WindowMovedEvent &event)
+	virtual bool on_window_moved(const WindowMovedEvent &event)
 	{
 		return false;
 	}
 	// focus
-	virtual bool OnWindowLostFocus(const WindowLostFocusEvent &event)
+	virtual bool on_window_lost_focus(const WindowLostFocusEvent &event)
 	{
 		return false;
 	}
-	virtual bool OnWindowGainFocus(const WindowGainFocusEvent &event)
+	virtual bool on_window_gain_focus(const WindowGainFocusEvent &event)
 	{
 		return false;
 	}

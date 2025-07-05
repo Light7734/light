@@ -19,10 +19,10 @@ public:
 		properties.size = glm::uvec2(1280u, 720u);
 		properties.vsync = true;
 
-		m_window->SetProperties(properties);
+		m_window->set_properties(properties);
 
 		// Attach the sandbox layer
-		LayerStack::EmplaceLayer<EditorLayer>(("MirrorLayer"));
+		LayerStack::emplace_layer<EditorLayer>(("MirrorLayer"));
 	}
 };
 

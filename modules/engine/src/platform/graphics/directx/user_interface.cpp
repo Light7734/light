@@ -11,7 +11,7 @@
 
 namespace Light {
 
-void dxUserInterface::PlatformImplementation(
+void dxUserInterface::platform_implementation(
     GLFWwindow *windowHandle,
     Ref<SharedContext> sharedContext
 )
@@ -20,7 +20,7 @@ void dxUserInterface::PlatformImplementation(
 	Ref<dxSharedContext> context = std::dynamic_pointer_cast<dxSharedContext>(sharedContext);
 
 	ImGui_ImplWin32_Init(glfwGetWin32Window(windowHandle));
-	ImGui_ImplDX11_Init(context->GetDevice().Get(), context->GetDeviceContext().Get());
+	ImGui_ImplDX11_Init(context->get_device().Get(), context->get_device_context().Get());
 }
 
 dxUserInterface::~dxUserInterface()
@@ -36,14 +36,14 @@ dxUserInterface::~dxUserInterface()
 	ImGui::DestroyContext();
 }
 
-void dxUserInterface::Begin()
+void dxUserInterface::begin()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 }
 
-void dxUserInterface::End()
+void dxUserInterface::end()
 {
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -52,15 +52,15 @@ void dxUserInterface::End()
 	ImGui::RenderPlatformWindowsDefault();
 }
 
-void dxUserInterface::LogDebugData()
+void dxUserInterface::log_debug_data()
 {
 	// #todo: improve
-	LOG(info, "________________________________________");
-	LOG(info, "UserInterface::");
-	LOG(info, "       API    : ImGui");
-	LOG(info, "       Version: {}", ImGui::GetVersion());
-	LOG(info, "  GraphicsAPI : DirectX");
-	LOG(info, "________________________________________");
+	lt_log(info, "________________________________________");
+	lt_log(info, "UserInterface::");
+	lt_log(info, "       API    : ImGui");
+	lt_log(info, "       Version: {}", ImGui::GetVersion());
+	lt_log(info, "  GraphicsAPI : DirectX");
+	lt_log(info, "________________________________________");
 }
 
 } // namespace Light

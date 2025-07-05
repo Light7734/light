@@ -37,10 +37,10 @@ enum class BlendFactor : uint8_t
 class Blender
 {
 public:
-	static Scope<Blender> Create(Ref<SharedContext> sharedContext);
+	static Scope<Blender> create(Ref<SharedContext> sharedContext);
 
-	virtual void Enable(BlendFactor srcFactor, BlendFactor dstFactor) = 0;
-	virtual void Disable()                                            = 0;
+	virtual void enable(BlendFactor srcFactor, BlendFactor dstFactor) = 0;
+	virtual void disable()                                            = 0;
 
 protected:
 	Blender() = default;

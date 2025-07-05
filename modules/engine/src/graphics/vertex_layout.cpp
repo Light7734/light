@@ -10,29 +10,29 @@
 
 namespace Light {
 
-Ref<VertexLayout> VertexLayout::Create(
+Ref<VertexLayout> VertexLayout::create(
     Ref<VertexBuffer> vertexBuffer,
     Ref<Shader> shader,
     const std::vector<std::pair<std::string, VertexElementType>> &elements,
     Ref<SharedContext> sharedContext
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateRef<glVertexLayout>(vertexBuffer, elements);
+	case GraphicsAPI::OpenGL: return create_ref<glVertexLayout>(vertexBuffer, elements);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateRef<dxVertexLayout>(
+		lt_win(return create_ref<dxVertexLayout>(
 		                  shader,
 		                  elements,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}

@@ -30,19 +30,19 @@ enum EventCategory
 {
 	None = 0,
 
-	WindowEventCategory = BIT(0),
-	InputEventCategory = BIT(1),
-	KeyboardEventCategory = BIT(2),
-	MouseEventCategory = BIT(3),
+	WindowEventCategory = bit(0),
+	InputEventCategory = bit(1),
+	KeyboardEventCategory = bit(2),
+	MouseEventCategory = bit(3),
 };
 
-#define EVENT_TYPE(type)                    \
-	EventType GetEventType() const override \
+#define event_type(type)                    \
+	EventType get_event_type() const override \
 	{                                       \
 		return ::Light::EventType::type;    \
 	}
-#define EVENT_CATEGORY(eCategory)                                  \
-	inline bool HasCategory(EventCategory category) const override \
+#define event_category(eCategory)                                  \
+	inline bool has_category(EventCategory category) const override \
 	{                                                              \
 		return (eCategory) & category;                             \
 	}
@@ -50,13 +50,13 @@ enum EventCategory
 class Event
 {
 public:
-	virtual EventType GetEventType() const = 0;
-	virtual std::string GetInfoLog() const = 0;
-	virtual bool HasCategory(EventCategory category) const = 0;
+	virtual EventType get_event_type() const = 0;
+	virtual std::string get_info_lt_log() const = 0;
+	virtual bool has_category(EventCategory category) const = 0;
 
 	friend std::ostream &operator<<(std::ostream &os, const Event &e)
 	{
-		return os << e.GetInfoLog();
+		return os << e.get_info_lt_log();
 	}
 };
 

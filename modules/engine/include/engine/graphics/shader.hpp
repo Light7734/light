@@ -20,16 +20,16 @@ public:
 	};
 
 public:
-	static Ref<Shader> Create(
-	    BasicFileHandle vertexFile,
-	    BasicFileHandle pixelFile,
+	static Ref<Shader> create(
+	    basic_file_handle vertexFile,
+	    basic_file_handle pixelFile,
 	    Ref<SharedContext> sharedContext
 	);
 
 	virtual ~Shader() = default;
 
-	virtual void Bind() = 0;
-	virtual void UnBind() = 0;
+	virtual void bind() = 0;
+	virtual void un_bind() = 0;
 
 protected:
 	Shader() = default;

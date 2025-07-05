@@ -9,58 +9,58 @@ SceneCamera::SceneCamera()
     , m_aspect_ratio(16.0f / 9.0f)
     , m_projection_type(ProjectionType::Orthographic)
 {
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetViewportSize(unsigned int width, unsigned int height)
+void SceneCamera::set_viewport_size(unsigned int width, unsigned int height)
 {
 	m_aspect_ratio = width / (float)height;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetProjectionType(ProjectionType projectionType)
+void SceneCamera::set_projection_type(ProjectionType projectionType)
 {
 	m_projection_type = projectionType;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetOrthographicSize(float size)
+void SceneCamera::set_orthographic_size(float size)
 {
 	m_orthographic_specification.size = size;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetOrthographicFarPlane(float farPlane)
+void SceneCamera::set_orthographic_far_plane(float farPlane)
 {
 	m_orthographic_specification.farPlane = farPlane;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetOrthographicNearPlane(float nearPlane)
+void SceneCamera::set_orthographic_near_plane(float nearPlane)
 {
 	m_orthographic_specification.nearPlane = nearPlane;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetPerspectiveVerticalFOV(float verticalFOV)
+void SceneCamera::set_perspective_vertical_fov(float verticalFOV)
 {
 	m_perspective_specification.verticalFOV = verticalFOV;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetPerspectiveFarPlane(float farPlane)
+void SceneCamera::set_perspective_far_plane(float farPlane)
 {
 	m_perspective_specification.farPlane = farPlane;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::SetPerspectiveNearPlane(float nearPlane)
+void SceneCamera::set_perspective_near_plane(float nearPlane)
 {
 	m_perspective_specification.nearPlane = nearPlane;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void SceneCamera::CalculateProjection()
+void SceneCamera::calculate_projection()
 {
 	if (m_projection_type == ProjectionType::Orthographic)
 	{

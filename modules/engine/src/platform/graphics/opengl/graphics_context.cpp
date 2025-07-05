@@ -23,23 +23,23 @@ glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(
 	glfwMakeContextCurrent(windowHandle);
 
 	// load opengl (glad)
-	ASSERT(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
+	lt_assert(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
 
-	SetDebugMessageCallback();
+	set_debug_message_callback();
 }
 
-void glGraphicsContext::LogDebugData()
+void glGraphicsContext::log_debug_data()
 {
 	// #todo: log more information
-	LOG(info, "________________________________________");
-	LOG(info, "GraphicsContext::");
-	LOG(info, "        API     : OpenGL");
-	// LOG(info, "        Version : {}", glGetString(GL_VERSION));
-	// LOG(info, "        Renderer: {}", glGetString(GL_RENDERER));
-	LOG(info, "________________________________________");
+	lt_log(info, "________________________________________");
+	lt_log(info, "GraphicsContext::");
+	lt_log(info, "        API     : OpenGL");
+	// lt_log(info, "        Version : {}", glGetString(GL_VERSION));
+	// lt_log(info, "        renderer: {}", glGetString(GL_RENDERER));
+	lt_log(info, "________________________________________");
 }
 
-void glGraphicsContext::SetDebugMessageCallback()
+void glGraphicsContext::set_debug_message_callback()
 {
 	// determine log level
 	// #todo: set filters from config.h
@@ -89,23 +89,23 @@ void glGraphicsContext::SetDebugMessageCallback()
 
 		    case GL_DEBUG_SEVERITY_MEDIUM:
 		    case GL_DEBUG_SEVERITY_LOW:
-			    LOG(warn,
+			    lt_log(warn,
 			        "glMessageCallback: Severity: {} :: Source: {} :: Type: {} :: ID: {}",
 			        Stringifier::glDebugMsgSeverity(severity),
 			        Stringifier::glDebugMsgSource(source),
 			        Stringifier::glDebugMsgType(type),
 			        id);
-			    LOG(warn, "      {}", message);
+			    lt_log(warn, "      {}", message);
 			    return;
 
 		    case GL_DEBUG_SEVERITY_NOTIFICATION:
-			    LOG(trace,
+			    lt_log(trace,
 			        "Severity: {} :: Source: {} :: Type: {} :: ID: {}",
 			        Stringifier::glDebugMsgSeverity(severity),
 			        Stringifier::glDebugMsgSource(source),
 			        Stringifier::glDebugMsgType(type),
 			        id);
-			    LOG(trace, "        {}", message);
+			    lt_log(trace, "        {}", message);
 			    return;
 		    }
 	    },

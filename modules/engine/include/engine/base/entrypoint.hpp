@@ -21,29 +21,29 @@ int main(int argc, char *argv[])
 	try
 	{
 		application = Light::CreateApplication();
-		ASSERT(application, "Light::Application is not intialized");
+		lt_assert(application, "Light::Application is not intialized");
 
 		for (int i = 0; i < argc; i++)
-			LOG(info, "argv[{}]: {}", i, argv[i]);
+			lt_log(info, "argv[{}]: {}", i, argv[i]);
 
-		application->GameLoop();
+		application->game_loop();
 	}
 	// failed engine assertion
 	catch (Light::FailedAssertion)
 	{
-		LOG(critical, "Terminating due to unhandled 'FailedEngineAssertion'");
+		lt_log(critical, "Terminating due to unhandled 'FailedEngineAssertion'");
 		exitCode = -1;
 	}
 	// gl exception
 	catch (Light::glException)
 	{
-		LOG(critical, "Terminating due to unhandled 'glException'");
+		lt_log(critical, "Terminating due to unhandled 'glException'");
 		exitCode = -3;
 	}
 	// dx exception
 	catch (Light::dxException)
 	{
-		LOG(critical, "Terminating due to unhandled 'dxException'");
+		lt_log(critical, "Terminating due to unhandled 'dxException'");
 		exitCode = -4;
 	}
 
@@ -67,20 +67,20 @@ int main(int argc, char *argv[])
 	try
 	{
 		application = Light::CreateApplication();
-		ASSERT(application, "Light::Application is not intialized");
+		lt_assert(application, "Light::Application is not intialized");
 
-		application->GameLoop();
+		application->game_loop();
 	}
 	// failed engine assertion
 	catch (Light::FailedAssertion)
 	{
-		LOG(critical, "Exitting due to unhandled 'FailedEngineAssertion'");
+		lt_log(critical, "Exitting due to unhandled 'FailedEngineAssertion'");
 		exitCode = -1;
 	}
 	// gl exception
 	catch (Light::glException)
 	{
-		LOG(critical, "main: exitting due to unhandled 'glException'");
+		lt_log(critical, "main: exitting due to unhandled 'glException'");
 		exitCode = -3;
 	}
 

@@ -12,9 +12,9 @@
 
 namespace Light {
 
-Renderer *Renderer::s_Context = nullptr;
+renderer *renderer::s_Context = nullptr;
 
-Renderer::Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+renderer::renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
     : m_quad_renderer(LT_MAX_QUAD_RENDERER_VERTICES, sharedContext)
     , m_texture_renderer(LT_MAX_TEXTURE_RENDERER_VERTICES, sharedContext)
     , m_tinted_texture_renderer(LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES, sharedContext)
@@ -25,40 +25,40 @@ Renderer::Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
     , m_target_framebuffer(nullptr)
     , m_should_clear_backbuffer(false)
 {
-	ASSERT(!s_Context, "An instance of 'Renderer' already exists, do not construct this class!");
+	lt_assert(!s_Context, "An instance of 'renderer' already exists, do not construct this class!");
 	s_Context = this;
 
-	m_view_projection_buffer = ConstantBuffer::Create(
+	m_view_projection_buffer = ConstantBuffer::create(
 	    ConstantBufferIndex::ViewProjection,
 	    sizeof(glm::mat4),
 	    sharedContext
 	);
 
-	m_render_command = RenderCommand::Create(windowHandle, sharedContext);
-	m_blender = Blender::Create(sharedContext);
-	m_blender->Enable(BlendFactor::SRC_ALPHA, BlendFactor::INVERSE_SRC_ALPHA);
+	m_render_command = RenderCommand::create(windowHandle, sharedContext);
+	m_blender = Blender::create(sharedContext);
+	m_blender->enable(BlendFactor::SRC_ALPHA, BlendFactor::INVERSE_SRC_ALPHA);
 }
 
-Scope<Renderer> Renderer::Create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+Scope<renderer> renderer::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 {
-	return MakeScope<Renderer>(new Renderer(windowHandle, sharedContext));
+	return make_scope<renderer>(new renderer(windowHandle, sharedContext));
 }
 
-void Renderer::OnWindowResize(const WindowResizedEvent &event)
+void renderer::on_window_resize(const WindowResizedEvent &event)
 {
-	m_render_command->SetViewport(0u, 0u, event.GetSize().x, event.GetSize().y);
+	m_render_command->set_viewport(0u, 0u, event.get_size().x, event.get_size().y);
 }
 
 //======================================== DRAW_QUAD ========================================//
 /* tinted textures */
-void Renderer::DrawQuadImpl(
+void renderer::draw_quad_impl(
     const glm::vec3 &position,
     const glm::vec2 &size,
     const glm::vec4 &tint,
     Ref<Texture> texture
 )
 {
-	DrawQuad(
+	draw_quad(
 	    glm::translate(glm::mat4(1.0f), position)
 	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
 	    tint,
@@ -67,9 +67,9 @@ void Renderer::DrawQuadImpl(
 }
 
 /* tint */
-void Renderer::DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint)
+void renderer::draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint)
 {
-	DrawQuad(
+	draw_quad(
 	    glm::translate(glm::mat4(1.0f), position)
 	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
 	    tint
@@ -77,9 +77,9 @@ void Renderer::DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, co
 }
 
 /* texture */
-void Renderer::DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture)
+void renderer::draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture)
 {
-	DrawQuad(
+	draw_quad(
 	    glm::translate(glm::mat4(1.0f), position)
 	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
 	    texture
@@ -88,7 +88,7 @@ void Renderer::DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, Re
 //======================================== DRAW_QUAD ========================================//
 
 //==================== DRAW_QUAD_TINT ====================//
-void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint)
+void renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 {
 	// locals
 	QuadRendererProgram::QuadVertexData *bufferMap = m_quad_renderer.GetMapCurrent();
@@ -110,20 +110,20 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint)
 	bufferMap[3].tint = tint;
 
 	// advance
-	if (!m_quad_renderer.Advance())
+	if (!m_quad_renderer.advance())
 	{
-		LOG(warn, "Exceeded LT_MAX_QUAD_RENDERER_VERTICES: {}", LT_MAX_QUAD_RENDERER_VERTICES);
-		FlushScene();
+		lt_log(warn, "Exceeded LT_MAX_QUAD_RENDERER_VERTICES: {}", LT_MAX_QUAD_RENDERER_VERTICES);
+		flush_scene();
 	}
 }
 //==================== DRAW_QUAD_TINT ====================//
 
 //==================== DRAW_QUAD_TEXTURE ====================//
-void Renderer::DrawQuadImpl(const glm::mat4 &transform, Ref<Texture> texture)
+void renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
 {
 	// #todo: implement a proper binding
-	ASSERT(texture, "Texture passed to Renderer::DrawQuadImpl");
-	texture->Bind();
+	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
+	texture->bind();
 
 	// locals
 	TextureRendererProgram::TextureVertexData *bufferMap = m_texture_renderer.GetMapCurrent();
@@ -145,19 +145,19 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, Ref<Texture> texture)
 	bufferMap[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
-	if (!m_texture_renderer.Advance())
+	if (!m_texture_renderer.advance())
 	{
-		LOG(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
+		lt_log(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
 		);
-		FlushScene();
+		flush_scene();
 	}
 }
 
-void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
+void renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
 {
 	// #todo: implement a proper binding
-	ASSERT(texture, "Texture passed to Renderer::DrawQuadImpl");
-	texture->Bind();
+	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
+	texture->bind();
 
 	// locals
 	TintedTextureRendererProgram::TintedTextureVertexData *bufferMap = m_tinted_texture_renderer
@@ -184,24 +184,24 @@ void Renderer::DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint, R
 	bufferMap[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
-	if (!m_tinted_texture_renderer.Advance())
+	if (!m_tinted_texture_renderer.advance())
 	{
-		LOG(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
+		lt_log(warn, "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES
 		);
-		FlushScene();
+		flush_scene();
 	}
 }
 
 //==================== DRAW_QUAD_TEXTURE ====================//
 
-void Renderer::BeginFrame()
+void renderer::begin_frame()
 {
 }
 
-void Renderer::EndFrame()
+void renderer::end_frame()
 {
-	m_render_command->SwapBuffers();
-	m_render_command->ClearBackBuffer(
+	m_render_command->swap_buffers();
+	m_render_command->clear_back_buffer(
 	    m_default_framebuffer_camera ? m_default_framebuffer_camera->GetBackgroundColor() :
 	                                 glm::vec4(0.0f)
 	);
@@ -209,7 +209,7 @@ void Renderer::EndFrame()
 	m_default_framebuffer_camera = nullptr;
 }
 
-void Renderer::BeginSceneImpl(
+void renderer::begin_scene_impl(
     Camera *camera,
     const glm::mat4 &cameraTransform,
     const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */
@@ -219,86 +219,86 @@ void Renderer::BeginSceneImpl(
 	m_target_framebuffer = targetFrameBuffer;
 
 	if (targetFrameBuffer)
-		targetFrameBuffer->BindAsTarget(camera->GetBackgroundColor());
+		targetFrameBuffer->bind_as_target(camera->GetBackgroundColor());
 	else
 	{
 		m_default_framebuffer_camera = camera;
-		m_render_command->DefaultTargetFramebuffer();
+		m_render_command->default_target_framebuffer();
 	}
 
 	// update view projection buffer
-	glm::mat4 *map = (glm::mat4 *)m_view_projection_buffer->Map();
+	glm::mat4 *map = (glm::mat4 *)m_view_projection_buffer->map();
 	map[0] = camera->GetProjection() * glm::inverse(cameraTransform);
-	m_view_projection_buffer->UnMap();
+	m_view_projection_buffer->un_map();
 
 	// map renderers
-	m_quad_renderer.Map();
-	m_texture_renderer.Map();
-	m_tinted_texture_renderer.Map();
+	m_quad_renderer.map();
+	m_texture_renderer.map();
+	m_tinted_texture_renderer.map();
 }
 
-void Renderer::FlushScene()
+void renderer::flush_scene()
 {
 	/* tinted texture renderer */
-	m_tinted_texture_renderer.UnMap();
-	if (m_tinted_texture_renderer.GetQuadCount())
+	m_tinted_texture_renderer.un_map();
+	if (m_tinted_texture_renderer.get_quad_count())
 	{
-		m_tinted_texture_renderer.Bind();
-		m_render_command->DrawIndexed(m_tinted_texture_renderer.GetQuadCount() * 6u);
+		m_tinted_texture_renderer.bind();
+		m_render_command->draw_indexed(m_tinted_texture_renderer.get_quad_count() * 6u);
 	}
 
 	/* quad renderer */
-	m_quad_renderer.UnMap();
-	if (m_quad_renderer.GetQuadCount())
+	m_quad_renderer.un_map();
+	if (m_quad_renderer.get_quad_count())
 	{
-		m_quad_renderer.Bind();
-		m_render_command->DrawIndexed(m_quad_renderer.GetQuadCount() * 6u);
+		m_quad_renderer.bind();
+		m_render_command->draw_indexed(m_quad_renderer.get_quad_count() * 6u);
 	}
 
 	/* texture renderer */
-	m_texture_renderer.UnMap();
-	if (m_texture_renderer.GetQuadCount())
+	m_texture_renderer.un_map();
+	if (m_texture_renderer.get_quad_count())
 	{
-		m_texture_renderer.Bind();
-		m_render_command->DrawIndexed(m_texture_renderer.GetQuadCount() * 6u);
+		m_texture_renderer.bind();
+		m_render_command->draw_indexed(m_texture_renderer.get_quad_count() * 6u);
 	}
 
-	m_quad_renderer.Map();
-	m_texture_renderer.Map();
-	m_tinted_texture_renderer.Map();
+	m_quad_renderer.map();
+	m_texture_renderer.map();
+	m_tinted_texture_renderer.map();
 }
 
-void Renderer::EndSceneImpl()
+void renderer::end_scene_impl()
 {
 	/* tinted texture renderer */
-	m_tinted_texture_renderer.UnMap();
-	if (m_tinted_texture_renderer.GetQuadCount())
+	m_tinted_texture_renderer.un_map();
+	if (m_tinted_texture_renderer.get_quad_count())
 	{
-		m_tinted_texture_renderer.Bind();
-		m_render_command->DrawIndexed(m_tinted_texture_renderer.GetQuadCount() * 6u);
+		m_tinted_texture_renderer.bind();
+		m_render_command->draw_indexed(m_tinted_texture_renderer.get_quad_count() * 6u);
 	}
 
 	/* quad renderer */
-	m_quad_renderer.UnMap();
-	if (m_quad_renderer.GetQuadCount())
+	m_quad_renderer.un_map();
+	if (m_quad_renderer.get_quad_count())
 	{
-		m_quad_renderer.Bind();
-		m_render_command->DrawIndexed(m_quad_renderer.GetQuadCount() * 6u);
+		m_quad_renderer.bind();
+		m_render_command->draw_indexed(m_quad_renderer.get_quad_count() * 6u);
 	}
 
 	/* texture renderer */
-	m_texture_renderer.UnMap();
-	if (m_texture_renderer.GetQuadCount())
+	m_texture_renderer.un_map();
+	if (m_texture_renderer.get_quad_count())
 	{
-		m_texture_renderer.Bind();
-		m_render_command->DrawIndexed(m_texture_renderer.GetQuadCount() * 6u);
+		m_texture_renderer.bind();
+		m_render_command->draw_indexed(m_texture_renderer.get_quad_count() * 6u);
 	}
 
 	// reset frame buffer
 	if (m_target_framebuffer)
 	{
 		m_target_framebuffer = nullptr;
-		m_render_command->DefaultTargetFramebuffer();
+		m_render_command->default_target_framebuffer();
 	}
 }
 

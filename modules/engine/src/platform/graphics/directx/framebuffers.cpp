@@ -29,25 +29,25 @@ dxFramebuffer::dxFramebuffer(
 	t2dDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	t2dDesc.CPUAccessFlags = NULL;
 	t2dDesc.MiscFlags = NULL;
-	DXC(m_context->GetDevice()->CreateTexture2D(&t2dDesc, nullptr, &m_color_attachment));
+	dxc(m_context->get_device()->CreateTexture2D(&t2dDesc, nullptr, &m_color_attachment));
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = t2dDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	DXC(m_context->GetDevice()
+	dxc(m_context->get_device()
 	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view));
 
 	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 	rtvDesc.Format = t2dDesc.Format;
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Texture2D.MipSlice = 0u;
-	DXC(m_context->GetDevice()
+	dxc(m_context->get_device()
 	        ->CreateRenderTargetView(m_color_attachment.Get(), &rtvDesc, &m_render_target_view));
 }
 
-void dxFramebuffer::BindAsTarget(const glm::vec4 &clearColor)
+void dxFramebuffer::bind_as_target(const glm::vec4 &clearColor)
 {
 	FLOAT color[] = {
 		clearColor.r,
@@ -56,9 +56,9 @@ void dxFramebuffer::BindAsTarget(const glm::vec4 &clearColor)
 		clearColor.a,
 	};
 
-	m_context->GetDeviceContext()
+	m_context->get_device_context()
 	    ->OMSetRenderTargets(1u, m_render_target_view.GetAddressOf(), nullptr);
-	m_context->GetDeviceContext()->ClearRenderTargetView(m_render_target_view.Get(), color);
+	m_context->get_device_context()->ClearRenderTargetView(m_render_target_view.Get(), color);
 
 	D3D11_VIEWPORT viewport;
 
@@ -72,15 +72,15 @@ void dxFramebuffer::BindAsTarget(const glm::vec4 &clearColor)
 	viewport.MaxDepth = 1.0f;
 
 	// set viewport
-	m_context->GetDeviceContext()->RSSetViewports(1u, &viewport);
+	m_context->get_device_context()->RSSetViewports(1u, &viewport);
 }
 
-void dxFramebuffer::BindAsResource()
+void dxFramebuffer::bind_as_resource()
 {
-	LOG(err, "NO_IMPLEMENT");
+	lt_log(err, "NO_IMPLEMENT");
 }
 
-void dxFramebuffer::Resize(const glm::uvec2 &size)
+void dxFramebuffer::resize(const glm::uvec2 &size)
 {
 	m_specification.width = std::clamp(size.x, 1u, 16384u);
 	m_specification.height = std::clamp(size.y, 1u, 16384u);
@@ -97,10 +97,10 @@ void dxFramebuffer::Resize(const glm::uvec2 &size)
 	textureDesc.Height = m_specification.height;
 
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateTexture2D(&textureDesc, nullptr, &m_color_attachment));
-	DXC(m_context->GetDevice()
+	dxc(m_context->get_device()->CreateTexture2D(&textureDesc, nullptr, &m_color_attachment));
+	dxc(m_context->get_device()
 	        ->CreateRenderTargetView(m_color_attachment.Get(), &rtvDesc, &m_render_target_view));
-	DXC(m_context->GetDevice()
+	dxc(m_context->get_device()
 	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view));
 }
 

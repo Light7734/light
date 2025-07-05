@@ -11,36 +11,36 @@ Layer::Layer(const std::string &name): m_layer_name(name)
 {
 }
 
-bool Layer::OnEvent(const Event &event)
+bool Layer::on_event(const Event &event)
 {
-	switch (event.GetEventType())
+	switch (event.get_event_type())
 	{
 	/* mouse */
 	// cursor
-	case EventType::MouseMoved: return OnMouseMoved((MouseMovedEvent &)event);
+	case EventType::MouseMoved: return on_mouse_moved((MouseMovedEvent &)event);
 	// button
-	case EventType::ButtonPressed: return OnButtonPressed((ButtonPressedEvent &)event);
-	case EventType::ButtonReleased: return OnButtonReleased((ButtonReleasedEvent &)event);
+	case EventType::ButtonPressed: return on_button_pressed((ButtonPressedEvent &)event);
+	case EventType::ButtonReleased: return on_button_released((ButtonReleasedEvent &)event);
 	// wheel
-	case EventType::WheelScrolled: return OnWheelScrolled((WheelScrolledEvent &)event);
+	case EventType::WheelScrolled: return on_wheel_scrolled((WheelScrolledEvent &)event);
 
 	/* keyboard */
 	// key
-	case EventType::KeyPressed: return OnKeyPressed((KeyPressedEvent &)event);
-	case EventType::KeyRepeated: return OnKeyRepeat((KeyRepeatEvent &)event);
-	case EventType::KeyReleased: return OnKeyReleased((KeyReleasedEvent &)event);
+	case EventType::KeyPressed: return on_key_pressed((KeyPressedEvent &)event);
+	case EventType::KeyRepeated: return on_key_repeat((KeyRepeatEvent &)event);
+	case EventType::KeyReleased: return on_key_released((KeyReleasedEvent &)event);
 	// char
-	case EventType::SetChar: return OnSetChar((SetCharEvent &)event);
+	case EventType::SetChar: return on_set_char((SetCharEvent &)event);
 
 	/* window */
 	// termination
-	case EventType::WindowClosed: return OnWindowClosed((WindowClosedEvent &)event);
+	case EventType::WindowClosed: return on_window_closed((WindowClosedEvent &)event);
 	// size/position
-	case EventType::WindowResized: return OnWindowResized((WindowResizedEvent &)event);
-	case EventType::WindowMoved: return OnWindowMoved((WindowMovedEvent &)event);
+	case EventType::WindowResized: return on_window_resized((WindowResizedEvent &)event);
+	case EventType::WindowMoved: return on_window_moved((WindowMovedEvent &)event);
 	// focus
-	case EventType::WindowLostFocus: return OnWindowLostFocus((WindowLostFocusEvent &)event);
-	case EventType::WindowGainFocus: return OnWindowGainFocus((WindowGainFocusEvent &)event);
+	case EventType::WindowLostFocus: return on_window_lost_focus((WindowLostFocusEvent &)event);
+	case EventType::WindowGainFocus: return on_window_gain_focus((WindowGainFocusEvent &)event);
 	}
 }
 

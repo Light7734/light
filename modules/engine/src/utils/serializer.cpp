@@ -76,7 +76,7 @@ SceneSerializer::SceneSerializer(const Ref<Scene> &scene): m_scene(scene)
 {
 }
 
-void SceneSerializer::Serialize(const std::string &filePath)
+void SceneSerializer::serialize(const std::string &filePath)
 {
 	YAML::Emitter out;
 	out << YAML::BeginMap; // Scene
@@ -86,10 +86,10 @@ void SceneSerializer::Serialize(const std::string &filePath)
 	for (auto [entityID, storage] : m_scene->m_registry.storage())
 	{
 		Entity entity = { static_cast<entt::entity>(entityID), m_scene.get() };
-		if (!entity.IsValid())
+		if (!entity.is_valid())
 			return;
 
-		SerializeEntity(out, entity);
+		serialize_entity(out, entity);
 	};
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
@@ -98,11 +98,11 @@ void SceneSerializer::Serialize(const std::string &filePath)
 
 	std::ofstream fout(filePath);
 	if (!fout.is_open())
-		LOG(trace, "Failed to create fout at: {}", filePath);
+		lt_log(trace, "Failed to create fout at: {}", filePath);
 	fout << out.c_str();
 }
 
-bool SceneSerializer::Deserialize(const std::string &filePath)
+bool SceneSerializer::deserialize(const std::string &filePath)
 {
 	std::ifstream stream(filePath);
 	std::stringstream ss;
@@ -113,7 +113,7 @@ bool SceneSerializer::Deserialize(const std::string &filePath)
 		return false;
 
 	std::string sceneName = data["Scene"].as<std::string>();
-	LOG(trace, "Deserializing scene: '{}'", sceneName);
+	lt_log(trace, "Deserializing scene: '{}'", sceneName);
 
 	auto entities = data["Entities"];
 	if (entities)
@@ -125,19 +125,19 @@ bool SceneSerializer::Deserialize(const std::string &filePath)
 
 		for (auto entity : entities)
 		{
-			uint64_t uuid = entity["Entity"].as<uint64_t>(); // #todo
+			uint64_t uuid = entity["entity"].as<uint64_t>(); // #todo
 
 			std::string name;
 			auto tagComponent = entity["TagComponent"];
 			if (tagComponent)
 				name = tagComponent["Tag"].as<std::string>();
 
-			LOG(trace, "Deserialized entity '{}' : '{}'", uuid, name);
+			lt_log(trace, "Deserialized entity '{}' : '{}'", uuid, name);
 
-			Entity deserializedEntity = m_scene->CreateEntityWithUUID(name, uuid);
+			Entity deserializedEntity = m_scene->create_entity_with_uuid(name, uuid);
 
 			TagComponent gg = deserializedEntity.GetComponent<TagComponent>();
-			LOG(trace, gg.tag);
+			lt_log(trace, gg.tag);
 			auto transformComponent = entity["TransformComponent"];
 			if (transformComponent)
 			{
@@ -163,11 +163,11 @@ bool SceneSerializer::Deserialize(const std::string &filePath)
 
 				if (!texturePaths.contains(texturePath))
 				{
-					ResourceManager::LoadTexture(texturePath, texturePath);
+					ResourceManager::load_texture(texturePath, texturePath);
 					texturePaths.insert(texturePath);
 				}
 
-				entitySpriteRendererComponent.texture = ResourceManager::GetTexture(texturePath);
+				entitySpriteRendererComponent.texture = ResourceManager::get_texture(texturePath);
 			}
 			/* #TEMPORARY SOLUTION# */
 
@@ -177,31 +177,31 @@ bool SceneSerializer::Deserialize(const std::string &filePath)
 				auto &entityCameraComponent = deserializedEntity.AddComponent<CameraComponent>();
 
 				const auto &cameraSpecifications = cameraComponent["Camera"];
-				entityCameraComponent.camera.SetProjectionType(
+				entityCameraComponent.camera.set_projection_type(
 				    (SceneCamera::ProjectionType)cameraSpecifications["ProjectionType"].as<int>()
 				);
 
-				entityCameraComponent.camera.SetOrthographicSize(
+				entityCameraComponent.camera.set_orthographic_size(
 				    cameraSpecifications["OrthographicSize"].as<float>()
 				);
-				entityCameraComponent.camera.SetOrthographicNearPlane(
+				entityCameraComponent.camera.set_orthographic_near_plane(
 				    cameraSpecifications["OrthographicNearPlane"].as<float>()
 				);
-				entityCameraComponent.camera.SetOrthographicFarPlane(
+				entityCameraComponent.camera.set_orthographic_far_plane(
 				    cameraSpecifications["OrthographicFarPlane"].as<float>()
 				);
 
-				entityCameraComponent.camera.SetPerspectiveVerticalFOV(
+				entityCameraComponent.camera.set_perspective_vertical_fov(
 				    cameraSpecifications["PerspectiveVerticalFOV"].as<float>()
 				);
-				entityCameraComponent.camera.SetPerspectiveNearPlane(
+				entityCameraComponent.camera.set_perspective_near_plane(
 				    cameraSpecifications["PerspectiveNearPlane"].as<float>()
 				);
-				entityCameraComponent.camera.SetPerspectiveFarPlane(
+				entityCameraComponent.camera.set_perspective_far_plane(
 				    cameraSpecifications["PerspectiveFarPlane"].as<float>()
 				);
 
-				entityCameraComponent.camera.SetBackgroundColor(
+				entityCameraComponent.camera.set_background_color(
 				    cameraSpecifications["BackgroundColor"].as<glm::vec4>()
 				);
 
@@ -215,23 +215,23 @@ bool SceneSerializer::Deserialize(const std::string &filePath)
 	return false;
 }
 
-void SceneSerializer::SerializeBinary(const std::string &filePath)
+void SceneSerializer::serialize_binary(const std::string &filePath)
 {
-	LOG(err, "NO_IMPLEMENT");
+	lt_log(err, "NO_IMPLEMENT");
 }
 
-bool SceneSerializer::DeserializeBinary(const std::string &filePath)
+bool SceneSerializer::deserialize_binary(const std::string &filePath)
 {
-	LOG(err, "NO_IMPLEMENT");
+	lt_log(err, "NO_IMPLEMENT");
 	return false;
 }
 
-void SceneSerializer::SerializeEntity(YAML::Emitter &out, Entity entity)
+void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 {
-	out << YAML::BeginMap;                                           // entity
-	out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID(); // dummy uuid
+	out << YAML::BeginMap;                                            // entity
+	out << YAML::Key << "entity" << YAML::Value << entity.get_uuid(); // dummy uuid
 
-	if (entity.HasComponent<TagComponent>())
+	if (entity.has_component<TagComponent>())
 	{
 		out << YAML::Key << "TagComponent";
 		out << YAML::BeginMap; // tag component
@@ -242,7 +242,7 @@ void SceneSerializer::SerializeEntity(YAML::Emitter &out, Entity entity)
 		out << YAML::EndMap; // tag component
 	}
 
-	if (entity.HasComponent<TransformComponent>())
+	if (entity.has_component<TransformComponent>())
 	{
 		out << YAML::Key << "TransformComponent";
 		out << YAML::BeginMap; // transform component
@@ -256,7 +256,7 @@ void SceneSerializer::SerializeEntity(YAML::Emitter &out, Entity entity)
 		out << YAML::EndMap; // transform component;
 	}
 
-	if (entity.HasComponent<SpriteRendererComponent>())
+	if (entity.has_component<SpriteRendererComponent>())
 	{
 		out << YAML::Key << "SpriteRendererComponent";
 		out << YAML::BeginMap; // sprite renderer component;
@@ -271,9 +271,9 @@ void SceneSerializer::SerializeEntity(YAML::Emitter &out, Entity entity)
 	}
 
 	// #todo:
-	// if(entity.HasComponent<NativeScriptComponent>())
+	// if(entity.has_component<NativeScriptComponent>())
 
-	if (entity.HasComponent<CameraComponent>())
+	if (entity.has_component<CameraComponent>())
 	{
 		out << YAML::Key << "CameraComponent";
 		out << YAML::BeginMap; // camera component
@@ -283,19 +283,19 @@ void SceneSerializer::SerializeEntity(YAML::Emitter &out, Entity entity)
 		out << YAML::Key << "Camera" << YAML::Value;
 		out << YAML::BeginMap; // camera
 		out << YAML::Key << "OrthographicSize" << YAML::Value
-		    << cameraComponent.camera.GetOrthographicSize();
+		    << cameraComponent.camera.get_orthographic_size();
 		out << YAML::Key << "OrthographicFarPlane" << YAML::Value
-		    << cameraComponent.camera.GetOrthographicFarPlane();
+		    << cameraComponent.camera.get_orthographic_far_plane();
 		out << YAML::Key << "OrthographicNearPlane" << YAML::Value
-		    << cameraComponent.camera.GetOrthographicNearPlane();
+		    << cameraComponent.camera.get_orthographic_near_plane();
 		out << YAML::Key << "PerspectiveVerticalFOV" << YAML::Value
-		    << cameraComponent.camera.GetPerspectiveVerticalFOV();
+		    << cameraComponent.camera.get_perspective_vertical_fov();
 		out << YAML::Key << "PerspectiveFarPlane" << YAML::Value
-		    << cameraComponent.camera.GetPerspectiveFarPlane();
+		    << cameraComponent.camera.get_perspective_far_plane();
 		out << YAML::Key << "PerspectiveNearPlane" << YAML::Value
-		    << cameraComponent.camera.GetPerspectiveNearPlane();
+		    << cameraComponent.camera.get_perspective_near_plane();
 		out << YAML::Key << "ProjectionType" << YAML::Value
-		    << (int)cameraComponent.camera.GetProjectionType();
+		    << (int)cameraComponent.camera.get_projection_type();
 		out << YAML::Key << "BackgroundColor" << YAML::Value
 		    << cameraComponent.camera.GetBackgroundColor();
 		out << YAML::EndMap; // camera

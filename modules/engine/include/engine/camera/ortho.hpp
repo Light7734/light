@@ -28,10 +28,10 @@ public:
 	);
 
 	// CAMERA //
-	void CalculateView();
-	void CalculateProjection();
+	void calculate_view();
+	void calculate_projection();
 
-	void OnResize(const glm::vec2 &size);
+	void on_resize(const glm::vec2 &size);
 
 	inline const glm::mat4 &GetView() const
 	{
@@ -48,7 +48,7 @@ public:
 	}
 
 	// CAMERA_CONTROLLER //
-	void Move(const glm::vec2 &position);
+	void move(const glm::vec2 &position);
 };
 
 } // namespace Light

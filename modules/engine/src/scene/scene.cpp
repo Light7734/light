@@ -14,7 +14,7 @@ Scene::~Scene()
 {
 }
 
-void Scene::OnCreate()
+void Scene::on_create()
 {
 	/* native scripts */
 	{
@@ -22,23 +22,23 @@ void Scene::OnCreate()
 			if (nsc.instance == nullptr)
 			{
 				nsc.instance = nsc.CreateInstance();
-				nsc.instance->OnCreate();
+				nsc.instance->on_create();
 			}
 		});
 	}
 }
 
-void Scene::OnUpdate(float deltaTime)
+void Scene::on_update(float deltaTime)
 {
 	/* native scripts */
 	{
 		m_registry.view<NativeScriptComponent>().each([=](NativeScriptComponent &nsc) {
-			nsc.instance->OnUpdate(deltaTime);
+			nsc.instance->on_update(deltaTime);
 		});
 	}
 }
 
-void Scene::OnRender(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
+void Scene::on_render(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
 {
 	Camera *sceneCamera = nullptr;
 	TransformComponent *sceneCameraTransform;
@@ -59,29 +59,29 @@ void Scene::OnRender(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
 	{
 		if (sceneCamera)
 		{
-			Renderer::BeginScene(sceneCamera, *sceneCameraTransform, targetFrameBuffer);
+			renderer::begin_scene(sceneCamera, *sceneCameraTransform, targetFrameBuffer);
 
 			m_registry.group(entt::get<TransformComponent, SpriteRendererComponent>)
 			    .each([](TransformComponent &transformComp,
 			             SpriteRendererComponent &spriteRendererComp) {
-				    Renderer::DrawQuad(
+				    renderer::draw_quad(
 				        transformComp,
 				        spriteRendererComp.tint,
 				        spriteRendererComp.texture
 				    );
 			    });
 
-			Renderer::EndScene();
+			renderer::end_scene();
 		}
 	}
 }
 
-Entity Scene::CreateEntity(const std::string &name, const TransformComponent &transform)
+Entity Scene::create_entity(const std::string &name, const TransformComponent &transform)
 {
-	return CreateEntityWithUUID(name, UUID(), transform);
+	return create_entity_with_uuid(name, UUID(), transform);
 }
 
-Entity Scene::GetEntityByTag(const std::string &tag)
+Entity Scene::get_entity_by_tag(const std::string &tag)
 {
 	// TagComponent tagComp(tag);
 	// entt::entity entity = entt::to_entity(m_registry, tagComp);
@@ -89,19 +89,19 @@ Entity Scene::GetEntityByTag(const std::string &tag)
 
 	m_registry.view<TagComponent>().each([&](TagComponent &tagComp) {
 		// if (tagComp.tag == tag)
-		// 	entity = Entity(entt::to_entity(m_registry, tagComp), this);
+		// 	entity = entity(entt::to_entity(m_registry, tagComp), this);
 	});
 
-	if (entity.IsValid())
+	if (entity.is_valid())
 		return entity;
 	else
 	{
-		ASSERT("Scene::GetEntityByTag: failed to find entity by tag: {}", tag);
-		return Entity();
+		lt_assert("Scene::get_entity_by_tag: failed to find entity by tag: {}", tag);
+		return {};
 	}
 }
 
-Entity Scene::CreateEntityWithUUID(
+Entity Scene::create_entity_with_uuid(
     const std::string &name,
     UUID uuid,
     const TransformComponent &transform

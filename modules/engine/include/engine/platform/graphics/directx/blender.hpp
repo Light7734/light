@@ -23,8 +23,8 @@ private:
 public:
 	dxBlender(Ref<dxSharedContext> sharedContext);
 
-	void Enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
-	void Disable() override;
+	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
+	void disable() override;
 };
 
 } // namespace Light

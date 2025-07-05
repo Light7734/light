@@ -10,7 +10,7 @@
 
 namespace Light {
 
-Ref<Texture> Texture::Create(
+Ref<Texture> Texture::create(
     unsigned int width,
     unsigned int height,
     unsigned int components,
@@ -19,13 +19,13 @@ Ref<Texture> Texture::Create(
     const std::string &filePath
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
 	case GraphicsAPI::OpenGL:
-		return CreateRef<glTexture>(width, height, components, pixels, filePath);
+		return create_ref<glTexture>(width, height, components, pixels, filePath);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateRef<dxTexture>(
+		lt_win(return create_ref<dxTexture>(
 		                  width,
 		                  height,
 		                  components,
@@ -35,10 +35,10 @@ Ref<Texture> Texture::Create(
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}

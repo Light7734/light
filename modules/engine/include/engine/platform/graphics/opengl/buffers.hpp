@@ -16,10 +16,10 @@ public:
 	glConstantBuffer(ConstantBufferIndex index, unsigned int size);
 	~glConstantBuffer();
 
-	void Bind() override;
+	void bind() override;
 
-	void *Map() override;
-	void UnMap() override;
+	void *map() override;
+	void un_map() override;
 };
 
 //========== VERTEX_BUFFER ==========//
@@ -32,11 +32,11 @@ public:
 	glVertexBuffer(float *vertices, unsigned int stride, unsigned int count);
 	~glVertexBuffer();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 
-	void *Map() override;
-	void UnMap() override;
+	void *map() override;
+	void un_map() override;
 };
 
 //========== INDEX_BUFFER ==========//
@@ -49,8 +49,8 @@ public:
 	glIndexBuffer(unsigned int *indices, unsigned int count);
 	~glIndexBuffer();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 };
 
 } // namespace Light

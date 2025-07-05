@@ -25,10 +25,10 @@ class Camera;
 
 class WindowResizedEvent;
 
-class Renderer
+class renderer
 {
 private:
-	static Renderer *s_Context;
+	static renderer *s_Context;
 
 	// renderer programs
 	QuadRendererProgram m_quad_renderer;
@@ -47,88 +47,88 @@ private:
 	bool m_should_clear_backbuffer;
 
 public:
-	static Scope<Renderer> Create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	static Scope<renderer> create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
-	static inline void DrawQuad(
+	static inline void draw_quad(
 	    const glm::vec3 &position,
 	    const glm::vec2 &size,
 	    const glm::vec4 &tint,
 	    Ref<Texture> texture
 	)
 	{
-		s_Context->DrawQuadImpl(position, size, tint, texture);
+		s_Context->draw_quad_impl(position, size, tint, texture);
 	}
-	static inline void DrawQuad(
+	static inline void draw_quad(
 	    const glm::vec3 &position,
 	    const glm::vec2 &size,
 	    const glm::vec4 &tint
 	)
 	{
-		s_Context->DrawQuadImpl(position, size, tint);
+		s_Context->draw_quad_impl(position, size, tint);
 	}
-	static inline void DrawQuad(
+	static inline void draw_quad(
 	    const glm::vec3 &position,
 	    const glm::vec2 &size,
 	    Ref<Texture> texture
 	)
 	{
-		s_Context->DrawQuadImpl(position, size, texture);
+		s_Context->draw_quad_impl(position, size, texture);
 	}
 
-	static void DrawQuad(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
+	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
 	{
-		s_Context->DrawQuadImpl(transform, tint, texture);
+		s_Context->draw_quad_impl(transform, tint, texture);
 	}
-	static void DrawQuad(const glm::mat4 &transform, const glm::vec4 &tint)
+	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint)
 	{
-		s_Context->DrawQuadImpl(transform, tint);
+		s_Context->draw_quad_impl(transform, tint);
 	}
-	static void DrawQuad(const glm::mat4 &transform, Ref<Texture> texture)
+	static void draw_quad(const glm::mat4 &transform, Ref<Texture> texture)
 	{
-		s_Context->DrawQuadImpl(transform, texture);
+		s_Context->draw_quad_impl(transform, texture);
 	}
 
-	static inline void BeginScene(
+	static inline void begin_scene(
 	    Camera *camera,
 	    const glm::mat4 &cameraTransform,
 	    const Ref<Framebuffer> &targetFrameBuffer = nullptr
 	)
 	{
-		s_Context->BeginSceneImpl(camera, cameraTransform, targetFrameBuffer);
+		s_Context->begin_scene_impl(camera, cameraTransform, targetFrameBuffer);
 	}
-	static inline void EndScene()
+	static inline void end_scene()
 	{
-		s_Context->EndSceneImpl();
+		s_Context->end_scene_impl();
 	}
 
-	void OnWindowResize(const WindowResizedEvent &event);
+	void on_window_resize(const WindowResizedEvent &event);
 
-	void BeginFrame();
-	void EndFrame();
+	void begin_frame();
+	void end_frame();
 
 private:
-	Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
-	void DrawQuadImpl(
+	void draw_quad_impl(
 	    const glm::vec3 &position,
 	    const glm::vec2 &size,
 	    const glm::vec4 &tint,
 	    Ref<Texture> texture
 	);
-	void DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint);
-	void DrawQuadImpl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture);
+	void draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint);
+	void draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture);
 
-	void DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture);
-	void DrawQuadImpl(const glm::mat4 &transform, const glm::vec4 &tint);
-	void DrawQuadImpl(const glm::mat4 &transform, Ref<Texture> texture);
+	void draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture);
+	void draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint);
+	void draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture);
 
-	void BeginSceneImpl(
+	void begin_scene_impl(
 	    Camera *camera,
 	    const glm::mat4 &cameraTransform,
 	    const Ref<Framebuffer> &targetFrameBuffer = nullptr
 	);
-	void FlushScene();
-	void EndSceneImpl();
+	void flush_scene();
+	void end_scene_impl();
 };
 
 } // namespace Light

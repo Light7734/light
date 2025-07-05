@@ -18,29 +18,29 @@ namespace Light {
 
 UserInterface *UserInterface::s_Context = nullptr;
 
-Scope<UserInterface> UserInterface::Create(
+Scope<UserInterface> UserInterface::create(
     GLFWwindow *windowHandle,
     Ref<SharedContext> sharedContext
 )
 {
 	Scope<UserInterface> scopeUserInterface = nullptr;
 
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: scopeUserInterface = CreateScope<glUserInterface>(); break;
+	case GraphicsAPI::OpenGL: scopeUserInterface = create_scope<glUserInterface>(); break;
 
-	case GraphicsAPI::DirectX: LT_WIN(scopeUserInterface = CreateScope<dxUserInterface>();) break;
+	case GraphicsAPI::DirectX: lt_win(scopeUserInterface = create_scope<dxUserInterface>();) break;
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
-		    "UserInterface::Create: invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    "UserInterface::create: invalid/unsupported 'GraphicsAPI' {}",
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}
 
-	scopeUserInterface->Init(windowHandle, sharedContext);
+	scopeUserInterface->init(windowHandle, sharedContext);
 	return std::move(scopeUserInterface);
 }
 
@@ -51,7 +51,7 @@ UserInterface::UserInterface()
           | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
       )
 {
-	ASSERT(
+	lt_assert(
 	    !s_Context,
 	    "UserInterface::UserInterface: an instance of 'UserInterface' already exists, do not "
 	    "construct this class!"
@@ -59,7 +59,7 @@ UserInterface::UserInterface()
 	s_Context = this;
 }
 
-void UserInterface::Init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+void UserInterface::init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 {
 	// create context
 	IMGUI_CHECKVERSION();
@@ -84,7 +84,7 @@ void UserInterface::Init(GLFWwindow *windowHandle, Ref<SharedContext> sharedCont
 	// style
 	ImGui::StyleColorsDark();
 
-	PlatformImplementation(windowHandle, sharedContext);
+	platform_implementation(windowHandle, sharedContext);
 
 	// keyboard map
 	io.KeyMap[ImGuiKey_Tab] = Key::Tab;
@@ -95,7 +95,7 @@ void UserInterface::Init(GLFWwindow *windowHandle, Ref<SharedContext> sharedCont
 	io.KeyMap[ImGuiKey_PageUp] = Key::PageUp;
 	io.KeyMap[ImGuiKey_PageDown] = Key::PageDown;
 	io.KeyMap[ImGuiKey_Home] = Key::Home;
-	io.KeyMap[ImGuiKey_End] = Key::End;
+	io.KeyMap[ImGuiKey_End] = Key::end;
 	io.KeyMap[ImGuiKey_Insert] = Key::Insert;
 	io.KeyMap[ImGuiKey_Delete] = Key::Delete;
 	io.KeyMap[ImGuiKey_Backspace] = Key::BackSpace;
@@ -116,10 +116,10 @@ void UserInterface::Init(GLFWwindow *windowHandle, Ref<SharedContext> sharedCont
 	    18.0f
 	);
 
-	SetDarkThemeColors();
+	set_dark_theme_colors();
 }
 
-void UserInterface::DockspaceBegin()
+void UserInterface::dockspace_begin()
 {
 	ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->Pos);
@@ -143,12 +143,12 @@ void UserInterface::DockspaceBegin()
 	style.WindowMinSize.x = minWinSizeX;
 }
 
-void UserInterface::DockspaceEnd()
+void UserInterface::dockspace_end()
 {
 	ImGui::End();
 }
 
-void UserInterface::SetDarkThemeColors()
+void UserInterface::set_dark_theme_colors()
 {
 	ImGuiStyle &style = ImGui::GetStyle();
 	ImVec4(&colors)[55] = style.Colors;

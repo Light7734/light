@@ -17,13 +17,13 @@ public:
 	dxUserInterface() = default;
 	~dxUserInterface();
 
-	void PlatformImplementation(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+	void platform_implementation(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 	    override;
 
-	void Begin() override;
-	void End() override;
+	void begin() override;
+	void end() override;
 
-	void LogDebugData() override;
+	void log_debug_data() override;
 };
 
 } // namespace Light

@@ -36,12 +36,12 @@ glTexture::glTexture(
 	                                                  NULL;
 
 	// check
-	ASSERT(format, "Invalid number of components: {}", components);
+	lt_assert(format, "Invalid number of components: {}", components);
 
 
 	// #todo: isn't there something like glTextureImage2D ???
 	// create texture and mipsmaps
-	Bind();
+	bind();
 	glTexImage2D(
 	    GL_TEXTURE_2D,
 	    0,
@@ -61,13 +61,13 @@ glTexture::~glTexture()
 	glDeleteTextures(1, &m_texture_id);
 }
 
-void glTexture::Bind(unsigned int slot /* = 0u */)
+void glTexture::bind(unsigned int slot /* = 0u */)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
-void *glTexture::GetTexture()
+void *glTexture::get_texture()
 {
 	return (void *)(intptr_t)m_texture_id;
 }

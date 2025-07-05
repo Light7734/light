@@ -20,7 +20,7 @@ SceneHierarchyPanel::
 {
 }
 
-void SceneHierarchyPanel::OnUserInterfaceUpdate()
+void SceneHierarchyPanel::on_user_interface_update()
 {
 	if (m_context)
 	{
@@ -31,15 +31,14 @@ void SceneHierarchyPanel::OnUserInterfaceUpdate()
 			Entity entity(static_cast<entt::entity>(entityID), m_context.get());
 			const std::string &tag = entity.GetComponent<TagComponent>();
 
-			DrawNode(entity, tag);
+			draw_node(entity, tag);
 		};
 	}
 
 	ImGui::End();
 }
 
-void SceneHierarchyPanel::
-    SetContext(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel /* = nullptr */)
+void SceneHierarchyPanel::set_context(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel)
 {
 	if (propertiesPanel)
 		m_properties_panel_context = propertiesPanel;
@@ -47,7 +46,7 @@ void SceneHierarchyPanel::
 	m_context = context;
 }
 
-void SceneHierarchyPanel::DrawNode(Entity entity, const std::string &label)
+void SceneHierarchyPanel::draw_node(Entity entity, const std::string &label)
 {
 	ImGuiTreeNodeFlags flags = (m_selection_context == entity ? ImGuiTreeNodeFlags_Selected : NULL)
 	                           | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
@@ -57,7 +56,7 @@ void SceneHierarchyPanel::DrawNode(Entity entity, const std::string &label)
 	if (ImGui::IsItemClicked())
 	{
 		m_selection_context = entity;
-		m_properties_panel_context->SetEntityContext(entity);
+		m_properties_panel_context->set_entity_context(entity);
 	}
 
 	if (expanded)

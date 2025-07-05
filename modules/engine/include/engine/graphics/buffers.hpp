@@ -15,12 +15,12 @@ enum class ConstantBufferIndex
 class ConstantBuffer
 {
 public:
-	static Scope<ConstantBuffer> Create(ConstantBufferIndex index, unsigned int size, Ref<SharedContext> sharedContext);
+	static Scope<ConstantBuffer> create(ConstantBufferIndex index, unsigned int size, Ref<SharedContext> sharedContext);
 
-	virtual void* Map()  = 0;
-	virtual void UnMap() = 0;
+	virtual void* map()  = 0;
+	virtual void un_map() = 0;
 
-	virtual void Bind() = 0;
+	virtual void bind() = 0;
 
 protected:
 	ConstantBuffer() = default;
@@ -30,15 +30,15 @@ protected:
 class VertexBuffer
 {
 public:
-	static Ref<VertexBuffer> Create(float* vertices, unsigned int stride, unsigned int count, Ref<SharedContext> sharedContext);
+	static Ref<VertexBuffer> create(float* vertices, unsigned int stride, unsigned int count, Ref<SharedContext> sharedContext);
 
 	virtual ~VertexBuffer() = default;
 
-	virtual void* Map()  = 0;
-	virtual void UnMap() = 0;
+	virtual void* map()  = 0;
+	virtual void un_map() = 0;
 
-	virtual void Bind()   = 0;
-	virtual void UnBind() = 0;
+	virtual void bind()   = 0;
+	virtual void un_bind() = 0;
 
 protected:
 	VertexBuffer() = default;
@@ -48,12 +48,12 @@ protected:
 class IndexBuffer
 {
 public:
-	static Ref<IndexBuffer> Create(unsigned int* indices, unsigned int count, Ref<SharedContext> sharedContext);
+	static Ref<IndexBuffer> create(unsigned int* indices, unsigned int count, Ref<SharedContext> sharedContext);
 
 	virtual ~IndexBuffer() = default;
 
-	virtual void Bind()   = 0;
-	virtual void UnBind() = 0;
+	virtual void bind()   = 0;
+	virtual void un_bind() = 0;
 
 protected:
 	IndexBuffer() = default;

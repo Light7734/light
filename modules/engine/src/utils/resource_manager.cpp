@@ -8,76 +8,76 @@ namespace Light {
 
 ResourceManager *ResourceManager::s_Context = nullptr;
 
-Scope<ResourceManager> ResourceManager::Create()
+Scope<ResourceManager> ResourceManager::create()
 {
-	return MakeScope(new ResourceManager());
+	return make_scope(new ResourceManager());
 }
 
 ResourceManager::ResourceManager(): m_shaders {}, m_textures {}
 {
-	ASSERT(!s_Context, "Repeated singleton construction");
+	lt_assert(!s_Context, "Repeated singleton construction");
 	s_Context = this;
 }
 
-void ResourceManager::LoadShaderImpl(
+void ResourceManager::load_shader_impl(
     const std::string &name,
     const std::string &vertexPath,
     const std::string &pixelPath
 )
 {
 	// check
-	ASSERT(s_Context, "Uninitliazed singleton");
-	ASSERT(!vertexPath.empty(), "Empty 'vertexPath'");
-	ASSERT(!pixelPath.empty(), "Empty 'pixelPath'");
+	lt_assert(s_Context, "Uninitliazed singleton");
+	lt_assert(!vertexPath.empty(), "Empty 'vertexPath'");
+	lt_assert(!pixelPath.empty(), "Empty 'pixelPath'");
 
 	// load files
-	BasicFileHandle vertexFile = FileManager::ReadTextFile(vertexPath);
-	BasicFileHandle pixelFile = FileManager::ReadTextFile(pixelPath);
+	basic_file_handle vertexFile = FileManager::read_text_file(vertexPath);
+	basic_file_handle pixelFile = FileManager::read_text_file(pixelPath);
 
 	// check
-	ASSERT(vertexFile.IsValid(), "Failed to read vertex file: {}", vertexPath);
-	ASSERT(pixelFile.IsValid(), "Failed to read vertex file: {}", pixelPath);
+	lt_assert(vertexFile.is_valid(), "Failed to read vertex file: {}", vertexPath);
+	lt_assert(pixelFile.is_valid(), "Failed to read vertex file: {}", pixelPath);
 
 	// create shader
 	m_shaders[name] = Ref<Shader>(
-	    Shader::Create(vertexFile, pixelFile, GraphicsContext::GetSharedContext())
+	    Shader::create(vertexFile, pixelFile, GraphicsContext::get_shared_context())
 	);
 
 	// free file
-	vertexFile.Release();
-	pixelFile.Release();
+	vertexFile.release();
+	pixelFile.release();
 }
 
-void ResourceManager::LoadTextureImpl(
+void ResourceManager::load_texture_impl(
     const std::string &name,
     const std::string &path,
     unsigned int desiredComponents /* = 4u */
 )
 {
-	ASSERT(s_Context, "Uninitliazed singleton");
+	lt_assert(s_Context, "Uninitliazed singleton");
 
 	// load file
-	ImageFileHandle imgFile = FileManager::ReadImageFile(path, desiredComponents);
+	image_file_handle imgFile = FileManager::read_image_file(path, desiredComponents);
 
 	// create texture
-	m_textures[name] = Ref<Texture>(Texture::Create(
-	    imgFile.GetWidth(),
-	    imgFile.GetHeight(),
-	    imgFile.GetComponents(),
+	m_textures[name] = Ref<Texture>(Texture::create(
+	    imgFile.get_width(),
+	    imgFile.get_height(),
+	    imgFile.get_components(),
 	    imgFile.GetData(),
-	    GraphicsContext::GetSharedContext(),
+	    GraphicsContext::get_shared_context(),
 	    path
 	));
 
 	// free file
-	imgFile.Release();
+	imgFile.release();
 }
 
-void ResourceManager::ReleaseTextureImpl(const std::string &name)
+void ResourceManager::release_texture_impl(const std::string &name)
 {
 	if (!m_textures[name])
 	{
-		LOG(warn, "Failed to find texture named: {}", name);
+		lt_log(warn, "Failed to find texture named: {}", name);
 		return;
 	}
 

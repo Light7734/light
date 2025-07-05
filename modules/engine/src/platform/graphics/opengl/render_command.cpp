@@ -10,33 +10,33 @@ glRenderCommand::glRenderCommand(GLFWwindow *windowHandle): m_window_handle(wind
 {
 }
 
-void glRenderCommand::SwapBuffers()
+void glRenderCommand::swap_buffers()
 {
 	glfwSwapBuffers(m_window_handle);
 }
 
-void glRenderCommand::ClearBackBuffer(const glm::vec4 &clearColor)
+void glRenderCommand::clear_back_buffer(const glm::vec4 &clearColor)
 {
 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void glRenderCommand::Draw(unsigned int count)
+void glRenderCommand::draw(unsigned int count)
 {
 	glDrawArrays(GL_TRIANGLES, 0, count);
 }
 
-void glRenderCommand::DrawIndexed(unsigned int count)
+void glRenderCommand::draw_indexed(unsigned int count)
 {
 	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
 
-void glRenderCommand::DefaultTargetFramebuffer()
+void glRenderCommand::default_target_framebuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
 }
 
-void glRenderCommand::SetViewport(
+void glRenderCommand::set_viewport(
     unsigned int x,
     unsigned int y,
     unsigned int width,

@@ -10,9 +10,9 @@ namespace Light {
 
 Input *Input::s_Context = nullptr;
 
-Scope<Input> Input::Create()
+Scope<Input> Input::create()
 {
-	return MakeScope(new Input);
+	return make_scope(new Input);
 }
 
 Input::Input()
@@ -24,30 +24,30 @@ Input::Input()
     , m_user_interface_events(true)
     , m_game_events(true)
 {
-	ASSERT(
+	lt_assert(
 	    !s_Context,
 	    "Input::Input: an instance of 'Input' already exists, do not construct this class!"
 	);
 	s_Context = this;
 
-	RestartInputState();
+	restart_input_state();
 }
 
-void Input::ReceiveUserInterfaceEventsImpl(bool receive, bool toggle /* = false */)
+void Input::receive_user_interface_events_impl(bool receive, bool toggle /* = false */)
 {
 	m_user_interface_events = toggle ? !m_user_interface_events : receive;
 }
 
-void Input::ReceieveGameEventsImpl(bool receive, bool toggle /*= false*/)
+void Input::receieve_game_events_impl(bool receive, bool toggle /*= false*/)
 {
 	bool prev = m_game_events;
 	m_game_events = toggle ? !m_user_interface_events : receive;
 
 	if (m_game_events != prev)
-		RestartInputState();
+		restart_input_state();
 }
 
-void Input::RestartInputState()
+void Input::restart_input_state()
 {
 	m_keyboad_keys.fill(false);
 	m_mouse_buttons.fill(false);
@@ -57,10 +57,10 @@ void Input::RestartInputState()
 	m_mouse_wheel_delta = 0.0f;
 }
 
-void Input::OnEvent(const Event &inputEvent)
+void Input::on_event(const Event &inputEvent)
 {
 	ImGuiIO &io = ImGui::GetIO();
-	switch (inputEvent.GetEventType())
+	switch (inputEvent.get_event_type())
 	{
 		//** MOUSE_EVENTS **//
 	case EventType::MouseMoved:
@@ -74,7 +74,7 @@ void Input::OnEvent(const Event &inputEvent)
 		}
 
 		if (m_user_interface_events)
-			io.MousePos = ImVec2(event.GetX(), event.GetY());
+			io.MousePos = ImVec2(event.get_x(), event.get_y());
 
 		return;
 	}
@@ -83,10 +83,10 @@ void Input::OnEvent(const Event &inputEvent)
 		const ButtonPressedEvent &event = (const ButtonPressedEvent &)inputEvent;
 
 		if (m_game_events)
-			m_mouse_buttons[event.GetButton()] = true;
+			m_mouse_buttons[event.get_button()] = true;
 
 		if (m_user_interface_events)
-			io.MouseDown[event.GetButton()] = true;
+			io.MouseDown[event.get_button()] = true;
 
 		return;
 	}
@@ -95,10 +95,10 @@ void Input::OnEvent(const Event &inputEvent)
 		const ButtonReleasedEvent &event = (const ButtonReleasedEvent &)inputEvent;
 
 		if (m_game_events)
-			m_mouse_buttons[event.GetButton()] = false;
+			m_mouse_buttons[event.get_button()] = false;
 
 		if (m_user_interface_events)
-			io.MouseDown[event.GetButton()] = false;
+			io.MouseDown[event.get_button()] = false;
 
 		return;
 	}
@@ -107,10 +107,10 @@ void Input::OnEvent(const Event &inputEvent)
 		const WheelScrolledEvent &event = (const WheelScrolledEvent &)inputEvent;
 
 		if (m_game_events)
-			m_mouse_wheel_delta = event.GetOffset();
+			m_mouse_wheel_delta = event.get_offset();
 
 		if (m_user_interface_events)
-			io.MouseWheel = event.GetOffset();
+			io.MouseWheel = event.get_offset();
 
 		return;
 	}
@@ -120,12 +120,12 @@ void Input::OnEvent(const Event &inputEvent)
 		const KeyPressedEvent &event = (const KeyPressedEvent &)inputEvent;
 
 		if (m_game_events)
-			m_keyboad_keys[event.GetKey()] = true;
+			m_keyboad_keys[event.get_key()] = true;
 
 		if (m_user_interface_events)
 		{
-			io.KeysDown[event.GetKey()] = true;
-			// if (event.GetKey() == Key::BackSpace)
+			io.KeysDown[event.get_key()] = true;
+			// if (event.get_key() == Key::BackSpace)
 			//	io.AddInputCharacter(Key::BackSpace);
 		}
 
@@ -136,10 +136,10 @@ void Input::OnEvent(const Event &inputEvent)
 		const KeyReleasedEvent &event = (const KeyReleasedEvent &)inputEvent;
 
 		if (m_game_events)
-			m_keyboad_keys[event.GetKey()] = false;
+			m_keyboad_keys[event.get_key()] = false;
 
 		if (m_user_interface_events)
-			io.KeysDown[event.GetKey()] = false;
+			io.KeysDown[event.get_key()] = false;
 
 		return;
 	}
@@ -148,7 +148,7 @@ void Input::OnEvent(const Event &inputEvent)
 		if (m_user_interface_events)
 		{
 			const SetCharEvent &event = (const SetCharEvent &)inputEvent;
-			io.AddInputCharacter(event.GetCharacter());
+			io.AddInputCharacter(event.get_character());
 		}
 
 		return;

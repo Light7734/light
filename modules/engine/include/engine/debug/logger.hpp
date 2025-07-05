@@ -5,19 +5,19 @@
 	#include <engine/base/base.hpp>
 	#include <spdlog/spdlog.h>
 
-	#define LT_LOG_FILE_LOCATION "Logs/Logger.txt"
+	#define LT_LOG_FILE_LOCATION "Logs/logger.txt"
 
 	#ifndef LIGHT_DIST
-		#define LOG(logLevel, ...)                  \
+		#define lt_log(logLevel, ...)                  \
 			SPDLOG_LOGGER_CALL(                     \
-			    ::Light::Logger::GetEngineLogger(), \
+			    ::Light::logger::get_engine_logger(), \
 			    spdlog::level::logLevel,            \
 			    __VA_ARGS__                         \
 			)
 	#else
-		#define LOG(logLevel, ...)                \
+		#define lt_log(logLevel, ...)                \
 			SPDLOG_LOGGER_CALL(                   \
-			    ::Light::Logger::GetFileLogger(), \
+			    ::Light::logger::get_file_logger(), \
 			    spdlog::level::logLevel,          \
 			    __VA_ARGS__                       \
 			)
@@ -26,31 +26,31 @@
 namespace Light {
 
 // #todo: extend
-class Logger /* singleton */
+class logger /* singleton */
 {
 private:
-	static Logger *s_Context;
+	static logger *s_Context;
 
 private:
 	Ref<spdlog::logger> m_engine_logger, m_file_logger;
 	std::string m_log_file_path;
 
 public:
-	static Scope<Logger> Create();
+	static Scope<logger> create();
 
-	static inline Ref<spdlog::logger> GetEngineLogger()
+	static inline Ref<spdlog::logger> get_engine_logger()
 	{
 		return s_Context->m_engine_logger;
 	}
-	static inline Ref<spdlog::logger> GetFileLogger()
+	static inline Ref<spdlog::logger> get_file_logger()
 	{
 		return s_Context->m_file_logger;
 	}
 
-	void LogDebugData();
+	void log_debug_data();
 
 private:
-	Logger();
+	logger();
 };
 
 } // namespace Light

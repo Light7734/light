@@ -38,8 +38,8 @@ dxTexture::dxTexture(
 
 	// create texture
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateTexture2D(&t2dDesc, nullptr, &m_texture_2d));
-	m_context->GetDeviceContext()
+	dxc(m_context->get_device()->CreateTexture2D(&t2dDesc, nullptr, &m_texture_2d));
+	m_context->get_device_context()
 	    ->UpdateSubresource(m_texture_2d.Get(), 0u, nullptr, pixels, width * 4u, 0u);
 
 	m_texture_2d->GetDesc(&t2dDesc);
@@ -52,9 +52,9 @@ dxTexture::dxTexture(
 	srvDesc.Texture2D.MipLevels = -1;
 
 	// create shader resource view
-	m_context->GetDevice()
+	m_context->get_device()
 	    ->CreateShaderResourceView(m_texture_2d.Get(), &srvDesc, &m_shader_resource_view);
-	m_context->GetDeviceContext()->GenerateMips(m_shader_resource_view.Get());
+	m_context->get_device_context()->GenerateMips(m_shader_resource_view.Get());
 
 	// sampler desc
 	D3D11_SAMPLER_DESC sDesc = {};
@@ -67,13 +67,13 @@ dxTexture::dxTexture(
 	sDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	// create sampler
-	m_context->GetDevice()->CreateSamplerState(&sDesc, &m_sampler_state);
+	m_context->get_device()->CreateSamplerState(&sDesc, &m_sampler_state);
 }
 
-void dxTexture::Bind(unsigned int slot /* = 0u */)
+void dxTexture::bind(unsigned int slot /* = 0u */)
 {
-	m_context->GetDeviceContext()->PSSetSamplers(slot, 1u, m_sampler_state.GetAddressOf());
-	m_context->GetDeviceContext()
+	m_context->get_device_context()->PSSetSamplers(slot, 1u, m_sampler_state.GetAddressOf());
+	m_context->get_device_context()
 	    ->PSSetShaderResources(slot, 1u, m_shader_resource_view.GetAddressOf());
 }
 

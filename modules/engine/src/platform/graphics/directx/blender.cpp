@@ -47,10 +47,10 @@ dxBlender::dxBlender(Ref<dxSharedContext> sharedContext)
 
 	// create blend state
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateBlendState(&m_desc, &m_blend_state));
+	dxc(m_context->get_device()->CreateBlendState(&m_desc, &m_blend_state));
 }
 
-void dxBlender::Enable(BlendFactor srcFactor, BlendFactor dstFactor)
+void dxBlender::enable(BlendFactor srcFactor, BlendFactor dstFactor)
 {
 	// update desc
 	m_desc.RenderTarget[0].BlendEnable = true;
@@ -59,23 +59,23 @@ void dxBlender::Enable(BlendFactor srcFactor, BlendFactor dstFactor)
 
 	// re-create blind state
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateBlendState(&m_desc, &m_blend_state));
+	dxc(m_context->get_device()->CreateBlendState(&m_desc, &m_blend_state));
 
 	// bind blend state
-	m_context->GetDeviceContext()->OMSetBlendState(m_blend_state.Get(), nullptr, 0x0000000f);
+	m_context->get_device_context()->OMSetBlendState(m_blend_state.Get(), nullptr, 0x0000000f);
 }
 
-void dxBlender::Disable()
+void dxBlender::disable()
 {
 	// update desc
 	m_desc.RenderTarget[0].BlendEnable = false;
 
 	// re-create blind state
 	HRESULT hr;
-	DXC(m_context->GetDevice()->CreateBlendState(&m_desc, &m_blend_state));
+	dxc(m_context->get_device()->CreateBlendState(&m_desc, &m_blend_state));
 
 	// bind blend state
-	m_context->GetDeviceContext()->OMSetBlendState(m_blend_state.Get(), nullptr, 0xffffffff);
+	m_context->get_device_context()->OMSetBlendState(m_blend_state.Get(), nullptr, 0xffffffff);
 }
 
 } // namespace Light

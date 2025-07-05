@@ -25,22 +25,22 @@ private:
 	bool m_game_events;
 
 public:
-	static Scope<Input> Create();
+	static Scope<Input> create();
 
-	static inline void ReceiveUserInterfaceEvents(bool receive, bool toggle = false)
+	static inline void receive_user_interface_events(bool receive, bool toggle = false)
 	{
-		s_Context->ReceiveUserInterfaceEventsImpl(receive, toggle);
+		s_Context->receive_user_interface_events_impl(receive, toggle);
 	}
-	static inline void ReceiveGameEvents(bool receive, bool toggle = false)
+	static inline void receive_game_events(bool receive, bool toggle = false)
 	{
-		s_Context->ReceieveGameEventsImpl(receive, toggle);
+		s_Context->receieve_game_events_impl(receive, toggle);
 	}
 
-	static inline bool GetKeyboardKey(int code)
+	static inline bool get_keyboard_key(int code)
 	{
 		return s_Context->m_keyboad_keys[code];
 	}
-	static inline bool GetMouseButton(int code)
+	static inline bool get_mouse_button(int code)
 	{
 		return s_Context->m_mouse_buttons[code];
 	}
@@ -50,13 +50,13 @@ public:
 		return s_Context->m_mouse_position;
 	}
 
-	void OnEvent(const Event &inputEvent);
+	void on_event(const Event &inputEvent);
 
-	inline bool IsReceivingInputEvents() const
+	inline bool is_receiving_input_events() const
 	{
 		return m_user_interface_events;
 	}
-	inline bool IsReceivingGameEvents() const
+	inline bool is_receiving_game_events() const
 	{
 		return m_game_events;
 	}
@@ -64,10 +64,10 @@ public:
 private:
 	Input();
 
-	void ReceiveUserInterfaceEventsImpl(bool receive, bool toggle = false);
-	void ReceieveGameEventsImpl(bool receive, bool toggle = false);
+	void receive_user_interface_events_impl(bool receive, bool toggle = false);
+	void receieve_game_events_impl(bool receive, bool toggle = false);
 
-	void RestartInputState();
+	void restart_input_state();
 };
 
 } // namespace Light

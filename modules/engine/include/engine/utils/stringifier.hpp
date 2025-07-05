@@ -17,7 +17,7 @@ public:
 
 	static std::string spdlogLevel(unsigned int level);
 
-	static std::string GraphicsAPIToString(GraphicsAPI api);
+	static std::string graphics_api_to_string(GraphicsAPI api);
 };
 
 } // namespace Light

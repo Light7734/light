@@ -18,12 +18,12 @@ OrthographicCamera::OrthographicCamera(
 {
 }
 
-void OrthographicCamera::CalculateView()
+void OrthographicCamera::calculate_view()
 {
 	m_view = glm::lookAt(glm::vec3(m_position, 100.0f), glm::vec3(m_position, 0.0f), m_up);
 }
 
-void OrthographicCamera::CalculateProjection()
+void OrthographicCamera::calculate_projection()
 {
 	m_projection = glm::ortho(
 	    -m_zoom_level * m_aspect_ratio,
@@ -35,13 +35,13 @@ void OrthographicCamera::CalculateProjection()
 	);
 }
 
-void OrthographicCamera::OnResize(const glm::vec2 &size)
+void OrthographicCamera::on_resize(const glm::vec2 &size)
 {
 	m_aspect_ratio = size.x / size.y;
-	CalculateProjection();
+	calculate_projection();
 }
 
-void OrthographicCamera::Move(const glm::vec2 &position)
+void OrthographicCamera::move(const glm::vec2 &position)
 {
 	m_position += position;
 }

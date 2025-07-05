@@ -10,16 +10,16 @@ class SharedContext;
 class Texture
 {
 public:
-	static Ref<Texture> Create(unsigned int width, unsigned int height, unsigned int components, unsigned char* pixels, Ref<SharedContext> sharedContext, const std::string& filePath);
+	static Ref<Texture> create(unsigned int width, unsigned int height, unsigned int components, unsigned char* pixels, Ref<SharedContext> sharedContext, const std::string& filePath);
 
 	Texture(const Texture&) = delete;
 	Texture& operator=(const Texture&) = delete;
 
 	virtual ~Texture() = default;
 
-	virtual void Bind(unsigned int slot = 0) = 0;
+	virtual void bind(unsigned int slot = 0) = 0;
 
-	virtual void* GetTexture() = 0;
+	virtual void* get_texture() = 0;
 
 	inline const std::string& GetFilePath() const { return m_file_path; }
 

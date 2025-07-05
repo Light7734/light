@@ -12,16 +12,16 @@ private:
 	unsigned int m_shader_id;
 
 public:
-	glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile);
+	glShader(basic_file_handle vertexFile, basic_file_handle pixelFile);
 	~glShader();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 
 private:
-	// shaderc::SpvCompilationResult CompileGLSL(BasicFileHandle file, Shader::Stage stage);
+	// shaderc::SpvCompilationResult compile_glsl(basic_file_handle file, Shader::Stage stage);
 
-	unsigned int CompileShader(std::string source, Shader::Stage stage);
+	unsigned int compile_shader(std::string source, Shader::Stage stage);
 };
 
 } // namespace Light

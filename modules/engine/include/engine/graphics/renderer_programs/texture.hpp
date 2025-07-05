@@ -39,24 +39,24 @@ private:
 public:
 	TextureRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
 
-	bool Advance();
+	bool advance();
 
-	void Map() override;
-	void UnMap() override;
+	void map() override;
+	void un_map() override;
 
-	void Bind() override;
+	void bind() override;
 
 	inline TextureVertexData *GetMapCurrent()
 	{
 		return m_map_current;
 	}
 
-	inline unsigned int GetQuadCount() const
+	inline unsigned int get_quad_count() const
 	{
 		return m_quad_count;
 	}
 
-	inline constexpr unsigned int GetVertexSize() const
+	inline constexpr unsigned int get_vertex_size() const
 	{
 		return sizeof(TextureVertexData);
 	}

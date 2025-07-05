@@ -14,9 +14,9 @@ public:
 	glTexture(unsigned int width, unsigned int height, unsigned int components, unsigned char* pixels, const std::string& filePath);
 	~glTexture();
 
-	void Bind(unsigned int slot = 0u) override;
+	void bind(unsigned int slot = 0u) override;
 
-	void* GetTexture() override;
+	void* get_texture() override;
 };
 
 } // namespace Light

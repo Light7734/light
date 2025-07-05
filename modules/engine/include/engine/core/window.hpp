@@ -23,7 +23,7 @@ protected:
 	bool b_Closed;
 
 public:
-	static Scope<Window> Create(std::function<void(Event &)> callback);
+	static Scope<Window> create(std::function<void(Event &)> callback);
 
 	Window(): m_graphics_context(nullptr), m_properties {}, b_Closed(false)
 	{
@@ -35,27 +35,27 @@ public:
 	virtual ~Window() = default;
 
 	/* events */
-	virtual void PollEvents() = 0;
-	virtual void OnEvent(const Event &event) = 0;
+	virtual void poll_events() = 0;
+	virtual void on_event(const Event &event) = 0;
 
 	//======================================== SETTERS ========================================//
-	virtual void SetProperties(
+	virtual void set_properties(
 	    const WindowProperties &properties,
 	    bool affectVisibility = false
 	) = 0;
 
-	virtual void SetTitle(const std::string &title) = 0;
+	virtual void set_title(const std::string &title) = 0;
 
-	virtual void SetSize(const glm::uvec2 &size, bool additive = false) = 0; // pass 0 for width or
+	virtual void set_size(const glm::uvec2 &size, bool additive = false) = 0; // pass 0 for width or
 	                                                                         // height for single
 	                                                                         // dimension resizing
 
-	inline void Close()
+	inline void close()
 	{
 		b_Closed = true;
 	}
-	virtual void SetVSync(bool vsync, bool toggle = false) = 0;
-	virtual void SetVisibility(bool visible, bool toggle = false) = 0;
+	virtual void set_v_sync(bool vsync, bool toggle = false) = 0;
+	virtual void set_visibility(bool visible, bool toggle = false) = 0;
 	//======================================== SETTERS ========================================//
 
 	//============================== GETTERS ==============================//
@@ -74,20 +74,20 @@ public:
 		return m_properties.title;
 	}
 
-	inline const glm::uvec2 &GetSize() const
+	inline const glm::uvec2 &get_size() const
 	{
 		return m_properties.size;
 	}
 
-	inline bool IsClosed() const
+	inline bool is_closed() const
 	{
 		return b_Closed;
 	}
-	inline bool IsVSync() const
+	inline bool is_v_sync() const
 	{
 		return m_properties.vsync;
 	}
-	inline bool IsVisible() const
+	inline bool is_visible() const
 	{
 		return m_properties.visible;
 	}

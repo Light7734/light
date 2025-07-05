@@ -7,7 +7,7 @@
 
 namespace Light {
 
-void glUserInterface::PlatformImplementation(
+void glUserInterface::platform_implementation(
     GLFWwindow *windowHandle,
     Ref<SharedContext> sharedContext
 )
@@ -31,14 +31,14 @@ glUserInterface::~glUserInterface()
 	ImGui::DestroyContext();
 }
 
-void glUserInterface::Begin()
+void glUserInterface::begin()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
 
-void glUserInterface::End()
+void glUserInterface::end()
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -48,15 +48,15 @@ void glUserInterface::End()
 	glfwMakeContextCurrent(m_window_handle);
 }
 
-void glUserInterface::LogDebugData()
+void glUserInterface::log_debug_data()
 {
 	// #todo: improve
-	LOG(info, "________________________________________");
-	LOG(info, "UserInterface::");
-	LOG(info, "       API    : ImGui");
-	LOG(info, "       Version: {}", ImGui::GetVersion());
-	LOG(info, "  GraphicsAPI : OpenGL");
-	LOG(info, "________________________________________");
+	lt_log(info, "________________________________________");
+	lt_log(info, "UserInterface::");
+	lt_log(info, "       API    : ImGui");
+	lt_log(info, "       Version: {}", ImGui::GetVersion());
+	lt_log(info, "  GraphicsAPI : OpenGL");
+	lt_log(info, "________________________________________");
 }
 
 } // namespace Light

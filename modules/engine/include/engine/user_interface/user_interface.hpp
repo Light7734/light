@@ -21,33 +21,33 @@ private:
 	ImGuiWindowFlags m_dockspace_flags;
 
 public:
-	static Scope<UserInterface> Create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	static Scope<UserInterface> create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
 	UserInterface(const UserInterface &) = delete;
 	UserInterface &operator=(const UserInterface &) = delete;
 
 	virtual ~UserInterface() = default;
 
-	void Init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	void init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
-	static void DockspaceBegin();
-	static void DockspaceEnd();
+	static void dockspace_begin();
+	static void dockspace_end();
 
-	virtual void PlatformImplementation(
+	virtual void platform_implementation(
 	    GLFWwindow *windowHandle,
 	    Ref<SharedContext> sharedContext
 	) = 0;
 
-	virtual void Begin() = 0;
-	virtual void End() = 0;
+	virtual void begin() = 0;
+	virtual void end() = 0;
 
-	virtual void LogDebugData() = 0;
+	virtual void log_debug_data() = 0;
 
 protected:
 	UserInterface();
 
 private:
-	void SetDarkThemeColors();
+	void set_dark_theme_colors();
 };
 
 } // namespace Light

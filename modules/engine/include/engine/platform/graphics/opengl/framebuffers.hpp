@@ -17,10 +17,10 @@ public:
 	glFramebuffer(const FramebufferSpecification &specification);
 	~glFramebuffer();
 
-	void BindAsTarget(const glm::vec4 &clearColor) override;
-	void BindAsResource() override;
+	void bind_as_target(const glm::vec4 &clearColor) override;
+	void bind_as_resource() override;
 
-	void Resize(const glm::uvec2 &size) override;
+	void resize(const glm::uvec2 &size) override;
 
 	inline void *GetColorAttachment() override
 	{

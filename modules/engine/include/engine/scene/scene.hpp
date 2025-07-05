@@ -26,20 +26,20 @@ public:
 	Scene();
 	~Scene();
 
-	void OnCreate();
+	void on_create();
 
-	void OnUpdate(float deltaTime);
-	void OnRender(const Ref<Framebuffer> &targetFrameBuffer = nullptr);
+	void on_update(float deltaTime);
+	void on_render(const Ref<Framebuffer> &targetFrameBuffer = nullptr);
 
-	Entity CreateEntity(
+	Entity create_entity(
 	    const std::string &name,
 	    const TransformComponent &transform = TransformComponent()
 	);
 
-	Entity GetEntityByTag(const std::string &tag);
+	Entity get_entity_by_tag(const std::string &tag);
 
 private:
-	Entity CreateEntityWithUUID(
+	Entity create_entity_with_uuid(
 	    const std::string &name,
 	    UUID uuid,
 	    const TransformComponent &transform = TransformComponent()

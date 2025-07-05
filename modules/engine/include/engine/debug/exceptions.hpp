@@ -1,10 +1,10 @@
 #pragma once
 
-#define DXC(x) DXC_NO_REDIFINITION(x, __LINE__)
+#define dxc(x) dxc_no_redifinition(x, __LINE__)
 
-#define DXC_NO_REDIFINITION(x, line) DXC_NO_REDIFINITION2(x, line)
+#define dxc_no_redifinition(x, line) dxc_no_redifinition2(x, line)
 
-#define DXC_NO_REDIFINITION2(x, line) \
+#define dxc_no_redifinition2(x, line) \
 	HRESULT hr##line;                 \
 	if (FAILED(hr##line = x))         \
 	throw dxException(hr##line, __FILE__, line)

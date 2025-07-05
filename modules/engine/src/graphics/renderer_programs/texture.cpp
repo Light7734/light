@@ -20,20 +20,20 @@ TextureRendererProgram::TextureRendererProgram(
     , m_max_vertices(maxVertices)
 {
 	// #todo: don't use relative path
-	ResourceManager::LoadShader(
+	ResourceManager::load_shader(
 	    "LT_ENGINE_RESOURCES_TEXTURE_SHADER",
 	    "Assets/Shaders/Texture/Texture_VS.glsl",
 	    "Assets/Shaders/Texture/Texture_PS.glsl"
 	);
 
-	m_shader = ResourceManager::GetShader("LT_ENGINE_RESOURCES_TEXTURE_SHADER");
+	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_TEXTURE_SHADER");
 	m_vertex_buffer = Ref<VertexBuffer>(
-	    VertexBuffer::Create(nullptr, sizeof(TextureVertexData), maxVertices, sharedContext)
+	    VertexBuffer::create(nullptr, sizeof(TextureVertexData), maxVertices, sharedContext)
 	);
 	m_index_buffer = Ref<IndexBuffer>(
-	    IndexBuffer::Create(nullptr, (maxVertices / 4) * 6, sharedContext)
+	    IndexBuffer::create(nullptr, (maxVertices / 4) * 6, sharedContext)
 	);
-	m_vertex_layout = Ref<VertexLayout>(VertexLayout::Create(
+	m_vertex_layout = Ref<VertexLayout>(VertexLayout::create(
 	    m_vertex_buffer,
 	    m_shader,
 	    { { "POSITION", VertexElementType::Float4 }, { "TEXCOORD", VertexElementType::Float2 } },
@@ -41,11 +41,11 @@ TextureRendererProgram::TextureRendererProgram(
 	));
 }
 
-bool TextureRendererProgram::Advance()
+bool TextureRendererProgram::advance()
 {
 	if (m_map_current + 4 >= m_map_end)
 	{
-		LOG(warn, "'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
+		lt_log(warn, "'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
 		return false;
 	}
 
@@ -54,25 +54,25 @@ bool TextureRendererProgram::Advance()
 	return true;
 }
 
-void TextureRendererProgram::Map()
+void TextureRendererProgram::map()
 {
 	m_quad_count = 0u;
 
-	m_map_current = (TextureRendererProgram::TextureVertexData *)m_vertex_buffer->Map();
+	m_map_current = (TextureRendererProgram::TextureVertexData *)m_vertex_buffer->map();
 	m_map_end = m_map_current + m_max_vertices;
 }
 
-void TextureRendererProgram::UnMap()
+void TextureRendererProgram::un_map()
 {
-	m_vertex_buffer->UnMap();
+	m_vertex_buffer->un_map();
 }
 
-void TextureRendererProgram::Bind()
+void TextureRendererProgram::bind()
 {
-	m_shader->Bind();
-	m_vertex_layout->Bind();
-	m_vertex_buffer->Bind();
-	m_index_buffer->Bind();
+	m_shader->bind();
+	m_vertex_layout->bind();
+	m_vertex_buffer->bind();
+	m_index_buffer->bind();
 }
 
 } // namespace Light

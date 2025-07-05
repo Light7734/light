@@ -26,29 +26,29 @@ private:
 	unsigned int m_current_session_count;
 
 public:
-	static Scope<Instrumentor> Create();
+	static Scope<Instrumentor> create();
 
-	static inline void BeginSession(const std::string &outputPath)
+	static inline void begin_session(const std::string &outputPath)
 	{
-		s_Context->BeginSessionImpl(outputPath);
+		s_Context->begin_session_impl(outputPath);
 	}
-	static inline void EndSession()
+	static inline void end_session()
 	{
-		s_Context->EndSessionImpl();
+		s_Context->end_session_impl();
 	}
 
-	static inline void SubmitScopeProfile(const ScopeProfileResult &profileResult)
+	static inline void submit_scope_profile(const ScopeProfileResult &profileResult)
 	{
-		s_Context->SubmitScopeProfileImpl(profileResult);
+		s_Context->submit_scope_profile_impl(profileResult);
 	}
 
 private:
 	Instrumentor();
 
-	void BeginSessionImpl(const std::string &outputPath);
-	void EndSessionImpl();
+	void begin_session_impl(const std::string &outputPath);
+	void end_session_impl();
 
-	void SubmitScopeProfileImpl(const ScopeProfileResult &profileResult);
+	void submit_scope_profile_impl(const ScopeProfileResult &profileResult);
 };
 
 class InstrumentorTimer
@@ -65,13 +65,13 @@ public:
 } // namespace Light
 
 /* scope */
-#define LT_PROFILE_SCOPE(name)                        LT_PROFILE_SCOPE_NO_REDIFINITION(name, __LINE__)
-#define LT_PROFILE_SCOPE_NO_REDIFINITION(name, line)  LT_PROFILE_SCOPE_NO_REDIFINITION2(name, line)
-#define LT_PROFILE_SCOPE_NO_REDIFINITION2(name, line) InstrumentorTimer timer##line(name)
+#define lt_profile_scope(name)                        lt_profile_scope_no_redifinition(name, __LINE__)
+#define lt_profile_scope_no_redifinition(name, line)  lt_profile_scope_no_redifinition2(name, line)
+#define lt_profile_scope_no_redifinition2(name, line) InstrumentorTimer timer##line(name)
 
 /* function */
-#define LT_PROFILE_FUNCTION LT_PROFILE_SCOPE(__FUNCSIG__)
+#define LT_PROFILE_FUNCTION lt_profile_scope(__FUNCSIG__)
 
 /* session */
-#define LT_PROFILE_BEGIN_SESSION(outputPath) ::Light::Instrumentor::BeginSession(outputPath)
-#define LT_PROFILE_END_SESSION()             ::Light::Instrumentor::EndSession()
+#define lt_profile_begin_session(outputPath) ::Light::Instrumentor::begin_session(outputPath)
+#define lt_profile_end_session()             ::Light::Instrumentor::end_session()

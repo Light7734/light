@@ -10,18 +10,18 @@ AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> activeScene)
     , m_assets_path("Assets")
     , m_active_scene(activeScene)
 {
-	ResourceManager::LoadTexture("_Assets_Directory", "EngineResources/Icons/Asset_Directory.png");
-	ResourceManager::LoadTexture("_Assets_Scene", "EngineResources/Icons/Asset_Scene.png");
-	ResourceManager::LoadTexture("_Assets_Image", "EngineResources/Icons/Asset_Image.png");
-	ResourceManager::LoadTexture("_Assets_Text", "EngineResources/Icons/Asset_Text.png");
+	ResourceManager::load_texture("_Assets_Directory", "EngineResources/Icons/Asset_Directory.png");
+	ResourceManager::load_texture("_Assets_Scene", "EngineResources/Icons/Asset_Scene.png");
+	ResourceManager::load_texture("_Assets_Image", "EngineResources/Icons/Asset_Image.png");
+	ResourceManager::load_texture("_Assets_Text", "EngineResources/Icons/Asset_Text.png");
 
-	m_directory_texture = ResourceManager::GetTexture("_Assets_Directory");
-	m_scene_texture = ResourceManager::GetTexture("_Assets_Scene");
-	m_image_texture = ResourceManager::GetTexture("_Assets_Image");
-	m_text_texture = ResourceManager::GetTexture("_Assets_Text");
+	m_directory_texture = ResourceManager::get_texture("_Assets_Directory");
+	m_scene_texture = ResourceManager::get_texture("_Assets_Scene");
+	m_image_texture = ResourceManager::get_texture("_Assets_Image");
+	m_text_texture = ResourceManager::get_texture("_Assets_Text");
 }
 
-void AssetBrowserPanel::OnUserInterfaceUpdate()
+void AssetBrowserPanel::on_user_interface_update()
 {
 	ImGui::Begin("Content Browser");
 
@@ -44,7 +44,7 @@ void AssetBrowserPanel::OnUserInterfaceUpdate()
 
 	if (ImGui::BeginTable("ContentBrowser", columnCount))
 	{
-		m_directory_texture->Bind(0u);
+		m_directory_texture->bind(0u);
 		for (auto &dirEntry : std::filesystem::directory_iterator(m_current_directory))
 		{
 			const auto &path = dirEntry.path();
@@ -77,7 +77,7 @@ void AssetBrowserPanel::OnUserInterfaceUpdate()
 			// Directory
 			case AssetType::Directory:
 				if (ImGui::ImageButton(
-				        m_directory_texture->GetTexture(),
+				        m_directory_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
 				        ImVec2 { 0.0f, 0.0f },
 				        ImVec2 { 1.0f, 1.0f },
@@ -93,7 +93,7 @@ void AssetBrowserPanel::OnUserInterfaceUpdate()
 			// Scene
 			case AssetType::Scene:
 				if (ImGui::ImageButton(
-				        m_scene_texture->GetTexture(),
+				        m_scene_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
 				        ImVec2 { 0.0f, 0.0f },
 				        ImVec2 { 1.0f, 1.0f },
@@ -103,15 +103,15 @@ void AssetBrowserPanel::OnUserInterfaceUpdate()
 				    ))
 				{
 					SceneSerializer serializer(m_active_scene);
-					LOG(info, "Attempting to deserialize: {}", path.string());
-					serializer.Deserialize(path.string());
+					lt_log(info, "Attempting to deserialize: {}", path.string());
+					serializer.deserialize(path.string());
 				}
 				break;
 
 			// Image
 			case AssetType::Image:
 				if (ImGui::ImageButton(
-				        m_image_texture->GetTexture(),
+				        m_image_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
 				        ImVec2 { 0.0f, 0.0f },
 				        ImVec2 { 1.0f, 1.0f },
@@ -126,7 +126,7 @@ void AssetBrowserPanel::OnUserInterfaceUpdate()
 			// Text
 			case AssetType::Text:
 				if (ImGui::ImageButton(
-				        m_text_texture->GetTexture(),
+				        m_text_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
 				        ImVec2 { 0.0f, 0.0f },
 				        ImVec2 { 1.0f, 1.0f },

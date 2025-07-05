@@ -19,37 +19,37 @@ private:
 	std::unordered_map<std::string, Ref<Texture>> m_textures;
 
 public:
-	static Scope<ResourceManager> Create();
+	static Scope<ResourceManager> create();
 
 	// #todo: add geometry shader support
-	static inline void LoadShader(
+	static inline void load_shader(
 	    const std::string &name,
 	    const std::string &vertexPath,
 	    const std::string &pixelPath
 	)
 	{
-		s_Context->LoadShaderImpl(name, vertexPath, pixelPath);
+		s_Context->load_shader_impl(name, vertexPath, pixelPath);
 	}
 
-	static inline void LoadTexture(
+	static inline void load_texture(
 	    const std::string &name,
 	    const std::string &path,
 	    unsigned int desiredComponents = 4u
 	)
 	{
-		s_Context->LoadTextureImpl(name, path, desiredComponents);
+		s_Context->load_texture_impl(name, path, desiredComponents);
 	}
 
-	static inline void ReleaseTexture(const std::string &name)
+	static inline void release_texture(const std::string &name)
 	{
-		s_Context->ReleaseTextureImpl(name);
+		s_Context->release_texture_impl(name);
 	}
 
-	static inline Ref<Shader> GetShader(const std::string &name)
+	static inline Ref<Shader> get_shader(const std::string &name)
 	{
 		return s_Context->m_shaders[name];
 	}
-	static inline Ref<Texture> GetTexture(const std::string &name)
+	static inline Ref<Texture> get_texture(const std::string &name)
 	{
 		return s_Context->m_textures[name];
 	}
@@ -57,19 +57,19 @@ public:
 private:
 	ResourceManager();
 
-	void LoadShaderImpl(
+	void load_shader_impl(
 	    const std::string &name,
 	    const std::string &vertexPath,
 	    const std::string &pixelPath
 	);
 
-	void LoadTextureImpl(
+	void load_texture_impl(
 	    const std::string &name,
 	    const std::string &path,
 	    unsigned int desiredComponents = 4u
 	);
 
-	void ReleaseTextureImpl(const std::string &name);
+	void release_texture_impl(const std::string &name);
 };
 
 } // namespace Light

@@ -4,19 +4,19 @@
 
 namespace Light {
 
-Logger *Logger::s_Context = nullptr;
+logger *logger::s_Context = nullptr;
 
-Scope<Logger> Logger::Create()
+Scope<logger> logger::create()
 {
-	return MakeScope<Logger>(new Logger());
+	return make_scope<logger>(new logger());
 }
 
-Logger::Logger()
+logger::logger()
     : m_engine_logger(nullptr)
     , m_file_logger(nullptr)
     , m_log_file_path(LT_LOG_FILE_LOCATION)
 {
-	ASSERT(!s_Context, "An instance of 'Logger' already exists, do not construct this class!");
+	lt_assert(!s_Context, "An instance of 'logger' already exists, do not construct this class!");
 	s_Context = this;
 
 	// set spdlog pattern
@@ -40,15 +40,15 @@ Logger::Logger()
 #endif
 }
 
-void Logger::LogDebugData()
+void logger::log_debug_data()
 {
 	// #todo: improve
-	LOG(info, "________________________________________");
-	LOG(info, "Logger::");
-	LOG(info, "        EngineLevel : {}", Stringifier::spdlogLevel(m_engine_logger->level()));
-	LOG(info, "        FileLevel   : {}", Stringifier::spdlogLevel(m_file_logger->level()));
-	LOG(info, "        DefaultLevel: {}", Stringifier::spdlogLevel(spdlog::get_level()));
-	LOG(info, "________________________________________");
+	lt_log(info, "________________________________________");
+	lt_log(info, "logger::");
+	lt_log(info, "        EngineLevel : {}", Stringifier::spdlogLevel(m_engine_logger->level()));
+	lt_log(info, "        FileLevel   : {}", Stringifier::spdlogLevel(m_file_logger->level()));
+	lt_log(info, "        DefaultLevel: {}", Stringifier::spdlogLevel(spdlog::get_level()));
+	lt_log(info, "________________________________________");
 }
 
 } // namespace Light

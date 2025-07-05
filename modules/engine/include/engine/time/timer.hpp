@@ -13,7 +13,7 @@ private:
 public:
 	Timer();
 
-	inline float GetElapsedTime() const
+	inline float get_elapsed_time() const
 	{
 		return (std::chrono::duration_cast<std::chrono::milliseconds>(
 		            std::chrono::steady_clock::now() - m_start
@@ -22,7 +22,7 @@ public:
 		       / 1000.;
 	}
 
-	inline void Reset()
+	inline void reset()
 	{
 		m_start = std::chrono::steady_clock::now();
 	}
@@ -39,9 +39,9 @@ private:
 public:
 	DeltaTimer();
 
-	void Update();
+	void update();
 
-	inline float GetDeltaTime() const
+	inline float get_delta_time() const
 	{
 		return m_delta_time;
 	}

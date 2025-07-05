@@ -21,7 +21,7 @@ GraphicsContext::~GraphicsContext()
 {
 }
 
-Scope<GraphicsContext> GraphicsContext::Create(GraphicsAPI api, GLFWwindow *windowHandle)
+Scope<GraphicsContext> GraphicsContext::create(GraphicsAPI api, GLFWwindow *windowHandle)
 {
 	// terminate 'GraphicsContext' dependent classes
 	if (s_Context)
@@ -50,30 +50,30 @@ Scope<GraphicsContext> GraphicsContext::Create(GraphicsAPI api, GLFWwindow *wind
 	{
 	// opengl
 	case GraphicsAPI::OpenGL:
-		scopeGfx = CreateScope<glGraphicsContext>(windowHandle);
+		scopeGfx = create_scope<glGraphicsContext>(windowHandle);
 		s_Context = scopeGfx.get();
 		break;
 	// directx
 	case GraphicsAPI::DirectX:
-		LT_WIN(scopeGfx = CreateScope<dxGraphicsContext>(windowHandle); s_Context = scopeGfx.get();
+		lt_win(scopeGfx = create_scope<dxGraphicsContext>(windowHandle); s_Context = scopeGfx.get();
 		       break;)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    Stringifier::GraphicsAPIToString(api)
+		    Stringifier::graphics_api_to_string(api)
 		);
 		return nullptr;
 	}
 
 	// create 'GraphicsContext' dependent classes
-	s_Context->m_user_interface = UserInterface::Create(windowHandle, s_Context->m_shared_context);
-	s_Context->m_renderer = Renderer::Create(windowHandle, s_Context->m_shared_context);
+	s_Context->m_user_interface = UserInterface::create(windowHandle, s_Context->m_shared_context);
+	s_Context->m_renderer = renderer::create(windowHandle, s_Context->m_shared_context);
 
 	// check
-	ASSERT(s_Context->m_user_interface, "Failed to create UserInterface");
-	ASSERT(s_Context->m_renderer, "Failed to create Renderer");
+	lt_assert(s_Context->m_user_interface, "Failed to create UserInterface");
+	lt_assert(s_Context->m_renderer, "Failed to create renderer");
 
 	return std::move(scopeGfx);
 }

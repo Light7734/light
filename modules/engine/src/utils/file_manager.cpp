@@ -4,7 +4,7 @@
 
 namespace Light {
 
-BasicFileHandle::BasicFileHandle(
+basic_file_handle::basic_file_handle(
     uint8_t *data,
     uint32_t size,
     const std::string &path,
@@ -19,7 +19,7 @@ BasicFileHandle::BasicFileHandle(
 {
 }
 
-void BasicFileHandle::Release()
+void basic_file_handle::release()
 {
 	delete m_data;
 	m_data = nullptr;
@@ -27,7 +27,7 @@ void BasicFileHandle::Release()
 }
 
 
-BasicFileHandle FileManager::ReadTextFile(const std::string &path)
+basic_file_handle FileManager::read_text_file(const std::string &path)
 {
 	// parse path info
 	std::string name = path.substr(0, path.find('.') + -1);
@@ -39,7 +39,7 @@ BasicFileHandle FileManager::ReadTextFile(const std::string &path)
 	// check
 	if (!file)
 	{
-		LOG(warn, "Failed to load text file: {}", path);
+		lt_log(warn, "Failed to load text file: {}", path);
 		file.close();
 		return NULL;
 	}
@@ -50,17 +50,17 @@ BasicFileHandle FileManager::ReadTextFile(const std::string &path)
 	file.seekg(0, std::ios::beg);
 
 	if (!size)
-		LOG(warn, "Empty text file: {}", path);
+		lt_log(warn, "Empty text file: {}", path);
 
 	// read file
 	uint8_t *data = new uint8_t[size];
 	file.read(reinterpret_cast<char *>(data), size);
 
 	file.close();
-	return BasicFileHandle(data, size, path, name, extension);
+	return basic_file_handle(data, size, path, name, extension);
 }
 
-ImageFileHandle FileManager::ReadImageFile(const std::string &path, int32_t desiredComponents)
+image_file_handle FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
 {
 	// parse path info
 	std::string name = path.substr(0, path.find('.') + -1);
@@ -78,15 +78,15 @@ ImageFileHandle FileManager::ReadImageFile(const std::string &path, int32_t desi
 
 	// check
 	if (!pixels)
-		LOG(warn, "Failed to load image file: <{}>", path);
+		lt_log(warn, "Failed to load image file: <{}>", path);
 	else if (fetchedComponents != desiredComponents)
-		LOG(warn,
+		lt_log(warn,
 		    "Mismatch of fetched/desired components: <{}> ({}/{})",
 		    name + '.' + extension,
 		    fetchedComponents,
 		    desiredComponents);
 
-	return ImageFileHandle(
+	return image_file_handle(
 	    pixels,
 	    width * height,
 	    path,
@@ -99,7 +99,7 @@ ImageFileHandle FileManager::ReadImageFile(const std::string &path, int32_t desi
 	);
 }
 
-void ImageFileHandle::Release()
+void image_file_handle::release()
 {
 	stbi_image_free(reinterpret_cast<void *>(m_data));
 	m_data = nullptr;

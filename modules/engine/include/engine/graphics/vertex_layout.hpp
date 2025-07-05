@@ -34,7 +34,7 @@ enum class VertexElementType
 class VertexLayout
 {
 public:
-	static Ref<VertexLayout> Create(
+	static Ref<VertexLayout> create(
 	    Ref<VertexBuffer> vertexBuffer,
 	    Ref<Shader> shader,
 	    const std::vector<std::pair<std::string, VertexElementType>> &elements,
@@ -44,8 +44,8 @@ public:
 	virtual ~VertexLayout() = default;
 	;
 
-	virtual void Bind() = 0;
-	virtual void UnBind() = 0;
+	virtual void bind() = 0;
+	virtual void un_bind() = 0;
 
 protected:
 	VertexLayout() = default;

@@ -10,12 +10,12 @@ namespace Light {
 class WindowClosedEvent: public Event
 {
 public:
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		return "WindowClosedEvent";
 	}
-	EVENT_TYPE(WindowClosed)
-	EVENT_CATEGORY(WindowEventCategory)
+	event_type(WindowClosed)
+	event_category(WindowEventCategory)
 };
 
 class WindowMovedEvent: public Event
@@ -33,15 +33,15 @@ public:
 		return m_position;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "WindwoMoved: " << m_position.x << ", " << m_position.y;
 		return ss.str();
 		;
 	}
-	EVENT_TYPE(WindowMoved)
-	EVENT_CATEGORY(WindowEventCategory)
+	event_type(WindowMoved)
+	event_category(WindowEventCategory)
 };
 
 class WindowResizedEvent: public Event
@@ -54,41 +54,41 @@ public:
 	{
 	}
 
-	const glm::uvec2 &GetSize() const
+	const glm::uvec2 &get_size() const
 	{
 		return m_size;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "WindowResized: " << m_size.x << ", " << m_size.y;
 		return ss.str();
 	}
-	EVENT_TYPE(WindowResized)
-	EVENT_CATEGORY(WindowEventCategory)
+	event_type(WindowResized)
+	event_category(WindowEventCategory)
 };
 
 class WindowLostFocusEvent: public Event
 {
 public:
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		return "WindowLostFocus";
 	}
-	EVENT_TYPE(WindowLostFocus)
-	EVENT_CATEGORY(WindowEventCategory)
+	event_type(WindowLostFocus)
+	event_category(WindowEventCategory)
 };
 
 class WindowGainFocusEvent: public Event
 {
 public:
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		return "WindowGainFocus";
 	}
-	EVENT_TYPE(WindowGainFocus)
-	EVENT_CATEGORY(WindowEventCategory)
+	event_type(WindowGainFocus)
+	event_category(WindowEventCategory)
 };
 
 } // namespace Light

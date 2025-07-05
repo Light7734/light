@@ -6,16 +6,16 @@
 
 namespace Light {
 
-glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_shader_id(0u)
+glShader::glShader(basic_file_handle vertexFile, basic_file_handle pixelFile): m_shader_id(0u)
 {
 	// create
 	m_shader_id = glCreateProgram();
 
-	std::string vertexSource(vertexFile.GetData(), vertexFile.GetData() + vertexFile.GetSize());
-	std::string pixelSource(pixelFile.GetData(), pixelFile.GetData() + pixelFile.GetSize());
+	std::string vertexSource(vertexFile.GetData(), vertexFile.GetData() + vertexFile.get_size());
+	std::string pixelSource(pixelFile.GetData(), pixelFile.GetData() + pixelFile.get_size());
 
-	unsigned int vertexShader = CompileShader(vertexSource, Shader::Stage::VERTEX);
-	unsigned int pixelShader = CompileShader(pixelSource, Shader::Stage::PIXEL);
+	unsigned int vertexShader = compile_shader(vertexSource, Shader::Stage::VERTEX);
+	unsigned int pixelShader = compile_shader(pixelSource, Shader::Stage::PIXEL);
 
 	// attach shaders
 	glAttachShader(m_shader_id, vertexShader);
@@ -34,17 +34,17 @@ glShader::~glShader()
 	glDeleteProgram(m_shader_id);
 }
 
-void glShader::Bind()
+void glShader::bind()
 {
 	glUseProgram(m_shader_id);
 }
 
-void glShader::UnBind()
+void glShader::un_bind()
 {
 	glUseProgram(NULL);
 }
 
-// shaderc::SpvCompilationResult glShader::CompileGLSL(BasicFileHandle file, Shader::Stage stage)
+// shaderc::SpvCompilationResult glShader::compile_glsl(basic_file_handle file, Shader::Stage stage)
 // {
 // 	// compile options
 // 	shaderc::CompileOptions options;
@@ -61,14 +61,14 @@ void glShader::UnBind()
 // 	// log error
 // 	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
 // 	{
-// 		LOG(err, "Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ? "vertex" :
-// "pixel", file.GetPath()); 		LOG(err, "    {}", result.GetErrorMessage());
+// 		lt_log(err, "Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ? "vertex" :
+// "pixel", file.GetPath()); 		lt_log(err, "    {}", result.GetErrorMessage());
 // 	}
 //
 // 	return result;
 // }
 
-unsigned int glShader::CompileShader(std::string source, Shader::Stage stage)
+unsigned int glShader::compile_shader(std::string source, Shader::Stage stage)
 {
 	// &(address of) needs an lvalue
 	const char *lvalue_source = source.c_str();
@@ -94,7 +94,7 @@ unsigned int glShader::CompileShader(std::string source, Shader::Stage stage)
 		char *errorLog = (char *)alloca(logLength);
 		glGetShaderInfoLog(shader, logLength, &logLength, &errorLog[0]);
 
-		LOG(err,
+		lt_log(err,
 		    "glShader::glShader: failed to compile {} shader:\n        {}",
 		    stage == Shader::Stage::VERTEX ? "Vertex" : "Pixel",
 		    errorLog);
@@ -112,7 +112,7 @@ unsigned int glShader::CompileShader(std::string source, Shader::Stage stage)
 			char *infoLog = (char *)alloca(logLength);
 			glGetShaderInfoLog(shader, logLength, &logLength, &infoLog[0]);
 
-			LOG(warn, infoLog);
+			lt_log(warn, infoLog);
 		}
 	}
 #endif

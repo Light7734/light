@@ -13,8 +13,8 @@ private:
 public:
 	glBlender();
 
-	void Enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
-	void Disable() override;
+	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;
+	void disable() override;
 };
 
 } // namespace Light

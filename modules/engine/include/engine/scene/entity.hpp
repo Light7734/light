@@ -15,38 +15,39 @@ private:
 
 public:
 	Entity(entt::entity handle = entt::null, Scene *registry = nullptr);
+
 	~Entity();
 
-	template<typename T, typename... Args>
-	inline T &AddComponent(Args &&...args)
+	template<typename t, typename... Args>
+	inline t &AddComponent(Args &&...args)
 	{
-		return m_scene->m_registry.emplace<T>(m_handle, std::forward<Args>(args)...);
+		return m_scene->m_registry.emplace<t>(m_handle, std::forward<Args>(args)...);
 	}
 
-	template<typename T>
-	inline T &GetComponent()
+	template<typename t>
+	inline t &GetComponent()
 	{
-		return m_scene->m_registry.get<T>(m_handle);
+		return m_scene->m_registry.get<t>(m_handle);
 	}
 
-	template<typename T>
-	inline bool HasComponent()
+	template<typename t>
+	inline bool has_component()
 	{
-		return m_scene->m_registry.any_of<T>(m_handle);
+		return m_scene->m_registry.any_of<t>(m_handle);
 	}
 
-	template<typename T>
-	inline void RemoveComponent()
+	template<typename t>
+	inline void remove_component()
 	{
-		m_scene->m_registry.remove<T>(m_handle);
+		m_scene->m_registry.remove<t>(m_handle);
 	}
 
-	inline uint64_t GetUUID()
+	inline uint64_t get_uuid()
 	{
 		return GetComponent<UUIDComponent>().uuid;
 	}
 
-	inline bool IsValid() const
+	inline bool is_valid() const
 	{
 		return m_handle != entt::null && m_scene != nullptr;
 	}

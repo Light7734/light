@@ -9,9 +9,9 @@
 
 namespace Light {
 
-Scope<Window> Window::Create(std::function<void(Event &)> callback)
+Scope<Window> Window::create(std::function<void(Event &)> callback)
 {
-	return CreateScope<lWindow>(callback);
+	return create_scope<lWindow>(callback);
 }
 
 lWindow::lWindow(std::function<void(Event &)> callback)
@@ -19,7 +19,7 @@ lWindow::lWindow(std::function<void(Event &)> callback)
     , m_event_callback(callback)
 {
 	// init glfw
-	ASSERT(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
+	lt_assert(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
 
 	// create window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -28,15 +28,15 @@ lWindow::lWindow(std::function<void(Event &)> callback)
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	m_handle = glfwCreateWindow(1u, 1u, "", nullptr, nullptr);
-	ASSERT(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
+	lt_assert(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
 
 	// bind event stuff
 	glfwSetWindowUserPointer(m_handle, &m_event_callback);
-	BindGlfwEvents();
+	bind_glfw_events();
 
 	// create graphics context
-	m_graphics_context = GraphicsContext::Create(GraphicsAPI::OpenGL, m_handle);
-	ASSERT(m_graphics_context, "lWindow::lWindow: failed to create 'GraphicsContext'");
+	m_graphics_context = GraphicsContext::create(GraphicsAPI::OpenGL, m_handle);
+	lt_assert(m_graphics_context, "lWindow::lWindow: failed to create 'GraphicsContext'");
 }
 
 lWindow::~lWindow()
@@ -44,30 +44,30 @@ lWindow::~lWindow()
 	glfwDestroyWindow(m_handle);
 }
 
-void lWindow::PollEvents()
+void lWindow::poll_events()
 {
 	glfwPollEvents();
 }
 
-void lWindow::OnEvent(const Event &event)
+void lWindow::on_event(const Event &event)
 {
-	switch (event.GetEventType())
+	switch (event.get_event_type())
 	{
 	/* closed */
 	case EventType::WindowClosed: b_Closed = true; break;
 
 	/* resized */
-	case EventType::WindowResized: OnWindowResize((const WindowResizedEvent &)event); break;
+	case EventType::WindowResized: on_window_resize((const WindowResizedEvent &)event); break;
 	}
 }
 
-void lWindow::OnWindowResize(const WindowResizedEvent &event)
+void lWindow::on_window_resize(const WindowResizedEvent &event)
 {
-	m_properties.size = event.GetSize();
+	m_properties.size = event.get_size();
 }
 
 void lWindow::
-    SetProperties(const WindowProperties &properties, bool overrideVisibility /* = false */)
+    set_properties(const WindowProperties &properties, bool overrideVisibility /* = false */)
 {
 	// save the visibility status and re-assign if 'overrideVisibility' is false
 	bool visible = overrideVisibility ? properties.visible : m_properties.visible;
@@ -75,20 +75,20 @@ void lWindow::
 	m_properties.visible = visible;
 
 	// set properties
-	SetTitle(properties.title);
-	SetSize(properties.size);
-	SetVSync(properties.vsync);
-	SetVisibility(visible);
+	set_title(properties.title);
+	set_size(properties.size);
+	set_v_sync(properties.vsync);
+	set_visibility(visible);
 }
 
-void lWindow::SetTitle(const std::string &title)
+void lWindow::set_title(const std::string &title)
 {
 	m_properties.title = title;
 
 	glfwSetWindowTitle(m_handle, title.c_str());
 }
 
-void lWindow::SetSize(const glm::uvec2 &size, bool additive /* = false */)
+void lWindow::set_size(const glm::uvec2 &size, bool additive /* = false */)
 {
 	m_properties.size.x = size.x == 0u ? m_properties.size.x :
 	                      additive     ? m_properties.size.x + size.x :
@@ -101,14 +101,14 @@ void lWindow::SetSize(const glm::uvec2 &size, bool additive /* = false */)
 	glfwSetWindowSize(m_handle, size.x, size.y);
 }
 
-void lWindow::SetVSync(bool vsync, bool toggle /* = false */)
+void lWindow::set_v_sync(bool vsync, bool toggle /* = false */)
 {
 	m_properties.vsync = toggle ? !m_properties.vsync : vsync;
 
 	glfwSwapInterval(m_properties.vsync);
 }
 
-void lWindow::SetVisibility(bool visible, bool toggle)
+void lWindow::set_visibility(bool visible, bool toggle)
 {
 	m_properties.visible = toggle ? !m_properties.visible : visible;
 
@@ -118,7 +118,7 @@ void lWindow::SetVisibility(bool visible, bool toggle)
 		glfwHideWindow(m_handle);
 }
 
-void lWindow::BindGlfwEvents()
+void lWindow::bind_glfw_events()
 {
 	//============================== MOUSE_EVENTS ==============================//
 	/* cursor position */

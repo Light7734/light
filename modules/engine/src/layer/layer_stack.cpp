@@ -9,15 +9,18 @@ namespace Light {
 
 LayerStack *LayerStack::s_Context = nullptr;
 
-Scope<LayerStack> LayerStack::Create()
+Scope<LayerStack> LayerStack::create()
 {
-	return MakeScope<LayerStack>(new LayerStack());
+	return make_scope<LayerStack>(new LayerStack());
 }
 
 LayerStack::LayerStack(): m_layers {}, m_begin(), m_end()
 {
-	ASSERT(!s_Context, "An instance of 'LayerStack' already exists, do not construct this class!")
-	s_Context = this;
+	lt_assert(
+	    !s_Context,
+	    "An instance of 'LayerStack' already exists, do not construct this class!"
+	) s_Context
+	    = this;
 }
 
 LayerStack::~LayerStack()
@@ -26,24 +29,24 @@ LayerStack::~LayerStack()
 		delete layer;
 }
 
-void LayerStack::AttachLayerImpl(Layer *layer)
+void LayerStack::attach_layer_impl(Layer *layer)
 {
 	// #todo: handle attaching layer inside a for loop
 	m_layers.push_back(layer);
 	m_begin = m_layers.begin();
 	m_end = m_layers.end();
 
-	LOG(trace, "Attached [{}]", layer->GetName());
+	lt_log(trace, "Attached [{}]", layer->GetName());
 }
 
-void LayerStack::DetachLayerImpl(Layer *layer)
+void LayerStack::detach_layer_impl(Layer *layer)
 {
 	// #todo: handle detaching layer inside a for loop
 	m_layers.erase(std::find(m_layers.begin(), m_layers.end(), layer));
 	m_begin = m_layers.begin();
 	m_end = m_layers.end();
 
-	LOG(trace, "Detached [{}]", layer->GetName());
+	lt_log(trace, "Detached [{}]", layer->GetName());
 }
 
 } // namespace Light

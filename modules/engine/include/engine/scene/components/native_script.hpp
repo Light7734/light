@@ -12,14 +12,14 @@ struct NativeScriptComponent
 	NativeScript *(*CreateInstance)();
 	void (*DestroyInstance)(NativeScriptComponent *);
 
-	template<typename T>
-	void Bind()
+	template<typename t>
+	void bind()
 	{
 		CreateInstance = []() {
-			return static_cast<NativeScript *>(new T());
+			return static_cast<NativeScript *>(new t());
 		};
 		DestroyInstance = [](NativeScriptComponent *nsc) {
-			delete (T *)(nsc->instance);
+			delete (t *)(nsc->instance);
 			nsc->instance = nullptr;
 		};
 	}

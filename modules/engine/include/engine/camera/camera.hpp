@@ -26,7 +26,7 @@ public:
 		return m_background_color;
 	}
 
-	inline void SetBackgroundColor(const glm::vec4 &color)
+	inline void set_background_color(const glm::vec4 &color)
 	{
 		m_background_color = color;
 	}

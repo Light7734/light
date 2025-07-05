@@ -20,20 +20,20 @@ TintedTextureRendererProgram::TintedTextureRendererProgram(
     , m_max_vertices(maxVertices)
 {
 	// #todo: don't use relative path
-	ResourceManager::LoadShader(
+	ResourceManager::load_shader(
 	    "LT_ENGINE_RESOURCES_TINTED_TEXTURE_SHADER",
 	    "Assets/Shaders/TintedTexture/TintedTexture_VS.glsl",
 	    "Assets/Shaders/TintedTexture/TintedTexture_PS.glsl"
 	);
 
-	m_shader = ResourceManager::GetShader("LT_ENGINE_RESOURCES_TINTED_TEXTURE_SHADER");
+	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_TINTED_TEXTURE_SHADER");
 	m_vertex_buffer = Ref<VertexBuffer>(
-	    VertexBuffer::Create(nullptr, sizeof(TintedTextureVertexData), maxVertices, sharedContext)
+	    VertexBuffer::create(nullptr, sizeof(TintedTextureVertexData), maxVertices, sharedContext)
 	);
 	m_index_buffer = Ref<IndexBuffer>(
-	    IndexBuffer::Create(nullptr, (maxVertices / 4) * 6, sharedContext)
+	    IndexBuffer::create(nullptr, (maxVertices / 4) * 6, sharedContext)
 	);
-	m_vertex_layout = Ref<VertexLayout>(VertexLayout::Create(
+	m_vertex_layout = Ref<VertexLayout>(VertexLayout::create(
 	    m_vertex_buffer,
 	    m_shader,
 	    { { "POSITION", VertexElementType::Float4 },
@@ -43,13 +43,13 @@ TintedTextureRendererProgram::TintedTextureRendererProgram(
 	));
 }
 
-bool TintedTextureRendererProgram::Advance()
+bool TintedTextureRendererProgram::advance()
 {
 	m_map_current += 4;
 
 	if (m_map_current >= m_map_end)
 	{
-		LOG(warn, "'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
+		lt_log(warn, "'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
 		return false;
 	}
 
@@ -57,25 +57,25 @@ bool TintedTextureRendererProgram::Advance()
 	return true;
 }
 
-void TintedTextureRendererProgram::Map()
+void TintedTextureRendererProgram::map()
 {
 	m_quad_count = 0u;
 
-	m_map_current = (TintedTextureRendererProgram::TintedTextureVertexData *)m_vertex_buffer->Map();
+	m_map_current = (TintedTextureRendererProgram::TintedTextureVertexData *)m_vertex_buffer->map();
 	m_map_end = m_map_current + m_max_vertices;
 }
 
-void TintedTextureRendererProgram::UnMap()
+void TintedTextureRendererProgram::un_map()
 {
-	m_vertex_buffer->UnMap();
+	m_vertex_buffer->un_map();
 }
 
-void TintedTextureRendererProgram::Bind()
+void TintedTextureRendererProgram::bind()
 {
-	m_shader->Bind();
-	m_vertex_layout->Bind();
-	m_vertex_buffer->Bind();
-	m_index_buffer->Bind();
+	m_shader->bind();
+	m_vertex_layout->bind();
+	m_vertex_buffer->bind();
+	m_index_buffer->bind();
 }
 
 } // namespace Light

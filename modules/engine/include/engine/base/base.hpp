@@ -5,55 +5,55 @@
 namespace Light {
 
 // Ref (Ref)
-template<typename T>
-using Ref = std::shared_ptr<T>;
+template<typename t>
+using Ref = std::shared_ptr<t>;
 
-template<typename T, typename... Args>
-constexpr Ref<T> CreateRef(Args &&...args)
+template<typename t, typename... Args>
+constexpr Ref<t> create_ref(Args &&...args)
 {
-	return std::make_shared<T>(std::forward<Args>(args)...);
+	return std::make_shared<t>(std::forward<Args>(args)...);
 }
 
-template<typename T>
-constexpr Ref<T> MakeRef(T *rawPointer)
+template<typename t>
+constexpr Ref<t> make_ref(t *rawPointer)
 {
-	return std::shared_ptr<T>(rawPointer);
+	return std::shared_ptr<t>(rawPointer);
 }
 
 // Scope (std::unique_ptr)
-template<typename T>
-using Scope = std::unique_ptr<T>;
+template<typename t>
+using Scope = std::unique_ptr<t>;
 
-template<typename T, typename... Args>
-constexpr std::unique_ptr<T> CreateScope(Args &&...args)
+template<typename t, typename... Args>
+constexpr std::unique_ptr<t> create_scope(Args &&...args)
 {
-	return std::make_unique<T>(std::forward<Args>(args)...);
+	return std::make_unique<t>(std::forward<Args>(args)...);
 }
 
-template<typename T>
-constexpr std::unique_ptr<T> MakeScope(T *rawPointer)
+template<typename t>
+constexpr std::unique_ptr<t> make_scope(t *rawPointer)
 {
-	return std::unique_ptr<T>(rawPointer);
+	return std::unique_ptr<t>(rawPointer);
 }
 
 } // namespace Light
 
 //========== PLATFORM ==========//
-#define LT_WIN(x) // windows
-#define LT_LIN(x) // linux
-#define LT_MAC(x) // mac
+#define lt_win(x) // windows
+#define lt_lin(x) // linux
+#define lt_mac(x) // mac
 
 #if defined(LIGHT_PLATFORM_WINDOWS)
 	#define LT_BUILD_PLATFORM "Windows"
-	#define LT_WIN(x)         x
+	#define lt_win(x)         x
 
 #elif defined(LIGHT_PLATFORM_LINUX)
 	#define LT_BUILD_PLATFORM "Linux"
-	#define LT_LIN(x)         x
+	#define lt_lin(x)         x
 
 #elif defined(LIGHT_PLATFORM_MAC)
 	#error "Unsupported platform: MAC"
-	#define LT_MAC(x) x
+	#define lt_mac(x) x
 
 #else
 	#error "Unsupported platform: Unknown"
@@ -63,23 +63,23 @@ constexpr std::unique_ptr<T> MakeScope(T *rawPointer)
 //====================================================================== OPERATIONS
 //======================================================================//
 /* assertions */
-#define ASSERT(x, ...)                                          \
+#define lt_assert(x, ...)                                          \
 	{                                                           \
 		if (!(x))                                               \
 		{                                                       \
-			LOG(critical, __VA_ARGS__);                         \
-			LT_DEBUG_TRAP();                                    \
+			lt_log(critical, __VA_ARGS__);                         \
+			lt_debug_trap();                                    \
 			throw ::Light::FailedAssertion(__FILE__, __LINE__); \
 		}                                                       \
 	}
 
 /* bit-wise */
-#define BIT(x) 1 << x
+#define bit(x) 1 << x
 
 /* token */
-#define LT_PAIR_TOKEN_VALUE_TO_NAME(token) { token, #token }
-#define LT_PAIR_TOKEN_NAME_TO_VALUE(token) { #token, token }
-#define LT_TOKEN_NAME(token)               #token
+#define lt_pair_token_value_to_name(token) { token, #token }
+#define lt_pair_token_name_to_value(token) { #token, token }
+#define lt_token_name(token)               #token
 //====================================================================== OPERATIONS
 //======================================================================//
 

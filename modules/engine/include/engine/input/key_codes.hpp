@@ -41,7 +41,7 @@ enum : uint16_t
 	Q = 81,
 	R = 82,
 	S = 83,
-	T = 84,
+	t = 84,
 	U = 85,
 	V = 86,
 	W = 87,
@@ -75,7 +75,7 @@ enum : uint16_t
 
 	/* home/end */
 	Home = 268,
-	End = 269,
+	end = 269,
 
 	/* toggles */
 	CapsLock = 280,

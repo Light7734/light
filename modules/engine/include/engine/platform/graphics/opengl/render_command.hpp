@@ -15,15 +15,15 @@ private:
 public:
 	glRenderCommand(GLFWwindow *windowHandle);
 
-	void SwapBuffers() override;
-	void ClearBackBuffer(const glm::vec4 &clearColor) override;
+	void swap_buffers() override;
+	void clear_back_buffer(const glm::vec4 &clearColor) override;
 
-	void Draw(unsigned int count) override;
-	void DrawIndexed(unsigned int count) override;
+	void draw(unsigned int count) override;
+	void draw_indexed(unsigned int count) override;
 
-	void DefaultTargetFramebuffer() override;
+	void default_target_framebuffer() override;
 
-	void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+	void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 	    override;
 };
 

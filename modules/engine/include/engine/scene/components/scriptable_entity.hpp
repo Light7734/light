@@ -17,25 +17,25 @@ public:
 	NativeScript() = default;
 	virtual ~NativeScript() = default;
 
-	inline unsigned int GetUID() const
+	inline unsigned int get_uid() const
 	{
 		return m_unique_identifier;
 	}
 
-	template<typename T>
-	T &GetComponent()
+	template<typename t>
+	t &GetComponent()
 	{
-		return m_entity.GetComponent<T>();
+		return m_entity.GetComponent<t>();
 	}
 
 protected:
-	virtual void OnCreate()
+	virtual void on_create()
 	{
 	}
-	virtual void OnDestroy()
+	virtual void on_destroy()
 	{
 	}
-	virtual void OnUpdate(float ts)
+	virtual void on_update(float ts)
 	{
 	}
 };

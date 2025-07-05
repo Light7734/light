@@ -10,26 +10,26 @@
 
 namespace Light {
 
-Ref<Framebuffer> Framebuffer::Create(
+Ref<Framebuffer> Framebuffer::create(
     const FramebufferSpecification &specification,
     Ref<SharedContext> sharedContext
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateRef<glFramebuffer>(specification);
+	case GraphicsAPI::OpenGL: return create_ref<glFramebuffer>(specification);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateRef<dxFramebuffer>(
+		lt_win(return create_ref<dxFramebuffer>(
 		                  specification,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}

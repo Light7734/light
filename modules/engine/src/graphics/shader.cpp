@@ -10,29 +10,29 @@
 
 namespace Light {
 
-Ref<Shader> Shader::Create(
-    BasicFileHandle vertexFile,
-    BasicFileHandle pixelFile,
+Ref<Shader> Shader::create(
+    basic_file_handle vertexFile,
+    basic_file_handle pixelFile,
     Ref<SharedContext> sharedContext
 )
 {
 	// load shader source
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateRef<glShader>(vertexFile, pixelFile);
+	case GraphicsAPI::OpenGL: return create_ref<glShader>(vertexFile, pixelFile);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateRef<dxShader>(
+		lt_win(return create_ref<dxShader>(
 		                  vertexFile,
 		                  pixelFile,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}

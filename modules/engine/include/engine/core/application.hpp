@@ -19,7 +19,7 @@ private:
 	static Application *s_Context;
 
 private:
-	Scope<Logger> m_logger;
+	Scope<logger> m_logger;
 	Scope<Instrumentor> m_instrumentor;
 	Scope<LayerStack> m_layer_stack;
 	Scope<Input> m_input;
@@ -34,19 +34,19 @@ public:
 
 	virtual ~Application();
 
-	void GameLoop();
+	void game_loop();
 
 	// To be defined in client project
 
-	static void Quit();
+	static void quit();
 
 protected:
 	Application();
 
 private:
-	void OnEvent(const Event &event);
+	void on_event(const Event &event);
 
-	void LogDebugData();
+	void log_debug_data();
 };
 
 extern Application *CreateApplication();

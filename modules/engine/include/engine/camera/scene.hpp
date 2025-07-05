@@ -36,51 +36,51 @@ private:
 public:
 	SceneCamera();
 
-	void SetViewportSize(unsigned int width, unsigned int height);
+	void set_viewport_size(unsigned int width, unsigned int height);
 
-	void SetProjectionType(ProjectionType projectionType);
+	void set_projection_type(ProjectionType projectionType);
 
-	void SetOrthographicSize(float size);
-	void SetOrthographicFarPlane(float farPlane);
-	void SetOrthographicNearPlane(float nearPlane);
+	void set_orthographic_size(float size);
+	void set_orthographic_far_plane(float farPlane);
+	void set_orthographic_near_plane(float nearPlane);
 
-	void SetPerspectiveVerticalFOV(float verticalFov);
-	void SetPerspectiveFarPlane(float farPlane);
-	void SetPerspectiveNearPlane(float nearPlane);
+	void set_perspective_vertical_fov(float verticalFov);
+	void set_perspective_far_plane(float farPlane);
+	void set_perspective_near_plane(float nearPlane);
 
-	inline float GetOrthographicSize() const
+	inline float get_orthographic_size() const
 	{
 		return m_orthographic_specification.size;
 	}
-	inline float GetOrthographicFarPlane() const
+	inline float get_orthographic_far_plane() const
 	{
 		return m_orthographic_specification.farPlane;
 	}
-	inline float GetOrthographicNearPlane() const
+	inline float get_orthographic_near_plane() const
 	{
 		return m_orthographic_specification.nearPlane;
 	}
 
-	inline float GetPerspectiveVerticalFOV() const
+	inline float get_perspective_vertical_fov() const
 	{
 		return m_perspective_specification.verticalFOV;
 	}
-	inline float GetPerspectiveFarPlane() const
+	inline float get_perspective_far_plane() const
 	{
 		return m_perspective_specification.farPlane;
 	}
-	inline float GetPerspectiveNearPlane() const
+	inline float get_perspective_near_plane() const
 	{
 		return m_perspective_specification.nearPlane;
 	}
 
-	inline ProjectionType GetProjectionType() const
+	inline ProjectionType get_projection_type() const
 	{
 		return m_projection_type;
 	}
 
 private:
-	void CalculateProjection();
+	void calculate_projection();
 };
 
 } // namespace Light

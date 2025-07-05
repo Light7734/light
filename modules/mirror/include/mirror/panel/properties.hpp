@@ -7,19 +7,17 @@ namespace Light {
 
 class PropertiesPanel: public Panel
 {
-private:
-	Entity m_entity_context;
-
 public:
 	PropertiesPanel() = default;
+
 	~PropertiesPanel() = default;
 
-	void OnUserInterfaceUpdate();
+	void on_user_interface_update();
 
-	void SetEntityContext(Entity entity);
+	void set_entity_context(Entity entity);
 
 private:
-	void DrawVec3Control(
+	void draw_vec3_control(
 	    const std::string &label,
 	    glm::vec3 &values,
 	    float resetValue = 0.0f,
@@ -27,7 +25,9 @@ private:
 	);
 
 	template<typename ComponentType, typename UIFunction>
-	void DrawComponent(const std::string &name, Entity entity, UIFunction function);
+	void draw_component(const std::string &name, Entity entity, UIFunction function);
+
+	Entity m_entity_context;
 };
 
 

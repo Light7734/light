@@ -5,30 +5,30 @@ namespace Light {
 
 EditorLayer::EditorLayer(const std::string &name): Layer(name), m_scene_dir("")
 {
-	m_scene = CreateRef<Scene>();
+	m_scene = create_ref<Scene>();
 
-	m_properties_panel = CreateRef<PropertiesPanel>();
-	m_sceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_scene, m_properties_panel);
-	m_content_browser_panel = CreateRef<AssetBrowserPanel>(m_scene);
+	m_properties_panel = create_ref<PropertiesPanel>();
+	m_sceneHierarchyPanel = create_ref<SceneHierarchyPanel>(m_scene, m_properties_panel);
+	m_content_browser_panel = create_ref<AssetBrowserPanel>(m_scene);
 
-	m_framebuffer = Framebuffer::Create({ 1, 1, 1 }, GraphicsContext::GetSharedContext());
+	m_framebuffer = Framebuffer::create({ 1, 1, 1 }, GraphicsContext::get_shared_context());
 
 	if (m_scene_dir.empty())
 	{
-		m_camera_entity = m_scene->CreateEntity("Camera");
+		m_camera_entity = m_scene->create_entity("Camera");
 		m_camera_entity.AddComponent<CameraComponent>(SceneCamera(), true);
 
-		ResourceManager::LoadTexture("Awesomeface", "Assets/Textures/awesomeface.png");
-		Entity entity = m_scene->CreateEntity("Awesomeface", {});
+		ResourceManager::load_texture("Awesomeface", "Assets/Textures/awesomeface.png");
+		Entity entity = m_scene->create_entity("Awesomeface", {});
 		entity.AddComponent<SpriteRendererComponent>(
-		    ResourceManager::GetTexture("Awesomeface"),
+		    ResourceManager::get_texture("Awesomeface"),
 		    glm::vec4 { 0.0f, 1.0f, 1.0f, 1.0f }
 		);
 	}
 	else
 	{
 		SceneSerializer serializer(m_scene);
-		ASSERT(serializer.Deserialize(m_scene_dir), "Failed to de-serialize: {}", m_scene_dir);
+		lt_assert(serializer.deserialize(m_scene_dir), "Failed to de-serialize: {}", m_scene_dir);
 
 		// m_camera_entity = m_scene->GetEntityByTag("Game Camera");
 	}
@@ -39,54 +39,54 @@ EditorLayer::~EditorLayer()
 	if (!m_scene_dir.empty())
 	{
 		SceneSerializer serializer(m_scene);
-		serializer.Serialize(m_scene_dir);
+		serializer.serialize(m_scene_dir);
 	}
 }
 
-void EditorLayer::OnUpdate(float deltaTime)
+void EditorLayer::on_update(float deltaTime)
 {
-	m_scene->OnUpdate(deltaTime);
+	m_scene->on_update(deltaTime);
 
-	m_direction.x = Input::GetKeyboardKey(Key::A) ? -1.0f :
-	                Input::GetKeyboardKey(Key::D) ? 1.0f :
-	                                                0.0f;
+	m_direction.x = Input::get_keyboard_key(Key::A) ? -1.0f :
+	                Input::get_keyboard_key(Key::D) ? 1.0f :
+	                                                  0.0f;
 
-	m_direction.y = Input::GetKeyboardKey(Key::S) ? -1.0f :
-	                Input::GetKeyboardKey(Key::W) ? 1.0f :
-	                                                0.0f;
+	m_direction.y = Input::get_keyboard_key(Key::S) ? -1.0f :
+	                Input::get_keyboard_key(Key::W) ? 1.0f :
+	                                                  0.0f;
 
 	auto &cameraTranslation = m_camera_entity.GetComponent<TransformComponent>().translation;
 	cameraTranslation += glm::vec3(m_direction * m_speed * deltaTime, 0.0f);
 
-	if (Input::GetKeyboardKey(Key::Escape))
-		Application::Quit();
+	if (Input::get_keyboard_key(Key::Escape))
+		Application::quit();
 }
 
-void EditorLayer::OnRender()
+void EditorLayer::on_render()
 {
-	m_scene->OnRender(m_framebuffer);
+	m_scene->on_render(m_framebuffer);
 }
 
-void EditorLayer::OnUserInterfaceUpdate()
+void EditorLayer::on_user_interface_update()
 {
-	UserInterface::DockspaceBegin();
+	UserInterface::dockspace_begin();
 	ImGui::ShowDemoWindow();
 
 	if (ImGui::Begin("Game"))
 	{
-		Input::ReceiveGameEvents(ImGui::IsWindowFocused());
+		Input::receive_game_events(ImGui::IsWindowFocused());
 		ImVec2 regionAvail = ImGui::GetContentRegionAvail();
 
 		if (m_available_content_region_prev != regionAvail)
 		{
-			m_framebuffer->Resize({ regionAvail.x, regionAvail.y });
+			m_framebuffer->resize({ regionAvail.x, regionAvail.y });
 			auto &camera = m_camera_entity.GetComponent<CameraComponent>().camera;
-			camera.SetViewportSize(regionAvail.x, regionAvail.y);
+			camera.set_viewport_size(regionAvail.x, regionAvail.y);
 
 			m_available_content_region_prev = regionAvail;
 		}
 
-		if (GraphicsContext::GetGraphicsAPI() == GraphicsAPI::DirectX)
+		if (GraphicsContext::get_graphics_api() == GraphicsAPI::DirectX)
 			ImGui::Image(m_framebuffer->GetColorAttachment(), regionAvail);
 		else
 			ImGui::Image(
@@ -99,11 +99,11 @@ void EditorLayer::OnUserInterfaceUpdate()
 	ImGui::End();
 
 	// Panels
-	m_sceneHierarchyPanel->OnUserInterfaceUpdate();
-	m_properties_panel->OnUserInterfaceUpdate();
-	m_content_browser_panel->OnUserInterfaceUpdate();
+	m_sceneHierarchyPanel->on_user_interface_update();
+	m_properties_panel->on_user_interface_update();
+	m_content_browser_panel->on_user_interface_update();
 
-	UserInterface::DockspaceEnd();
+	UserInterface::dockspace_end();
 }
 
 } // namespace Light

@@ -27,11 +27,11 @@ public:
 	);
 	~glVertexLayout();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 
 private:
-	glVertexElementDesc GetElementDesc(VertexElementType type, unsigned int offset);
+	glVertexElementDesc get_element_desc(VertexElementType type, unsigned int offset);
 };
 
 } // namespace Light

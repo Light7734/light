@@ -2,11 +2,12 @@
 
 namespace Light {
 
-	class Panel
-	{
-	public:
-		Panel() = default;
-		virtual ~Panel() = default;
-	};
+class Panel
+{
+public:
+	Panel() = default;
 
-}
+	virtual ~Panel() = default;
+};
+
+} // namespace Light

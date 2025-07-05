@@ -16,19 +16,19 @@ public:
 	{
 	}
 
-	inline int GetCharacter() const
+	inline int get_character() const
 	{
 		return m_character;
 	}
 
-	virtual std::string GetInfoLog() const override
+	virtual std::string get_info_lt_log() const override
 	{
 		std::stringstream ss;
 		ss << "CharSet: " << m_character;
 		return ss.str();
 	}
-	EVENT_TYPE(SetChar)
-	EVENT_CATEGORY(InputEventCategory | KeyboardEventCategory)
+	event_type(SetChar)
+	event_category(InputEventCategory | KeyboardEventCategory)
 };
 
 } // namespace Light

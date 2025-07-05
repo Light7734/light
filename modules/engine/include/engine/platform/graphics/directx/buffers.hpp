@@ -27,10 +27,10 @@ public:
 	    Ref<dxSharedContext> sharedContext
 	);
 
-	void Bind() override;
+	void bind() override;
 
-	void *Map() override;
-	void UnMap() override;
+	void *map() override;
+	void un_map() override;
 };
 
 //========== VERTEX_BUFFER  ==========//
@@ -53,11 +53,11 @@ public:
 	);
 	~dxVertexBuffer();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 
-	void *Map() override;
-	void UnMap() override;
+	void *map() override;
+	void un_map() override;
 };
 
 //========== INDEX_BUFFER  ==========//
@@ -72,8 +72,8 @@ public:
 	dxIndexBuffer(unsigned int *indices, unsigned int count, Ref<dxSharedContext> sharedContext);
 	~dxIndexBuffer();
 
-	void Bind() override;
-	void UnBind() override;
+	void bind() override;
+	void un_bind() override;
 };
 
 } // namespace Light

@@ -29,7 +29,7 @@ struct TransformComponent
 	{
 	}
 
-	inline glm::mat4 GetTransform() const
+	inline glm::mat4 get_transform() const
 	{
 		return glm::translate(translation) * glm::rotate(rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
 		       * glm::scale(scale);
@@ -37,7 +37,7 @@ struct TransformComponent
 
 	operator const glm::mat4() const
 	{
-		return GetTransform();
+		return get_transform();
 	}
 };
 

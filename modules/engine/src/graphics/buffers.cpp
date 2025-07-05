@@ -13,28 +13,28 @@ namespace Light {
 
 //================================================== CONSTANT_BUFFER
 //==================================================//
-Scope<ConstantBuffer> ConstantBuffer::Create(
+Scope<ConstantBuffer> ConstantBuffer::create(
     ConstantBufferIndex index,
     unsigned int size,
     Ref<SharedContext> sharedContext
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateScope<glConstantBuffer>(index, size);
+	case GraphicsAPI::OpenGL: return create_scope<glConstantBuffer>(index, size);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateScope<dxConstantBuffer>(
+		lt_win(return create_scope<dxConstantBuffer>(
 		                  index,
 		                  size,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}
@@ -44,19 +44,19 @@ Scope<ConstantBuffer> ConstantBuffer::Create(
 
 //================================================== VERTEX_BUFFER
 //==================================================//
-Ref<VertexBuffer> VertexBuffer::Create(
+Ref<VertexBuffer> VertexBuffer::create(
     float *vertices,
     unsigned int stride,
     unsigned int count,
     Ref<SharedContext> sharedContext
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateRef<glVertexBuffer>(vertices, stride, count);
+	case GraphicsAPI::OpenGL: return create_ref<glVertexBuffer>(vertices, stride, count);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateRef<dxVertexBuffer>(
+		lt_win(return create_ref<dxVertexBuffer>(
 		                  vertices,
 		                  stride,
 		                  count,
@@ -64,10 +64,10 @@ Ref<VertexBuffer> VertexBuffer::Create(
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}
@@ -76,28 +76,28 @@ Ref<VertexBuffer> VertexBuffer::Create(
 //==================================================//
 
 //======================================== INDEX_BUFFER ========================================//
-Ref<IndexBuffer> IndexBuffer::Create(
+Ref<IndexBuffer> IndexBuffer::create(
     unsigned int *indices,
     unsigned int count,
     Ref<SharedContext> sharedContext
 )
 {
-	switch (GraphicsContext::GetGraphicsAPI())
+	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return CreateRef<glIndexBuffer>(indices, count);
+	case GraphicsAPI::OpenGL: return create_ref<glIndexBuffer>(indices, count);
 
 	case GraphicsAPI::DirectX:
-		LT_WIN(return CreateRef<dxIndexBuffer>(
+		lt_win(return create_ref<dxIndexBuffer>(
 		                  indices,
 		                  count,
 		                  std::dynamic_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
 	default:
-		ASSERT(
+		lt_assert(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::GetGraphicsAPI())
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
 		);
 		return nullptr;
 	}

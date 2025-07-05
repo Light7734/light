@@ -15,10 +15,10 @@ private:
 public:
 	glGraphicsContext(GLFWwindow *windowHandle);
 
-	void LogDebugData() override;
+	void log_debug_data() override;
 
 private:
-	void SetDebugMessageCallback();
+	void set_debug_message_callback();
 };
 
 } // namespace Light
