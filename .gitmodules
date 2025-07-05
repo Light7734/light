@@ -1,25 +1,4 @@
-[submodule "Dependencies/spdlog"]
-	path = Dependencies/spdlog
-	url = https://github.com/gabime/spdlog
-[submodule "Dependencies/GLFW"]
-	path = Dependencies/GLFW
-	url = https://github.com/glfw/glfw
-[submodule "Dependencies/glm"]
-	path = Dependencies/glm
-	url = https://github.com/g-truc/glm
-[submodule "Dependencies/imgui"]
-	path = Dependencies/imgui
+[submodule "external/imgui"]
+	path = external/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
-[submodule "Dependencies/entt"]
-	path = Dependencies/entt
-	url = https://github.com/skypjack/entt
-[submodule "Dependencies/yaml-cpp"]
-	path = Dependencies/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp
-[submodule "Dependencies/shaderc"]
-	path = Dependencies/shaderc
-	url = https://github.com/google/shaderc
-[submodule "Dependencies/spirv-cross"]
-	path = Dependencies/spirv-cross
-	url = https://github.com/KhronosGroup/SPIRV-Cross
