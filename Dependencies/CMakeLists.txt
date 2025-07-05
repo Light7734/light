@@ -36,11 +36,9 @@ if(WIN32)
 endif()
 
 add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLAD)
-include_directories(${DEPENDENCIES_DIR}GLAD/include)
 include_directories(${DEPENDENCIES_DIR}GLFW/include)
 include_directories(${DEPENDENCIES_DIR}glm/)
 add_library(imgui STATIC ${IMGUI_FILES} ${IMGUI_BACKEND_FILES})
-
 
 # Copy imconfig.h over
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Configurations/imgui/imconfig.h

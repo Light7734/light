@@ -1,6 +1,6 @@
 #include "glBlender.hpp"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Light {
 

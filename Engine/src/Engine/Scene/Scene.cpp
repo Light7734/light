@@ -84,8 +84,8 @@ Entity Scene::GetEntityByTag(const std::string& tag)
 	Entity entity;
 
 	m_Registry.view<TagComponent>().each([&](TagComponent& tagComp) {
-		if (tagComp.tag == tag)
-			entity = Entity(entt::to_entity(m_Registry, tagComp), this);
+		// if (tagComp.tag == tag)
+		// 	entity = Entity(entt::to_entity(m_Registry, tagComp), this);
 	});
 
 	if (entity.IsValid())

@@ -24,15 +24,16 @@ void SceneHierarchyPanel::OnUserInterfaceUpdate()
 	{
 		ImGui::Begin("Hierarchy");
 
-		m_Context->m_Registry.each([&](auto entityID) {
-			Entity entity(entityID, m_Context.get());
+		for (auto entityID : m_Context->m_Registry.view<TagComponent>())
+		{
+			Entity entity(static_cast<entt::entity>(entityID), m_Context.get());
 			const std::string& tag = entity.GetComponent<TagComponent>();
 
 			DrawNode(entity, tag);
-		});
-
-		ImGui::End();
+		};
 	}
+
+	ImGui::End();
 }
 
 void SceneHierarchyPanel::SetContext(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel /* = nullptr */)

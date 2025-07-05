@@ -2,24 +2,14 @@
 
 #include "Base/Base.hpp"
 
-#include <stb_image.h>
-
 namespace Light {
 
 class BasicFileHandle
 {
 public:
-	BasicFileHandle(uint8_t* data = nullptr, uint32_t size = 0ull, const std::string& path = "", const std::string& name = "", const std::string& extension = "")
-	    : m_Data(data), m_Size(size), m_Path(path), m_Name(name), m_Extension(extension)
-	{
-	}
+	BasicFileHandle(uint8_t* data = nullptr, uint32_t size = 0ull, const std::string& path = "", const std::string& name = "", const std::string& extension = "");
 
-	virtual void Release()
-	{
-		delete m_Data;
-		m_Data = nullptr;
-		m_Size = 0ull;
-	}
+	virtual void Release();
 
 	// getters
 	inline uint8_t* GetData() { return m_Data; }
@@ -54,12 +44,7 @@ public:
 	{
 	}
 
-	void Release() override
-	{
-		stbi_image_free(reinterpret_cast<void*>(m_Data));
-		m_Data = nullptr;
-		m_Size = 0ull;
-	}
+	void Release() override;
 
 	// getters
 	inline uint32_t GetWidth() const { return m_Width; }

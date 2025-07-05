@@ -8,7 +8,7 @@
 #include "UserInterface/UserInterface.hpp" // required for forward declaration
 #include "Utility/ResourceManager.hpp"     // required for forward declaration
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #ifndef STOP_FUCKING_ORDERING_THESE_THE_WRONG_WAY_CLANG_FORMAT____
 	#include <GLFW/glfw3.h>
@@ -26,7 +26,7 @@ glGraphicsContext::glGraphicsContext(GLFWwindow* windowHandle)
 	glfwMakeContextCurrent(windowHandle);
 
 	// load opengl (glad)
-	ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to initialize opengl (glad)");
+	ASSERT(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
 
 	SetDebugMessageCallback();
 }

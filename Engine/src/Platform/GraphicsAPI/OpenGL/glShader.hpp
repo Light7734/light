@@ -4,8 +4,6 @@
 #include "Graphics/Shader.hpp"
 #include "Utility/FileManager.hpp"
 
-#include <shaderc/shaderc.hpp>
-
 namespace Light {
 
 class glShader: public Shader
@@ -21,7 +19,7 @@ public:
 	void UnBind() override;
 
 private:
-	shaderc::SpvCompilationResult CompileGLSL(BasicFileHandle file, Shader::Stage stage);
+	// shaderc::SpvCompilationResult CompileGLSL(BasicFileHandle file, Shader::Stage stage);
 
 	unsigned int CompileShader(std::string source, Shader::Stage stage);
 };

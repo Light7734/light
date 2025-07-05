@@ -1,6 +1,6 @@
 #include "glShader.hpp"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
@@ -47,26 +47,26 @@ void glShader::UnBind()
 	glUseProgram(NULL);
 }
 
-shaderc::SpvCompilationResult glShader::CompileGLSL(BasicFileHandle file, Shader::Stage stage)
-{
-	// compile options
-	shaderc::CompileOptions options;
-	options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-	options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-	// compile
-	shaderc::Compiler compiler;
-	shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(reinterpret_cast<const char*>(file.GetData()), stage == Shader::Stage::VERTEX ? shaderc_shader_kind::shaderc_vertex_shader : shaderc_shader_kind::shaderc_fragment_shader, file.GetName().c_str(), options);
-
-	// log error
-	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-	{
-		LOG(err, "Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ? "vertex" : "pixel", file.GetPath());
-		LOG(err, "    {}", result.GetErrorMessage());
-	}
-
-	return result;
-}
+// shaderc::SpvCompilationResult glShader::CompileGLSL(BasicFileHandle file, Shader::Stage stage)
+// {
+// 	// compile options
+// 	shaderc::CompileOptions options;
+// 	options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+// 	options.SetOptimizationLevel(shaderc_optimization_level_performance);
+//
+// 	// compile
+// 	shaderc::Compiler compiler;
+// 	shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(reinterpret_cast<const char*>(file.GetData()), stage == Shader::Stage::VERTEX ? shaderc_shader_kind::shaderc_vertex_shader : shaderc_shader_kind::shaderc_fragment_shader, file.GetName().c_str(), options);
+//
+// 	// log error
+// 	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+// 	{
+// 		LOG(err, "Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ? "vertex" : "pixel", file.GetPath());
+// 		LOG(err, "    {}", result.GetErrorMessage());
+// 	}
+//
+// 	return result;
+// }
 
 unsigned int glShader::CompileShader(std::string source, Shader::Stage stage)
 {
@@ -75,7 +75,7 @@ unsigned int glShader::CompileShader(std::string source, Shader::Stage stage)
 	unsigned int shader       = glCreateShader(stage == Shader::Stage::VERTEX   ? GL_VERTEX_SHADER :
 	                                           stage == Shader::Stage::PIXEL    ? GL_FRAGMENT_SHADER :
 	                                           stage == Shader::Stage::GEOMETRY ? GL_GEOMETRY_SHADER :
-                                                                                  NULL);
+	                                                                              NULL);
 
 	// compile
 	glShaderSource(shader, 1, &lvalue_source, NULL);

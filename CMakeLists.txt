@@ -9,9 +9,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(MIRROR_DIR ${CMAKE_BINARY_DIR}/../Mirror/)
-set(ENGINE_DIR ${CMAKE_BINARY_DIR}/../Engine/)
-set(DEPENDENCIES_DIR ${CMAKE_BINARY_DIR}/../Dependencies/)
+set(CMAKE_EXPORT_COMPILE_COMMANDS True)
+
+set(MIRROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Mirror/)
+set(ENGINE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Engine/)
+set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/)
 
 if(NOT MSV)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error")
@@ -28,37 +30,42 @@ add_subdirectory(${ENGINE_DIR}/)
 add_subdirectory(${MIRROR_DIR}/)
 
 # Dependencies
-add_subdirectory(${DEPENDENCIES_DIR}GLAD/)
-add_subdirectory(${DEPENDENCIES_DIR}GLFW/)
+find_package(glfw3 REQUIRED)
+find_package(glm REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(stb REQUIRED)
+find_package(yaml-cpp REQUIRED)
+find_package(EnTT REQUIRED)
+find_package(opengl_system REQUIRED)
+
 add_subdirectory(${DEPENDENCIES_DIR})
-add_subdirectory(${DEPENDENCIES_DIR}spdlog/)
-add_subdirectory(${DEPENDENCIES_DIR}glm/)
-add_subdirectory(${DEPENDENCIES_DIR}entt/)
-add_subdirectory(${DEPENDENCIES_DIR}stb_image/)
-add_subdirectory(${DEPENDENCIES_DIR}yaml-cpp/)
-add_subdirectory(${DEPENDENCIES_DIR}shaderc/)
+add_subdirectory(external/glad/)
 
 # Link
 target_link_libraries(
   imgui
   PUBLIC glad
+  PUBLIC opengl::opengl
+  PUBLIC glm::glm 
   PUBLIC glfw
 )
 
 target_link_libraries(
   Engine
-  PRIVATE glad
-  PRIVATE glfw
-  PRIVATE spdlog
-  PRIVATE imgui
-  PRIVATE stb_image
-  PRIVATE yaml-cpp
-  PRIVATE shaderc
+  PUBLIC glad
+  PUBLIC opengl::opengl
+  PUBLIC glfw
+  PUBLIC spdlog::spdlog
+  PUBLIC imgui
+  PUBLIC stb::stb
+  PUBLIC yaml-cpp::yaml-cpp
+  PUBLIC EnTT::EnTT
 )
 
 target_link_libraries(
   Mirror
   PRIVATE Engine
+  PRIVATE opengl::opengl
   PRIVATE imgui
 )
 

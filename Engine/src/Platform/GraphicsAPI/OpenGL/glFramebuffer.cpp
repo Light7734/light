@@ -1,6 +1,6 @@
 #include "glFramebuffer.hpp"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/glm.hpp>
 
 namespace Light {

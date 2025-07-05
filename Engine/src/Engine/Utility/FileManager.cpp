@@ -1,8 +1,22 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include "FileManager.hpp"
 
 #include <stb_image.h>
 
 namespace Light {
+
+BasicFileHandle::BasicFileHandle(uint8_t* data, uint32_t size, const std::string& path, const std::string& name, const std::string& extension)
+    : m_Data(data), m_Size(size), m_Path(path), m_Name(name), m_Extension(extension)
+{
+}
+
+void BasicFileHandle::Release()
+{
+	delete m_Data;
+	m_Data = nullptr;
+	m_Size = 0ull;
+}
+
 
 BasicFileHandle FileManager::ReadTextFile(const std::string& path)
 {
@@ -55,5 +69,13 @@ ImageFileHandle FileManager::ReadImageFile(const std::string& path, int32_t desi
 
 	return ImageFileHandle(pixels, width * height, path, name, extension, width, height, fetchedComponents, desiredComponents);
 }
+
+void ImageFileHandle::Release()
+{
+	stbi_image_free(reinterpret_cast<void*>(m_Data));
+	m_Data = nullptr;
+	m_Size = 0ull;
+}
+
 
 } // namespace Light

@@ -1,6 +1,6 @@
 #include "glRenderCommand.hpp"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #ifndef DONT_FUCKING_ORDER_THESSE_PLEASE_FOR_THE_LOVE_OF_GOD_CLANG_FORMAT
 	#include <GLFW/glfw3.h>
 #endif

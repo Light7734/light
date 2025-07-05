@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "Base/Base.hpp"
 
 #include <glm/glm.hpp>

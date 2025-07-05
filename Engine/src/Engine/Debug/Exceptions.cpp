@@ -2,7 +2,7 @@
 
 #include "Utility/Stringifier.hpp"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #ifdef LIGHT_PLATFORM_WINDOWS
 	#include <Windows.h>
@@ -20,7 +20,7 @@ glException::glException(unsigned int source, unsigned int type, unsigned int id
 	// #todo: improve
 	LOG(critical, "________________________________________");
 	LOG(critical, "glException::glException::");
-	LOG(critical, "        Severity: {}", Stringifier::glDebugMsgSeverity(GL_DEBUG_SEVERITY_HIGH));
+	// LOG(critical, "        Severity: {}", Stringifier::glDebugMsgSeverity(GL_DEBUG_SEVERITY_HIGH));
 	LOG(critical, "        Source  : {}", Stringifier::glDebugMsgSource(source));
 	LOG(critical, "        Type    : {}", Stringifier::glDebugMsgType(type));
 	LOG(critical, "        ID      : {}", id);

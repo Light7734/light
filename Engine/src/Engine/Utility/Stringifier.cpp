@@ -2,7 +2,7 @@
 
 #include "Graphics/GraphicsContext.hpp"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <spdlog/common.h>
 
 namespace Light {

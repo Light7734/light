@@ -42,7 +42,6 @@ include_directories(
   ${ENGINE_DIR}src/Engine/
   ${ENGINE_DIR}src/Platform/GraphicsAPI/
   ${ENGINE_DIR}src/Platform/OS/
-  ${DEPENDENCIES_DIR}entt/src/
   ${DEPENDENCIES_DIR}GLAD/include/
   ${DEPENDENCIES_DIR}GLFW/include/
   ${DEPENDENCIES_DIR}glm/

@@ -29,7 +29,7 @@ EditorLayer::EditorLayer(const std::string& name, const std::vector<std::string>
 		SceneSerializer serializer(m_Scene);
 		ASSERT(serializer.Deserialize(m_SceneDir), "Failed to de-serialize: {}", m_SceneDir);
 
-		m_CameraEntity = m_Scene->GetEntityByTag("Game Camera");
+		// m_CameraEntity = m_Scene->GetEntityByTag("Game Camera");
 	}
 }
 
@@ -48,11 +48,11 @@ void EditorLayer::OnUpdate(float deltaTime)
 
 	m_Direction.x = Input::GetKeyboardKey(Key::A) ? -1.0f :
 	                Input::GetKeyboardKey(Key::D) ? 1.0f :
-                                                    0.0f;
+	                                                0.0f;
 
 	m_Direction.y = Input::GetKeyboardKey(Key::S) ? -1.0f :
 	                Input::GetKeyboardKey(Key::W) ? 1.0f :
-                                                    0.0f;
+	                                                0.0f;
 
 	auto& cameraTranslation = m_CameraEntity.GetComponent<TransformComponent>().translation;
 	cameraTranslation += glm::vec3(m_Direction * m_Speed * deltaTime, 0.0f);

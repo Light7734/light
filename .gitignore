@@ -29,5 +29,8 @@ Makefile
 !**/default_gui_layout.ini
 
 CMake/
+CMakeUserPresets.json
 
 compile_commands.json
+
+
