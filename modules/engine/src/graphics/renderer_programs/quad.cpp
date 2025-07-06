@@ -19,8 +19,8 @@ QuadRendererProgram::QuadRendererProgram(unsigned int maxVertices, Ref<SharedCon
 	// #todo: don't use relative path
 	ResourceManager::load_shader(
 	    "LT_ENGINE_RESOURCES_QUAD_SHADER",
-	    "Assets/Shaders/Quad/Quad_VS.glsl",
-	    "Assets/Shaders/Quad/Quad_PS.glsl"
+	    "data/assets/shaders/quads/vs.glsl",
+	    "data/assets/shaders/quads/ps.glsl"
 	);
 
 	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_QUAD_SHADER");

@@ -22,8 +22,8 @@ TextureRendererProgram::TextureRendererProgram(
 	// #todo: don't use relative path
 	ResourceManager::load_shader(
 	    "LT_ENGINE_RESOURCES_TEXTURE_SHADER",
-	    "Assets/Shaders/Texture/Texture_VS.glsl",
-	    "Assets/Shaders/Texture/Texture_PS.glsl"
+	    "data/assets/shaders/texture/ps.glsl",
+	    "data/assets/shaders/texture/ps.glsl"
 	);
 
 	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_TEXTURE_SHADER");
