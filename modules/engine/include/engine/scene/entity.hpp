@@ -15,35 +15,35 @@ public:
 	~Entity();
 
 	template<typename t, typename... Args>
-	inline t &AddComponent(Args &&...args)
+	auto add_component(Args &&...args) -> t &
 	{
 		return m_scene->m_registry.emplace<t>(m_handle, std::forward<Args>(args)...);
 	}
 
 	template<typename t>
-	inline t &GetComponent()
+	auto get_component() -> t &
 	{
 		return m_scene->m_registry.get<t>(m_handle);
 	}
 
 	template<typename t>
-	inline bool has_component()
+	auto has_component() -> bool
 	{
 		return m_scene->m_registry.any_of<t>(m_handle);
 	}
 
 	template<typename t>
-	inline void remove_component()
+	void remove_component()
 	{
 		m_scene->m_registry.remove<t>(m_handle);
 	}
 
-	inline uint64_t get_uuid()
+	auto get_uuid() -> uint64_t
 	{
-		return GetComponent<UUIDComponent>().uuid;
+		return get_component<UUIDComponent>().uuid;
 	}
 
-	inline bool is_valid() const
+	auto is_valid() const -> bool
 	{
 		return m_handle != entt::null && m_scene != nullptr;
 	}
@@ -55,6 +55,7 @@ public:
 
 private:
 	entt::entity m_handle;
+
 	Scene *m_scene;
 };
 

@@ -5,8 +5,8 @@
 namespace Light {
 
 dxShader::dxShader(
-    basic_file_handle vertexFile,
-    basic_file_handle pixelFile,
+    BasicFileHandle vertexFile,
+    BasicFileHandle pixelFile,
     Ref<dxSharedContext> sharedContext
 )
     : m_context(sharedContext)
@@ -14,7 +14,9 @@ dxShader::dxShader(
     , m_pixel_shader(nullptr)
     , m_vertex_blob(nullptr)
 {
-	Microsoft::WRL::ComPtr<ID3DBlob> ps = nullptr, vsErr = nullptr, psErr = nullptr;
+	auto ps = Microsoft::WRL::ComPtr<ID3DBlob> { nullptr };
+	auto vsErr = Microsoft::WRL::ComPtr<ID3DBlob> { nullptr };
+	auto psErr = Microsoft::WRL::ComPtr<ID3DBlob> { nullptr };
 
 	// compile shaders (we don't use dxc here because if d3_d_compile fails it throws a dxException
 	// without logging the vsErr/psErr
@@ -50,7 +52,7 @@ dxShader::dxShader(
 	lt_assert(!psErr.Get(), "Pixels shader compile error: {}", (char *)psErr->GetBufferPointer());
 
 	// create shaders
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateVertexShader(
 	    m_vertex_blob->GetBufferPointer(),
 	    m_vertex_blob->GetBufferSize(),
@@ -58,7 +60,8 @@ dxShader::dxShader(
 	    &m_vertex_shader
 	));
 	dxc(m_context->get_device()
-	        ->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), NULL, &m_pixel_shader));
+	        ->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), NULL, &m_pixel_shader)
+	);
 }
 
 dxShader::~dxShader()

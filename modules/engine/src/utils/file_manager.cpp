@@ -27,14 +27,14 @@ void BasicFileHandle::release()
 }
 
 
-BasicFileHandle FileManager::read_text_file(const std::string &path)
+auto FileManager::read_text_file(const std::string &path) -> BasicFileHandle
 {
 	// parse path info
-	std::string name = path.substr(0, path.find('.') + -1);
-	std::string extension = path.substr(path.find('.') + 1);
+	auto name = path.substr(0, path.find('.') + -1);
+	auto extension = path.substr(path.find('.') + 1);
 
 	// open file
-	std::ifstream file(path.c_str(), std::ios_base::in | std::ios_base::binary);
+	auto file = std::ifstream { path.c_str(), std::ios_base::in | std::ios_base::binary };
 
 	// check
 	if (!file)
@@ -46,45 +46,44 @@ BasicFileHandle FileManager::read_text_file(const std::string &path)
 
 	// fetch file size
 	file.seekg(0, std::ios::end);
-	uint32_t size = file.tellg();
+	auto size = file.tellg();
 	file.seekg(0, std::ios::beg);
 
 	if (!size)
 		lt_log(warn, "Empty text file: {}", path);
 
 	// read file
-	uint8_t *data = new uint8_t[size];
+	auto *data = new uint8_t[size];
 	file.read(reinterpret_cast<char *>(data), size);
 
 	file.close();
-	return BasicFileHandle(data, size, path, name, extension);
+	return { data, static_cast<unsigned int>(size), path, name, extension };
 }
 
-ImageFileHandle FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
+auto FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
+    -> ImageFileHandle
 {
 	// parse path info
-	std::string name = path.substr(0, path.find('.') + -1);
-	std::string extension = path.substr(path.find('.') + 1);
+	auto name = path.substr(0, path.find('.') + -1);
+	auto extension = path.substr(path.find('.') + 1);
 
 	// load image
-	int32_t width = 0, height = 0, fetchedComponents = 0;
-	uint8_t *pixels = stbi_load(
-	    path.c_str(),
-	    &width,
-	    &height,
-	    &fetchedComponents,
-	    desiredComponents
-	);
+	auto width = 0;
+	auto height = 0;
+	auto fetchedComponents = 0;
+	auto *pixels = stbi_load(path.c_str(), &width, &height, &fetchedComponents, desiredComponents);
 
 	// check
 	if (!pixels)
 		lt_log(warn, "Failed to load image file: <{}>", path);
 	else if (fetchedComponents != desiredComponents)
-		lt_log(warn,
+		lt_log(
+		    warn,
 		    "Mismatch of fetched/desired components: <{}> ({}/{})",
 		    name + '.' + extension,
 		    fetchedComponents,
-		    desiredComponents);
+		    desiredComponents
+		);
 
 	return ImageFileHandle(
 	    pixels,
@@ -105,6 +104,5 @@ void ImageFileHandle::release()
 	m_data = nullptr;
 	m_size = 0ull;
 }
-
 
 } // namespace Light

@@ -16,14 +16,16 @@ void PropertiesPanel::on_user_interface_update()
 	{
 		if (m_entity_context.has_component<TagComponent>())
 		{
-			auto &tagComponent = m_entity_context.GetComponent<TagComponent>();
+			auto &tagComponent = m_entity_context.get_component<TagComponent>();
 
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));
-			std::strncpy(buffer, tagComponent.tag.c_str(), sizeof(buffer));
+			auto buffer = std::array<char, 256> {};
+			memset(buffer.data(), 0, buffer.size());
+			std::strncpy(buffer.data(), tagComponent.tag.c_str(), buffer.size());
 
-			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
-				tagComponent.tag = std::string(buffer);
+			if (ImGui::InputText("##Tag", buffer.data(), buffer.size()))
+			{
+				tagComponent.tag = buffer.data();
+			}
 		}
 
 		ImGui::SameLine();
@@ -41,7 +43,7 @@ void PropertiesPanel::on_user_interface_update()
 			            ImGuiSelectableFlags_Disabled :
 			            NULL
 			    ))
-				m_entity_context.AddComponent<SpriteRendererComponent>(
+				m_entity_context.add_component<SpriteRendererComponent>(
 				    Light::ResourceManager::get_texture("awesomeface")
 				);
 
@@ -52,7 +54,7 @@ void PropertiesPanel::on_user_interface_update()
 			            ImGuiSelectableFlags_Disabled :
 			            NULL
 			    ))
-				m_entity_context.AddComponent<CameraComponent>();
+				m_entity_context.add_component<CameraComponent>();
 
 			ImGui::EndPopup();
 		}
@@ -80,14 +82,17 @@ void PropertiesPanel::on_user_interface_update()
 		    [&](auto &cameraComponent) {
 			    auto &camera = cameraComponent.camera;
 
-			    SceneCamera::ProjectionType projectionType = camera.get_projection_type();
-			    const char *projectionTypesString[] = { "Orthographic", "Perspective" };
+			    auto projectionType = camera.get_projection_type();
+			    auto projectionTypesString = std::array<const char *, 2> {
+				    "Orthographic",
+				    "Perspective",
+			    };
 
 			    if (ImGui::BeginCombo("ProjectionType", projectionTypesString[(int)projectionType]))
 			    {
 				    for (int i = 0; i < 2; i++)
 				    {
-					    const bool isSelected = (int)projectionType == i;
+					    const auto isSelected = (int)projectionType == i;
 					    if (ImGui::Selectable(projectionTypesString[i], isSelected))
 					    {
 						    projectionType = (SceneCamera::ProjectionType)i;
@@ -103,7 +108,9 @@ void PropertiesPanel::on_user_interface_update()
 
 			    if (projectionType == SceneCamera::ProjectionType::Orthographic)
 			    {
-				    float orthoSize, nearPlane, farPlane;
+				    auto orthoSize = float {};
+				    auto nearPlane = float {};
+				    auto farPlane = float {};
 
 				    orthoSize = camera.get_orthographic_size();
 				    nearPlane = camera.get_orthographic_near_plane();
@@ -121,7 +128,9 @@ void PropertiesPanel::on_user_interface_update()
 
 			    else // perspective
 			    {
-				    float verticalFOV, nearPlane, farPlane;
+				    auto verticalFOV = float {};
+				    auto nearPlane = float {};
+				    auto farPlane = float {};
 
 				    verticalFOV = glm::degrees(camera.get_perspective_vertical_fov());
 				    nearPlane = camera.get_perspective_near_plane();
@@ -157,7 +166,7 @@ void PropertiesPanel::draw_vec3_control(
     float columnWidth /*= 100.0f*/
 )
 {
-	ImGuiIO &io = ImGui::GetIO();
+	auto &io = ImGui::GetIO();
 
 	auto boldFont = io.Fonts->Fonts[0];
 
@@ -169,8 +178,8 @@ void PropertiesPanel::draw_vec3_control(
 	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2 { 0, 0 });
 
-	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+	auto lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	auto buttonSize = ImVec2 { lineHeight + 3.0f, lineHeight };
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));
@@ -229,16 +238,16 @@ void PropertiesPanel::draw_component(
 	if (!entity.has_component<ComponentType>())
 		return;
 
-	auto &component = entity.GetComponent<ComponentType>();
+	auto &component = entity.get_component<ComponentType>();
 
-	ImVec2 regionAvail = ImGui::GetContentRegionAvail();
+	auto regionAvail = ImGui::GetContentRegionAvail();
 
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth
-	                           | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap
-	                           | ImGuiTreeNodeFlags_FramePadding;
+	auto flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth
+	             | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap
+	             | ImGuiTreeNodeFlags_FramePadding;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
-	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	auto lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 	ImGui::Separator();
 
 	if (ImGui::TreeNodeEx((void *)typeid(ComponentType).hash_code(), flags, name.c_str()))

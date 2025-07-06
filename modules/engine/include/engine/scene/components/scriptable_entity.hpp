@@ -14,15 +14,15 @@ public:
 
 	virtual ~NativeScript() = default;
 
-	inline unsigned int get_uid() const
+	auto get_uid() const -> unsigned int
 	{
 		return m_unique_identifier;
 	}
 
 	template<typename t>
-	t &GetComponent()
+	auto GetComponent() -> t &
 	{
-		return m_entity.GetComponent<t>();
+		return m_entity.get_component<t>();
 	}
 
 protected:

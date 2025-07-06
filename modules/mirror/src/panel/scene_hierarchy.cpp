@@ -28,9 +28,12 @@ void SceneHierarchyPanel::on_user_interface_update()
 
 		for (auto entityID : m_context->m_registry.view<TagComponent>())
 		{
-			Entity entity(static_cast<entt::entity>(entityID), m_context.get());
-			const std::string &tag = entity.GetComponent<TagComponent>();
+			auto entity = Entity {
+				static_cast<entt::entity>(entityID),
+				m_context.get(),
+			};
 
+			const auto &tag = entity.get_component<TagComponent>();
 			draw_node(entity, tag);
 		};
 	}
@@ -48,10 +51,14 @@ void SceneHierarchyPanel::set_context(Ref<Scene> context, Ref<PropertiesPanel> p
 
 void SceneHierarchyPanel::draw_node(Entity entity, const std::string &label)
 {
-	ImGuiTreeNodeFlags flags = (m_selection_context == entity ? ImGuiTreeNodeFlags_Selected : NULL)
-	                           | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
+	auto flags = (m_selection_context == entity ? ImGuiTreeNodeFlags_Selected : NULL)
+	             | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
 
-	bool expanded = ImGui::TreeNodeEx((void *)(uint64_t)(uint32_t)(entity), flags, label.c_str());
+	const auto expanded = ImGui::TreeNodeEx(
+	    (void *)(uint64_t)(uint32_t)(entity),
+	    flags,
+	    label.c_str()
+	);
 
 	if (ImGui::IsItemClicked())
 	{

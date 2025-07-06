@@ -24,9 +24,9 @@ void glConstantBuffer::bind()
 	glBindBufferBase(GL_UNIFORM_BUFFER, m_index, m_buffer_id);
 }
 
-void *glConstantBuffer::map()
+auto glConstantBuffer::map() -> void *
 {
-	void *map = glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
+	auto *map = glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
 	return map;
 }
 
@@ -59,7 +59,7 @@ void glVertexBuffer::un_bind()
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-void *glVertexBuffer::map()
+auto glVertexBuffer::map() -> void *
 {
 	return glMapNamedBuffer(m_buffer_id, GL_WRITE_ONLY);
 }
@@ -74,21 +74,26 @@ void glVertexBuffer::un_map()
 glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_buffer_id(NULL)
 {
 	// generate indices if not provided
-	bool hasIndices = !!indices;
+	auto hasIndices = !!indices;
 	if (!hasIndices)
 	{
 		// check
 		if (count % 6 != 0)
 		{
 			lt_log(warn, "'indices' can only be null if count is multiple of 6");
-			lt_log(warn, "Adding {} to 'count' -> {}", (6 - (count % 6)), count + (6 - (count % 6)));
+			lt_log(
+			    warn,
+			    "Adding {} to 'count' -> {}",
+			    (6 - (count % 6)),
+			    count + (6 - (count % 6))
+			);
 			count = count + (6 - (count % 6));
 		}
 
 		// create indices
 		indices = new unsigned int[count];
-		unsigned int offset = 0u;
-		for (unsigned int i = 0u; i < count; i += 6u)
+		auto offset = 0u;
+		for (auto i = 0u; i < count; i += 6u)
 		{
 			indices[i + 0] = offset + 0u;
 			indices[i + 1] = offset + 1u;

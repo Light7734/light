@@ -14,10 +14,11 @@ public:
 	Mirror()
 	{
 		// Set window properties
-		Light::WindowProperties properties;
-		properties.title = "Mirror";
-		properties.size = glm::uvec2(1280u, 720u);
-		properties.vsync = true;
+		auto properties = Light::WindowProperties {
+			.title = "Mirror",
+			.size = glm::uvec2(1280u, 720u),
+			.vsync = true,
+		};
 
 		m_window->set_properties(properties);
 
@@ -26,7 +27,7 @@ public:
 	}
 };
 
-Application *CreateApplication()
+auto create_application() -> Application *
 {
 	return new Mirror();
 }

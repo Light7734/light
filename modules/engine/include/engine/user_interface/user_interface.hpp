@@ -14,19 +14,20 @@ class SharedContext;
 class UserInterface /* singleton */
 {
 public:
-	static Scope<UserInterface> create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
-
-	UserInterface(const UserInterface &) = delete;
-
-	UserInterface &operator=(const UserInterface &) = delete;
-
-	virtual ~UserInterface() = default;
-
-	void init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	static auto create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+	    -> Scope<UserInterface>;
 
 	static void dockspace_begin();
 
 	static void dockspace_end();
+
+	UserInterface(const UserInterface &) = delete;
+
+	auto operator=(const UserInterface &) -> UserInterface & = delete;
+
+	virtual ~UserInterface() = default;
+
+	void init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
 	virtual void platform_implementation(
 	    GLFWwindow *windowHandle,
@@ -46,7 +47,6 @@ private:
 	static UserInterface *s_context;
 
 	void set_dark_theme_colors();
-
 
 	ImGuiWindowFlags m_dockspace_flags;
 };

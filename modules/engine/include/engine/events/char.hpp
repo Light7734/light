@@ -13,20 +13,20 @@ public:
 	{
 	}
 
-	inline int get_character() const
+	auto get_character() const -> int
 	{
 		return m_character;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "CharSet: " << m_character;
 		return ss.str();
 	}
 
-
 	event_type(SetChar);
+
 	event_category(InputEventCategory | KeyboardEventCategory);
 
 private:

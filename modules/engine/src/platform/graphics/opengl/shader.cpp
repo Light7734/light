@@ -61,18 +61,18 @@ void glShader::un_bind()
 // 	// log error
 // 	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
 // 	{
-// 		lt_log(err, "Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ? "vertex" :
-// "pixel", file.GetPath()); 		lt_log(err, "    {}", result.GetErrorMessage());
+// 		lt_log(err, "Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ?
+// "vertex" : "pixel", file.GetPath()); 		lt_log(err, "    {}", result.GetErrorMessage());
 // 	}
 //
 // 	return result;
 // }
 
-unsigned int glShader::compile_shader(std::string source, Shader::Stage stage)
+auto glShader::compile_shader(std::string source, Shader::Stage stage) -> unsigned int
 {
 	// &(address of) needs an lvalue
-	const char *lvalue_source = source.c_str();
-	unsigned int shader = glCreateShader(
+	const auto *lvalue_source = source.c_str();
+	auto shader = glCreateShader(
 	    stage == Shader::Stage::VERTEX   ? GL_VERTEX_SHADER :
 	    stage == Shader::Stage::PIXEL    ? GL_FRAGMENT_SHADER :
 	    stage == Shader::Stage::GEOMETRY ? GL_GEOMETRY_SHADER :
@@ -84,20 +84,22 @@ unsigned int glShader::compile_shader(std::string source, Shader::Stage stage)
 	glCompileShader(shader);
 
 	// check
-	int isCompiled = 0;
+	auto isCompiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
 	if (isCompiled == GL_FALSE)
 	{
-		int logLength = 0;
+		auto logLength = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 
-		char *errorLog = (char *)alloca(logLength);
+		auto *errorLog = (char *)alloca(logLength);
 		glGetShaderInfoLog(shader, logLength, &logLength, &errorLog[0]);
 
-		lt_log(err,
+		lt_log(
+		    err,
 		    "glShader::glShader: failed to compile {} shader:\n        {}",
 		    stage == Shader::Stage::VERTEX ? "Vertex" : "Pixel",
-		    errorLog);
+		    errorLog
+		);
 
 		return NULL;
 	}
@@ -105,7 +107,7 @@ unsigned int glShader::compile_shader(std::string source, Shader::Stage stage)
 #ifdef LIGHT_OPENGL_ENABLE_SHADER_INFO_LOG
 	// info log
 	{
-		int logLength = 0;
+		auto logLength = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 		if (logLength)
 		{

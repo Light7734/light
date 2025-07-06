@@ -8,16 +8,16 @@ namespace YAML {
 template<>
 struct convert<glm::vec3>
 {
-	static Node encode(const glm::vec3 &rhs)
+	static auto encode(const glm::vec3 &rhs) -> Node
 	{
-		Node node;
+		auto node = Node {};
 		node.push_back(rhs.x);
 		node.push_back(rhs.y);
 		node.push_back(rhs.z);
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec3 &rhs)
+	static auto decode(const Node &node, glm::vec3 &rhs) -> bool
 	{
 		if (!node.IsSequence() || node.size() != 3)
 			return false;
@@ -32,9 +32,9 @@ struct convert<glm::vec3>
 template<>
 struct convert<glm::vec4>
 {
-	static Node encode(const glm::vec4 &rhs)
+	static auto encode(const glm::vec4 &rhs) -> Node
 	{
-		Node node;
+		auto node = Node {};
 		node.push_back(rhs.x);
 		node.push_back(rhs.y);
 		node.push_back(rhs.z);
@@ -42,7 +42,7 @@ struct convert<glm::vec4>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec4 &rhs)
+	static auto decode(const Node &node, glm::vec4 &rhs) -> bool
 	{
 		if (!node.IsSequence() || node.size() != 4)
 			return false;
@@ -58,14 +58,14 @@ struct convert<glm::vec4>
 
 namespace Light {
 
-static YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec3 &v)
+static auto operator<<(YAML::Emitter &out, const glm::vec3 &v) -> YAML::Emitter &
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
 	return out;
 }
 
-static YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v)
+static auto operator<<(YAML::Emitter &out, const glm::vec4 &v) -> YAML::Emitter &
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
@@ -78,14 +78,14 @@ SceneSerializer::SceneSerializer(const Ref<Scene> &scene): m_scene(scene)
 
 void SceneSerializer::serialize(const std::string &filePath)
 {
-	YAML::Emitter out;
+	auto out = YAML::Emitter {};
 	out << YAML::BeginMap; // Scene
 	out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 
 	out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 	for (auto [entityID, storage] : m_scene->m_registry.storage())
 	{
-		Entity entity = { static_cast<entt::entity>(entityID), m_scene.get() };
+		auto entity = Entity { static_cast<entt::entity>(entityID), m_scene.get() };
 		if (!entity.is_valid())
 			return;
 
@@ -96,53 +96,53 @@ void SceneSerializer::serialize(const std::string &filePath)
 
 	std::filesystem::create_directories(filePath.substr(0ull, filePath.find_last_of('\\')));
 
-	std::ofstream fout(filePath);
+	auto fout = std::ofstream { filePath };
 	if (!fout.is_open())
 		lt_log(trace, "Failed to create fout at: {}", filePath);
+
 	fout << out.c_str();
 }
 
-bool SceneSerializer::deserialize(const std::string &filePath)
+auto SceneSerializer::deserialize(const std::string &filePath) -> bool
 {
-	std::ifstream stream(filePath);
-	std::stringstream ss;
+	auto stream = std::ifstream { filePath };
+	auto ss = std::stringstream {};
 	ss << stream.rdbuf();
 
-	YAML::Node data = YAML::Load(ss.str());
+	auto data = YAML::Load(ss.str());
 	if (!data["Scene"])
 		return false;
 
-	std::string sceneName = data["Scene"].as<std::string>();
+	auto sceneName = data["Scene"].as<std::string>();
 	lt_log(trace, "Deserializing scene: '{}'", sceneName);
 
 	auto entities = data["Entities"];
 	if (entities)
 	{
 		/* #TEMPORARY SOLUTION# */
-		std::unordered_set<std::string> texturePaths;
+		auto texturePaths = std::unordered_set<std::string> {};
 		/* #TEMPORARY SOLUTION# */
-
 
 		for (auto entity : entities)
 		{
-			uint64_t uuid = entity["entity"].as<uint64_t>(); // #todo
+			auto uuid = entity["entity"].as<uint64_t>(); // #todo
 
-			std::string name;
+			auto name = std::string {};
 			auto tagComponent = entity["TagComponent"];
 			if (tagComponent)
 				name = tagComponent["Tag"].as<std::string>();
 
 			lt_log(trace, "Deserialized entity '{}' : '{}'", uuid, name);
 
-			Entity deserializedEntity = m_scene->create_entity_with_uuid(name, uuid);
+			auto deserializedEntity = m_scene->create_entity_with_uuid(name, uuid);
 
-			TagComponent gg = deserializedEntity.GetComponent<TagComponent>();
+			auto gg = deserializedEntity.get_component<TagComponent>();
 			lt_log(trace, gg.tag);
 			auto transformComponent = entity["TransformComponent"];
 			if (transformComponent)
 			{
 				auto &entityTransforomComponent = deserializedEntity
-				                                      .GetComponent<TransformComponent>();
+				                                      .get_component<TransformComponent>();
 
 				entityTransforomComponent.translation = transformComponent["Translation"]
 				                                            .as<glm::vec3>();
@@ -155,11 +155,11 @@ bool SceneSerializer::deserialize(const std::string &filePath)
 			if (spriteRendererComponent)
 			{
 				auto &entitySpriteRendererComponent = deserializedEntity
-				                                          .AddComponent<SpriteRendererComponent>();
+				                                          .add_component<SpriteRendererComponent>();
 				entitySpriteRendererComponent.tint = spriteRendererComponent["Tint"].as<glm::vec4>(
 				);
 
-				std::string texturePath = spriteRendererComponent["Texture"].as<std::string>();
+				auto texturePath = spriteRendererComponent["Texture"].as<std::string>();
 
 				if (!texturePaths.contains(texturePath))
 				{
@@ -174,7 +174,7 @@ bool SceneSerializer::deserialize(const std::string &filePath)
 			auto cameraComponent = entity["CameraComponent"];
 			if (cameraComponent)
 			{
-				auto &entityCameraComponent = deserializedEntity.AddComponent<CameraComponent>();
+				auto &entityCameraComponent = deserializedEntity.add_component<CameraComponent>();
 
 				const auto &cameraSpecifications = cameraComponent["Camera"];
 				entityCameraComponent.camera.set_projection_type(
@@ -220,7 +220,7 @@ void SceneSerializer::serialize_binary(const std::string &filePath)
 	lt_log(err, "NO_IMPLEMENT");
 }
 
-bool SceneSerializer::deserialize_binary(const std::string &filePath)
+auto SceneSerializer::deserialize_binary(const std::string &filePath) -> bool
 {
 	lt_log(err, "NO_IMPLEMENT");
 	return false;
@@ -236,7 +236,7 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 		out << YAML::Key << "TagComponent";
 		out << YAML::BeginMap; // tag component
 
-		auto &tagComponent = entity.GetComponent<TagComponent>().tag;
+		auto &tagComponent = entity.get_component<TagComponent>().tag;
 		out << YAML::Key << "Tag" << YAML::Value << tagComponent;
 
 		out << YAML::EndMap; // tag component
@@ -247,7 +247,7 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 		out << YAML::Key << "TransformComponent";
 		out << YAML::BeginMap; // transform component
 
-		auto &transformComponent = entity.GetComponent<TransformComponent>();
+		auto &transformComponent = entity.get_component<TransformComponent>();
 
 		out << YAML::Key << "Translation" << YAML::Value << transformComponent.translation;
 		out << YAML::Key << "Rotation" << YAML::Value << transformComponent.rotation;
@@ -261,7 +261,7 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 		out << YAML::Key << "SpriteRendererComponent";
 		out << YAML::BeginMap; // sprite renderer component;
 
-		auto &spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
+		auto &spriteRendererComponent = entity.get_component<SpriteRendererComponent>();
 
 		out << YAML::Key << "Texture" << YAML::Value
 		    << spriteRendererComponent.texture->GetFilePath();
@@ -278,7 +278,7 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 		out << YAML::Key << "CameraComponent";
 		out << YAML::BeginMap; // camera component
 
-		auto &cameraComponent = entity.GetComponent<CameraComponent>();
+		auto &cameraComponent = entity.get_component<CameraComponent>();
 
 		out << YAML::Key << "Camera" << YAML::Value;
 		out << YAML::BeginMap; // camera
@@ -297,7 +297,7 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 		out << YAML::Key << "ProjectionType" << YAML::Value
 		    << (int)cameraComponent.camera.get_projection_type();
 		out << YAML::Key << "BackgroundColor" << YAML::Value
-		    << cameraComponent.camera.GetBackgroundColor();
+		    << cameraComponent.camera.get_background_color();
 		out << YAML::EndMap; // camera
 
 		out << YAML::Key << "IsPrimary" << YAML::Value << cameraComponent.isPrimary;

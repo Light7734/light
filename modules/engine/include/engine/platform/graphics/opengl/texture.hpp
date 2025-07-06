@@ -20,7 +20,7 @@ public:
 
 	void bind(unsigned int slot = 0u) override;
 
-	void *get_texture() override;
+	auto get_texture() -> void * override;
 
 private:
 	unsigned int m_texture_id;

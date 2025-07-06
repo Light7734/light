@@ -48,6 +48,6 @@ private:
 	void log_debug_data();
 };
 
-extern Application *CreateApplication();
+extern Application *create_application();
 
 } // namespace Light

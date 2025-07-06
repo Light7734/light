@@ -18,16 +18,16 @@ class Instrumentor
 public:
 	static Scope<Instrumentor> create();
 
-	static inline void begin_session(const std::string &outputPath)
+	static void begin_session(const std::string &outputPath)
 	{
 		s_context->begin_session_impl(outputPath);
 	}
-	static inline void end_session()
+	static void end_session()
 	{
 		s_context->end_session_impl();
 	}
 
-	static inline void submit_scope_profile(const ScopeProfileResult &profileResult)
+	static void submit_scope_profile(const ScopeProfileResult &profileResult)
 	{
 		s_context->submit_scope_profile_impl(profileResult);
 	}

@@ -6,7 +6,6 @@ namespace Light {
 
 class SharedContext;
 
-// #todo: improve textures
 class Texture
 {
 public:
@@ -21,15 +20,15 @@ public:
 
 	Texture(const Texture &) = delete;
 
-	Texture &operator=(const Texture &) = delete;
+	auto operator=(const Texture &) -> Texture & = delete;
 
 	virtual ~Texture() = default;
 
 	virtual void bind(unsigned int slot = 0) = 0;
 
-	virtual void *get_texture() = 0;
+	virtual auto get_texture() -> void * = 0;
 
-	inline const std::string &GetFilePath() const
+	auto GetFilePath() const -> const std::string &
 	{
 		return m_file_path;
 	}

@@ -11,7 +11,9 @@ class Event;
 struct WindowProperties
 {
 	std::string title;
+
 	glm::uvec2 size;
+
 	bool vsync, visible;
 };
 
@@ -41,47 +43,49 @@ public:
 
 	virtual void set_title(const std::string &title) = 0;
 
-	virtual void set_size(const glm::uvec2 &size, bool additive = false) = 0; // pass 0 for width or
-	                                                                          // height for single
-	                                                                          // dimension resizing
+	/** pass 0 for width or height for single dimension resizing */
+	virtual void set_size(const glm::uvec2 &size, bool additive = false) = 0;
 
-	inline void close()
+	void close()
 	{
 		b_Closed = true;
 	}
+
 	virtual void set_v_sync(bool vsync, bool toggle = false) = 0;
 
 	virtual void set_visibility(bool visible, bool toggle = false) = 0;
 
-	inline GraphicsContext *GetGfxContext() const
+	auto get_graphics_context() const -> GraphicsContext *
 	{
 		return m_graphics_context.get();
 	}
 
-	inline const WindowProperties &GetProperties() const
+	auto get_properties() const -> const WindowProperties &
 	{
 		return m_properties;
 	}
 
-	inline const std::string &GetTitle() const
+	auto get_title() const -> const std::string &
 	{
 		return m_properties.title;
 	}
 
-	inline const glm::uvec2 &get_size() const
+	auto get_size() const -> const glm::uvec2 &
 	{
 		return m_properties.size;
 	}
 
-	inline bool is_closed() const
+	auto is_closed() const -> bool
 	{
 		return b_Closed;
 	}
-	inline bool is_v_sync() const
+
+	auto is_v_sync() const -> bool
 	{
 		return m_properties.vsync;
 	}
-	inline bool is_visible() const
+
+	auto is_visible() const -> bool
 	{
 		return m_properties.visible;
 	}

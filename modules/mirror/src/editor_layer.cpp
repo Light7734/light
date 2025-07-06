@@ -16,18 +16,19 @@ EditorLayer::EditorLayer(const std::string &name): Layer(name), m_scene_dir("")
 	if (m_scene_dir.empty())
 	{
 		m_camera_entity = m_scene->create_entity("Camera");
-		m_camera_entity.AddComponent<CameraComponent>(SceneCamera(), true);
+		m_camera_entity.add_component<CameraComponent>(SceneCamera(), true);
 
 		ResourceManager::load_texture("Awesomeface", "Assets/Textures/awesomeface.png");
-		Entity entity = m_scene->create_entity("Awesomeface", {});
-		entity.AddComponent<SpriteRendererComponent>(
+
+		auto entity = Entity { m_scene->create_entity("Awesomeface", {}) };
+		entity.add_component<SpriteRendererComponent>(
 		    ResourceManager::get_texture("Awesomeface"),
 		    glm::vec4 { 0.0f, 1.0f, 1.0f, 1.0f }
 		);
 	}
 	else
 	{
-		SceneSerializer serializer(m_scene);
+		auto serializer = SceneSerializer { m_scene };
 		lt_assert(serializer.deserialize(m_scene_dir), "Failed to de-serialize: {}", m_scene_dir);
 
 		// m_camera_entity = m_scene->GetEntityByTag("Game Camera");
@@ -38,7 +39,7 @@ EditorLayer::~EditorLayer()
 {
 	if (!m_scene_dir.empty())
 	{
-		SceneSerializer serializer(m_scene);
+		auto serializer = SceneSerializer { m_scene };
 		serializer.serialize(m_scene_dir);
 	}
 }
@@ -55,7 +56,7 @@ void EditorLayer::on_update(float deltaTime)
 	                Input::get_keyboard_key(Key::W) ? 1.0f :
 	                                                  0.0f;
 
-	auto &cameraTranslation = m_camera_entity.GetComponent<TransformComponent>().translation;
+	auto &cameraTranslation = m_camera_entity.get_component<TransformComponent>().translation;
 	cameraTranslation += glm::vec3(m_direction * m_speed * deltaTime, 0.0f);
 
 	if (Input::get_keyboard_key(Key::Escape))
@@ -75,22 +76,22 @@ void EditorLayer::on_user_interface_update()
 	if (ImGui::Begin("Game"))
 	{
 		Input::receive_game_events(ImGui::IsWindowFocused());
-		ImVec2 regionAvail = ImGui::GetContentRegionAvail();
+		auto regionAvail = ImGui::GetContentRegionAvail();
 
 		if (m_available_content_region_prev != regionAvail)
 		{
 			m_framebuffer->resize({ regionAvail.x, regionAvail.y });
-			auto &camera = m_camera_entity.GetComponent<CameraComponent>().camera;
+			auto &camera = m_camera_entity.get_component<CameraComponent>().camera;
 			camera.set_viewport_size(regionAvail.x, regionAvail.y);
 
 			m_available_content_region_prev = regionAvail;
 		}
 
 		if (GraphicsContext::get_graphics_api() == GraphicsAPI::DirectX)
-			ImGui::Image(m_framebuffer->GetColorAttachment(), regionAvail);
+			ImGui::Image(m_framebuffer->get_color_attachment(), regionAvail);
 		else
 			ImGui::Image(
-			    m_framebuffer->GetColorAttachment(),
+			    m_framebuffer->get_color_attachment(),
 			    regionAvail,
 			    ImVec2(0, 1),
 			    ImVec2(1, 0)

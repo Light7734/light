@@ -5,8 +5,7 @@
 
 namespace Light {
 
-//============================== OPENGL ==============================//
-std::string Stringifier::glDebugMsgSeverity(unsigned int severity)
+auto Stringifier::glDebugMsgSeverity(unsigned int severity) -> std::string
 {
 	switch (severity)
 	{
@@ -18,7 +17,7 @@ std::string Stringifier::glDebugMsgSeverity(unsigned int severity)
 	}
 }
 
-std::string Stringifier::glDebugMsgSource(unsigned int source)
+auto Stringifier::glDebugMsgSource(unsigned int source) -> std::string
 {
 	switch (source)
 	{
@@ -32,7 +31,7 @@ std::string Stringifier::glDebugMsgSource(unsigned int source)
 	}
 }
 
-std::string Stringifier::glDebugMsgType(unsigned int type)
+auto Stringifier::glDebugMsgType(unsigned int type) -> std::string
 {
 	switch (type)
 	{
@@ -48,10 +47,8 @@ std::string Stringifier::glDebugMsgType(unsigned int type)
 	default: return "UNKNOWN";
 	}
 }
-//============================== OPENGL ==============================//
 
-//==================== SPDLOG ====================//
-std::string Stringifier::spdlogLevel(unsigned int level)
+auto Stringifier::spdlogLevel(unsigned int level) -> std::string
 {
 	switch (level)
 	{
@@ -65,10 +62,8 @@ std::string Stringifier::spdlogLevel(unsigned int level)
 	default: return "UNKNOWN";
 	}
 }
-//==================== SPDLOG ====================//
 
-//==================== GRAPHICS_API ====================//
-std::string Stringifier::graphics_api_to_string(GraphicsAPI api)
+auto Stringifier::graphics_api_to_string(GraphicsAPI api) -> std::string
 {
 	switch (api)
 	{
@@ -80,6 +75,5 @@ std::string Stringifier::graphics_api_to_string(GraphicsAPI api)
 	default: return "UNKNOWN";
 	}
 }
-//==================== GRAPHICS_API ====================//
 
 } // namespace Light

@@ -9,7 +9,7 @@ namespace Light {
 
 LayerStack *LayerStack::s_context = nullptr;
 
-Scope<LayerStack> LayerStack::create()
+auto LayerStack::create() -> Scope<LayerStack>
 {
 	return make_scope<LayerStack>(new LayerStack());
 }
@@ -25,7 +25,7 @@ LayerStack::LayerStack(): m_layers {}, m_begin(), m_end()
 
 LayerStack::~LayerStack()
 {
-	for (Layer *layer : m_layers)
+	for (auto *layer : m_layers)
 		delete layer;
 }
 
@@ -36,7 +36,7 @@ void LayerStack::attach_layer_impl(Layer *layer)
 	m_begin = m_layers.begin();
 	m_end = m_layers.end();
 
-	lt_log(trace, "Attached [{}]", layer->GetName());
+	lt_log(trace, "Attached [{}]", layer->get_name());
 }
 
 void LayerStack::detach_layer_impl(Layer *layer)
@@ -46,7 +46,7 @@ void LayerStack::detach_layer_impl(Layer *layer)
 	m_begin = m_layers.begin();
 	m_end = m_layers.end();
 
-	lt_log(trace, "Detached [{}]", layer->GetName());
+	lt_log(trace, "Detached [{}]", layer->get_name());
 }
 
 } // namespace Light

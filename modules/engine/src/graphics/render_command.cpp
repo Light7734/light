@@ -10,10 +10,8 @@
 
 namespace Light {
 
-Scope<RenderCommand> RenderCommand::create(
-    GLFWwindow *windowHandle,
-    Ref<SharedContext> sharedContext
-)
+auto RenderCommand::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+    -> Scope<RenderCommand>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -24,12 +22,12 @@ Scope<RenderCommand> RenderCommand::create(
 		                  (std::static_pointer_cast<dxSharedContext>)(sharedContext)
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }

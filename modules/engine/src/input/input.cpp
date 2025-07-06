@@ -10,7 +10,7 @@ namespace Light {
 
 Input *Input::s_context = nullptr;
 
-Scope<Input> Input::create()
+auto Input::create() -> Scope<Input>
 {
 	return make_scope(new Input);
 }
@@ -40,7 +40,7 @@ void Input::receive_user_interface_events_impl(bool receive, bool toggle /* = fa
 
 void Input::receieve_game_events_impl(bool receive, bool toggle /*= false*/)
 {
-	bool prev = m_game_events;
+	auto prev = m_game_events;
 	m_game_events = toggle ? !m_user_interface_events : receive;
 
 	if (m_game_events != prev)
@@ -59,18 +59,18 @@ void Input::restart_input_state()
 
 void Input::on_event(const Event &inputEvent)
 {
-	ImGuiIO &io = ImGui::GetIO();
+	auto &io = ImGui::GetIO();
 	switch (inputEvent.get_event_type())
 	{
 		//** MOUSE_EVENTS **//
 	case EventType::MouseMoved:
 	{
-		const MouseMovedEvent &event = (const MouseMovedEvent &)inputEvent;
+		const auto &event = dynamic_cast<const MouseMovedEvent &>(inputEvent);
 
 		if (m_game_events)
 		{
-			m_mouse_delta = event.GetPosition() - m_mouse_position;
-			m_mouse_position = event.GetPosition();
+			m_mouse_delta = event.get_position() - m_mouse_position;
+			m_mouse_position = event.get_position();
 		}
 
 		if (m_user_interface_events)
@@ -80,7 +80,7 @@ void Input::on_event(const Event &inputEvent)
 	}
 	case EventType::ButtonPressed:
 	{
-		const ButtonPressedEvent &event = (const ButtonPressedEvent &)inputEvent;
+		const auto &event = (const ButtonPressedEvent &)inputEvent;
 
 		if (m_game_events)
 			m_mouse_buttons[event.get_button()] = true;
@@ -92,7 +92,7 @@ void Input::on_event(const Event &inputEvent)
 	}
 	case EventType::ButtonReleased:
 	{
-		const ButtonReleasedEvent &event = (const ButtonReleasedEvent &)inputEvent;
+		const auto &event = (const ButtonReleasedEvent &)inputEvent;
 
 		if (m_game_events)
 			m_mouse_buttons[event.get_button()] = false;
@@ -104,7 +104,7 @@ void Input::on_event(const Event &inputEvent)
 	}
 	case EventType::WheelScrolled:
 	{
-		const WheelScrolledEvent &event = (const WheelScrolledEvent &)inputEvent;
+		const auto &event = (const WheelScrolledEvent &)inputEvent;
 
 		if (m_game_events)
 			m_mouse_wheel_delta = event.get_offset();
@@ -117,7 +117,7 @@ void Input::on_event(const Event &inputEvent)
 	//** KEYBOARD_EVENTS **//
 	case EventType::KeyPressed:
 	{
-		const KeyPressedEvent &event = (const KeyPressedEvent &)inputEvent;
+		const auto &event = (const KeyPressedEvent &)inputEvent;
 
 		if (m_game_events)
 			m_keyboad_keys[event.get_key()] = true;
@@ -133,7 +133,7 @@ void Input::on_event(const Event &inputEvent)
 	}
 	case EventType::KeyReleased:
 	{
-		const KeyReleasedEvent &event = (const KeyReleasedEvent &)inputEvent;
+		const auto &event = (const KeyReleasedEvent &)inputEvent;
 
 		if (m_game_events)
 			m_keyboad_keys[event.get_key()] = false;
@@ -147,7 +147,7 @@ void Input::on_event(const Event &inputEvent)
 	{
 		if (m_user_interface_events)
 		{
-			const SetCharEvent &event = (const SetCharEvent &)inputEvent;
+			const auto &event = (const SetCharEvent &)inputEvent;
 			io.AddInputCharacter(event.get_character());
 		}
 

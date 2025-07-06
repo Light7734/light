@@ -43,7 +43,7 @@ TintedTextureRendererProgram::TintedTextureRendererProgram(
 	));
 }
 
-bool TintedTextureRendererProgram::advance()
+auto TintedTextureRendererProgram::advance() -> bool
 {
 	m_map_current += 4;
 

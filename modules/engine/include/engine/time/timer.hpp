@@ -10,7 +10,7 @@ class Timer
 public:
 	Timer();
 
-	inline float get_elapsed_time() const
+	auto get_elapsed_time() const -> float
 	{
 		return (std::chrono::duration_cast<std::chrono::milliseconds>(
 		            std::chrono::steady_clock::now() - m_start
@@ -19,7 +19,7 @@ public:
 		       / 1000.;
 	}
 
-	inline void reset()
+	void reset()
 	{
 		m_start = std::chrono::steady_clock::now();
 	}
@@ -35,7 +35,7 @@ public:
 
 	void update();
 
-	inline float get_delta_time() const
+	auto get_delta_time() const -> float
 	{
 		return m_delta_time;
 	}

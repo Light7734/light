@@ -10,14 +10,14 @@
 
 namespace Light {
 
-Ref<Texture> Texture::create(
+auto Texture::create(
     unsigned int width,
     unsigned int height,
     unsigned int components,
     unsigned char *pixels,
     Ref<SharedContext> sharedContext,
     const std::string &filePath
-)
+) -> Ref<Texture>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -34,12 +34,12 @@ Ref<Texture> Texture::create(
 		                  filePath
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }

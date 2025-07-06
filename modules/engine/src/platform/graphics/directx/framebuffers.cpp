@@ -15,9 +15,9 @@ dxFramebuffer::dxFramebuffer(
     , m_shader_resource_view(nullptr)
     , m_depth_stencil_view(nullptr)
 {
-	HRESULT hr;
+	auto hr = HRESULT {};
 
-	D3D11_TEXTURE2D_DESC t2dDesc = {};
+	auto t2dDesc = D3D11_TEXTURE2D_DESC {};
 	t2dDesc.Width = specification.width;
 	t2dDesc.Height = specification.height;
 	t2dDesc.MipLevels = 1;
@@ -31,15 +31,16 @@ dxFramebuffer::dxFramebuffer(
 	t2dDesc.MiscFlags = NULL;
 	dxc(m_context->get_device()->CreateTexture2D(&t2dDesc, nullptr, &m_color_attachment));
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	auto srvDesc = D3D11_SHADER_RESOURCE_VIEW_DESC {};
 	srvDesc.Format = t2dDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	dxc(m_context->get_device()
-	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view));
+	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view)
+	);
 
-	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	auto rtvDesc = D3D11_RENDER_TARGET_VIEW_DESC {};
 	rtvDesc.Format = t2dDesc.Format;
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Texture2D.MipSlice = 0u;
@@ -60,7 +61,7 @@ void dxFramebuffer::bind_as_target(const glm::vec4 &clearColor)
 	    ->OMSetRenderTargets(1u, m_render_target_view.GetAddressOf(), nullptr);
 	m_context->get_device_context()->ClearRenderTargetView(m_render_target_view.Get(), color);
 
-	D3D11_VIEWPORT viewport;
+	auto viewport = D3D11_VIEWPORT {};
 
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
@@ -85,9 +86,9 @@ void dxFramebuffer::resize(const glm::uvec2 &size)
 	m_specification.width = std::clamp(size.x, 1u, 16384u);
 	m_specification.height = std::clamp(size.y, 1u, 16384u);
 
-	D3D11_TEXTURE2D_DESC textureDesc;
-	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	auto textureDesc = D3D11_TEXTURE2D_DESC {};
+	auto rtvDesc = D3D11_RENDER_TARGET_VIEW_DESC {};
+	auto srvDesc = D3D11_SHADER_RESOURCE_VIEW_DESC {};
 
 	m_color_attachment->GetDesc(&textureDesc);
 	m_render_target_view->GetDesc(&rtvDesc);
@@ -96,12 +97,13 @@ void dxFramebuffer::resize(const glm::uvec2 &size)
 	textureDesc.Width = m_specification.width;
 	textureDesc.Height = m_specification.height;
 
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateTexture2D(&textureDesc, nullptr, &m_color_attachment));
 	dxc(m_context->get_device()
 	        ->CreateRenderTargetView(m_color_attachment.Get(), &rtvDesc, &m_render_target_view));
 	dxc(m_context->get_device()
-	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view));
+	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view)
+	);
 }
 
 } // namespace Light

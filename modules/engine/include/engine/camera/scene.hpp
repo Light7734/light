@@ -14,26 +14,24 @@ public:
 		Perspetcive = 1
 	};
 
-	struct OrthographicSpecification // :#todo use this
+	struct OrthographicSpecification
 	{
 		float size;
-		float nearPlane, farPlane;
+
+		float near_plane;
+
+		float far_plane;
 	};
 
 	struct PerspectiveSpecification
 	{
-		float verticalFOV;
-		float nearPlane, farPlane;
+		float vertical_fov;
+
+		float near_plane;
+
+		float far_plane;
 	};
 
-private:
-	OrthographicSpecification m_orthographic_specification;
-	PerspectiveSpecification m_perspective_specification;
-	float m_aspect_ratio;
-
-	ProjectionType m_projection_type;
-
-public:
 	SceneCamera();
 
 	void set_viewport_size(unsigned int width, unsigned int height);
@@ -41,45 +39,62 @@ public:
 	void set_projection_type(ProjectionType projectionType);
 
 	void set_orthographic_size(float size);
+
 	void set_orthographic_far_plane(float farPlane);
+
 	void set_orthographic_near_plane(float nearPlane);
 
 	void set_perspective_vertical_fov(float verticalFov);
+
 	void set_perspective_far_plane(float farPlane);
+
 	void set_perspective_near_plane(float nearPlane);
 
-	inline float get_orthographic_size() const
+	auto get_orthographic_size() const -> float
 	{
 		return m_orthographic_specification.size;
 	}
-	inline float get_orthographic_far_plane() const
+
+	auto get_orthographic_far_plane() const -> float
 	{
-		return m_orthographic_specification.farPlane;
-	}
-	inline float get_orthographic_near_plane() const
-	{
-		return m_orthographic_specification.nearPlane;
+		return m_orthographic_specification.far_plane;
 	}
 
-	inline float get_perspective_vertical_fov() const
+	auto get_orthographic_near_plane() const -> float
 	{
-		return m_perspective_specification.verticalFOV;
-	}
-	inline float get_perspective_far_plane() const
-	{
-		return m_perspective_specification.farPlane;
-	}
-	inline float get_perspective_near_plane() const
-	{
-		return m_perspective_specification.nearPlane;
+		return m_orthographic_specification.near_plane;
 	}
 
-	inline ProjectionType get_projection_type() const
+	auto get_perspective_vertical_fov() const -> float
+	{
+		return m_perspective_specification.vertical_fov;
+	}
+
+	auto get_perspective_far_plane() const -> float
+	{
+		return m_perspective_specification.far_plane;
+	}
+
+	auto get_perspective_near_plane() const -> float
+	{
+		return m_perspective_specification.near_plane;
+	}
+
+	auto get_projection_type() const -> ProjectionType
 	{
 		return m_projection_type;
 	}
 
+
 private:
+	OrthographicSpecification m_orthographic_specification;
+
+	PerspectiveSpecification m_perspective_specification;
+
+	float m_aspect_ratio;
+
+	ProjectionType m_projection_type;
+
 	void calculate_projection();
 };
 

@@ -18,7 +18,7 @@ dxTexture::dxTexture(
     , m_sampler_state(nullptr)
 {
 	// texture2d desc
-	D3D11_TEXTURE2D_DESC t2dDesc = {};
+	auto t2dDesc = D3D11_TEXTURE2D_DESC {};
 	t2dDesc.Width = width;
 	t2dDesc.Height = height;
 	t2dDesc.MipLevels = 0u;
@@ -37,7 +37,7 @@ dxTexture::dxTexture(
 	t2dDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 	// create texture
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateTexture2D(&t2dDesc, nullptr, &m_texture_2d));
 	m_context->get_device_context()
 	    ->UpdateSubresource(m_texture_2d.Get(), 0u, nullptr, pixels, width * 4u, 0u);
@@ -45,7 +45,7 @@ dxTexture::dxTexture(
 	m_texture_2d->GetDesc(&t2dDesc);
 
 	// shader resource view desc
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	auto srvDesc = D3D11_SHADER_RESOURCE_VIEW_DESC {};
 	srvDesc.Format = t2dDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0u;
@@ -57,7 +57,7 @@ dxTexture::dxTexture(
 	m_context->get_device_context()->GenerateMips(m_shader_resource_view.Get());
 
 	// sampler desc
-	D3D11_SAMPLER_DESC sDesc = {};
+	auto sDesc = D3D11_SAMPLER_DESC {};
 	sDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	sDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;

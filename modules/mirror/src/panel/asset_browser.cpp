@@ -34,9 +34,9 @@ void AssetBrowserPanel::on_user_interface_update()
 		}
 	}
 
-	ImVec2 regionAvail = ImGui::GetContentRegionAvail();
-	uint32_t cellSize = m_file_size + m_file_padding;
-	uint32_t columnCount = std::clamp(
+	auto regionAvail = ImGui::GetContentRegionAvail();
+	auto cellSize = m_file_size + m_file_padding;
+	auto columnCount = std::clamp(
 	    static_cast<uint32_t>(std::floor(regionAvail.x / cellSize)),
 	    1u,
 	    64u
@@ -45,13 +45,13 @@ void AssetBrowserPanel::on_user_interface_update()
 	if (ImGui::BeginTable("ContentBrowser", columnCount))
 	{
 		m_directory_texture->bind(0u);
-		for (auto &dirEntry : std::filesystem::directory_iterator(m_current_directory))
+		for (const auto &dirEntry : std::filesystem::directory_iterator(m_current_directory))
 		{
 			const auto &path = dirEntry.path();
-			std::string extension = dirEntry.path().extension().string();
+			auto extension = dirEntry.path().extension().string();
 
 			// TODO: Tidy up
-			AssetType assetType;
+			auto assetType = AssetType {};
 			assetType = extension.empty() ? AssetType::Directory :
 
 			            extension == ".txt"  ? AssetType::Text :
@@ -102,7 +102,7 @@ void AssetBrowserPanel::on_user_interface_update()
 				        ImVec4 { 1.0f, 1.0f, 1.0f, 1.0f }
 				    ))
 				{
-					SceneSerializer serializer(m_active_scene);
+					auto serializer = SceneSerializer { m_active_scene };
 					lt_log(info, "Attempting to deserialize: {}", path.string());
 					serializer.deserialize(path.string());
 				}

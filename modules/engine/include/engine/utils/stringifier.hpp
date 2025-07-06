@@ -11,15 +11,15 @@ enum class GraphicsAPI;
 class Stringifier
 {
 public:
-	static std::string glDebugMsgSeverity(unsigned int severity);
+	static auto glDebugMsgSeverity(unsigned int severity) -> std::string;
 
-	static std::string glDebugMsgSource(unsigned int source);
+	static auto glDebugMsgSource(unsigned int source) -> std::string;
 
-	static std::string glDebugMsgType(unsigned int type);
+	static auto glDebugMsgType(unsigned int type) -> std::string;
 
-	static std::string spdlogLevel(unsigned int level);
+	static auto spdlogLevel(unsigned int level) -> std::string;
 
-	static std::string graphics_api_to_string(GraphicsAPI api);
+	static auto graphics_api_to_string(GraphicsAPI api) -> std::string;
 };
 
 } // namespace Light

@@ -22,12 +22,13 @@ class SharedContext;
 class Camera;
 class WindowResizedEvent;
 
-class renderer
+class Renderer
 {
 public:
-	static Scope<renderer> create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	static auto create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+	    -> Scope<Renderer>;
 
-	static inline void draw_quad(
+	static void draw_quad(
 	    const glm::vec3 &position,
 	    const glm::vec2 &size,
 	    const glm::vec4 &tint,
@@ -37,20 +38,12 @@ public:
 		s_context->draw_quad_impl(position, size, tint, texture);
 	}
 
-	static inline void draw_quad(
-	    const glm::vec3 &position,
-	    const glm::vec2 &size,
-	    const glm::vec4 &tint
-	)
+	static void draw_quad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint)
 	{
 		s_context->draw_quad_impl(position, size, tint);
 	}
 
-	static inline void draw_quad(
-	    const glm::vec3 &position,
-	    const glm::vec2 &size,
-	    Ref<Texture> texture
-	)
+	static void draw_quad(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture)
 	{
 		s_context->draw_quad_impl(position, size, texture);
 	}
@@ -70,7 +63,7 @@ public:
 		s_context->draw_quad_impl(transform, texture);
 	}
 
-	static inline void begin_scene(
+	static void begin_scene(
 	    Camera *camera,
 	    const glm::mat4 &cameraTransform,
 	    const Ref<Framebuffer> &targetFrameBuffer = nullptr
@@ -78,7 +71,8 @@ public:
 	{
 		s_context->begin_scene_impl(camera, cameraTransform, targetFrameBuffer);
 	}
-	static inline void end_scene()
+
+	static void end_scene()
 	{
 		s_context->end_scene_impl();
 	}
@@ -86,10 +80,11 @@ public:
 	void on_window_resize(const WindowResizedEvent &event);
 
 	void begin_frame();
+
 	void end_frame();
 
 private:
-	static renderer *s_context;
+	static Renderer *s_context;
 
 	QuadRendererProgram m_quad_renderer;
 
@@ -109,7 +104,7 @@ private:
 
 	bool m_should_clear_backbuffer;
 
-	renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
 	void draw_quad_impl(
 	    const glm::vec3 &position,

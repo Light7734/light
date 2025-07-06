@@ -17,7 +17,7 @@ public:
 	    Ref<dxSharedContext> sharedContext
 	);
 
-	inline void *GetColorAttachment() override
+	auto get_color_attachment() -> void * override
 	{
 		return (void *)m_shader_resource_view.Get();
 	}

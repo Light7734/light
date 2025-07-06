@@ -12,11 +12,12 @@ class SharedContext;
 class RenderCommand
 {
 public:
-	static Scope<RenderCommand> create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	static auto create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+	    -> Scope<RenderCommand>;
 
 	RenderCommand(const RenderCommand &) = delete;
 
-	RenderCommand &operator=(const RenderCommand &) = delete;
+	auto operator=(const RenderCommand &) -> RenderCommand & = delete;
 
 	virtual ~RenderCommand() = default;
 

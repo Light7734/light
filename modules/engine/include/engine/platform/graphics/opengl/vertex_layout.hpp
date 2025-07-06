@@ -33,7 +33,7 @@ public:
 	void un_bind() override;
 
 private:
-	glVertexElementDesc get_element_desc(VertexElementType type, unsigned int offset);
+	auto get_element_desc(VertexElementType type, unsigned int offset) -> glVertexElementDesc;
 
 	unsigned int m_array_id;
 };

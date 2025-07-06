@@ -41,7 +41,7 @@ TextureRendererProgram::TextureRendererProgram(
 	));
 }
 
-bool TextureRendererProgram::advance()
+auto TextureRendererProgram::advance() -> bool
 {
 	if (m_map_current + 4 >= m_map_end)
 	{

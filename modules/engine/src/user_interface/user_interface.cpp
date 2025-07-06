@@ -18,12 +18,10 @@ namespace Light {
 
 UserInterface *UserInterface::s_context = nullptr;
 
-Scope<UserInterface> UserInterface::create(
-    GLFWwindow *windowHandle,
-    Ref<SharedContext> sharedContext
-)
+auto UserInterface::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+    -> Scope<UserInterface>
 {
-	Scope<UserInterface> scopeUserInterface = nullptr;
+	auto scopeUserInterface = Scope<UserInterface> { nullptr };
 
 	switch (GraphicsContext::get_graphics_api())
 	{

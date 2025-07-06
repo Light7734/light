@@ -25,7 +25,7 @@ public:
 
 	void un_bind() override;
 
-	inline Microsoft::WRL::ComPtr<ID3DBlob> get_vertex_blob()
+	auto get_vertex_blob() -> Microsoft::WRL::ComPtr<ID3DBlob>
 	{
 		return m_vertex_blob;
 	}

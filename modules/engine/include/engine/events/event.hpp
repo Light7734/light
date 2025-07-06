@@ -36,25 +36,32 @@ enum EventCategory
 	MouseEventCategory = bit(3),
 };
 
-#define event_type(type)                    \
+#define event_type(type)                      \
 	EventType get_event_type() const override \
-	{                                       \
-		return ::Light::EventType::type;    \
+	{                                         \
+		return ::Light::EventType::type;      \
 	}
-#define event_category(eCategory)                                  \
+
+#define event_category(eCategory)                                   \
 	inline bool has_category(EventCategory category) const override \
-	{                                                              \
-		return (eCategory) & category;                             \
+	{                                                               \
+		return (eCategory) & category;                              \
 	}
 
 class Event
 {
 public:
-	virtual EventType get_event_type() const = 0;
-	virtual std::string get_info_lt_log() const = 0;
-	virtual bool has_category(EventCategory category) const = 0;
+	Event() = default;
 
-	friend std::ostream &operator<<(std::ostream &os, const Event &e)
+	virtual ~Event() = default;
+
+	virtual auto get_event_type() const -> EventType = 0;
+
+	virtual auto get_info_lt_log() const -> std::string = 0;
+
+	virtual auto has_category(EventCategory category) const -> bool = 0;
+
+	friend auto operator<<(std::ostream &os, const Event &e) -> std::ostream &
 	{
 		return os << e.get_info_lt_log();
 	}

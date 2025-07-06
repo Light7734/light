@@ -10,22 +10,23 @@
 
 namespace Light {
 
-Scope<Blender> Blender::create(Ref<SharedContext> sharedContext)
+auto Blender::create(Ref<SharedContext> sharedContext) -> Scope<Blender>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
 	case GraphicsAPI::OpenGL: return create_scope<glBlender>();
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_scope<dxBlender>(std::static_pointer_cast<dxSharedContext>(sharedContext
-		));)
+		lt_win(return create_scope<dxBlender>(
+		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
+		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 	}
 }
 

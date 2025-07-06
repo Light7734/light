@@ -49,8 +49,8 @@ void Application::game_loop()
 
 	// log debug data
 	m_logger->log_debug_data();
-	m_window->GetGfxContext()->log_debug_data();
-	m_window->GetGfxContext()->GetUserInterface()->log_debug_data();
+	m_window->get_graphics_context()->log_debug_data();
+	m_window->get_graphics_context()->get_user_interface()->log_debug_data();
 
 	// reveal window
 	m_window->set_visibility(true);
@@ -59,7 +59,7 @@ void Application::game_loop()
 	m_instrumentor->begin_session("Logs/ProfileResults_GameLoop.json");
 
 	/* game loop */
-	DeltaTimer deltaTimer;
+	auto delta_timer = DeltaTimer {};
 	while (!m_window->is_closed())
 	{
 		{
@@ -67,29 +67,29 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::update");
 
 			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->on_update(deltaTimer.get_delta_time());
+				(*it)->on_update(delta_timer.get_delta_time());
 		}
 
 		{
 			// render layers
 			lt_profile_scope("game_loop::Render");
-			m_window->GetGfxContext()->GetRenderer()->begin_frame();
+			m_window->get_graphics_context()->get_renderer()->begin_frame();
 
 			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
 				(*it)->on_render();
 
-			m_window->GetGfxContext()->GetRenderer()->end_frame();
+			m_window->get_graphics_context()->get_renderer()->end_frame();
 		}
 
 		{
 			// render user interface
 			lt_profile_scope("game_loop::UserInterface");
-			m_window->GetGfxContext()->GetUserInterface()->begin();
+			m_window->get_graphics_context()->get_user_interface()->begin();
 
 			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
 				(*it)->on_user_interface_update();
 
-			m_window->GetGfxContext()->GetUserInterface()->end();
+			m_window->get_graphics_context()->get_user_interface()->end();
 		}
 
 		{
@@ -99,7 +99,7 @@ void Application::game_loop()
 		}
 
 		/// update delta time
-		deltaTimer.update();
+		delta_timer.update();
 	}
 
 	m_instrumentor->end_session(); // ProfileResults_GameLoop //
@@ -119,7 +119,7 @@ void Application::on_event(const Event &event)
 		m_window->on_event(event);
 
 		if (event.get_event_type() == EventType::WindowResized)
-			m_window->GetGfxContext()->GetRenderer()->on_window_resize(
+			m_window->get_graphics_context()->get_renderer()->on_window_resize(
 			    (const WindowResizedEvent &)event
 			);
 	}

@@ -60,7 +60,7 @@ void dxRenderCommand::set_viewport(
 	set_resolution(width, height);
 
 	// create viewport
-	D3D11_VIEWPORT viewport;
+	auto viewport = D3D11_VIEWPORT {};
 
 	viewport.TopLeftX = x;
 	viewport.TopLeftY = y;
@@ -77,10 +77,10 @@ void dxRenderCommand::set_viewport(
 
 void dxRenderCommand::set_resolution(unsigned int width, unsigned int height)
 {
-	HRESULT hr;
+	auto hr = HRESULT {};
 
 	// remove render target
-	ID3D11RenderTargetView *nullViews[] = { nullptr };
+	auto *nullViews[] = (ID3D11RenderTargetView *) { nullptr };
 	m_context->get_device_context()->OMSetRenderTargets(1u, nullViews, nullptr);
 	m_context->GetRenderTargetViewRef().reset();
 
@@ -89,7 +89,7 @@ void dxRenderCommand::set_resolution(unsigned int width, unsigned int height)
 	        ->ResizeBuffers(0u, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, NULL));
 
 	// create render target
-	Microsoft::WRL::ComPtr<ID3D11Resource> backBuffer = nullptr;
+	auto backBuffer = Microsoft::WRL::ComPtr<ID3D11Resource> { nullptr };
 	dxc(m_context->get_swap_chain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
 	dxc(m_context->get_device()->CreateRenderTargetView(
 	    backBuffer.Get(),

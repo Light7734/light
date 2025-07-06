@@ -4,7 +4,7 @@ namespace Light {
 
 Instrumentor *Instrumentor::s_context = nullptr;
 
-Scope<Instrumentor> Instrumentor::create()
+auto Instrumentor::create() -> Scope<Instrumentor>
 {
 	return make_scope<Instrumentor>(new Instrumentor);
 }
@@ -69,6 +69,7 @@ InstrumentorTimer::~InstrumentorTimer()
 	m_result.start = std::chrono::time_point_cast<std::chrono::microseconds>(m_start)
 	                     .time_since_epoch()
 	                     .count();
+
 	m_result.duration = std::chrono::time_point_cast<std::chrono::microseconds>(end)
 	                        .time_since_epoch()
 	                        .count()

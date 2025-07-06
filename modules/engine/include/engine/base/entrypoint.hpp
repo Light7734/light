@@ -2,10 +2,10 @@
 
 #ifdef LIGHT_PLATFORM_WINDOWS
 
-	#include <LightEngine.hpp>
+	#include <engine/engine.hpp>
 
 // to be defined in client project
-extern Light::Application *Light::CreateApplication();
+extern Light::Application *Light::create_application();
 
 // #todo: use windows specific stuff
 int main(int argc, char *argv[])
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		application = Light::CreateApplication();
+		application = Light::create_application();
 		lt_assert(application, "Light::Application is not intialized");
 
 		for (int i = 0; i < argc; i++)
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	#include <engine/engine.hpp>
 
 // to be defined in client project
-extern Light::Application *Light::CreateApplication();
+extern Light::Application *Light::create_application();
 
 // #todo: use linux specific stuff
 int main(int argc, char *argv[])
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		application = Light::CreateApplication();
+		application = Light::create_application();
 		lt_assert(application, "Light::Application is not intialized");
 
 		application->game_loop();

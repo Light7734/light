@@ -10,7 +10,7 @@ namespace Light {
 class WindowClosedEvent: public Event
 {
 public:
-	virtual std::string get_info_lt_log() const override
+	auto get_info_lt_log() const -> std::string override
 	{
 		return "WindowClosedEvent";
 	}
@@ -27,12 +27,12 @@ public:
 	{
 	}
 
-	const glm::ivec2 &GetPosition() const
+	auto get_position() const -> const glm::ivec2 &
 	{
 		return m_position;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "WindwoMoved: " << m_position.x << ", " << m_position.y;
@@ -55,12 +55,12 @@ public:
 	{
 	}
 
-	const glm::uvec2 &get_size() const
+	auto get_size() const -> const glm::uvec2 &
 	{
 		return m_size;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "WindowResized: " << m_size.x << ", " << m_size.y;
@@ -78,24 +78,26 @@ private:
 class WindowLostFocusEvent: public Event
 {
 public:
-	virtual std::string get_info_lt_log() const override
+	auto get_info_lt_log() const -> std::string override
 	{
 		return "WindowLostFocus";
 	}
 
 	event_type(WindowLostFocus);
+
 	event_category(WindowEventCategory);
 };
 
 class WindowGainFocusEvent: public Event
 {
 public:
-	virtual std::string get_info_lt_log() const override
+	auto get_info_lt_log() const -> std::string override
 	{
 		return "WindowGainFocus";
 	}
 
 	event_type(WindowGainFocus);
+
 	event_category(WindowEventCategory);
 };
 

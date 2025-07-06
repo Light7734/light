@@ -32,31 +32,31 @@ void SceneCamera::set_orthographic_size(float size)
 
 void SceneCamera::set_orthographic_far_plane(float farPlane)
 {
-	m_orthographic_specification.farPlane = farPlane;
+	m_orthographic_specification.far_plane = farPlane;
 	calculate_projection();
 }
 
 void SceneCamera::set_orthographic_near_plane(float nearPlane)
 {
-	m_orthographic_specification.nearPlane = nearPlane;
+	m_orthographic_specification.near_plane = nearPlane;
 	calculate_projection();
 }
 
 void SceneCamera::set_perspective_vertical_fov(float verticalFOV)
 {
-	m_perspective_specification.verticalFOV = verticalFOV;
+	m_perspective_specification.vertical_fov = verticalFOV;
 	calculate_projection();
 }
 
 void SceneCamera::set_perspective_far_plane(float farPlane)
 {
-	m_perspective_specification.farPlane = farPlane;
+	m_perspective_specification.far_plane = farPlane;
 	calculate_projection();
 }
 
 void SceneCamera::set_perspective_near_plane(float nearPlane)
 {
-	m_perspective_specification.nearPlane = nearPlane;
+	m_perspective_specification.near_plane = nearPlane;
 	calculate_projection();
 }
 
@@ -69,17 +69,17 @@ void SceneCamera::calculate_projection()
 		    m_orthographic_specification.size * 0.5f * m_aspect_ratio,
 		    -m_orthographic_specification.size * 0.5f,
 		    m_orthographic_specification.size * 0.5f,
-		    m_orthographic_specification.farPlane,
-		    m_orthographic_specification.nearPlane
+		    m_orthographic_specification.far_plane,
+		    m_orthographic_specification.near_plane
 		);
 	}
 	else // perspective
 	{
 		m_projection = glm::perspective(
-		    m_perspective_specification.verticalFOV,
+		    m_perspective_specification.vertical_fov,
 		    m_aspect_ratio,
-		    m_perspective_specification.nearPlane,
-		    m_perspective_specification.farPlane
+		    m_perspective_specification.near_plane,
+		    m_perspective_specification.far_plane
 		);
 	}
 }

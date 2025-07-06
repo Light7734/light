@@ -4,38 +4,38 @@
 namespace Light {
 namespace Math {
 
-float rand(int min, int max, int decimals /* = 0 */)
+auto rand(int min, int max, int decimals /* = 0 */) -> float
 {
-	const int dec = std::pow(10, decimals);
+	const auto dec = static_cast<int>(std::pow(10, decimals));
 	min *= dec;
 	max *= dec;
 
 	return (min + (::rand() % (max)-min)) / (float)dec;
 }
 
-glm::vec2 rand_vec2(int min, int max, int decimals /* = 0 */)
+auto rand_vec2(int min, int max, int decimals /* = 0 */) -> glm::vec2
 {
-	const int dec = std::pow(10, decimals);
+	const auto dec = static_cast<int>(std::pow(10, decimals));
 	min *= dec;
 	max *= dec;
 
-	float r1 = (min + (::rand() % (max)-min)) / (float)dec;
-	float r2 = (min + (::rand() % (max)-min)) / (float)dec;
+	auto r1 = (min + (::rand() % (max)-min)) / (float)dec;
+	auto r2 = (min + (::rand() % (max)-min)) / (float)dec;
 
-	return glm::vec2(r1, r2);
+	return { r1, r2 };
 }
 
-glm::vec3 rand_vec3(int min, int max, int decimals /* = 0 */)
+auto rand_vec3(int min, int max, int decimals /* = 0 */) -> glm::vec3
 {
-	const int dec = std::pow(10, decimals);
+	const auto dec = static_cast<int>(std::pow(10, decimals));
 	min *= dec;
 	max *= dec;
 
-	float r1 = (min + (::rand() % (max - min))) / (float)dec;
-	float r2 = (min + (::rand() % (max - min))) / (float)dec;
-	float r3 = (min + (::rand() % (max - min))) / (float)dec;
+	auto r1 = (min + (::rand() % (max - min))) / (float)dec;
+	auto r2 = (min + (::rand() % (max - min))) / (float)dec;
+	auto r3 = (min + (::rand() % (max - min))) / (float)dec;
 
-	return glm::vec3(r1, r2, r3);
+	return { r1, r2, r3 };
 }
 } // namespace Math
 } // namespace Light

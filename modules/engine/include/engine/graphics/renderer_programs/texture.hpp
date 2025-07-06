@@ -19,12 +19,13 @@ public:
 	struct TextureVertexData
 	{
 		glm::vec4 position;
+
 		glm::vec2 texcoord;
 	};
 
 	TextureRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
 
-	bool advance();
+	auto advance() -> bool;
 
 	void map() override;
 
@@ -32,17 +33,17 @@ public:
 
 	void bind() override;
 
-	inline TextureVertexData *GetMapCurrent()
+	auto get_map_current() -> TextureVertexData *
 	{
 		return m_map_current;
 	}
 
-	inline unsigned int get_quad_count() const
+	auto get_quad_count() const -> unsigned int
 	{
 		return m_quad_count;
 	}
 
-	inline constexpr unsigned int get_vertex_size() const
+	constexpr auto get_vertex_size() const -> unsigned int
 	{
 		return sizeof(TextureVertexData);
 	}

@@ -18,9 +18,9 @@ glVertexLayout::glVertexLayout(
 	lt_assert(!elements.empty(), "'elements' is empty");
 
 	// local
-	std::vector<glVertexElementDesc> elementsDesc;
+	auto elementsDesc = std::vector<glVertexElementDesc> {};
 	elementsDesc.reserve(elements.size());
-	unsigned int stride = 0u;
+	auto stride = 0u;
 
 	// extract elements desc
 	for (const auto &element : elements)
@@ -37,7 +37,7 @@ glVertexLayout::glVertexLayout(
 	bind();
 
 	// enable vertex attributes
-	unsigned int index = 0u;
+	auto index = 0u;
 	for (const auto &elementDesc : elementsDesc)
 	{
 		glVertexAttribPointer(
@@ -67,7 +67,8 @@ void glVertexLayout::un_bind()
 	glBindVertexArray(NULL);
 }
 
-glVertexElementDesc glVertexLayout::get_element_desc(VertexElementType type, unsigned int offset)
+auto glVertexLayout::get_element_desc(VertexElementType type, unsigned int offset)
+    -> glVertexElementDesc
 {
 	switch (type)
 	{

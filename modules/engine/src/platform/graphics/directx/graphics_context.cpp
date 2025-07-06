@@ -31,10 +31,10 @@ dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
 
 void dxGraphicsContext::setup_device_and_swap_chain(GLFWwindow *windowHandle)
 {
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
+	auto context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// swap chain desc
-	DXGI_SWAP_CHAIN_DESC sd = { 0 };
+	auto sd = DXGI_SWAP_CHAIN_DESC { 0 };
 
 	// buffer desc
 	sd.BufferDesc.Width = 1u;
@@ -62,7 +62,7 @@ void dxGraphicsContext::setup_device_and_swap_chain(GLFWwindow *windowHandle)
 	sd.Flags = NULL;
 
 	// determine device flags
-	UINT flags = NULL;
+	auto flags = UINT { NULL };
 #ifdef LIGHT_DEBUG
 	flags = D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -86,13 +86,13 @@ void dxGraphicsContext::setup_device_and_swap_chain(GLFWwindow *windowHandle)
 
 void dxGraphicsContext::setup_render_targets()
 {
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
+	auto context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// set primitive topology
 	context->get_device_context()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// create render target view
-	Microsoft::WRL::ComPtr<ID3D11Resource> backBuffer;
+	auto backBuffer = Microsoft::WRL::ComPtr<ID3D11Resource> {};
 
 	dxc(context->get_swap_chain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
 	dxc(context->get_device()
@@ -134,22 +134,22 @@ void dxGraphicsContext::setup_debug_interface()
 
 void dxGraphicsContext::log_debug_data()
 {
-	Ref<dxSharedContext> context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
+	auto context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
 	// locals
-	IDXGIDevice *DXGIDevice;
-	IDXGIAdapter *DXGIAdapter;
-	DXGI_ADAPTER_DESC DXGIAdapterDesc;
+	auto *DXGIDevice = (IDXGIDevice *) {};
+	auto *DXGIAdapter = (IDXGIAdapter *) {};
+	auto *DXGIAdapterDesc = (DXGI_ADAPTER_DESC *) {};
 
 	context->get_device()->QueryInterface(__uuidof(IDXGIDevice), (void **)&DXGIDevice);
 	DXGIDevice->GetAdapter(&DXGIAdapter);
 	DXGIAdapter->GetDesc(&DXGIAdapterDesc);
 
 	// get the adapter's description
-	char DefChar = ' ';
+	auto DefChar = ' ';
 	char ch[180];
 	WideCharToMultiByte(CP_ACP, 0, DXGIAdapterDesc.Description, -1, ch, 180, &DefChar, NULL);
-	std::string adapterDesc(ch);
+	auto adapterDesc = std::string { ch };
 
 	// release memory
 	DXGIDevice->release();

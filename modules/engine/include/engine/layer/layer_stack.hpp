@@ -10,47 +10,48 @@ class Event;
 class LayerStack /* singleton */
 {
 public:
-	static Scope<LayerStack> create();
+	static auto create() -> Scope<LayerStack>;
 
 	~LayerStack();
 
 	// #todo: is this needed?
 	template<typename t, typename... Args>
-	static inline void emplace_layer(Args &&...args)
+	static void emplace_layer(Args &&...args)
 	{
 		s_context->attach_layer_impl(new t((args)...));
 	}
 
-	static inline void attach_layer(Layer *layer)
+	static void attach_layer(Layer *layer)
 	{
 		s_context->attach_layer_impl(layer);
 	}
-	static inline void detach_layer(Layer *layer)
+
+	static void detach_layer(Layer *layer)
 	{
 		s_context->detach_layer_impl(layer);
 	}
 
-	inline bool is_empty()
+	auto is_empty() -> bool
 	{
 		return m_layers.empty();
 	}
 
-	std::vector<Layer *>::iterator begin()
+	auto begin() -> std::vector<Layer *>::iterator
 	{
 		return m_layers.begin();
 	}
 
-	std::vector<Layer *>::iterator end()
+	auto end() -> std::vector<Layer *>::iterator
 	{
 		return m_layers.end();
 	}
 
-	std::vector<Layer *>::reverse_iterator rbegin()
+	auto rbegin() -> std::vector<Layer *>::reverse_iterator
 	{
 		return m_layers.rbegin();
 	}
 
-	std::vector<Layer *>::reverse_iterator rend()
+	auto rend() -> std::vector<Layer *>::reverse_iterator
 	{
 		return m_layers.rend();
 	}

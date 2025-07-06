@@ -10,10 +10,10 @@
 
 namespace Light {
 
-Ref<Framebuffer> Framebuffer::create(
+auto Framebuffer::create(
     const FramebufferSpecification &specification,
     Ref<SharedContext> sharedContext
-)
+) -> Ref<Framebuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -25,12 +25,12 @@ Ref<Framebuffer> Framebuffer::create(
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }

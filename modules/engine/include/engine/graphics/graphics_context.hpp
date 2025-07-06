@@ -6,7 +6,7 @@ struct GLFWwindow;
 
 namespace Light {
 
-class renderer;
+class Renderer;
 class resource_manager;
 class SharedContext;
 class UserInterface;
@@ -24,7 +24,7 @@ enum class GraphicsAPI
 class GraphicsContext
 {
 public:
-	static Scope<GraphicsContext> create(GraphicsAPI api, GLFWwindow *windowHandle);
+	static auto create(GraphicsAPI api, GLFWwindow *windowHandle) -> Scope<GraphicsContext>;
 
 	GraphicsContext(const GraphicsContext &) = delete;
 
@@ -34,22 +34,22 @@ public:
 
 	virtual void log_debug_data() = 0;
 
-	static inline GraphicsAPI get_graphics_api()
+	static GraphicsAPI get_graphics_api()
 	{
 		return s_context->m_graphics_api;
 	}
 
-	static inline Ref<SharedContext> get_shared_context()
+	static Ref<SharedContext> get_shared_context()
 	{
 		return s_context->m_shared_context;
 	}
 
-	inline renderer *GetRenderer()
+	auto get_renderer() -> Renderer *
 	{
 		return m_renderer.get();
 	}
 
-	inline UserInterface *GetUserInterface()
+	auto get_user_interface() -> UserInterface *
 	{
 		return m_user_interface.get();
 	}
@@ -66,7 +66,7 @@ private:
 
 	Scope<UserInterface> m_user_interface;
 
-	Scope<renderer> m_renderer;
+	Scope<Renderer> m_renderer;
 };
 
 } // namespace Light

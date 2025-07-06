@@ -6,7 +6,7 @@ namespace Light {
 
 logger *logger::s_context = nullptr;
 
-Scope<logger> logger::create()
+auto logger::create() -> Scope<logger>
 {
 	return make_scope<logger>(new logger());
 }

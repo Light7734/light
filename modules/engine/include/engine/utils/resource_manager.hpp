@@ -11,9 +11,9 @@ class SharedContext;
 class ResourceManager
 {
 public:
-	static Scope<ResourceManager> create();
+	static auto create() -> Scope<ResourceManager>;
 
-	static inline void load_shader(
+	static void load_shader(
 	    const std::string &name,
 	    const std::string &vertexPath,
 	    const std::string &pixelPath
@@ -22,7 +22,7 @@ public:
 		s_context->load_shader_impl(name, vertexPath, pixelPath);
 	}
 
-	static inline void load_texture(
+	static void load_texture(
 	    const std::string &name,
 	    const std::string &path,
 	    unsigned int desiredComponents = 4u
@@ -31,17 +31,17 @@ public:
 		s_context->load_texture_impl(name, path, desiredComponents);
 	}
 
-	static inline void release_texture(const std::string &name)
+	static void release_texture(const std::string &name)
 	{
 		s_context->release_texture_impl(name);
 	}
 
-	static inline Ref<Shader> get_shader(const std::string &name)
+	static auto get_shader(const std::string &name) -> Ref<Shader>
 	{
 		return s_context->m_shaders[name];
 	}
 
-	static inline Ref<Texture> get_texture(const std::string &name)
+	static auto get_texture(const std::string &name) -> Ref<Texture>
 	{
 		return s_context->m_textures[name];
 	}

@@ -8,7 +8,7 @@ namespace Light {
 
 ResourceManager *ResourceManager::s_context = nullptr;
 
-Scope<ResourceManager> ResourceManager::create()
+auto ResourceManager::create() -> Scope<ResourceManager>
 {
 	return make_scope(new ResourceManager());
 }
@@ -31,8 +31,8 @@ void ResourceManager::load_shader_impl(
 	lt_assert(!pixelPath.empty(), "Empty 'pixelPath'");
 
 	// load files
-	BasicFileHandle vertexFile = FileManager::read_text_file(vertexPath);
-	BasicFileHandle pixelFile = FileManager::read_text_file(pixelPath);
+	auto vertexFile = FileManager::read_text_file(vertexPath);
+	auto pixelFile = FileManager::read_text_file(pixelPath);
 
 	// check
 	lt_assert(vertexFile.is_valid(), "Failed to read vertex file: {}", vertexPath);
@@ -57,7 +57,7 @@ void ResourceManager::load_texture_impl(
 	lt_assert(s_context, "Uninitliazed singleton");
 
 	// load file
-	ImageFileHandle imgFile = FileManager::read_image_file(path, desiredComponents);
+	auto imgFile = FileManager::read_image_file(path, desiredComponents);
 
 	// create texture
 	m_textures[name] = Ref<Texture>(Texture::create(

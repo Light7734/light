@@ -10,12 +10,12 @@
 
 namespace Light {
 
-Ref<VertexLayout> VertexLayout::create(
+auto VertexLayout::create(
     Ref<VertexBuffer> vertexBuffer,
     Ref<Shader> shader,
     const std::vector<std::pair<std::string, VertexElementType>> &elements,
     Ref<SharedContext> sharedContext
-)
+) -> Ref<VertexLayout>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -28,12 +28,12 @@ Ref<VertexLayout> VertexLayout::create(
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }

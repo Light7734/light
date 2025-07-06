@@ -11,38 +11,39 @@ class Event;
 class Input
 {
 public:
-	static Scope<Input> create();
+	static auto create() -> Scope<Input>;
 
-	static inline void receive_user_interface_events(bool receive, bool toggle = false)
+	static void receive_user_interface_events(bool receive, bool toggle = false)
 	{
 		s_context->receive_user_interface_events_impl(receive, toggle);
 	}
-	static inline void receive_game_events(bool receive, bool toggle = false)
+	static void receive_game_events(bool receive, bool toggle = false)
 	{
 		s_context->receieve_game_events_impl(receive, toggle);
 	}
 
-	static inline bool get_keyboard_key(int code)
+	static auto get_keyboard_key(int code) -> bool
 	{
 		return s_context->m_keyboad_keys[code];
 	}
-	static inline bool get_mouse_button(int code)
+	static auto get_mouse_button(int code) -> bool
 	{
 		return s_context->m_mouse_buttons[code];
 	}
 
-	static inline const glm::vec2 &get_mouse_position(int code)
+	static auto get_mouse_position(int code) -> const glm::vec2 &
 	{
 		return s_context->m_mouse_position;
 	}
 
 	void on_event(const Event &inputEvent);
 
-	inline bool is_receiving_input_events() const
+	auto is_receiving_input_events() const -> bool
 	{
 		return m_user_interface_events;
 	}
-	inline bool is_receiving_game_events() const
+
+	auto is_receiving_game_events() const -> bool
 	{
 		return m_game_events;
 	}

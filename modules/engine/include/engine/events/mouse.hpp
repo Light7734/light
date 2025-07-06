@@ -14,27 +14,30 @@ public:
 	{
 	}
 
-	inline const glm::vec2 &GetPosition() const
+	auto get_position() const -> const glm::vec2 &
 	{
 		return m_position;
 	}
 
-	inline float get_x() const
+	auto get_x() const -> float
 	{
 		return m_position.x;
 	}
-	inline float get_y() const
+
+	auto get_y() const -> float
 	{
 		return m_position.y;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "MouseMoved: " << m_position.x << ", " << m_position.y;
 		return ss.str();
 	}
+
 	event_type(MouseMoved);
+
 	event_category(InputEventCategory | MouseEventCategory);
 
 private:
@@ -48,18 +51,20 @@ public:
 	{
 	}
 
-	inline float get_offset() const
+	auto get_offset() const -> float
 	{
 		return m_offset;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "WheelScrolled: " << m_offset;
 		return ss.str();
 	}
+
 	event_type(WheelScrolled);
+
 	event_category(InputEventCategory | MouseEventCategory);
 
 private:
@@ -73,18 +78,20 @@ public:
 	{
 	}
 
-	inline int get_button() const
+	auto get_button() const -> int
 	{
 		return m_button;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "ButtonPressed: " << m_button;
 		return ss.str();
 	}
+
 	event_type(ButtonPressed);
+
 	event_category(InputEventCategory | MouseEventCategory);
 
 private:
@@ -98,12 +105,12 @@ public:
 	{
 	}
 
-	inline int get_button() const
+	auto get_button() const -> int
 	{
 		return m_button;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "ButtonReleased: " << m_button;
@@ -111,6 +118,7 @@ public:
 	}
 
 	event_type(ButtonReleased);
+
 	event_category(InputEventCategory | MouseEventCategory);
 
 private:

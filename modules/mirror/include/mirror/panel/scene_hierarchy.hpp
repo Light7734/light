@@ -13,6 +13,7 @@ class SceneHierarchyPanel: public Panel
 {
 public:
 	SceneHierarchyPanel();
+
 	SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel = nullptr);
 
 	void on_user_interface_update();

@@ -18,7 +18,7 @@ public:
 
 	void resize(const glm::uvec2 &size) override;
 
-	inline void *GetColorAttachment() override
+	auto get_color_attachment() -> void * override
 	{
 		return (void *)m_color_attachment_id;
 	}

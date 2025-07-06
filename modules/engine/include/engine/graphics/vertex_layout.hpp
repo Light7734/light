@@ -33,12 +33,12 @@ enum class VertexElementType
 class VertexLayout
 {
 public:
-	static Ref<VertexLayout> create(
+	static auto create(
 	    Ref<VertexBuffer> vertexBuffer,
 	    Ref<Shader> shader,
 	    const std::vector<std::pair<std::string, VertexElementType>> &elements,
 	    Ref<SharedContext> sharedContext
-	);
+	) -> Ref<VertexLayout>;
 
 	virtual ~VertexLayout() = default;
 

@@ -13,12 +13,12 @@ public:
 	{
 	}
 
-	inline int get_key() const
+	auto get_key() const -> int
 	{
 		return m_key;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "KeyPressed: " << m_key;
@@ -40,18 +40,20 @@ public:
 	{
 	}
 
-	inline int get_key() const
+	auto get_key() const -> int
 	{
 		return m_key;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "KeyRepeated: " << m_key;
 		return ss.str();
 	}
+
 	event_type(KeyRepeated);
+
 	event_category(InputEventCategory | KeyboardEventCategory);
 
 private:
@@ -65,12 +67,12 @@ public:
 	{
 	}
 
-	inline int get_key() const
+	auto get_key() const -> int
 	{
 		return m_key;
 	}
 
-	virtual std::string get_info_lt_log() const override
+	virtual auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "KeyReleased: " << m_key;
@@ -78,6 +80,7 @@ public:
 	}
 
 	event_type(KeyReleased);
+
 	event_category(InputEventCategory | KeyboardEventCategory);
 
 private:

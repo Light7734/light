@@ -12,13 +12,13 @@ class SceneSerializer
 public:
 	SceneSerializer(const Ref<Scene> &scene);
 
-	void serialize(const std::string &filePath);
+	void serialize(const std::string &file_path);
 
-	bool deserialize(const std::string &filePath);
+	auto deserialize(const std::string &file_path) -> bool;
 
-	void serialize_binary(const std::string &filePath);
+	void serialize_binary(const std::string &file_path);
 
-	bool deserialize_binary(const std::string &filePath);
+	auto deserialize_binary(const std::string &file_path) -> bool;
 
 private:
 	Ref<Scene> m_scene;

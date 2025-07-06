@@ -21,7 +21,7 @@ GraphicsContext::~GraphicsContext()
 {
 }
 
-Scope<GraphicsContext> GraphicsContext::create(GraphicsAPI api, GLFWwindow *windowHandle)
+auto GraphicsContext::create(GraphicsAPI api, GLFWwindow *windowHandle) -> Scope<GraphicsContext>
 {
 	// terminate 'GraphicsContext' dependent classes
 	if (s_context)
@@ -45,17 +45,18 @@ Scope<GraphicsContext> GraphicsContext::create(GraphicsAPI api, GLFWwindow *wind
 	}
 
 	// create gfx context
-	Scope<GraphicsContext> scopeGfx;
+	auto scope_gfx = Scope<GraphicsContext> {};
 	switch (api)
 	{
 	// opengl
 	case GraphicsAPI::OpenGL:
-		scopeGfx = create_scope<glGraphicsContext>(windowHandle);
-		s_context = scopeGfx.get();
+		scope_gfx = create_scope<glGraphicsContext>(windowHandle);
+		s_context = scope_gfx.get();
 		break;
 	// directx
 	case GraphicsAPI::DirectX:
-		lt_win(scopeGfx = create_scope<dxGraphicsContext>(windowHandle); s_context = scopeGfx.get();
+		lt_win(scope_gfx = create_scope<dxGraphicsContext>(windowHandle);
+		       s_context = scope_gfx.get();
 		       break;)
 
 		    default
@@ -69,13 +70,13 @@ Scope<GraphicsContext> GraphicsContext::create(GraphicsAPI api, GLFWwindow *wind
 
 	// create 'GraphicsContext' dependent classes
 	s_context->m_user_interface = UserInterface::create(windowHandle, s_context->m_shared_context);
-	s_context->m_renderer = renderer::create(windowHandle, s_context->m_shared_context);
+	s_context->m_renderer = Renderer::create(windowHandle, s_context->m_shared_context);
 
 	// check
 	lt_assert(s_context->m_user_interface, "Failed to create UserInterface");
 	lt_assert(s_context->m_renderer, "Failed to create renderer");
 
-	return std::move(scopeGfx);
+	return std::move(scope_gfx);
 }
 
 } // namespace Light

@@ -46,7 +46,7 @@ dxBlender::dxBlender(Ref<dxSharedContext> sharedContext)
 	m_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	// create blend state
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateBlendState(&m_desc, &m_blend_state));
 }
 
@@ -58,7 +58,7 @@ void dxBlender::enable(BlendFactor srcFactor, BlendFactor dstFactor)
 	m_desc.RenderTarget[0].DestBlend = m_factor_map.at(dstFactor);
 
 	// re-create blind state
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateBlendState(&m_desc, &m_blend_state));
 
 	// bind blend state
@@ -71,7 +71,7 @@ void dxBlender::disable()
 	m_desc.RenderTarget[0].BlendEnable = false;
 
 	// re-create blind state
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateBlendState(&m_desc, &m_blend_state));
 
 	// bind blend state

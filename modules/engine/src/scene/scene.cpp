@@ -40,8 +40,8 @@ void Scene::on_update(float deltaTime)
 
 void Scene::on_render(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
 {
-	Camera *sceneCamera = nullptr;
-	TransformComponent *sceneCameraTransform;
+	auto *sceneCamera = (Camera *) {};
+	auto *sceneCameraTransform = (TransformComponent *) {};
 
 	/* scene camera */
 	{
@@ -59,33 +59,33 @@ void Scene::on_render(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
 	{
 		if (sceneCamera)
 		{
-			renderer::begin_scene(sceneCamera, *sceneCameraTransform, targetFrameBuffer);
+			Renderer::begin_scene(sceneCamera, *sceneCameraTransform, targetFrameBuffer);
 
 			m_registry.group(entt::get<TransformComponent, SpriteRendererComponent>)
 			    .each([](TransformComponent &transformComp,
 			             SpriteRendererComponent &spriteRendererComp) {
-				    renderer::draw_quad(
+				    Renderer::draw_quad(
 				        transformComp,
 				        spriteRendererComp.tint,
 				        spriteRendererComp.texture
 				    );
 			    });
 
-			renderer::end_scene();
+			Renderer::end_scene();
 		}
 	}
 }
 
-Entity Scene::create_entity(const std::string &name, const TransformComponent &transform)
+auto Scene::create_entity(const std::string &name, const TransformComponent &transform) -> Entity
 {
 	return create_entity_with_uuid(name, UUID(), transform);
 }
 
-Entity Scene::get_entity_by_tag(const std::string &tag)
+auto Scene::get_entity_by_tag(const std::string &tag) -> Entity
 {
 	// TagComponent tagComp(tag);
 	// entt::entity entity = entt::to_entity(m_registry, tagComp);
-	Entity entity;
+	auto entity = Entity {};
 
 	m_registry.view<TagComponent>().each([&](TagComponent &tagComp) {
 		// if (tagComp.tag == tag)
@@ -101,16 +101,16 @@ Entity Scene::get_entity_by_tag(const std::string &tag)
 	}
 }
 
-Entity Scene::create_entity_with_uuid(
+auto Scene::create_entity_with_uuid(
     const std::string &name,
     UUID uuid,
     const TransformComponent &transform
-)
+) -> Entity
 {
-	Entity entity { m_registry.create(), this };
-	entity.AddComponent<TagComponent>(name);
-	entity.AddComponent<TransformComponent>(transform);
-	entity.AddComponent<UUIDComponent>(uuid);
+	auto entity = Entity { m_registry.create(), this };
+	entity.add_component<TagComponent>(name);
+	entity.add_component<TransformComponent>(transform);
+	entity.add_component<UUIDComponent>(uuid);
 
 	return entity;
 }

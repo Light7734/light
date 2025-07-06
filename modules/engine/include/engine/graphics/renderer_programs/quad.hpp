@@ -10,9 +10,7 @@ class Shader;
 class VertexBuffer;
 class IndexBuffer;
 class VertexLayout;
-
 class OrthographicCamera;
-
 class SharedContext;
 
 class QuadRendererProgram: RendererProgram
@@ -26,7 +24,7 @@ public:
 
 	QuadRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
 
-	bool advance();
+	auto advance() -> bool;
 
 	void map() override;
 
@@ -34,17 +32,17 @@ public:
 
 	void bind() override;
 
-	inline QuadVertexData *GetMapCurrent()
+	auto get_map_current() -> QuadVertexData *
 	{
 		return m_map_current;
 	}
 
-	inline unsigned int get_quad_count() const
+	auto get_quad_count() const -> unsigned int
 	{
 		return m_quad_count;
 	}
 
-	inline constexpr unsigned int get_vertex_size() const
+	constexpr auto get_vertex_size() const -> unsigned int
 	{
 		return sizeof(QuadVertexData);
 	}

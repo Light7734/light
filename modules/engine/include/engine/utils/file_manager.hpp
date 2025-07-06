@@ -17,42 +17,42 @@ public:
 
 	virtual void release();
 
-	inline uint8_t *get_data()
+	auto get_data() -> uint8_t *
 	{
 		return m_data;
 	}
 
-	inline uint32_t get_size()
+	auto get_size() -> uint32_t
 	{
 		return m_size;
 	}
 
-	inline const std::string &get_path()
+	auto get_path() -> const std::string &
 	{
 		return m_path;
 	}
 
-	inline const std::string &get_name()
+	auto get_name() -> const std::string &
 	{
 		return m_name;
 	}
 
-	inline const std::string &get_extension()
+	auto get_extension() -> const std::string &
 	{
 		return m_extension;
 	}
 
-	inline const std::string &get_name_with_extention()
+	auto get_name_with_extention() -> const std::string &
 	{
 		return m_name + '.' + m_extension;
 	}
 
-	inline bool is_valid() const
+	auto is_valid() const -> bool
 	{
 		return !!m_data;
 	}
 
-	inline operator bool() const
+	operator bool() const
 	{
 		return is_valid();
 	}
@@ -95,22 +95,22 @@ public:
 
 	void release() override;
 
-	inline uint32_t get_width() const
+	auto get_width() const -> uint32_t
 	{
 		return m_width;
 	}
 
-	inline uint32_t get_height() const
+	auto get_height() const -> uint32_t
 	{
 		return m_height;
 	}
 
-	inline uint32_t get_components() const
+	auto get_components() const -> uint32_t
 	{
 		return m_components;
 	}
 
-	inline uint32_t get_desired_components() const
+	auto get_desired_components() const -> uint32_t
 	{
 		return m_desired_components;
 	}
@@ -128,9 +128,10 @@ private:
 class FileManager
 {
 public:
-	static BasicFileHandle read_text_file(const std::string &path);
+	static auto read_text_file(const std::string &path) -> BasicFileHandle;
 
-	static ImageFileHandle read_image_file(const std::string &path, int32_t desiredComponents);
+	static auto read_image_file(const std::string &path, int32_t desiredComponents)
+	    -> ImageFileHandle;
 };
 
 } // namespace Light

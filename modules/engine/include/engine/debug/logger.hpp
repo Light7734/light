@@ -30,11 +30,12 @@ class logger
 public:
 	static Scope<logger> create();
 
-	static inline Ref<spdlog::logger> get_engine_logger()
+	static auto get_engine_logger() -> Ref<spdlog::logger>
 	{
 		return s_context->m_engine_logger;
 	}
-	static inline Ref<spdlog::logger> get_file_logger()
+
+	static auto get_file_logger() -> Ref<spdlog::logger>
 	{
 		return s_context->m_file_logger;
 	}

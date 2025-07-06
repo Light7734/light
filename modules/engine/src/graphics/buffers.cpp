@@ -11,13 +11,11 @@
 
 namespace Light {
 
-//================================================== CONSTANT_BUFFER
-//==================================================//
-Scope<ConstantBuffer> ConstantBuffer::create(
+auto ConstantBuffer::create(
     ConstantBufferIndex index,
     unsigned int size,
     Ref<SharedContext> sharedContext
-)
+) -> Scope<ConstantBuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -30,26 +28,22 @@ Scope<ConstantBuffer> ConstantBuffer::create(
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }
-//================================================== CONSTANT_BUFFER
-//==================================================//
 
-//================================================== VERTEX_BUFFER
-//==================================================//
-Ref<VertexBuffer> VertexBuffer::create(
+auto VertexBuffer::create(
     float *vertices,
     unsigned int stride,
     unsigned int count,
     Ref<SharedContext> sharedContext
-)
+) -> Ref<VertexBuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -63,24 +57,21 @@ Ref<VertexBuffer> VertexBuffer::create(
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }
-//================================================== VERTEX_BUFFER
-//==================================================//
 
-//======================================== INDEX_BUFFER ========================================//
-Ref<IndexBuffer> IndexBuffer::create(
+auto IndexBuffer::create(
     unsigned int *indices,
     unsigned int count,
     Ref<SharedContext> sharedContext
-)
+) -> Ref<IndexBuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
@@ -93,15 +84,14 @@ Ref<IndexBuffer> IndexBuffer::create(
 		                  std::dynamic_pointer_cast<dxSharedContext>(sharedContext)
 		);)
 
-	default:
-		lt_assert(
-		    false,
-		    "Invalid/unsupported 'GraphicsAPI' {}",
-		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		);
+		    default
+		    : lt_assert(
+		          false,
+		          "Invalid/unsupported 'GraphicsAPI' {}",
+		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		      );
 		return nullptr;
 	}
 }
-//======================================== INDEX_BUFFER ========================================//
 
 } // namespace Light

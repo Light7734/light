@@ -21,7 +21,7 @@ void glUserInterface::platform_implementation(
 glUserInterface::~glUserInterface()
 {
 	// #todo: handle this in a better way
-	ImGuiIO &io = ImGui::GetIO();
+	auto &io = ImGui::GetIO();
 
 	if (io.IniFilename == "default_gui_layout.ini")
 		io.IniFilename = "user_gui_layout.ini";

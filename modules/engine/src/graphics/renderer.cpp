@@ -12,9 +12,9 @@
 
 namespace Light {
 
-renderer *renderer::s_context = nullptr;
+Renderer *Renderer::s_context = nullptr;
 
-renderer::renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+Renderer::Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
     : m_quad_renderer(LT_MAX_QUAD_RENDERER_VERTICES, sharedContext)
     , m_texture_renderer(LT_MAX_TEXTURE_RENDERER_VERTICES, sharedContext)
     , m_tinted_texture_renderer(LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES, sharedContext)
@@ -39,19 +39,19 @@ renderer::renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 	m_blender->enable(BlendFactor::SRC_ALPHA, BlendFactor::INVERSE_SRC_ALPHA);
 }
 
-Scope<renderer> renderer::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+auto Renderer::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext) -> Scope<Renderer>
 {
-	return make_scope<renderer>(new renderer(windowHandle, sharedContext));
+	return make_scope<Renderer>(new Renderer(windowHandle, sharedContext));
 }
 
-void renderer::on_window_resize(const WindowResizedEvent &event)
+void Renderer::on_window_resize(const WindowResizedEvent &event)
 {
 	m_render_command->set_viewport(0u, 0u, event.get_size().x, event.get_size().y);
 }
 
 //======================================== DRAW_QUAD ========================================//
 /* tinted textures */
-void renderer::draw_quad_impl(
+void Renderer::draw_quad_impl(
     const glm::vec3 &position,
     const glm::vec2 &size,
     const glm::vec4 &tint,
@@ -67,7 +67,7 @@ void renderer::draw_quad_impl(
 }
 
 /* tint */
-void renderer::draw_quad_impl(
+void Renderer::draw_quad_impl(
     const glm::vec3 &position,
     const glm::vec2 &size,
     const glm::vec4 &tint
@@ -81,7 +81,7 @@ void renderer::draw_quad_impl(
 }
 
 /* texture */
-void renderer::draw_quad_impl(
+void Renderer::draw_quad_impl(
     const glm::vec3 &position,
     const glm::vec2 &size,
     Ref<Texture> texture
@@ -96,10 +96,10 @@ void renderer::draw_quad_impl(
 //======================================== DRAW_QUAD ========================================//
 
 //==================== DRAW_QUAD_TINT ====================//
-void renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
+void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 {
 	// locals
-	QuadRendererProgram::QuadVertexData *bufferMap = m_quad_renderer.GetMapCurrent();
+	QuadRendererProgram::QuadVertexData *bufferMap = m_quad_renderer.get_map_current();
 
 	// top left
 	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
@@ -127,14 +127,14 @@ void renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 //==================== DRAW_QUAD_TINT ====================//
 
 //==================== DRAW_QUAD_TEXTURE ====================//
-void renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
+void Renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
 {
 	// #todo: implement a proper binding
 	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
 	texture->bind();
 
 	// locals
-	TextureRendererProgram::TextureVertexData *bufferMap = m_texture_renderer.GetMapCurrent();
+	TextureRendererProgram::TextureVertexData *bufferMap = m_texture_renderer.get_map_current();
 
 	// top left
 	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
@@ -164,7 +164,7 @@ void renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
 	}
 }
 
-void renderer::draw_quad_impl(
+void Renderer::draw_quad_impl(
     const glm::mat4 &transform,
     const glm::vec4 &tint,
     Ref<Texture> texture
@@ -176,7 +176,7 @@ void renderer::draw_quad_impl(
 
 	// locals
 	TintedTextureRendererProgram::TintedTextureVertexData *bufferMap = m_tinted_texture_renderer
-	                                                                       .GetMapCurrent();
+	                                                                       .get_map_current();
 
 	// top left
 	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
@@ -212,22 +212,22 @@ void renderer::draw_quad_impl(
 
 //==================== DRAW_QUAD_TEXTURE ====================//
 
-void renderer::begin_frame()
+void Renderer::begin_frame()
 {
 }
 
-void renderer::end_frame()
+void Renderer::end_frame()
 {
 	m_render_command->swap_buffers();
 	m_render_command->clear_back_buffer(
-	    m_default_framebuffer_camera ? m_default_framebuffer_camera->GetBackgroundColor() :
+	    m_default_framebuffer_camera ? m_default_framebuffer_camera->get_background_color() :
 	                                   glm::vec4(0.0f)
 	);
 
 	m_default_framebuffer_camera = nullptr;
 }
 
-void renderer::begin_scene_impl(
+void Renderer::begin_scene_impl(
     Camera *camera,
     const glm::mat4 &cameraTransform,
     const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */
@@ -237,7 +237,7 @@ void renderer::begin_scene_impl(
 	m_target_framebuffer = targetFrameBuffer;
 
 	if (targetFrameBuffer)
-		targetFrameBuffer->bind_as_target(camera->GetBackgroundColor());
+		targetFrameBuffer->bind_as_target(camera->get_background_color());
 	else
 	{
 		m_default_framebuffer_camera = camera;
@@ -246,7 +246,7 @@ void renderer::begin_scene_impl(
 
 	// update view projection buffer
 	glm::mat4 *map = (glm::mat4 *)m_view_projection_buffer->map();
-	map[0] = camera->GetProjection() * glm::inverse(cameraTransform);
+	map[0] = camera->get_projection() * glm::inverse(cameraTransform);
 	m_view_projection_buffer->un_map();
 
 	// map renderers
@@ -255,7 +255,7 @@ void renderer::begin_scene_impl(
 	m_tinted_texture_renderer.map();
 }
 
-void renderer::flush_scene()
+void Renderer::flush_scene()
 {
 	/* tinted texture renderer */
 	m_tinted_texture_renderer.un_map();
@@ -286,7 +286,7 @@ void renderer::flush_scene()
 	m_tinted_texture_renderer.map();
 }
 
-void renderer::end_scene_impl()
+void Renderer::end_scene_impl()
 {
 	/* tinted texture renderer */
 	m_tinted_texture_renderer.un_map();

@@ -23,17 +23,17 @@ glTexture::glTexture(
 	glTextureParameteri(m_texture_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// determine formats
-	unsigned int format = components == 4u ? GL_RGBA :
-	                      components == 3u ? GL_RGB :
-	                      components == 2u ? GL_RG :
-	                      components == 1u ? GL_RED :
-	                                         NULL;
+	auto format = components == 4u ? GL_RGBA :
+	              components == 3u ? GL_RGB :
+	              components == 2u ? GL_RG :
+	              components == 1u ? GL_RED :
+	                                 NULL;
 
-	unsigned int internalFormat = format == GL_RGBA ? GL_RGBA8 :
-	                              format == GL_RGB  ? GL_RGB8 :
-	                              format == GL_RG   ? GL_RG8 :
-	                              format == GL_RED  ? GL_R8 :
-	                                                  NULL;
+	auto internalFormat = format == GL_RGBA ? GL_RGBA8 :
+	                      format == GL_RGB  ? GL_RGB8 :
+	                      format == GL_RG   ? GL_RG8 :
+	                      format == GL_RED  ? GL_R8 :
+	                                          NULL;
 
 	// check
 	lt_assert(format, "Invalid number of components: {}", components);
@@ -67,7 +67,7 @@ void glTexture::bind(unsigned int slot /* = 0u */)
 	glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
-void *glTexture::get_texture()
+auto glTexture::get_texture() -> void *
 {
 	return (void *)(intptr_t)m_texture_id;
 }

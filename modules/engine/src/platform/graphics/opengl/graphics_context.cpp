@@ -42,7 +42,6 @@ void glGraphicsContext::log_debug_data()
 void glGraphicsContext::set_debug_message_callback()
 {
 	// determine log level
-	// #todo: set filters from config.h
 #if defined(LIGHT_DEBUG)
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
@@ -89,22 +88,26 @@ void glGraphicsContext::set_debug_message_callback()
 
 		    case GL_DEBUG_SEVERITY_MEDIUM:
 		    case GL_DEBUG_SEVERITY_LOW:
-			    lt_log(warn,
+			    lt_log(
+			        warn,
 			        "glMessageCallback: Severity: {} :: Source: {} :: Type: {} :: ID: {}",
 			        Stringifier::glDebugMsgSeverity(severity),
 			        Stringifier::glDebugMsgSource(source),
 			        Stringifier::glDebugMsgType(type),
-			        id);
+			        id
+			    );
 			    lt_log(warn, "      {}", message);
 			    return;
 
 		    case GL_DEBUG_SEVERITY_NOTIFICATION:
-			    lt_log(trace,
+			    lt_log(
+			        trace,
 			        "Severity: {} :: Source: {} :: Type: {} :: ID: {}",
 			        Stringifier::glDebugMsgSeverity(severity),
 			        Stringifier::glDebugMsgSource(source),
 			        Stringifier::glDebugMsgType(type),
-			        id);
+			        id
+			    );
 			    lt_log(trace, "        {}", message);
 			    return;
 		    }

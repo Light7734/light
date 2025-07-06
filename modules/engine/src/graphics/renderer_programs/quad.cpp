@@ -38,7 +38,7 @@ QuadRendererProgram::QuadRendererProgram(unsigned int maxVertices, Ref<SharedCon
 	));
 }
 
-bool QuadRendererProgram::advance()
+auto QuadRendererProgram::advance() -> bool
 {
 	m_map_current += 4;
 

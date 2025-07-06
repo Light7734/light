@@ -9,7 +9,7 @@
 
 namespace Light {
 
-Scope<Window> Window::create(std::function<void(Event &)> callback)
+auto Window::create(std::function<void(Event &)> callback) -> Scope<Window>
 {
 	return create_scope<lWindow>(callback);
 }
@@ -70,7 +70,7 @@ void lWindow::
     set_properties(const WindowProperties &properties, bool overrideVisibility /* = false */)
 {
 	// save the visibility status and re-assign if 'overrideVisibility' is false
-	bool visible = overrideVisibility ? properties.visible : m_properties.visible;
+	auto visible = overrideVisibility ? properties.visible : m_properties.visible;
 	m_properties = properties;
 	m_properties.visible = visible;
 
@@ -120,119 +120,102 @@ void lWindow::set_visibility(bool visible, bool toggle)
 
 void lWindow::bind_glfw_events()
 {
-	//============================== MOUSE_EVENTS ==============================//
-	/* cursor position */
 	glfwSetCursorPosCallback(m_handle, [](GLFWwindow *window, double xpos, double ypos) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
-		MouseMovedEvent event(xpos, ypos);
+		auto event = MouseMovedEvent {
+			static_cast<float>(xpos),
+			static_cast<float>(ypos),
+		};
 		callback(event);
 	});
 
-	/* mouse button */
 	glfwSetMouseButtonCallback(m_handle, [](GLFWwindow *window, int button, int action, int mods) {
 		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
 		                                            glfwGetWindowUserPointer(window);
 
 		if (action == GLFW_PRESS)
 		{
-			ButtonPressedEvent event(button);
+			auto event = ButtonPressedEvent { button };
 			callback(event);
 		}
 		else if (action == GLFW_RELEASE)
 		{
-			ButtonReleasedEvent event(button);
+			auto event = ButtonReleasedEvent { button };
 			callback(event);
 		}
 	});
 
-	/* scroll */
 	glfwSetScrollCallback(m_handle, [](GLFWwindow *window, double xoffset, double yoffset) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
-		WheelScrolledEvent event(yoffset);
+		auto event = WheelScrolledEvent { static_cast<float>(yoffset) };
 		callback(event);
 	});
-	//============================== MOUSE_EVENTS ==============================//
 
-	//============================== KEYBOARD_EVENTS ==============================//
-	/* key */
 	glfwSetKeyCallback(
 	    m_handle,
 	    [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-		    std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                                glfwGetWindowUserPointer(window);
+		    auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
 		    if (action == GLFW_PRESS)
 		    {
-			    KeyPressedEvent event(key);
+			    auto event = KeyPressedEvent { key };
 			    callback(event);
 		    }
 		    else if (action == GLFW_RELEASE)
 		    {
-			    KeyReleasedEvent event(key);
+			    auto event = KeyReleasedEvent { key };
 			    callback(event);
 		    }
 	    }
 	);
-	/* char */
+
 	glfwSetCharCallback(m_handle, [](GLFWwindow *window, unsigned int character) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
-		SetCharEvent event(character);
+		auto event = SetCharEvent { character };
 		callback(event);
 	});
 
-	//============================== KEYBOARD_EVENTS ==============================//
-
-	//============================== WINDOW_EVENTS ==============================//
-	/* window position */
 	glfwSetWindowPosCallback(m_handle, [](GLFWwindow *window, int xpos, int ypos) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
-		WindowMovedEvent event(xpos, ypos);
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
+		auto event = WindowMovedEvent { xpos, ypos };
 
 		callback(event);
 	});
 
-	/* window size */
 	glfwSetWindowSizeCallback(m_handle, [](GLFWwindow *window, int width, int height) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
-		WindowResizedEvent event(width, height);
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
+		auto event = WindowResizedEvent {
+			static_cast<unsigned int>(width),
+			static_cast<unsigned int>(height),
+		};
 
 		callback(event);
 	});
 
-	/* window close */
 	glfwSetWindowCloseCallback(m_handle, [](GLFWwindow *window) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
-		WindowClosedEvent event;
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
+		auto event = WindowClosedEvent {};
 
 		callback(event);
 	});
 
-	/* window focus */
 	glfwSetWindowFocusCallback(m_handle, [](GLFWwindow *window, int focus) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
-		                                            glfwGetWindowUserPointer(window);
+		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
 		if (focus == GLFW_TRUE)
 		{
-			WindowGainFocusEvent event;
+			auto event = WindowGainFocusEvent {};
 			callback(event);
 		}
 		else
 		{
-			WindowLostFocusEvent event;
+			auto event = WindowLostFocusEvent {};
 			callback(event);
 		}
 	});
-	//============================== WINDOW_EVENTS ==============================//
 }
 
 } // namespace Light

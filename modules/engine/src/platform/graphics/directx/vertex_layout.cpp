@@ -12,8 +12,7 @@ dxVertexLayout::dxVertexLayout(
     : m_context(sharedContext)
     , m_input_layout(nullptr)
 {
-	// occupy space for input elements
-	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementsDesc;
+	auto inputElementsDesc = std::vector<D3D11_INPUT_ELEMENT_DESC> {};
 	inputElementsDesc.reserve(elements.size());
 
 	// extract elements desc
@@ -28,11 +27,11 @@ dxVertexLayout::dxVertexLayout(
 		                                                          0u });
 	}
 
-	Ref<dxShader> dxpShader = std::dynamic_pointer_cast<dxShader>(shader);
+	auto dxpShader = std::dynamic_pointer_cast<dxShader>(shader);
 	lt_assert(dxpShader, "Failed to cast 'Shader' to 'dxShader'");
 
 	// create input layout (vertex layout)
-	HRESULT hr;
+	auto hr = HRESULT {};
 	dxc(m_context->get_device()->CreateInputLayout(
 	    &inputElementsDesc[0],
 	    inputElementsDesc.size(),
@@ -57,7 +56,7 @@ void dxVertexLayout::un_bind()
 	m_context->get_device_context()->IASetInputLayout(nullptr);
 }
 
-DXGI_FORMAT dxVertexLayout::get_dxgi_format(VertexElementType type)
+auto dxVertexLayout::get_dxgi_format(VertexElementType type) -> DXGI_FORMAT
 {
 	switch (type)
 	{

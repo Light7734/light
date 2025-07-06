@@ -14,7 +14,7 @@ public:
 
 	void bind() override;
 
-	void *map() override;
+	auto map() -> void * override;
 
 	void un_map() override;
 
@@ -35,7 +35,7 @@ public:
 
 	void un_bind() override;
 
-	void *map() override;
+	auto map() -> void * override;
 
 	void un_map() override;
 

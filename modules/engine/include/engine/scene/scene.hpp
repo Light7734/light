@@ -24,25 +24,27 @@ public:
 
 	void on_render(const Ref<Framebuffer> &targetFrameBuffer = nullptr);
 
-	Entity create_entity(
+	auto create_entity(
 	    const std::string &name,
 	    const TransformComponent &transform = TransformComponent()
-	);
+	) -> Entity;
 
-	Entity get_entity_by_tag(const std::string &tag);
+	auto get_entity_by_tag(const std::string &tag) -> Entity;
 
 private:
 	friend class Entity;
+
 	friend class SceneSerializer;
+
 	friend class SceneHierarchyPanel;
 
 	entt::registry m_registry;
 
-	Entity create_entity_with_uuid(
+	auto create_entity_with_uuid(
 	    const std::string &name,
 	    UUID uuid,
 	    const TransformComponent &transform = TransformComponent()
-	);
+	) -> Entity;
 };
 
 } // namespace Light

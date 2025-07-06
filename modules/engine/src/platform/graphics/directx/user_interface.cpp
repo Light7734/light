@@ -16,8 +16,8 @@ void dxUserInterface::platform_implementation(
     Ref<SharedContext> sharedContext
 )
 {
-	ImGuiIO &io = ImGui::GetIO();
-	Ref<dxSharedContext> context = std::dynamic_pointer_cast<dxSharedContext>(sharedContext);
+	auto &io = ImGui::GetIO();
+	auto context = std::dynamic_pointer_cast<dxSharedContext>(sharedContext);
 
 	ImGui_ImplWin32_Init(glfwGetWin32Window(windowHandle));
 	ImGui_ImplDX11_Init(context->get_device().Get(), context->get_device_context().Get());
@@ -26,7 +26,7 @@ void dxUserInterface::platform_implementation(
 dxUserInterface::~dxUserInterface()
 {
 	// #todo: handle this in a better way
-	ImGuiIO &io = ImGui::GetIO();
+	auto &io = ImGui::GetIO();
 
 	if (io.IniFilename == "default_gui_layout.ini")
 		io.IniFilename = "user_gui_layout.ini";

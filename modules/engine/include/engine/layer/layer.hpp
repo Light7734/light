@@ -25,9 +25,10 @@ class Layer
 {
 public:
 	Layer(const std::string &name);
+
 	virtual ~Layer() = default;
 
-	const std::string &GetName() const
+	auto get_name() const -> const std::string &
 	{
 		return m_layer_name;
 	}
@@ -43,72 +44,72 @@ public:
 	{
 	}
 
-	bool on_event(const Event &event);
+	auto on_event(const Event &event) -> bool;
 
 protected:
 	std::string m_layer_name;
 
-	virtual bool on_mouse_moved(const MouseMovedEvent &event)
+	virtual auto on_mouse_moved(const MouseMovedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_button_pressed(const ButtonPressedEvent &event)
+	virtual auto on_button_pressed(const ButtonPressedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_button_released(const ButtonReleasedEvent &event)
+	virtual auto on_button_released(const ButtonReleasedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_wheel_scrolled(const WheelScrolledEvent &event)
+	virtual auto on_wheel_scrolled(const WheelScrolledEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_key_pressed(const KeyPressedEvent &event)
+	virtual auto on_key_pressed(const KeyPressedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_key_repeat(const KeyRepeatEvent &event)
+	virtual auto on_key_repeat(const KeyRepeatEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_key_released(const KeyReleasedEvent &event)
+	virtual auto on_key_released(const KeyReleasedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_set_char(const SetCharEvent &event)
+	virtual auto on_set_char(const SetCharEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_window_closed(const WindowClosedEvent &event)
+	virtual auto on_window_closed(const WindowClosedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_window_resized(const WindowResizedEvent &event)
+	virtual auto on_window_resized(const WindowResizedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_window_moved(const WindowMovedEvent &event)
+	virtual auto on_window_moved(const WindowMovedEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_window_lost_focus(const WindowLostFocusEvent &event)
+	virtual auto on_window_lost_focus(const WindowLostFocusEvent &event) -> bool
 	{
 		return false;
 	}
 
-	virtual bool on_window_gain_focus(const WindowGainFocusEvent &event)
+	virtual auto on_window_gain_focus(const WindowGainFocusEvent &event) -> bool
 	{
 		return false;
 	}
