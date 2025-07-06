@@ -34,37 +34,47 @@ void AssetBrowserPanel::on_user_interface_update()
 		}
 	}
 
-	auto regionAvail = ImGui::GetContentRegionAvail();
-	auto cellSize = m_file_size + m_file_padding;
-	auto columnCount = std::clamp(
-	    static_cast<uint32_t>(std::floor(regionAvail.x / cellSize)),
+	const auto available_region = ImGui::GetContentRegionAvail();
+	const auto cell_size = m_file_size + m_file_padding;
+	const auto column_count = std::clamp(
+	    static_cast<uint32_t>(std::floor(available_region.x / cell_size)),
 	    1u,
 	    64u
 	);
 
-	if (ImGui::BeginTable("ContentBrowser", columnCount))
+	if (ImGui::BeginTable("ContentBrowser", static_cast<int>(column_count)))
 	{
 		m_directory_texture->bind(0u);
-		for (const auto &dirEntry : std::filesystem::directory_iterator(m_current_directory))
+		for (const auto &directory_entry : std::filesystem::directory_iterator(m_current_directory))
 		{
-			const auto &path = dirEntry.path();
-			auto extension = dirEntry.path().extension().string();
+			const auto &path = directory_entry.path();
+			auto extension = directory_entry.path().extension().string();
 
-			// TODO: Tidy up
-			auto assetType = AssetType {};
-			assetType = extension.empty() ? AssetType::directory :
+			auto asset_type = AssetType {};
 
-			            extension == ".txt"  ? AssetType::text :
-			            extension == ".glsl" ? AssetType::text :
-
-			            extension == ".png" ? AssetType::image :
-
-			            extension == ".scene" ? AssetType::scene :
-
-			                                    AssetType::none;
+			if (extension.empty())
+			{
+				asset_type = AssetType::directory;
+			}
+			else if (extension == ".txt" || extension == ".glsl")
+			{
+				asset_type = AssetType::text;
+			}
+			else if (extension == ".png")
+			{
+				asset_type = AssetType::image;
+			}
+			else if (extension == ".scene")
+			{
+				asset_type = AssetType::scene;
+			}
+			else
+			{
+				asset_type = AssetType::none;
+			}
 
 			// Extension not supported
-			if (assetType == AssetType::none)
+			if (asset_type == AssetType::none)
 			{
 				continue;
 			}
@@ -72,7 +82,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Button
 			ImGui::TableNextColumn();
 			ImGui::PushID(path.c_str());
-			switch (assetType)
+			switch (asset_type)
 			{
 			// Directory
 			case AssetType::directory:
@@ -142,7 +152,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			default: break;
 			}
 			// Label
-			ImGui::Text("%s", path.filename().c_str());
+			ImGui::TextUnformatted(fmt::format("{}", path.filename().string()).c_str());
 			ImGui::PopID();
 		}
 

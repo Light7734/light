@@ -10,18 +10,16 @@ class PropertiesPanel: public Panel
 public:
 	PropertiesPanel() = default;
 
-	~PropertiesPanel() = default;
-
 	void on_user_interface_update();
 
-	void set_entity_context(Entity entity);
+	void set_entity_context(const Entity &entity);
 
 private:
 	void draw_vec3_control(
 	    const std::string &label,
 	    glm::vec3 &values,
-	    float resetValue = 0.0f,
-	    float columnWidth = 100.0f
+	    float reset_value = 0.0f,
+	    float column_width = 100.0f
 	);
 
 	template<typename ComponentType, typename UIFunction>

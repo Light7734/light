@@ -3,7 +3,10 @@
 
 namespace Light {
 
-EditorLayer::EditorLayer(const std::string &name): Layer(name), m_scene_dir("")
+EditorLayer::EditorLayer(const std::string &name)
+    : Layer(name)
+    , m_scene_dir("")
+    , m_direction { 0.0, 0.0 }
 {
 	m_scene = create_ref<Scene>();
 
@@ -11,7 +14,14 @@ EditorLayer::EditorLayer(const std::string &name): Layer(name), m_scene_dir("")
 	m_sceneHierarchyPanel = create_ref<SceneHierarchyPanel>(m_scene, m_properties_panel);
 	m_content_browser_panel = create_ref<AssetBrowserPanel>(m_scene);
 
-	m_framebuffer = Framebuffer::create({ 1, 1, 1 }, GraphicsContext::get_shared_context());
+	m_framebuffer = Framebuffer::create(
+	    {
+	        .width = 1,
+	        .height = 1,
+	        .samples = 1,
+	    },
+	    GraphicsContext::get_shared_context()
+	);
 
 	if (m_scene_dir.empty())
 	{
@@ -44,23 +54,43 @@ EditorLayer::~EditorLayer()
 	}
 }
 
-void EditorLayer::on_update(float deltaTime)
+void EditorLayer::on_update(float delta_time)
 {
-	m_scene->on_update(deltaTime);
+	m_scene->on_update(delta_time);
 
-	m_direction.x = Input::get_keyboard_key(Key::A) ? -1.0f :
-	                Input::get_keyboard_key(Key::D) ? 1.0f :
-	                                                  0.0f;
+	if (Input::get_keyboard_key(Key::A))
+	{
+		m_direction.x = -1.0;
+	}
+	else if (Input::get_keyboard_key(Key::D))
+	{
+		m_direction.x = 1.0f;
+	}
+	else
+	{
+		m_direction.x = 0.0;
+	}
 
-	m_direction.y = Input::get_keyboard_key(Key::S) ? -1.0f :
-	                Input::get_keyboard_key(Key::W) ? 1.0f :
-	                                                  0.0f;
+	if (Input::get_keyboard_key(Key::S))
+	{
+		m_direction.y = -1.0;
+	}
+	else if (Input::get_keyboard_key(Key::W))
+	{
+		m_direction.y = 1.0f;
+	}
+	else
+	{
+		m_direction.y = 0.0;
+	}
 
-	auto &cameraTranslation = m_camera_entity.get_component<TransformComponent>().translation;
-	cameraTranslation += glm::vec3(m_direction * m_speed * deltaTime, 0.0f);
+	auto &translation = m_camera_entity.get_component<TransformComponent>().translation;
+	translation += glm::vec3 { m_direction * m_speed * delta_time, 0.0f };
 
 	if (Input::get_keyboard_key(Key::Escape))
+	{
 		Application::quit();
+	}
 }
 
 void EditorLayer::on_render()
@@ -76,26 +106,33 @@ void EditorLayer::on_user_interface_update()
 	if (ImGui::Begin("Game"))
 	{
 		Input::receive_game_events(ImGui::IsWindowFocused());
-		auto regionAvail = ImGui::GetContentRegionAvail();
+		auto available_region = ImGui::GetContentRegionAvail();
 
-		if (m_available_content_region_prev != regionAvail)
+		if (m_available_content_region_prev != available_region)
 		{
-			m_framebuffer->resize({ regionAvail.x, regionAvail.y });
+			m_framebuffer->resize({ available_region.x, available_region.y });
 			auto &camera = m_camera_entity.get_component<CameraComponent>().camera;
-			camera.set_viewport_size(regionAvail.x, regionAvail.y);
+			camera.set_viewport_size(
+			    static_cast<uint32_t>(available_region.x),
+			    static_cast<uint32_t>(available_region.y)
+			);
 
-			m_available_content_region_prev = regionAvail;
+			m_available_content_region_prev = available_region;
 		}
 
 		if (GraphicsContext::get_graphics_api() == GraphicsAPI::DirectX)
-			ImGui::Image(m_framebuffer->get_color_attachment(), regionAvail);
+		{
+			ImGui::Image(m_framebuffer->get_color_attachment(), available_region);
+		}
 		else
+		{
 			ImGui::Image(
 			    m_framebuffer->get_color_attachment(),
-			    regionAvail,
+			    available_region,
 			    ImVec2(0, 1),
 			    ImVec2(1, 0)
 			);
+		}
 	}
 	ImGui::End();
 

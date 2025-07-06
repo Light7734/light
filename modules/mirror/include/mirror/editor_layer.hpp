@@ -13,9 +13,17 @@ class EditorLayer: public Layer
 public:
 	EditorLayer(const std::string &name);
 
-	~EditorLayer();
+	~EditorLayer() override;
 
-	void on_update(float deltaTime) override;
+	EditorLayer(EditorLayer &&) = delete;
+
+	EditorLayer(const EditorLayer &) = delete;
+
+	auto operator=(EditorLayer &&) const -> EditorLayer & = delete;
+
+	auto operator=(const EditorLayer &) const -> EditorLayer & = delete;
+
+	void on_update(float delta_time) override;
 
 	void on_render() override;
 
@@ -24,7 +32,6 @@ public:
 private:
 	std::string m_scene_dir;
 
-	// #todo: add camera controller class to the engine
 	glm::vec2 m_direction;
 
 	float m_speed = 1000.0f;

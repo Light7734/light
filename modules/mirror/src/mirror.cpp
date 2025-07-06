@@ -27,9 +27,9 @@ public:
 	}
 };
 
-auto create_application() -> Application *
+auto create_application() -> Light::Scope<Application>
 {
-	return new Mirror();
+	return Light::create_scope<Mirror>();
 }
 
 } // namespace Light

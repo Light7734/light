@@ -27,9 +27,9 @@ private:
 
 	const std::filesystem::path m_assets_path;
 
-	uint32_t m_file_size = 128u;
+	float m_file_size = 128.0f;
 
-	uint32_t m_file_padding = 8u;
+	float m_file_padding = 8.0f;
 
 	Ref<Scene> m_active_scene;
 

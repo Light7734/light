@@ -6,17 +6,13 @@
 
 namespace Light {
 
-SceneHierarchyPanel::SceneHierarchyPanel()
-    : m_context(nullptr)
-    , m_properties_panel_context(nullptr)
-    , m_selection_context()
+SceneHierarchyPanel::SceneHierarchyPanel(): m_context(nullptr), m_properties_panel_context(nullptr)
 {
 }
 
-SceneHierarchyPanel::
-    SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel /* = nullptr */)
-    : m_context(context)
-    , m_properties_panel_context(propertiesPanel)
+SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> properties_panel)
+    : m_context(std::move(context))
+    , m_properties_panel_context(std::move(properties_panel))
 {
 }
 
@@ -41,22 +37,29 @@ void SceneHierarchyPanel::on_user_interface_update()
 	ImGui::End();
 }
 
-void SceneHierarchyPanel::set_context(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel)
+void SceneHierarchyPanel::set_context(Ref<Scene> context, Ref<PropertiesPanel> properties_panel)
 {
-	if (propertiesPanel)
-		m_properties_panel_context = propertiesPanel;
+	if (properties_panel)
+	{
+		m_properties_panel_context = std::move(properties_panel);
+	}
 
-	m_context = context;
+	m_context = std::move(context);
 }
 
 void SceneHierarchyPanel::draw_node(Entity entity, const std::string &label)
 {
-	auto flags = (m_selection_context == entity ? ImGuiTreeNodeFlags_Selected : NULL)
-	             | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
+	auto flags = ImGuiTreeNodeFlags {
+		// NOLINTNEXTLINE
+		(m_selection_context == entity ? ImGuiTreeNodeFlags_Selected : ImGuiTreeNodeFlags {})
+		| ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth
+	};
 
+	// NOLINTNEXTLINE
 	const auto expanded = ImGui::TreeNodeEx(
-	    (void *)(uint64_t)(uint32_t)(entity),
+	    std::bit_cast<void *>(static_cast<uint64_t>(entity)),
 	    flags,
+	    "%s",
 	    label.c_str()
 	);
 
@@ -68,7 +71,7 @@ void SceneHierarchyPanel::draw_node(Entity entity, const std::string &label)
 
 	if (expanded)
 	{
-		ImGui::Text("TEST_OPENED_TREE!");
+		ImGui::TextUnformatted("TEST_OPENED_TREE!");
 		ImGui::TreePop();
 	}
 }

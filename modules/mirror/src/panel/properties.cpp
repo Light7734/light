@@ -32,7 +32,9 @@ void PropertiesPanel::on_user_interface_update()
 		ImGui::PushItemWidth(-1);
 
 		if (ImGui::Button("Add component"))
+		{
 			ImGui::OpenPopup("Components");
+		}
 
 		if (ImGui::BeginPopup("Components"))
 		{
@@ -41,20 +43,24 @@ void PropertiesPanel::on_user_interface_update()
 			        false,
 			        m_entity_context.has_component<SpriteRendererComponent>() ?
 			            ImGuiSelectableFlags_Disabled :
-			            NULL
+			            ImGuiSelectableFlags {}
 			    ))
+			{
 				m_entity_context.add_component<SpriteRendererComponent>(
 				    Light::ResourceManager::get_texture("awesomeface")
 				);
+			}
 
 			if (ImGui::Selectable(
 			        "Camera",
 			        false,
 			        m_entity_context.has_component<CameraComponent>() ?
 			            ImGuiSelectableFlags_Disabled :
-			            NULL
+			            ImGuiSelectableFlags {}
 			    ))
+			{
 				m_entity_context.add_component<CameraComponent>();
+			}
 
 			ImGui::EndPopup();
 		}
@@ -82,68 +88,82 @@ void PropertiesPanel::on_user_interface_update()
 		    [&](auto &cameraComponent) {
 			    auto &camera = cameraComponent.camera;
 
-			    auto projectionType = camera.get_projection_type();
-			    auto projectionTypesString = std::array<const char *, 2> {
+			    auto projection_type = camera.get_projection_type();
+			    auto projection_types_str = std::array<const char *, 2> {
 				    "Orthographic",
 				    "Perspective",
 			    };
 
-			    if (ImGui::BeginCombo("ProjectionType", projectionTypesString[(int)projectionType]))
+			    if (ImGui::BeginCombo("ProjectionType", projection_types_str[(int)projection_type]))
 			    {
-				    for (int i = 0; i < 2; i++)
+				    for (auto idx = 0; idx < 2; idx++)
 				    {
-					    const auto isSelected = (int)projectionType == i;
-					    if (ImGui::Selectable(projectionTypesString[i], isSelected))
+					    const auto is_selected = static_cast<int>(projection_type) == idx;
+					    if (ImGui::Selectable(projection_types_str[idx], is_selected))
 					    {
-						    projectionType = (SceneCamera::ProjectionType)i;
-						    camera.set_projection_type(projectionType);
+						    projection_type = static_cast<SceneCamera::ProjectionType>(idx);
+						    camera.set_projection_type(projection_type);
 					    }
 
-					    if (isSelected)
+					    if (is_selected)
+					    {
 						    ImGui::SetItemDefaultFocus();
+					    }
 				    }
 
 				    ImGui::EndCombo();
 			    }
 
-			    if (projectionType == SceneCamera::ProjectionType::Orthographic)
+			    if (projection_type == SceneCamera::ProjectionType::Orthographic)
 			    {
-				    auto orthoSize = float {};
-				    auto nearPlane = float {};
-				    auto farPlane = float {};
+				    auto ortho_size = float {};
+				    auto near_plane = float {};
+				    auto far_plane = float {};
 
-				    orthoSize = camera.get_orthographic_size();
-				    nearPlane = camera.get_orthographic_near_plane();
-				    farPlane = camera.get_orthographic_far_plane();
+				    ortho_size = camera.get_orthographic_size();
+				    near_plane = camera.get_orthographic_near_plane();
+				    far_plane = camera.get_orthographic_far_plane();
 
-				    if (ImGui::DragFloat("Orthographic Size", &orthoSize))
-					    camera.set_orthographic_size(orthoSize);
+				    if (ImGui::DragFloat("Orthographic Size", &ortho_size))
+				    {
+					    camera.set_orthographic_size(ortho_size);
+				    }
 
-				    if (ImGui::DragFloat("Near Plane", &nearPlane))
-					    camera.set_orthographic_near_plane(nearPlane);
+				    if (ImGui::DragFloat("Near Plane", &near_plane))
+				    {
+					    camera.set_orthographic_near_plane(near_plane);
+				    }
 
-				    if (ImGui::DragFloat("Far Plane", &farPlane))
-					    camera.set_orthographic_far_plane(farPlane);
+				    if (ImGui::DragFloat("Far Plane", &far_plane))
+				    {
+					    camera.set_orthographic_far_plane(far_plane);
+				    }
 			    }
 
 			    else // perspective
 			    {
-				    auto verticalFOV = float {};
-				    auto nearPlane = float {};
-				    auto farPlane = float {};
+				    auto vertical_fov = float {};
+				    auto near_plane = float {};
+				    auto far_plane = float {};
 
-				    verticalFOV = glm::degrees(camera.get_perspective_vertical_fov());
-				    nearPlane = camera.get_perspective_near_plane();
-				    farPlane = camera.get_perspective_far_plane();
+				    vertical_fov = glm::degrees(camera.get_perspective_vertical_fov());
+				    near_plane = camera.get_perspective_near_plane();
+				    far_plane = camera.get_perspective_far_plane();
 
-				    if (ImGui::DragFloat("Vertical FOV", &verticalFOV))
-					    camera.set_perspective_vertical_fov(glm::radians(verticalFOV));
+				    if (ImGui::DragFloat("Vertical FOV", &vertical_fov))
+				    {
+					    camera.set_perspective_vertical_fov(glm::radians(vertical_fov));
+				    }
 
-				    if (ImGui::DragFloat("Near Plane", &nearPlane))
-					    camera.set_perspective_near_plane(nearPlane);
+				    if (ImGui::DragFloat("Near Plane", &near_plane))
+				    {
+					    camera.set_perspective_near_plane(near_plane);
+				    }
 
-				    if (ImGui::DragFloat("Far Plane", &farPlane))
-					    camera.set_perspective_far_plane(farPlane);
+				    if (ImGui::DragFloat("Far Plane", &far_plane))
+				    {
+					    camera.set_perspective_far_plane(far_plane);
+				    }
 			    }
 
 			    ImGui::Separator();
@@ -154,7 +174,7 @@ void PropertiesPanel::on_user_interface_update()
 	ImGui::End();
 }
 
-void PropertiesPanel::set_entity_context(Entity entity)
+void PropertiesPanel::set_entity_context(const Entity &entity)
 {
 	m_entity_context = entity;
 }
@@ -162,31 +182,33 @@ void PropertiesPanel::set_entity_context(Entity entity)
 void PropertiesPanel::draw_vec3_control(
     const std::string &label,
     glm::vec3 &values,
-    float resetValue /*= 0.0f*/,
-    float columnWidth /*= 100.0f*/
+    float reset_value,
+    float column_width
 )
 {
 	auto &io = ImGui::GetIO();
 
-	auto boldFont = io.Fonts->Fonts[0];
+	auto *bold_font = io.Fonts->Fonts[0];
 
 	ImGui::Columns(2);
-	ImGui::SetColumnWidth(0, columnWidth);
-	ImGui::Text(label.c_str());
+	ImGui::SetColumnWidth(0, column_width);
+	ImGui::TextUnformatted(label.c_str());
 	ImGui::NextColumn();
 
 	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2 { 0, 0 });
 
-	auto lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	auto buttonSize = ImVec2 { lineHeight + 3.0f, lineHeight };
+	auto line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	auto button_size = ImVec2 { line_height + 3.0f, line_height };
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
-	ImGui::PushFont(boldFont);
-	if (ImGui::Button("X", buttonSize))
-		values.x = resetValue;
+	ImGui::PushFont(bold_font);
+	if (ImGui::Button("X", button_size))
+	{
+		values.x = reset_value;
+	}
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
 
@@ -198,9 +220,11 @@ void PropertiesPanel::draw_vec3_control(
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
-	ImGui::PushFont(boldFont);
-	if (ImGui::Button("Y", buttonSize))
-		values.y = resetValue;
+	ImGui::PushFont(bold_font);
+	if (ImGui::Button("Y", button_size))
+	{
+		values.y = reset_value;
+	}
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
 
@@ -213,9 +237,11 @@ void PropertiesPanel::draw_vec3_control(
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.35f, 0.9f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
-	ImGui::PushFont(boldFont);
-	if (ImGui::Button("Z", buttonSize))
-		values.z = resetValue;
+	ImGui::PushFont(bold_font);
+	if (ImGui::Button("Z", button_size))
+	{
+		values.z = reset_value;
+	}
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
 
@@ -232,16 +258,19 @@ template<typename ComponentType, typename UIFunction>
 void PropertiesPanel::draw_component(
     const std::string &name,
     Entity entity,
-    UIFunction userInterfaceFunction
+    UIFunction user_interface_function
 )
 {
 	if (!entity.has_component<ComponentType>())
+	{
 		return;
+	}
 
 	auto &component = entity.get_component<ComponentType>();
 
-	auto regionAvail = ImGui::GetContentRegionAvail();
+	auto available_region = ImGui::GetContentRegionAvail();
 
+	// NOLINTNEXTLINE
 	auto flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth
 	             | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap
 	             | ImGuiTreeNodeFlags_FramePadding;
@@ -250,27 +279,34 @@ void PropertiesPanel::draw_component(
 	auto lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 	ImGui::Separator();
 
+	// NOLINTNEXTLINE
 	if (ImGui::TreeNodeEx((void *)typeid(ComponentType).hash_code(), flags, name.c_str()))
 	{
 		ImGui::PopStyleVar();
 
-		ImGui::SameLine(regionAvail.x - lineHeight * .5f);
+		ImGui::SameLine(available_region.x - lineHeight * .5f);
 		if (ImGui::Button("+", { lineHeight, lineHeight }))
+		{
 			ImGui::OpenPopup("ComponentSettings");
+		}
 
 		if (ImGui::BeginPopup("ComponentSettings"))
 		{
 			if (ImGui::Selectable("Remove component"))
+			{
 				entity.remove_component<ComponentType>();
+			}
 
 			ImGui::EndPopup();
 		}
 
-		userInterfaceFunction(component);
+		user_interface_function(component);
 		ImGui::TreePop();
 	}
 	else
+	{
 		ImGui::PopStyleVar();
+	}
 }
 
 } // namespace Light
