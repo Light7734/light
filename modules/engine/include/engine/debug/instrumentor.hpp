@@ -16,30 +16,32 @@ struct ScopeProfileResult
 class Instrumentor
 {
 public:
-	static Scope<Instrumentor> create();
+	static auto instance() -> Instrumentor &
+	{
+		static auto instance = Instrumentor {};
+		return instance;
+	}
 
 	static void begin_session(const std::string &outputPath)
 	{
-		s_context->begin_session_impl(outputPath);
+		instance().begin_session_impl(outputPath);
 	}
 	static void end_session()
 	{
-		s_context->end_session_impl();
+		instance().end_session_impl();
 	}
 
 	static void submit_scope_profile(const ScopeProfileResult &profileResult)
 	{
-		s_context->submit_scope_profile_impl(profileResult);
+		instance().submit_scope_profile_impl(profileResult);
 	}
 
 private:
-	static Instrumentor *s_context;
-
 	std::ofstream m_output_file_stream;
 
-	unsigned int m_current_session_count{0u};
+	unsigned int m_current_session_count { 0u };
 
-	Instrumentor();
+	Instrumentor() = default;
 
 	void begin_session_impl(const std::string &outputPath);
 

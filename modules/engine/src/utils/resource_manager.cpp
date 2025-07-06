@@ -6,19 +6,6 @@
 
 namespace Light {
 
-ResourceManager *ResourceManager::s_context = nullptr;
-
-auto ResourceManager::create() -> Scope<ResourceManager>
-{
-	return make_scope(new ResourceManager());
-}
-
-ResourceManager::ResourceManager() 
-{
-	lt_assert(!s_context, "Repeated singleton construction");
-	s_context = this;
-}
-
 void ResourceManager::load_shader_impl(
     const std::string &name,
     const std::string &vertexPath,
@@ -26,7 +13,6 @@ void ResourceManager::load_shader_impl(
 )
 {
 	// check
-	lt_assert(s_context, "Uninitliazed singleton");
 	lt_assert(!vertexPath.empty(), "Empty 'vertexPath'");
 	lt_assert(!pixelPath.empty(), "Empty 'pixelPath'");
 
@@ -54,8 +40,6 @@ void ResourceManager::load_texture_impl(
     unsigned int desiredComponents /* = 4u */
 )
 {
-	lt_assert(s_context, "Uninitliazed singleton");
-
 	// load file
 	auto imgFile = FileManager::read_image_file(path, desiredComponents);
 

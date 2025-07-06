@@ -10,7 +10,11 @@ class Event;
 class LayerStack /* singleton */
 {
 public:
-	static auto create() -> Scope<LayerStack>;
+	static auto instance() -> LayerStack &
+	{
+		static auto instance = LayerStack {};
+		return instance;
+	}
 
 	~LayerStack();
 
@@ -18,17 +22,17 @@ public:
 	template<typename t, typename... Args>
 	static void emplace_layer(Args &&...args)
 	{
-		s_context->attach_layer_impl(new t((args)...));
+		instance().attach_layer_impl(new t((args)...));
 	}
 
 	static void attach_layer(Layer *layer)
 	{
-		s_context->attach_layer_impl(layer);
+		instance().attach_layer_impl(layer);
 	}
 
 	static void detach_layer(Layer *layer)
 	{
-		s_context->detach_layer_impl(layer);
+		instance().detach_layer_impl(layer);
 	}
 
 	auto is_empty() -> bool
@@ -57,15 +61,13 @@ public:
 	}
 
 private:
-	static LayerStack *s_context;
-
 	std::vector<Layer *> m_layers;
 
 	std::vector<Layer *>::iterator m_begin;
 
 	std::vector<Layer *>::iterator m_end;
 
-	LayerStack();
+	LayerStack() = default;
 
 	void attach_layer_impl(Layer *layer);
 

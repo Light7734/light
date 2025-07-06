@@ -7,27 +7,12 @@
 
 namespace Light {
 
-LayerStack *LayerStack::s_context = nullptr;
-
-auto LayerStack::create() -> Scope<LayerStack>
-{
-	return make_scope<LayerStack>(new LayerStack());
-}
-
-LayerStack::LayerStack() 
-{
-	lt_assert(
-	    !s_context,
-	    "An instance of 'LayerStack' already exists, do not construct this class!"
-	) s_context
-	    = this;
-}
-
 LayerStack::~LayerStack()
 {
-	for (auto *layer : m_layers) {
+	for (auto *layer : m_layers)
+	{
 		delete layer;
-}
+	}
 }
 
 void LayerStack::attach_layer_impl(Layer *layer)

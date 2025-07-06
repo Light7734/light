@@ -12,34 +12,23 @@
 
 namespace Light {
 
-Application *Application::s_context = nullptr;
-
-Application::Application()
-    : m_instrumentor(nullptr)
-    , m_layer_stack(nullptr)
-    , m_input(nullptr)
-    , m_window(nullptr)
+Application::Application(): m_window(nullptr)
 {
-	lt_assert(!s_context, "Repeated singleton construction");
-	s_context = this;
+	static auto constructed = false;
+	lt_assert(!constructed, "Application constructed twice");
+	constructed = true;
 
 	log_debug_data();
 
-	m_instrumentor = Instrumentor::create();
 	Light::Instrumentor::begin_session("Logs/ProfileResults_Startup.json");
 
-	m_layer_stack = LayerStack::create();
-	m_input = Input::create();
-
-	m_resource_manager = ResourceManager::create();
-
-	m_window = Window::create([this](auto && PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
+	m_window = Window::create([this](auto &&PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
 }
 
 Application::~Application()
 {
 	log_trc("Application::~Application()");
-	Light::Instrumentor::end_session();
+	Instrumentor::end_session();
 }
 
 void Application::game_loop()
@@ -54,8 +43,8 @@ void Application::game_loop()
 	// reveal window
 	m_window->set_visibility(true);
 
-	Light::Instrumentor::end_session();
-	Light::Instrumentor::begin_session("Logs/ProfileResults_GameLoop.json");
+	Instrumentor::end_session();
+	Instrumentor::begin_session("Logs/ProfileResults_GameLoop.json");
 
 	/* game loop */
 	auto delta_timer = DeltaTimer {};
@@ -65,9 +54,10 @@ void Application::game_loop()
 			// update layers
 			lt_profile_scope("game_loop::update");
 
-			for (auto & it : *m_layer_stack) {
+			for (auto &it : *m_layer_stack)
+			{
 				it->on_update(delta_timer.get_delta_time());
-}
+			}
 		}
 
 		{
@@ -75,9 +65,10 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::Render");
 			m_window->get_graphics_context()->get_renderer()->begin_frame();
 
-			for (auto & it : *m_layer_stack) {
+			for (auto &it : *m_layer_stack)
+			{
 				it->on_render();
-}
+			}
 
 			m_window->get_graphics_context()->get_renderer()->end_frame();
 		}
@@ -87,9 +78,10 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::UserInterface");
 			m_window->get_graphics_context()->get_user_interface()->begin();
 
-			for (auto & it : *m_layer_stack) {
+			for (auto &it : *m_layer_stack)
+			{
 				it->on_user_interface_update();
-}
+			}
 
 			m_window->get_graphics_context()->get_user_interface()->end();
 		}
@@ -104,13 +96,13 @@ void Application::game_loop()
 		delta_timer.update();
 	}
 
-	Light::Instrumentor::end_session();
-	Light::Instrumentor::begin_session("Logs/ProfileResults_Termination.json");
+	Instrumentor::end_session();
+	Instrumentor::begin_session("Logs/ProfileResults_Termination.json");
 }
 
 void Application::quit()
 {
-	s_context->m_window->close();
+	/** TODO: fix quitting procedure */
 }
 
 void Application::on_event(const Event &event)
@@ -120,19 +112,20 @@ void Application::on_event(const Event &event)
 	{
 		m_window->on_event(event);
 
-		if (event.get_event_type() == EventType::WindowResized) {
+		if (event.get_event_type() == EventType::WindowResized)
+		{
 			m_window->get_graphics_context()->get_renderer()->on_window_resize(
 			    (const WindowResizedEvent &)event
 			);
-}
+		}
 	}
 
 	// input
 	if (event.has_category(InputEventCategory))
 	{
-		m_input->on_event(event);
+		Input::instance().on_event(event);
 
-		if (!m_input->is_receiving_game_events())
+		if (!Input::instance().is_receiving_game_events())
 		{
 			return;
 		}
@@ -149,13 +142,10 @@ void Application::on_event(const Event &event)
 
 void Application::log_debug_data()
 {
-	// #todo: log more information
-	log_inf("________________________________________");
 	log_inf("Platform::");
 	log_inf("       Platform name: {}", constants::platform_name);
 	log_inf("       Platform identifier: {}", std::to_underlying(constants::platform));
 	log_inf("       CWD: {}", std::filesystem::current_path().generic_string());
-	log_inf("________________________________________");
 }
 
 } // namespace Light

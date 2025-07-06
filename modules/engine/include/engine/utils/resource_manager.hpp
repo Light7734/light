@@ -11,7 +11,11 @@ class SharedContext;
 class ResourceManager
 {
 public:
-	static auto create() -> Scope<ResourceManager>;
+	static auto instance() -> ResourceManager &
+	{
+		static auto instance = ResourceManager {};
+		return instance;
+	}
 
 	static void load_shader(
 	    const std::string &name,
@@ -19,7 +23,7 @@ public:
 	    const std::string &pixelPath
 	)
 	{
-		s_context->load_shader_impl(name, vertexPath, pixelPath);
+		instance().load_shader_impl(name, vertexPath, pixelPath);
 	}
 
 	static void load_texture(
@@ -28,32 +32,26 @@ public:
 	    unsigned int desiredComponents = 4u
 	)
 	{
-		s_context->load_texture_impl(name, path, desiredComponents);
+		instance().load_texture_impl(name, path, desiredComponents);
 	}
 
 	static void release_texture(const std::string &name)
 	{
-		s_context->release_texture_impl(name);
+		instance().release_texture_impl(name);
 	}
 
 	static auto get_shader(const std::string &name) -> Ref<Shader>
 	{
-		return s_context->m_shaders[name];
+		return instance().m_shaders[name];
 	}
 
 	static auto get_texture(const std::string &name) -> Ref<Texture>
 	{
-		return s_context->m_textures[name];
+		return instance().m_textures[name];
 	}
 
 private:
-	static ResourceManager *s_context;
-
-	std::unordered_map<std::string, Ref<Shader>> m_shaders;
-
-	std::unordered_map<std::string, Ref<Texture>> m_textures;
-
-	ResourceManager();
+	ResourceManager() = default;
 
 	void load_shader_impl(
 	    const std::string &name,
@@ -68,6 +66,10 @@ private:
 	);
 
 	void release_texture_impl(const std::string &name);
+
+	std::unordered_map<std::string, Ref<Shader>> m_shaders;
+
+	std::unordered_map<std::string, Ref<Texture>> m_textures;
 };
 
 } // namespace Light

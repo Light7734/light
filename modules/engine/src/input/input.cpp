@@ -8,25 +8,9 @@
 
 namespace Light {
 
-Input *Input::s_context = nullptr;
+Input::Input(): m_mouse_position {}, m_mouse_delta {}
 
-auto Input::create() -> Scope<Input>
 {
-	return make_scope(new Input);
-}
-
-Input::Input()
-    : 
-     m_mouse_position {}
-    , m_mouse_delta {}
-     
-{
-	lt_assert(
-	    !s_context,
-	    "Input::Input: an instance of 'Input' already exists, do not construct this class!"
-	);
-	s_context = this;
-
 	restart_input_state();
 }
 
@@ -40,9 +24,10 @@ void Input::receieve_game_events_impl(bool receive, bool toggle /*= false*/)
 	auto prev = m_game_events;
 	m_game_events = toggle ? !m_user_interface_events : receive;
 
-	if (m_game_events != prev) {
+	if (m_game_events != prev)
+	{
 		restart_input_state();
-}
+	}
 }
 
 void Input::restart_input_state()
@@ -71,9 +56,10 @@ void Input::on_event(const Event &inputEvent)
 			m_mouse_position = event.get_position();
 		}
 
-		if (m_user_interface_events) {
+		if (m_user_interface_events)
+		{
 			io.MousePos = ImVec2(event.get_x(), event.get_y());
-}
+		}
 
 		return;
 	}
@@ -81,13 +67,15 @@ void Input::on_event(const Event &inputEvent)
 	{
 		const auto &event = dynamic_cast<const ButtonPressedEvent &>(inputEvent);
 
-		if (m_game_events) {
+		if (m_game_events)
+		{
 			m_mouse_buttons[event.get_button()] = true;
-}
+		}
 
-		if (m_user_interface_events) {
+		if (m_user_interface_events)
+		{
 			io.MouseDown[event.get_button()] = true;
-}
+		}
 
 		return;
 	}
@@ -95,13 +83,15 @@ void Input::on_event(const Event &inputEvent)
 	{
 		const auto &event = dynamic_cast<const ButtonReleasedEvent &>(inputEvent);
 
-		if (m_game_events) {
+		if (m_game_events)
+		{
 			m_mouse_buttons[event.get_button()] = false;
-}
+		}
 
-		if (m_user_interface_events) {
+		if (m_user_interface_events)
+		{
 			io.MouseDown[event.get_button()] = false;
-}
+		}
 
 		return;
 	}
@@ -109,13 +99,15 @@ void Input::on_event(const Event &inputEvent)
 	{
 		const auto &event = dynamic_cast<const WheelScrolledEvent &>(inputEvent);
 
-		if (m_game_events) {
+		if (m_game_events)
+		{
 			m_mouse_wheel_delta = event.get_offset();
-}
+		}
 
-		if (m_user_interface_events) {
+		if (m_user_interface_events)
+		{
 			io.MouseWheel = event.get_offset();
-}
+		}
 
 		return;
 	}
@@ -124,9 +116,10 @@ void Input::on_event(const Event &inputEvent)
 	{
 		const auto &event = dynamic_cast<const KeyPressedEvent &>(inputEvent);
 
-		if (m_game_events) {
+		if (m_game_events)
+		{
 			m_keyboad_keys[event.get_key()] = true;
-}
+		}
 
 		if (m_user_interface_events)
 		{
@@ -141,13 +134,15 @@ void Input::on_event(const Event &inputEvent)
 	{
 		const auto &event = dynamic_cast<const KeyReleasedEvent &>(inputEvent);
 
-		if (m_game_events) {
+		if (m_game_events)
+		{
 			m_keyboad_keys[event.get_key()] = false;
-}
+		}
 
-		if (m_user_interface_events) {
+		if (m_user_interface_events)
+		{
 			io.KeysDown[event.get_key()] = false;
-}
+		}
 
 		return;
 	}

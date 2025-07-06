@@ -1,16 +1,13 @@
 #pragma once
 
 #include <engine/base/base.hpp>
-#include <engine/debug/instrumentor.hpp>
 #include <engine/input/input.hpp>
 #include <engine/layer/layer_stack.hpp>
-#include <engine/utils/resource_manager.hpp>
 
 namespace Light {
 
 class Window;
 class Event;
-class Instrumentor;
 
 class Application
 {
@@ -35,15 +32,7 @@ private:
 
 	void log_debug_data();
 
-	static Application *s_context;
-
-	Scope<Instrumentor> m_instrumentor;
-
 	Scope<LayerStack> m_layer_stack;
-
-	Scope<Input> m_input;
-
-	Scope<ResourceManager> m_resource_manager;
 };
 
 extern Light::Scope<Application> create_application();

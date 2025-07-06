@@ -2,23 +2,6 @@
 
 namespace Light {
 
-Instrumentor *Instrumentor::s_context = nullptr;
-
-auto Instrumentor::create() -> Scope<Instrumentor>
-{
-	return make_scope<Instrumentor>(new Instrumentor);
-}
-
-Instrumentor::Instrumentor() 
-{
-	// #todo: maintenance
-	lt_assert(
-	    !s_context,
-	    "An instance of 'Instrumentor' already exists, do not construct this class!"
-	);
-	s_context = this;
-}
-
 void Instrumentor::begin_session_impl(const std::string &outputPath)
 {
 	std::filesystem::create_directory(outputPath.substr(0, outputPath.find_last_of('/') + 1));
@@ -29,9 +12,10 @@ void Instrumentor::begin_session_impl(const std::string &outputPath)
 
 void Instrumentor::end_session_impl()
 {
-	if (m_current_session_count == 0u) {
+	if (m_current_session_count == 0u)
+	{
 		log_wrn("0 profiling for the ended session");
-}
+	}
 
 	m_current_session_count = 0u;
 
@@ -42,11 +26,14 @@ void Instrumentor::end_session_impl()
 
 void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileResult)
 {
-	if (m_current_session_count++ == 0u) {
+	if (m_current_session_count++ == 0u)
+	{
 		m_output_file_stream << "{";
-	} else {
+	}
+	else
+	{
 		m_output_file_stream << ",{";
-}
+	}
 
 	m_output_file_stream << R"("name":")" << profileResult.name << "\",";
 	m_output_file_stream << R"("cat": "scope",)";
@@ -59,7 +46,7 @@ void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileRe
 }
 
 InstrumentorTimer::InstrumentorTimer(const std::string &scopeName)
-    : m_result({ .name=scopeName, .start=0, .duration=0, .threadID=0 })
+    : m_result({ .name = scopeName, .start = 0, .duration = 0, .threadID = 0 })
     , m_start(std::chrono::steady_clock::now())
 {
 }
