@@ -23,7 +23,7 @@ public:
 		m_window->set_properties(properties);
 
 		// Attach the sandbox layer
-		LayerStack::emplace_layer<EditorLayer>(("MirrorLayer"));
+		LayerStack::emplace_layer<EditorLayer>("MirrorLayer");
 	}
 };
 

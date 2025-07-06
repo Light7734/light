@@ -7,7 +7,7 @@ namespace Light {
 class Layer;
 class Event;
 
-class LayerStack /* singleton */
+class LayerStack
 {
 public:
 	static auto instance() -> LayerStack &
@@ -16,21 +16,18 @@ public:
 		return instance;
 	}
 
-	~LayerStack();
-
-	// #todo: is this needed?
-	template<typename t, typename... Args>
+	template<typename Layer_T, typename... Args>
 	static void emplace_layer(Args &&...args)
 	{
-		instance().attach_layer_impl(new t((args)...));
+		instance().attach_layer_impl(create_ref<Layer_T>(std::forward<Args>(args)...));
 	}
 
-	static void attach_layer(Layer *layer)
+	static void attach_layer(Ref<Layer> layer)
 	{
-		instance().attach_layer_impl(layer);
+		instance().attach_layer_impl(std::move(layer));
 	}
 
-	static void detach_layer(Layer *layer)
+	static void detach_layer(const Ref<Layer> &layer)
 	{
 		instance().detach_layer_impl(layer);
 	}
@@ -40,38 +37,34 @@ public:
 		return m_layers.empty();
 	}
 
-	auto begin() -> std::vector<Layer *>::iterator
+	auto begin() -> std::vector<Ref<Layer>>::iterator
 	{
 		return m_layers.begin();
 	}
 
-	auto end() -> std::vector<Layer *>::iterator
+	auto end() -> std::vector<Ref<Layer>>::iterator
 	{
 		return m_layers.end();
 	}
 
-	auto rbegin() -> std::vector<Layer *>::reverse_iterator
+	auto rbegin() -> std::vector<Ref<Layer>>::reverse_iterator
 	{
 		return m_layers.rbegin();
 	}
 
-	auto rend() -> std::vector<Layer *>::reverse_iterator
+	auto rend() -> std::vector<Ref<Layer>>::reverse_iterator
 	{
 		return m_layers.rend();
 	}
 
 private:
-	std::vector<Layer *> m_layers;
-
-	std::vector<Layer *>::iterator m_begin;
-
-	std::vector<Layer *>::iterator m_end;
+	std::vector<Ref<Layer>> m_layers;
 
 	LayerStack() = default;
 
-	void attach_layer_impl(Layer *layer);
+	void attach_layer_impl(Ref<Layer> layer);
 
-	void detach_layer_impl(Layer *layer);
+	void detach_layer_impl(const Ref<Layer> &layer);
 };
 
 } // namespace Light

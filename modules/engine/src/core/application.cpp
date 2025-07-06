@@ -12,11 +12,12 @@
 
 namespace Light {
 
+Application *Application::s_instance = nullptr;
+
 Application::Application(): m_window(nullptr)
 {
-	static auto constructed = false;
-	lt_assert(!constructed, "Application constructed twice");
-	constructed = true;
+	lt_assert(!s_instance, "Application constructed twice");
+	s_instance = this;
 
 	log_debug_data();
 
@@ -34,7 +35,7 @@ Application::~Application()
 void Application::game_loop()
 {
 	// check
-	lt_assert(!m_layer_stack->is_empty(), "layer_stack is empty");
+	lt_assert(!LayerStack::instance().is_empty(), "layer_stack is empty");
 
 	// log debug data
 	m_window->get_graphics_context()->log_debug_data();
@@ -54,7 +55,7 @@ void Application::game_loop()
 			// update layers
 			lt_profile_scope("game_loop::update");
 
-			for (auto &it : *m_layer_stack)
+			for (auto &it : LayerStack::instance())
 			{
 				it->on_update(delta_timer.get_delta_time());
 			}
@@ -65,7 +66,7 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::Render");
 			m_window->get_graphics_context()->get_renderer()->begin_frame();
 
-			for (auto &it : *m_layer_stack)
+			for (auto &it : LayerStack::instance())
 			{
 				it->on_render();
 			}
@@ -78,7 +79,7 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::UserInterface");
 			m_window->get_graphics_context()->get_user_interface()->begin();
 
-			for (auto &it : *m_layer_stack)
+			for (auto &it : LayerStack::instance())
 			{
 				it->on_user_interface_update();
 			}
@@ -102,7 +103,7 @@ void Application::game_loop()
 
 void Application::quit()
 {
-	/** TODO: fix quitting procedure */
+	s_instance->m_window->close();
 }
 
 void Application::on_event(const Event &event)
@@ -131,7 +132,7 @@ void Application::on_event(const Event &event)
 		}
 	}
 
-	for (auto &it : std::ranges::reverse_view(*m_layer_stack))
+	for (auto &it : std::ranges::reverse_view(LayerStack::instance()))
 	{
 		if (it->on_event(event))
 		{

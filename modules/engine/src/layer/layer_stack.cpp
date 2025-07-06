@@ -7,32 +7,16 @@
 
 namespace Light {
 
-LayerStack::~LayerStack()
+void LayerStack::attach_layer_impl(Ref<Layer> layer)
 {
-	for (auto *layer : m_layers)
-	{
-		delete layer;
-	}
+	log_trc("Attaching [{}]", layer->get_name());
+	m_layers.emplace_back(std::move(layer));
 }
 
-void LayerStack::attach_layer_impl(Layer *layer)
+void LayerStack::detach_layer_impl(const Ref<Layer> &layer)
 {
-	// #todo: handle attaching layer inside a for loop
-	m_layers.push_back(layer);
-	m_begin = m_layers.begin();
-	m_end = m_layers.end();
-
-	log_trc("Attached [{}]", layer->get_name());
-}
-
-void LayerStack::detach_layer_impl(Layer *layer)
-{
-	// #todo: handle detaching layer inside a for loop
+	log_trc("Detaching [{}]", layer->get_name());
 	m_layers.erase(std::find(m_layers.begin(), m_layers.end(), layer));
-	m_begin = m_layers.begin();
-	m_end = m_layers.end();
-
-	log_trc("Detached [{}]", layer->get_name());
 }
 
 } // namespace Light

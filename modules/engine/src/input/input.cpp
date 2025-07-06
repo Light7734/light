@@ -123,7 +123,7 @@ void Input::on_event(const Event &inputEvent)
 
 		if (m_user_interface_events)
 		{
-			io.KeysDown[event.get_key()] = true;
+			// io.AddKeyEvent(event.get_key(), true);
 			// if (event.get_key() == Key::BackSpace)
 			//	io.AddInputCharacter(Key::BackSpace);
 		}
@@ -141,7 +141,7 @@ void Input::on_event(const Event &inputEvent)
 
 		if (m_user_interface_events)
 		{
-			io.KeysDown[event.get_key()] = false;
+			// io.AddKeyEvent(event.get_key(), false);
 		}
 
 		return;

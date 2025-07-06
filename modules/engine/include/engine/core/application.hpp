@@ -28,11 +28,11 @@ protected:
 	Scope<Window> m_window;
 
 private:
+	static Application *s_instance;
+
 	void on_event(const Event &event);
 
 	void log_debug_data();
-
-	Scope<LayerStack> m_layer_stack;
 };
 
 extern Light::Scope<Application> create_application();
