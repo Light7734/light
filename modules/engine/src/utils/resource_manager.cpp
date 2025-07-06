@@ -13,7 +13,7 @@ auto ResourceManager::create() -> Scope<ResourceManager>
 	return make_scope(new ResourceManager());
 }
 
-ResourceManager::ResourceManager(): m_shaders {}, m_textures {}
+ResourceManager::ResourceManager() 
 {
 	lt_assert(!s_context, "Repeated singleton construction");
 	s_context = this;

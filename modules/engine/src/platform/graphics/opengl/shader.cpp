@@ -6,16 +6,16 @@
 
 namespace Light {
 
-glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile): m_shader_id(0u)
+glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile) 
 {
 	// create
 	m_shader_id = glCreateProgram();
 
-	std::string vertexSource(vertexFile.get_data(), vertexFile.get_data() + vertexFile.get_size());
-	std::string pixelSource(pixelFile.get_data(), pixelFile.get_data() + pixelFile.get_size());
+	std::string const vertexSource(vertexFile.get_data(), vertexFile.get_data() + vertexFile.get_size());
+	std::string const pixelSource(pixelFile.get_data(), pixelFile.get_data() + pixelFile.get_size());
 
-	unsigned int vertexShader = compile_shader(vertexSource, Shader::Stage::VERTEX);
-	unsigned int pixelShader = compile_shader(pixelSource, Shader::Stage::PIXEL);
+	unsigned int const vertexShader = compile_shader(vertexSource, Shader::Stage::VERTEX);
+	unsigned int const pixelShader = compile_shader(pixelSource, Shader::Stage::PIXEL);
 
 	// attach shaders
 	glAttachShader(m_shader_id, vertexShader);
@@ -68,7 +68,7 @@ void glShader::un_bind()
 // 	return result;
 // }
 
-auto glShader::compile_shader(std::string source, Shader::Stage stage) -> unsigned int
+auto glShader::compile_shader(const std::string& source, Shader::Stage stage) -> unsigned int
 {
 	// &(address of) needs an lvalue
 	const auto *lvalue_source = source.c_str();
@@ -80,7 +80,7 @@ auto glShader::compile_shader(std::string source, Shader::Stage stage) -> unsign
 	);
 
 	// compile
-	glShaderSource(shader, 1, &lvalue_source, NULL);
+	glShaderSource(shader, 1, &lvalue_source, nullptr);
 	glCompileShader(shader);
 
 	// check

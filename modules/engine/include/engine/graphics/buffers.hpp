@@ -14,10 +14,11 @@ enum class ConstantBufferIndex
 class ConstantBuffer
 {
 public:
+virtual ~ConstantBuffer() = default;
 	static auto create(
 	    ConstantBufferIndex index,
 	    unsigned int size,
-	    Ref<SharedContext> sharedContext
+	    const Ref<SharedContext>& sharedContext
 	) -> Scope<ConstantBuffer>;
 
 	virtual auto map() -> void * = 0;
@@ -37,7 +38,7 @@ public:
 	    float *vertices,
 	    unsigned int stride,
 	    unsigned int count,
-	    Ref<SharedContext> sharedContext
+	    const Ref<SharedContext>& sharedContext
 	) -> Ref<VertexBuffer>;
 
 	virtual ~VertexBuffer() = default;
@@ -57,7 +58,7 @@ protected:
 class IndexBuffer
 {
 public:
-	static auto create(unsigned int *indices, unsigned int count, Ref<SharedContext> sharedContext)
+	static auto create(unsigned int *indices, unsigned int count, const Ref<SharedContext>& sharedContext)
 	    -> Ref<IndexBuffer>;
 
 	virtual ~IndexBuffer() = default;

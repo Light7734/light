@@ -8,6 +8,7 @@ namespace Light {
 class glBlender: public Blender
 {
 public:
+virtual ~glBlender() = default;
 	glBlender();
 
 	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;

@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-namespace Light {
 
-namespace Key {
+
+namespace Light::Key {
 enum : uint16_t
 {
 	/* digits */
@@ -179,4 +179,4 @@ enum : uint16_t
 };
 }
 
-} // namespace Light
+

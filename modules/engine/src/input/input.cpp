@@ -16,13 +16,10 @@ auto Input::create() -> Scope<Input>
 }
 
 Input::Input()
-    : m_keyboad_keys {}
-    , m_mouse_buttons {}
-    , m_mouse_position {}
+    : 
+     m_mouse_position {}
     , m_mouse_delta {}
-    , m_mouse_wheel_delta {}
-    , m_user_interface_events(true)
-    , m_game_events(true)
+     
 {
 	lt_assert(
 	    !s_context,
@@ -43,8 +40,9 @@ void Input::receieve_game_events_impl(bool receive, bool toggle /*= false*/)
 	auto prev = m_game_events;
 	m_game_events = toggle ? !m_user_interface_events : receive;
 
-	if (m_game_events != prev)
+	if (m_game_events != prev) {
 		restart_input_state();
+}
 }
 
 void Input::restart_input_state()
@@ -73,54 +71,62 @@ void Input::on_event(const Event &inputEvent)
 			m_mouse_position = event.get_position();
 		}
 
-		if (m_user_interface_events)
+		if (m_user_interface_events) {
 			io.MousePos = ImVec2(event.get_x(), event.get_y());
+}
 
 		return;
 	}
 	case EventType::ButtonPressed:
 	{
-		const auto &event = (const ButtonPressedEvent &)inputEvent;
+		const auto &event = dynamic_cast<const ButtonPressedEvent &>(inputEvent);
 
-		if (m_game_events)
+		if (m_game_events) {
 			m_mouse_buttons[event.get_button()] = true;
+}
 
-		if (m_user_interface_events)
+		if (m_user_interface_events) {
 			io.MouseDown[event.get_button()] = true;
+}
 
 		return;
 	}
 	case EventType::ButtonReleased:
 	{
-		const auto &event = (const ButtonReleasedEvent &)inputEvent;
+		const auto &event = dynamic_cast<const ButtonReleasedEvent &>(inputEvent);
 
-		if (m_game_events)
+		if (m_game_events) {
 			m_mouse_buttons[event.get_button()] = false;
+}
 
-		if (m_user_interface_events)
+		if (m_user_interface_events) {
 			io.MouseDown[event.get_button()] = false;
+}
 
 		return;
 	}
 	case EventType::WheelScrolled:
 	{
-		const auto &event = (const WheelScrolledEvent &)inputEvent;
+		const auto &event = dynamic_cast<const WheelScrolledEvent &>(inputEvent);
 
-		if (m_game_events)
+		if (m_game_events) {
 			m_mouse_wheel_delta = event.get_offset();
+}
 
-		if (m_user_interface_events)
+		if (m_user_interface_events) {
 			io.MouseWheel = event.get_offset();
+}
 
 		return;
 	}
 	//** KEYBOARD_EVENTS **//
 	case EventType::KeyPressed:
 	{
-		const auto &event = (const KeyPressedEvent &)inputEvent;
+		const auto &event = dynamic_cast<const KeyPressedEvent &>(inputEvent);
 
-		if (m_game_events)
+		if (m_game_events) {
 			m_keyboad_keys[event.get_key()] = true;
+}
 
 		if (m_user_interface_events)
 		{
@@ -133,13 +139,15 @@ void Input::on_event(const Event &inputEvent)
 	}
 	case EventType::KeyReleased:
 	{
-		const auto &event = (const KeyReleasedEvent &)inputEvent;
+		const auto &event = dynamic_cast<const KeyReleasedEvent &>(inputEvent);
 
-		if (m_game_events)
+		if (m_game_events) {
 			m_keyboad_keys[event.get_key()] = false;
+}
 
-		if (m_user_interface_events)
+		if (m_user_interface_events) {
 			io.KeysDown[event.get_key()] = false;
+}
 
 		return;
 	}
@@ -147,7 +155,7 @@ void Input::on_event(const Event &inputEvent)
 	{
 		if (m_user_interface_events)
 		{
-			const auto &event = (const SetCharEvent &)inputEvent;
+			const auto &event = dynamic_cast<const SetCharEvent &>(inputEvent);
 			io.AddInputCharacter(event.get_character());
 		}
 

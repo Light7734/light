@@ -21,17 +21,17 @@ public:
 
 	void on_resize(const glm::vec2 &size);
 
-	auto get_view() const -> const glm::mat4 &
+	[[nodiscard]] auto get_view() const -> const glm::mat4 &
 	{
 		return m_view;
 	}
 
-	auto get_projection() const -> const glm::mat4 &
+	[[nodiscard]] auto get_projection() const -> const glm::mat4 &
 	{
 		return m_projection;
 	}
 
-	auto get_clear_color() const -> const glm::vec4 &
+	[[nodiscard]] auto get_clear_color() const -> const glm::vec4 &
 	{
 		return m_clear_color;
 	}
@@ -47,9 +47,9 @@ private:
 
 	const glm::vec3 m_up;
 
-	glm::mat4 m_projection;
+	glm::mat4 m_projection{};
 
-	glm::mat4 m_view;
+	glm::mat4 m_view{};
 
 	glm::vec4 m_clear_color;
 };

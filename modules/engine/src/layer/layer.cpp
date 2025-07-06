@@ -7,7 +7,7 @@
 
 namespace Light {
 
-Layer::Layer(const std::string &name): m_layer_name(name)
+Layer::Layer(std::string name): m_layer_name(std::move(name))
 {
 }
 

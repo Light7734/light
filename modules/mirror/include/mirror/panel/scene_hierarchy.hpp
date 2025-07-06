@@ -14,11 +14,11 @@ class SceneHierarchyPanel: public Panel
 public:
 	SceneHierarchyPanel();
 
-	SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel = nullptr);
+	SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> properties_panel = nullptr);
 
 	void on_user_interface_update();
 
-	void set_context(Ref<Scene> context, Ref<PropertiesPanel> propertiesPanel = nullptr);
+	void set_context(Ref<Scene> context, Ref<PropertiesPanel> properties_panel = nullptr);
 
 private:
 	void draw_node(Entity entity, const std::string &label);

@@ -55,11 +55,11 @@ public:
 
 	virtual ~Event() = default;
 
-	virtual auto get_event_type() const -> EventType = 0;
+	[[nodiscard]] virtual auto get_event_type() const -> EventType = 0;
 
-	virtual auto get_info_lt_log() const -> std::string = 0;
+	[[nodiscard]] virtual auto get_info_lt_log() const -> std::string = 0;
 
-	virtual auto has_category(EventCategory category) const -> bool = 0;
+	[[nodiscard]] virtual auto has_category(EventCategory category) const -> bool = 0;
 
 	friend auto operator<<(std::ostream &os, const Event &e) -> std::ostream &
 	{

@@ -10,7 +10,7 @@ class glFramebuffer: public Framebuffer
 public:
 	glFramebuffer(const FramebufferSpecification &specification);
 
-	~glFramebuffer();
+	virtual ~glFramebuffer();
 
 	void bind_as_target(const glm::vec4 &clearColor) override;
 

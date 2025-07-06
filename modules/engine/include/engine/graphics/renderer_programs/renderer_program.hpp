@@ -13,6 +13,8 @@ class RendererProgram
 	virtual void un_map() = 0;
 
 	virtual void bind() = 0;
+public:
+virtual ~RendererProgram() = default;
 };
 
 } // namespace Light

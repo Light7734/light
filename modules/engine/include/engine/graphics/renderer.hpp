@@ -4,10 +4,11 @@
 #include <engine/graphics/renderer_programs/quad.hpp>
 #include <engine/graphics/renderer_programs/texture.hpp>
 #include <engine/graphics/renderer_programs/tinted_texture.hpp>
+#include <utility>
 
-#define LT_MAX_QUAD_RENDERER_VERTICES           1028u * 4u
-#define LT_MAX_TEXTURE_RENDERER_VERTICES        1028u * 4u
-#define LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES 1028u * 4u
+#define LT_MAX_QUAD_RENDERER_VERTICES           (1028u * 4u)
+#define LT_MAX_TEXTURE_RENDERER_VERTICES        (1028u * 4u)
+#define LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES (1028u * 4u)
 
 struct GLFWwindow;
 
@@ -35,7 +36,7 @@ public:
 	    Ref<Texture> texture
 	)
 	{
-		s_context->draw_quad_impl(position, size, tint, texture);
+		s_context->draw_quad_impl(position, size, tint, std::move(texture));
 	}
 
 	static void draw_quad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint)
@@ -45,12 +46,12 @@ public:
 
 	static void draw_quad(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture)
 	{
-		s_context->draw_quad_impl(position, size, texture);
+		s_context->draw_quad_impl(position, size, std::move(texture));
 	}
 
 	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
 	{
-		s_context->draw_quad_impl(transform, tint, texture);
+		s_context->draw_quad_impl(transform, tint, std::move(texture));
 	}
 
 	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint)
@@ -60,7 +61,7 @@ public:
 
 	static void draw_quad(const glm::mat4 &transform, Ref<Texture> texture)
 	{
-		s_context->draw_quad_impl(transform, texture);
+		s_context->draw_quad_impl(transform, std::move(texture));
 	}
 
 	static void begin_scene(
@@ -98,13 +99,13 @@ private:
 
 	Scope<Blender> m_blender;
 
-	Camera *m_default_framebuffer_camera;
+	Camera *m_default_framebuffer_camera { nullptr };
 
 	Ref<Framebuffer> m_target_framebuffer;
 
-	bool m_should_clear_backbuffer;
+	bool m_should_clear_backbuffer { false };
 
-	Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
+	Renderer(GLFWwindow *windowHandle, const Ref<SharedContext> &sharedContext);
 
 	void draw_quad_impl(
 	    const glm::vec3 &position,
@@ -117,11 +118,15 @@ private:
 
 	void draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture);
 
-	void draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture);
+	void draw_quad_impl(
+	    const glm::mat4 &transform,
+	    const glm::vec4 &tint,
+	    const Ref<Texture> &texture
+	);
 
 	void draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint);
 
-	void draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture);
+	void draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &texture);
 
 	void begin_scene_impl(
 	    Camera *camera,

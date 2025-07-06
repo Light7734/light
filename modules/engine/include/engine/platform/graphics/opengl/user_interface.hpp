@@ -12,7 +12,7 @@ class glUserInterface: public UserInterface
 public:
 	glUserInterface() = default;
 
-	~glUserInterface();
+	~glUserInterface() override;
 
 	void platform_implementation(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 	    override;
@@ -24,7 +24,7 @@ public:
 	void log_debug_data() override;
 
 private:
-	GLFWwindow *m_window_handle;
+	GLFWwindow *m_window_handle{};
 };
 
 } // namespace Light

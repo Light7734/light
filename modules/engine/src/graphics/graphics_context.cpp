@@ -18,8 +18,7 @@ namespace Light {
 GraphicsContext *GraphicsContext::s_context = nullptr;
 
 GraphicsContext::~GraphicsContext()
-{
-}
+= default;
 
 auto GraphicsContext::create(GraphicsAPI api, GLFWwindow *windowHandle) -> Scope<GraphicsContext>
 {

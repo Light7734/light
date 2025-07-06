@@ -34,10 +34,10 @@ class VertexLayout
 {
 public:
 	static auto create(
-	    Ref<VertexBuffer> vertexBuffer,
-	    Ref<Shader> shader,
+	    const Ref<VertexBuffer>& vertexBuffer,
+	    const Ref<Shader>& shader,
 	    const std::vector<std::pair<std::string, VertexElementType>> &elements,
-	    Ref<SharedContext> sharedContext
+	    const Ref<SharedContext>& sharedContext
 	) -> Ref<VertexLayout>;
 
 	virtual ~VertexLayout() = default;

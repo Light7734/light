@@ -9,21 +9,21 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
+#include <utility>
 
 namespace Light {
 
 Renderer *Renderer::s_context = nullptr;
 
-Renderer::Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+Renderer::Renderer(GLFWwindow *windowHandle, const Ref<SharedContext> &sharedContext)
     : m_quad_renderer(LT_MAX_QUAD_RENDERER_VERTICES, sharedContext)
     , m_texture_renderer(LT_MAX_TEXTURE_RENDERER_VERTICES, sharedContext)
     , m_tinted_texture_renderer(LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES, sharedContext)
     , m_view_projection_buffer(nullptr)
     , m_render_command(nullptr)
     , m_blender(nullptr)
-    , m_default_framebuffer_camera(nullptr)
     , m_target_framebuffer(nullptr)
-    , m_should_clear_backbuffer(false)
+
 {
 	lt_assert(!s_context, "An instance of 'renderer' already exists, do not construct this class!");
 	s_context = this;
@@ -41,7 +41,7 @@ Renderer::Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 
 auto Renderer::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext) -> Scope<Renderer>
 {
-	return make_scope<Renderer>(new Renderer(windowHandle, sharedContext));
+	return make_scope<Renderer>(new Renderer(windowHandle, std::move(sharedContext)));
 }
 
 void Renderer::on_window_resize(const WindowResizedEvent &event)
@@ -62,7 +62,7 @@ void Renderer::draw_quad_impl(
 	    glm::translate(glm::mat4(1.0f), position)
 	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
 	    tint,
-	    texture
+	    std::move(texture)
 	);
 }
 
@@ -90,7 +90,7 @@ void Renderer::draw_quad_impl(
 	draw_quad(
 	    glm::translate(glm::mat4(1.0f), position)
 	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
-	    texture
+	    std::move(texture)
 	);
 }
 //======================================== DRAW_QUAD ========================================//
@@ -127,7 +127,7 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 //==================== DRAW_QUAD_TINT ====================//
 
 //==================== DRAW_QUAD_TEXTURE ====================//
-void Renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
+void Renderer::draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &texture)
 {
 	// #todo: implement a proper binding
 	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
@@ -163,7 +163,7 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
 void Renderer::draw_quad_impl(
     const glm::mat4 &transform,
     const glm::vec4 &tint,
-    Ref<Texture> texture
+    const Ref<Texture> &texture
 )
 {
 	// #todo: implement a proper binding
@@ -229,7 +229,9 @@ void Renderer::begin_scene_impl(
 	m_target_framebuffer = targetFrameBuffer;
 
 	if (targetFrameBuffer)
+	{
 		targetFrameBuffer->bind_as_target(camera->get_background_color());
+	}
 	else
 	{
 		m_default_framebuffer_camera = camera;
@@ -237,7 +239,7 @@ void Renderer::begin_scene_impl(
 	}
 
 	// update view projection buffer
-	glm::mat4 *map = (glm::mat4 *)m_view_projection_buffer->map();
+	auto *map = (glm::mat4 *)m_view_projection_buffer->map();
 	map[0] = camera->get_projection() * glm::inverse(cameraTransform);
 	m_view_projection_buffer->un_map();
 

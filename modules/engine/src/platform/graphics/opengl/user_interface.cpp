@@ -9,7 +9,7 @@ namespace Light {
 
 void glUserInterface::platform_implementation(
     GLFWwindow *windowHandle,
-    Ref<SharedContext> sharedContext
+    Ref<SharedContext>  /*sharedContext*/
 )
 {
 	m_window_handle = windowHandle;
@@ -23,8 +23,9 @@ glUserInterface::~glUserInterface()
 	// #todo: handle this in a better way
 	auto &io = ImGui::GetIO();
 
-	if (io.IniFilename == "default_gui_layout.ini")
+	if (io.IniFilename == "default_gui_layout.ini") {
 		io.IniFilename = "user_gui_layout.ini";
+}
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

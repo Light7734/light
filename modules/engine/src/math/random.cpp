@@ -1,8 +1,8 @@
 #include <cmath>
 #include <engine/math/random.hpp>
 
-namespace Light {
-namespace Math {
+
+namespace Light::Math {
 
 auto rand(int min, int max, int decimals /* = 0 */) -> float
 {
@@ -37,5 +37,5 @@ auto rand_vec3(int min, int max, int decimals /* = 0 */) -> glm::vec3
 
 	return { r1, r2, r3 };
 }
-} // namespace Math
-} // namespace Light
+} // namespace Light::Math
+

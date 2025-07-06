@@ -50,37 +50,37 @@ public:
 
 	void set_perspective_near_plane(float nearPlane);
 
-	auto get_orthographic_size() const -> float
+	[[nodiscard]] auto get_orthographic_size() const -> float
 	{
 		return m_orthographic_specification.size;
 	}
 
-	auto get_orthographic_far_plane() const -> float
+	[[nodiscard]] auto get_orthographic_far_plane() const -> float
 	{
 		return m_orthographic_specification.far_plane;
 	}
 
-	auto get_orthographic_near_plane() const -> float
+	[[nodiscard]] auto get_orthographic_near_plane() const -> float
 	{
 		return m_orthographic_specification.near_plane;
 	}
 
-	auto get_perspective_vertical_fov() const -> float
+	[[nodiscard]] auto get_perspective_vertical_fov() const -> float
 	{
 		return m_perspective_specification.vertical_fov;
 	}
 
-	auto get_perspective_far_plane() const -> float
+	[[nodiscard]] auto get_perspective_far_plane() const -> float
 	{
 		return m_perspective_specification.far_plane;
 	}
 
-	auto get_perspective_near_plane() const -> float
+	[[nodiscard]] auto get_perspective_near_plane() const -> float
 	{
 		return m_perspective_specification.near_plane;
 	}
 
-	auto get_projection_type() const -> ProjectionType
+	[[nodiscard]] auto get_projection_type() const -> ProjectionType
 	{
 		return m_projection_type;
 	}
@@ -93,7 +93,7 @@ private:
 
 	float m_aspect_ratio;
 
-	ProjectionType m_projection_type;
+	ProjectionType m_projection_type{ProjectionType::Orthographic};
 
 	void calculate_projection();
 };

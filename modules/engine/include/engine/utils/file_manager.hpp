@@ -7,12 +7,13 @@ namespace Light {
 class BasicFileHandle
 {
 public:
+virtual ~BasicFileHandle() = default;
 	BasicFileHandle(
 	    uint8_t *data = nullptr,
 	    uint32_t size = 0ull,
-	    const std::string &path = "",
-	    const std::string &name = "",
-	    const std::string &extension = ""
+	    std::string path = "",
+	    std::string name = "",
+	    std::string extension = ""
 	);
 
 	virtual void release();
@@ -22,7 +23,7 @@ public:
 		return m_data;
 	}
 
-	auto get_size() -> uint32_t
+	auto get_size() const -> uint32_t
 	{
 		return m_size;
 	}
@@ -47,7 +48,7 @@ public:
 		return m_name + '.' + m_extension;
 	}
 
-	auto is_valid() const -> bool
+	[[nodiscard]] auto is_valid() const -> bool
 	{
 		return !!m_data;
 	}
@@ -74,6 +75,7 @@ private:
 class ImageFileHandle: public BasicFileHandle
 {
 public:
+virtual ~ImageFileHandle() = default;
 	ImageFileHandle(
 	    uint8_t *data,
 	    uint32_t size,
@@ -95,22 +97,22 @@ public:
 
 	void release() override;
 
-	auto get_width() const -> uint32_t
+	[[nodiscard]] auto get_width() const -> uint32_t
 	{
 		return m_width;
 	}
 
-	auto get_height() const -> uint32_t
+	[[nodiscard]] auto get_height() const -> uint32_t
 	{
 		return m_height;
 	}
 
-	auto get_components() const -> uint32_t
+	[[nodiscard]] auto get_components() const -> uint32_t
 	{
 		return m_components;
 	}
 
-	auto get_desired_components() const -> uint32_t
+	[[nodiscard]] auto get_desired_components() const -> uint32_t
 	{
 		return m_desired_components;
 	}

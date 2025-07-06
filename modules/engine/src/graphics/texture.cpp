@@ -7,6 +7,7 @@
 #endif
 
 #include <engine/graphics/graphics_context.hpp>
+#include <utility>
 
 namespace Light {
 
@@ -15,7 +16,7 @@ auto Texture::create(
     unsigned int height,
     unsigned int components,
     unsigned char *pixels,
-    Ref<SharedContext> sharedContext,
+    const Ref<SharedContext>&  /*sharedContext*/,
     const std::string &filePath
 ) -> Ref<Texture>
 {
@@ -44,7 +45,7 @@ auto Texture::create(
 	}
 }
 
-Texture::Texture(const std::string &filePath): m_file_path(filePath)
+Texture::Texture(std::string filePath): m_file_path(std::move(filePath))
 {
 }
 

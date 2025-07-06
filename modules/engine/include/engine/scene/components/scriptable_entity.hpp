@@ -14,7 +14,7 @@ public:
 
 	virtual ~NativeScript() = default;
 
-	auto get_uid() const -> unsigned int
+	[[nodiscard]] auto get_uid() const -> unsigned int
 	{
 		return m_unique_identifier;
 	}

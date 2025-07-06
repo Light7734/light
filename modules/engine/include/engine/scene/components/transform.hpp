@@ -25,7 +25,7 @@ struct TransformComponent
 	{
 	}
 
-	auto get_transform() const -> glm::mat4
+	[[nodiscard]] auto get_transform() const -> glm::mat4
 	{
 		return glm::translate(translation) * glm::rotate(rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
 		       * glm::scale(scale);

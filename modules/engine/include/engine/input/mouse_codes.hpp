@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-namespace Light {
 
-namespace Mouse {
+
+namespace Light::Mouse {
 enum : uint8_t
 {
 	Button1 = 0,
@@ -22,4 +22,4 @@ enum : uint8_t
 };
 }
 
-} // namespace Light
+

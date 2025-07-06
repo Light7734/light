@@ -5,7 +5,7 @@
 namespace Light {
 
 glVertexLayout::glVertexLayout(
-    Ref<VertexBuffer> buffer,
+    const Ref<VertexBuffer>& buffer,
     const std::vector<std::pair<std::string, VertexElementType>> &elements
 )
     : m_array_id(NULL)
@@ -73,32 +73,32 @@ auto glVertexLayout::get_element_desc(VertexElementType type, unsigned int offse
 	switch (type)
 	{
 	/* byte */
-	case Light::VertexElementType::Byte1: return { GL_BYTE, 1u, sizeof(GLbyte), offset };
-	case Light::VertexElementType::Byte2: return { GL_BYTE, 1u, sizeof(GLbyte), offset };
-	case Light::VertexElementType::Byte4: return { GL_BYTE, 1u, sizeof(GLbyte), offset };
+	case Light::VertexElementType::Byte1: return { .type=GL_BYTE, .count=1u, .typeSize=sizeof(GLbyte), .offset=offset };
+	case Light::VertexElementType::Byte2: return { .type=GL_BYTE, .count=1u, .typeSize=sizeof(GLbyte), .offset=offset };
+	case Light::VertexElementType::Byte4: return { .type=GL_BYTE, .count=1u, .typeSize=sizeof(GLbyte), .offset=offset };
 
 	/* ubyte */
-	case Light::VertexElementType::UByte1: return { GL_UNSIGNED_BYTE, 1u, sizeof(GLubyte), offset };
-	case Light::VertexElementType::UByte2: return { GL_UNSIGNED_BYTE, 2u, sizeof(GLubyte), offset };
-	case Light::VertexElementType::UByte4: return { GL_UNSIGNED_BYTE, 4u, sizeof(GLubyte), offset };
+	case Light::VertexElementType::UByte1: return { .type=GL_UNSIGNED_BYTE, .count=1u, .typeSize=sizeof(GLubyte), .offset=offset };
+	case Light::VertexElementType::UByte2: return { .type=GL_UNSIGNED_BYTE, .count=2u, .typeSize=sizeof(GLubyte), .offset=offset };
+	case Light::VertexElementType::UByte4: return { .type=GL_UNSIGNED_BYTE, .count=4u, .typeSize=sizeof(GLubyte), .offset=offset };
 
 	/* int */
-	case VertexElementType::Int1: return { GL_INT, 1u, sizeof(GLint), offset };
-	case VertexElementType::Int2: return { GL_INT, 2u, sizeof(GLint), offset };
-	case VertexElementType::Int3: return { GL_INT, 3u, sizeof(GLint), offset };
-	case VertexElementType::Int4: return { GL_INT, 4u, sizeof(GLint), offset };
+	case VertexElementType::Int1: return { .type=GL_INT, .count=1u, .typeSize=sizeof(GLint), .offset=offset };
+	case VertexElementType::Int2: return { .type=GL_INT, .count=2u, .typeSize=sizeof(GLint), .offset=offset };
+	case VertexElementType::Int3: return { .type=GL_INT, .count=3u, .typeSize=sizeof(GLint), .offset=offset };
+	case VertexElementType::Int4: return { .type=GL_INT, .count=4u, .typeSize=sizeof(GLint), .offset=offset };
 
 	/* uint */
-	case VertexElementType::UInt1: return { GL_UNSIGNED_INT, 1u, sizeof(GLuint), offset };
-	case VertexElementType::UInt2: return { GL_UNSIGNED_INT, 2u, sizeof(GLuint), offset };
-	case VertexElementType::UInt3: return { GL_UNSIGNED_INT, 3u, sizeof(GLuint), offset };
-	case VertexElementType::UInt4: return { GL_UNSIGNED_INT, 4u, sizeof(GLuint), offset };
+	case VertexElementType::UInt1: return { .type=GL_UNSIGNED_INT, .count=1u, .typeSize=sizeof(GLuint), .offset=offset };
+	case VertexElementType::UInt2: return { .type=GL_UNSIGNED_INT, .count=2u, .typeSize=sizeof(GLuint), .offset=offset };
+	case VertexElementType::UInt3: return { .type=GL_UNSIGNED_INT, .count=3u, .typeSize=sizeof(GLuint), .offset=offset };
+	case VertexElementType::UInt4: return { .type=GL_UNSIGNED_INT, .count=4u, .typeSize=sizeof(GLuint), .offset=offset };
 
 	/* float */
-	case VertexElementType::Float1: return { GL_FLOAT, 1u, sizeof(GLfloat), offset };
-	case VertexElementType::Float2: return { GL_FLOAT, 2u, sizeof(GLfloat), offset };
-	case VertexElementType::Float3: return { GL_FLOAT, 3u, sizeof(GLfloat), offset };
-	case VertexElementType::Float4: return { GL_FLOAT, 4u, sizeof(GLfloat), offset };
+	case VertexElementType::Float1: return { .type=GL_FLOAT, .count=1u, .typeSize=sizeof(GLfloat), .offset=offset };
+	case VertexElementType::Float2: return { .type=GL_FLOAT, .count=2u, .typeSize=sizeof(GLfloat), .offset=offset };
+	case VertexElementType::Float3: return { .type=GL_FLOAT, .count=3u, .typeSize=sizeof(GLfloat), .offset=offset };
+	case VertexElementType::Float4: return { .type=GL_FLOAT, .count=4u, .typeSize=sizeof(GLfloat), .offset=offset };
 
 	default: lt_assert(false, "Invalid 'VertexElementType'"); return {};
 	}

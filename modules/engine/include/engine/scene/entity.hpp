@@ -10,7 +10,7 @@ namespace Light {
 class Entity
 {
 public:
-	Entity(entt::entity handle = entt::null, Scene *registry = nullptr);
+	Entity(entt::entity handle = entt::null, Scene *scene = nullptr);
 
 	~Entity();
 
@@ -43,7 +43,7 @@ public:
 		return get_component<UUIDComponent>().uuid;
 	}
 
-	auto is_valid() const -> bool
+	[[nodiscard]] auto is_valid() const -> bool
 	{
 		return m_handle != entt::null && m_scene != nullptr;
 	}

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <engine/platform/graphics/opengl/buffers.hpp>
 #include <glad/gl.h>
 
@@ -41,7 +42,12 @@ glVertexBuffer::glVertexBuffer(float *vertices, unsigned int stride, unsigned in
     : m_buffer_id(NULL)
 {
 	glCreateBuffers(1, &m_buffer_id);
-	glNamedBufferData(m_buffer_id, stride * count, vertices, GL_DYNAMIC_DRAW);
+	glNamedBufferData(
+	    m_buffer_id,
+	    static_cast<GLsizeiptr>(stride * count),
+	    vertices,
+	    GL_DYNAMIC_DRAW
+	);
 }
 
 glVertexBuffer::~glVertexBuffer()
@@ -108,7 +114,9 @@ glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_buffe
 
 	// delete indices
 	if (!hasIndices)
+	{
 		delete[] indices;
+	}
 }
 
 glIndexBuffer::~glIndexBuffer()

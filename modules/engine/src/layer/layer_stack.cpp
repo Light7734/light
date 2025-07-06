@@ -14,7 +14,7 @@ auto LayerStack::create() -> Scope<LayerStack>
 	return make_scope<LayerStack>(new LayerStack());
 }
 
-LayerStack::LayerStack(): m_layers {}, m_begin(), m_end()
+LayerStack::LayerStack() 
 {
 	lt_assert(
 	    !s_context,
@@ -25,8 +25,9 @@ LayerStack::LayerStack(): m_layers {}, m_begin(), m_end()
 
 LayerStack::~LayerStack()
 {
-	for (auto *layer : m_layers)
+	for (auto *layer : m_layers) {
 		delete layer;
+}
 }
 
 void LayerStack::attach_layer_impl(Layer *layer)

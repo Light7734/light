@@ -70,9 +70,9 @@ void glGraphicsContext::set_debug_message_callback()
 	       unsigned int type,
 	       unsigned int id,
 	       unsigned int severity,
-	       int length,
+	       int  /*length*/,
 	       const char *message,
-	       const void *userParam) {
+	       const void * /*userParam*/) {
 		    switch (severity)
 		    {
 		    case GL_DEBUG_SEVERITY_HIGH:

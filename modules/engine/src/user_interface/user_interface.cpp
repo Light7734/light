@@ -12,6 +12,7 @@
 #include <engine/events/mouse.hpp>
 #include <engine/graphics/graphics_context.hpp>
 #include <engine/input/key_codes.hpp>
+#include <utility>
 #include <imgui.h>
 
 namespace Light {
@@ -38,7 +39,7 @@ auto UserInterface::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedCo
 		return nullptr;
 	}
 
-	scopeUserInterface->init(windowHandle, sharedContext);
+	scopeUserInterface->init(windowHandle, std::move(sharedContext));
 	return std::move(scopeUserInterface);
 }
 
@@ -74,15 +75,16 @@ void UserInterface::init(GLFWwindow *windowHandle, Ref<SharedContext> sharedCont
 	io.ConfigFlags |= ImGuiBackendFlags_RendererHasViewports;
 
 	// #todo: handle this in a better way
-	if (std::filesystem::exists("user_gui_layout.ini"))
+	if (std::filesystem::exists("user_gui_layout.ini")) {
 		io.IniFilename = "user_gui_layout.ini";
-	else
+	} else {
 		io.IniFilename = "default_gui_layout.ini";
+}
 
 	// style
 	ImGui::StyleColorsDark();
 
-	platform_implementation(windowHandle, sharedContext);
+	platform_implementation(windowHandle, std::move(sharedContext));
 
 	// keyboard map
 	io.KeyMap[ImGuiKey_Tab] = Key::Tab;
@@ -127,11 +129,11 @@ void UserInterface::dockspace_begin()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::Begin("Dockspace", (bool *)0, s_context->m_dockspace_flags);
+	ImGui::Begin("Dockspace", (bool *)nullptr, s_context->m_dockspace_flags);
 	ImGui::PopStyleVar(3);
 
 	ImGuiStyle &style = ImGui::GetStyle();
-	float minWinSizeX = style.WindowMinSize.x;
+	float const minWinSizeX = style.WindowMinSize.x;
 	style.WindowMinSize.x = 370.0f;
 	ImGui::DockSpace(
 	    ImGui::GetID("MyDockSpace"),

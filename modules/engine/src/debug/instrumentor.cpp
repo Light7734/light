@@ -9,7 +9,7 @@ auto Instrumentor::create() -> Scope<Instrumentor>
 	return make_scope<Instrumentor>(new Instrumentor);
 }
 
-Instrumentor::Instrumentor(): m_current_session_count(0u)
+Instrumentor::Instrumentor() 
 {
 	// #todo: maintenance
 	lt_assert(
@@ -29,8 +29,9 @@ void Instrumentor::begin_session_impl(const std::string &outputPath)
 
 void Instrumentor::end_session_impl()
 {
-	if (m_current_session_count == 0u)
+	if (m_current_session_count == 0u) {
 		log_wrn("0 profiling for the ended session");
+}
 
 	m_current_session_count = 0u;
 
@@ -41,14 +42,15 @@ void Instrumentor::end_session_impl()
 
 void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileResult)
 {
-	if (m_current_session_count++ == 0u)
+	if (m_current_session_count++ == 0u) {
 		m_output_file_stream << "{";
-	else
+	} else {
 		m_output_file_stream << ",{";
+}
 
-	m_output_file_stream << "\"name\":\"" << profileResult.name << "\",";
-	m_output_file_stream << "\"cat\": \"scope\",";
-	m_output_file_stream << "\"ph\": \"X\",";
+	m_output_file_stream << R"("name":")" << profileResult.name << "\",";
+	m_output_file_stream << R"("cat": "scope",)";
+	m_output_file_stream << R"("ph": "X",)";
 	m_output_file_stream << "\"ts\":" << profileResult.start << ",";
 	m_output_file_stream << "\"dur\":" << profileResult.duration << ",";
 	m_output_file_stream << "\"pid\":0,";
@@ -57,7 +59,7 @@ void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileRe
 }
 
 InstrumentorTimer::InstrumentorTimer(const std::string &scopeName)
-    : m_result({ scopeName, 0, 0, 0 })
+    : m_result({ .name=scopeName, .start=0, .duration=0, .threadID=0 })
     , m_start(std::chrono::steady_clock::now())
 {
 }

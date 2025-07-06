@@ -13,12 +13,12 @@ public:
 	{
 	}
 
-	auto get_key() const -> int
+	[[nodiscard]] auto get_key() const -> int
 	{
 		return m_key;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "KeyPressed: " << m_key;
@@ -40,12 +40,12 @@ public:
 	{
 	}
 
-	auto get_key() const -> int
+	[[nodiscard]] auto get_key() const -> int
 	{
 		return m_key;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "KeyRepeated: " << m_key;
@@ -67,12 +67,12 @@ public:
 	{
 	}
 
-	auto get_key() const -> int
+	[[nodiscard]] auto get_key() const -> int
 	{
 		return m_key;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "KeyReleased: " << m_key;

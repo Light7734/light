@@ -14,7 +14,7 @@ namespace Light {
 auto ConstantBuffer::create(
     ConstantBufferIndex index,
     unsigned int size,
-    Ref<SharedContext> sharedContext
+    const Ref<SharedContext>&  /*sharedContext*/
 ) -> Scope<ConstantBuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
@@ -42,7 +42,7 @@ auto VertexBuffer::create(
     float *vertices,
     unsigned int stride,
     unsigned int count,
-    Ref<SharedContext> sharedContext
+    const Ref<SharedContext>&  /*sharedContext*/
 ) -> Ref<VertexBuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
@@ -70,7 +70,7 @@ auto VertexBuffer::create(
 auto IndexBuffer::create(
     unsigned int *indices,
     unsigned int count,
-    Ref<SharedContext> sharedContext
+    const Ref<SharedContext>&  /*sharedContext*/
 ) -> Ref<IndexBuffer>
 {
 	switch (GraphicsContext::get_graphics_api())

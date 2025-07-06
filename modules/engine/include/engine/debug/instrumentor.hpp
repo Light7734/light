@@ -37,7 +37,7 @@ private:
 
 	std::ofstream m_output_file_stream;
 
-	unsigned int m_current_session_count;
+	unsigned int m_current_session_count{0u};
 
 	Instrumentor();
 

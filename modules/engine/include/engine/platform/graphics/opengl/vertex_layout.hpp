@@ -22,11 +22,11 @@ class glVertexLayout: public VertexLayout
 {
 public:
 	glVertexLayout(
-	    Ref<VertexBuffer> buffer,
+	    const Ref<VertexBuffer>& buffer,
 	    const std::vector<std::pair<std::string, VertexElementType>> &elements
 	);
 
-	~glVertexLayout();
+	~glVertexLayout() override;
 
 	void bind() override;
 

@@ -13,12 +13,12 @@ public:
 	{
 	}
 
-	auto get_character() const -> int
+	[[nodiscard]] auto get_character() const -> int
 	{
 		return m_character;
 	}
 
-	auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "CharSet: " << m_character;

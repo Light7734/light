@@ -11,9 +11,9 @@
 namespace Light {
 
 auto Shader::create(
-    BasicFileHandle vertexFile,
-    BasicFileHandle pixelFile,
-    Ref<SharedContext> sharedContext
+    const BasicFileHandle& vertexFile,
+    const BasicFileHandle& pixelFile,
+    const Ref<SharedContext>&  /*sharedContext*/
 ) -> Ref<Shader>
 {
 	// load shader source

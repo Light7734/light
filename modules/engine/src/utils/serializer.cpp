@@ -19,8 +19,9 @@ struct convert<glm::vec3>
 
 	static auto decode(const Node &node, glm::vec3 &rhs) -> bool
 	{
-		if (!node.IsSequence() || node.size() != 3)
+		if (!node.IsSequence() || node.size() != 3) {
 			return false;
+}
 
 		rhs.x = node[0].as<float>();
 		rhs.y = node[1].as<float>();
@@ -44,8 +45,9 @@ struct convert<glm::vec4>
 
 	static auto decode(const Node &node, glm::vec4 &rhs) -> bool
 	{
-		if (!node.IsSequence() || node.size() != 4)
+		if (!node.IsSequence() || node.size() != 4) {
 			return false;
+}
 
 		rhs.x = node[0].as<float>();
 		rhs.y = node[1].as<float>();
@@ -221,12 +223,12 @@ auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 	return false;
 }
 
-void SceneSerializer::serialize_binary(const std::string &filePath)
+void SceneSerializer::serialize_binary(const std::string & /*filePath*/)
 {
 	log_err("NO_IMPLEMENT");
 }
 
-auto SceneSerializer::deserialize_binary(const std::string &filePath) -> bool
+auto SceneSerializer::deserialize_binary(const std::string & /*filePath*/) -> bool
 {
 	log_err("NO_IMPLEMENT");
 	return false;

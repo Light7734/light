@@ -1,5 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <engine/utils/file_manager.hpp>
+#include <utility>
 #include <stb_image.h>
 
 namespace Light {
@@ -7,15 +8,15 @@ namespace Light {
 BasicFileHandle::BasicFileHandle(
     uint8_t *data,
     uint32_t size,
-    const std::string &path,
-    const std::string &name,
-    const std::string &extension
+    std::string path,
+    std::string name,
+    std::string extension
 )
     : m_data(data)
     , m_size(size)
-    , m_path(path)
-    , m_name(name)
-    , m_extension(extension)
+    , m_path(std::move(path))
+    , m_name(std::move(name))
+    , m_extension(std::move(extension))
 {
 }
 

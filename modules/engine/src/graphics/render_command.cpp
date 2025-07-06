@@ -10,7 +10,7 @@
 
 namespace Light {
 
-auto RenderCommand::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+auto RenderCommand::create(GLFWwindow *windowHandle, const Ref<SharedContext>&  /*sharedContext*/)
     -> Scope<RenderCommand>
 {
 	switch (GraphicsContext::get_graphics_api())

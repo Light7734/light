@@ -14,22 +14,22 @@ public:
 	{
 	}
 
-	auto get_position() const -> const glm::vec2 &
+	[[nodiscard]] auto get_position() const -> const glm::vec2 &
 	{
 		return m_position;
 	}
 
-	auto get_x() const -> float
+	[[nodiscard]] auto get_x() const -> float
 	{
 		return m_position.x;
 	}
 
-	auto get_y() const -> float
+	[[nodiscard]] auto get_y() const -> float
 	{
 		return m_position.y;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "MouseMoved: " << m_position.x << ", " << m_position.y;
@@ -51,12 +51,12 @@ public:
 	{
 	}
 
-	auto get_offset() const -> float
+	[[nodiscard]] auto get_offset() const -> float
 	{
 		return m_offset;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "WheelScrolled: " << m_offset;
@@ -78,12 +78,12 @@ public:
 	{
 	}
 
-	auto get_button() const -> int
+	[[nodiscard]] auto get_button() const -> int
 	{
 		return m_button;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "ButtonPressed: " << m_button;
@@ -105,12 +105,12 @@ public:
 	{
 	}
 
-	auto get_button() const -> int
+	[[nodiscard]] auto get_button() const -> int
 	{
 		return m_button;
 	}
 
-	virtual auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "ButtonReleased: " << m_button;

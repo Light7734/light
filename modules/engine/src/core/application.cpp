@@ -26,20 +26,20 @@ Application::Application()
 	log_debug_data();
 
 	m_instrumentor = Instrumentor::create();
-	m_instrumentor->begin_session("Logs/ProfileResults_Startup.json");
+	Light::Instrumentor::begin_session("Logs/ProfileResults_Startup.json");
 
 	m_layer_stack = LayerStack::create();
 	m_input = Input::create();
 
 	m_resource_manager = ResourceManager::create();
 
-	m_window = Window::create(std::bind(&Application::on_event, this, std::placeholders::_1));
+	m_window = Window::create([this](auto && PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
 }
 
 Application::~Application()
 {
 	log_trc("Application::~Application()");
-	m_instrumentor->end_session();
+	Light::Instrumentor::end_session();
 }
 
 void Application::game_loop()
@@ -54,8 +54,8 @@ void Application::game_loop()
 	// reveal window
 	m_window->set_visibility(true);
 
-	m_instrumentor->end_session();
-	m_instrumentor->begin_session("Logs/ProfileResults_GameLoop.json");
+	Light::Instrumentor::end_session();
+	Light::Instrumentor::begin_session("Logs/ProfileResults_GameLoop.json");
 
 	/* game loop */
 	auto delta_timer = DeltaTimer {};
@@ -65,8 +65,9 @@ void Application::game_loop()
 			// update layers
 			lt_profile_scope("game_loop::update");
 
-			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->on_update(delta_timer.get_delta_time());
+			for (auto & it : *m_layer_stack) {
+				it->on_update(delta_timer.get_delta_time());
+}
 		}
 
 		{
@@ -74,8 +75,9 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::Render");
 			m_window->get_graphics_context()->get_renderer()->begin_frame();
 
-			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->on_render();
+			for (auto & it : *m_layer_stack) {
+				it->on_render();
+}
 
 			m_window->get_graphics_context()->get_renderer()->end_frame();
 		}
@@ -85,8 +87,9 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::UserInterface");
 			m_window->get_graphics_context()->get_user_interface()->begin();
 
-			for (auto it = m_layer_stack->begin(); it != m_layer_stack->end(); it++)
-				(*it)->on_user_interface_update();
+			for (auto & it : *m_layer_stack) {
+				it->on_user_interface_update();
+}
 
 			m_window->get_graphics_context()->get_user_interface()->end();
 		}
@@ -101,8 +104,8 @@ void Application::game_loop()
 		delta_timer.update();
 	}
 
-	m_instrumentor->end_session();
-	m_instrumentor->begin_session("Logs/ProfileResults_Termination.json");
+	Light::Instrumentor::end_session();
+	Light::Instrumentor::begin_session("Logs/ProfileResults_Termination.json");
 }
 
 void Application::quit()
@@ -117,10 +120,11 @@ void Application::on_event(const Event &event)
 	{
 		m_window->on_event(event);
 
-		if (event.get_event_type() == EventType::WindowResized)
+		if (event.get_event_type() == EventType::WindowResized) {
 			m_window->get_graphics_context()->get_renderer()->on_window_resize(
 			    (const WindowResizedEvent &)event
 			);
+}
 	}
 
 	// input

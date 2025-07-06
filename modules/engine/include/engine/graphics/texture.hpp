@@ -14,7 +14,7 @@ public:
 	    unsigned int height,
 	    unsigned int components,
 	    unsigned char *pixels,
-	    Ref<SharedContext> sharedContext,
+	    const Ref<SharedContext>& sharedContext,
 	    const std::string &filePath
 	);
 
@@ -28,7 +28,7 @@ public:
 
 	virtual auto get_texture() -> void * = 0;
 
-	auto GetFilePath() const -> const std::string &
+	[[nodiscard]] auto GetFilePath() const -> const std::string &
 	{
 		return m_file_path;
 	}
@@ -36,7 +36,7 @@ public:
 protected:
 	std::string m_file_path;
 
-	Texture(const std::string &filePath);
+	Texture(std::string filePath);
 };
 
 } // namespace Light

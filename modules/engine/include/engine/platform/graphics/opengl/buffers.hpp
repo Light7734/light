@@ -10,7 +10,7 @@ class glConstantBuffer: public ConstantBuffer
 public:
 	glConstantBuffer(ConstantBufferIndex index, unsigned int size);
 
-	~glConstantBuffer();
+	virtual ~glConstantBuffer();
 
 	void bind() override;
 
@@ -29,7 +29,7 @@ class glVertexBuffer: public VertexBuffer
 public:
 	glVertexBuffer(float *vertices, unsigned int stride, unsigned int count);
 
-	~glVertexBuffer();
+	~glVertexBuffer() override;
 
 	void bind() override;
 
@@ -48,7 +48,7 @@ class glIndexBuffer: public IndexBuffer
 public:
 	glIndexBuffer(unsigned int *indices, unsigned int count);
 
-	~glIndexBuffer();
+	~glIndexBuffer() override;
 
 	void bind() override;
 

@@ -9,9 +9,9 @@ class SharedContext;
 
 struct FramebufferSpecification
 {
-	unsigned int width;
+	unsigned int width{};
 
-	unsigned int height;
+	unsigned int height{};
 
 	unsigned int samples = 1;
 };
@@ -19,9 +19,10 @@ struct FramebufferSpecification
 class Framebuffer
 {
 public:
+virtual ~Framebuffer() = default;
 	static auto create(
 	    const FramebufferSpecification &specification,
-	    Ref<SharedContext> sharedContext
+	    const Ref<SharedContext>& sharedContext
 	) -> Ref<Framebuffer>;
 
 	virtual void bind_as_target(const glm::vec4 &clearColor) = 0;

@@ -4,10 +4,10 @@
 namespace Light {
 
 SceneCamera::SceneCamera()
-    : m_orthographic_specification { 1000.0f, -1.0f, 10000.0f }
-    , m_perspective_specification { glm::radians(45.0f), 0.01f, 10000.0f }
+    : m_orthographic_specification { .size=1000.0f, .near_plane=-1.0f, .far_plane=10000.0f }
+    , m_perspective_specification { .vertical_fov=glm::radians(45.0f), .near_plane=0.01f, .far_plane=10000.0f }
     , m_aspect_ratio(16.0f / 9.0f)
-    , m_projection_type(ProjectionType::Orthographic)
+     
 {
 	calculate_projection();
 }

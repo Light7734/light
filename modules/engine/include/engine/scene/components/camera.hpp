@@ -18,14 +18,14 @@ struct CameraComponent
 	{
 	}
 
-	operator SceneCamera()
+	operator SceneCamera() const
 	{
 		return camera;
 	}
 
 	SceneCamera camera;
 
-	bool isPrimary;
+	bool isPrimary{};
 };
 
 } // namespace Light

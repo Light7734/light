@@ -15,7 +15,7 @@ class lWindow: public Window
 public:
 	lWindow(std::function<void(Event &)> callback);
 
-	~lWindow();
+	~lWindow() override;
 
 	void poll_events() override;
 
@@ -33,7 +33,7 @@ public:
 	void set_visibility(bool visible, bool toggle = false) override;
 
 private:
-	GLFWwindow *m_handle;
+	GLFWwindow *m_handle{nullptr};
 
 	std::function<void(Event &)> m_event_callback;
 

@@ -10,7 +10,7 @@ namespace Light {
 class WindowClosedEvent: public Event
 {
 public:
-	auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		return "WindowClosedEvent";
 	}
@@ -27,12 +27,12 @@ public:
 	{
 	}
 
-	auto get_position() const -> const glm::ivec2 &
+	[[nodiscard]] auto get_position() const -> const glm::ivec2 &
 	{
 		return m_position;
 	}
 
-	auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "WindwoMoved: " << m_position.x << ", " << m_position.y;
@@ -55,12 +55,12 @@ public:
 	{
 	}
 
-	auto get_size() const -> const glm::uvec2 &
+	[[nodiscard]] auto get_size() const -> const glm::uvec2 &
 	{
 		return m_size;
 	}
 
-	auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		std::stringstream ss;
 		ss << "WindowResized: " << m_size.x << ", " << m_size.y;
@@ -78,7 +78,7 @@ private:
 class WindowLostFocusEvent: public Event
 {
 public:
-	auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		return "WindowLostFocus";
 	}
@@ -91,7 +91,7 @@ public:
 class WindowGainFocusEvent: public Event
 {
 public:
-	auto get_info_lt_log() const -> std::string override
+	[[nodiscard]] auto get_info_lt_log() const -> std::string override
 	{
 		return "WindowGainFocus";
 	}

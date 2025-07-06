@@ -10,7 +10,7 @@
 
 namespace Light {
 
-auto Blender::create(Ref<SharedContext> sharedContext) -> Scope<Blender>
+auto Blender::create(const Ref<SharedContext>&  /*sharedContext*/) -> Scope<Blender>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{

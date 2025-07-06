@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/base/base.hpp>
+#include <utility>
 
 namespace Light {
 
@@ -10,11 +11,11 @@ struct TagComponent
 
 	TagComponent(const TagComponent &) = default;
 
-	TagComponent(const std::string &_tag): tag(_tag)
+	TagComponent(std::string _tag): tag(std::move(_tag))
 	{
 	}
 
-	operator std::string()
+	operator std::string() const
 	{
 		return tag;
 	}

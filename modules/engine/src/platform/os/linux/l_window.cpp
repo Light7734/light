@@ -6,17 +6,19 @@
 #include <engine/events/window.hpp>
 #include <engine/graphics/graphics_context.hpp>
 #include <engine/platform/os/linux/l_window.hpp>
+#include <utility>
+#include <utility>
 
 namespace Light {
 
-auto Window::create(std::function<void(Event &)> callback) -> Scope<Window>
+auto Window::create(const std::function<void(Event &)>& callback) -> Scope<Window>
 {
 	return create_scope<lWindow>(callback);
 }
 
 lWindow::lWindow(std::function<void(Event &)> callback)
-    : m_handle(nullptr)
-    , m_event_callback(callback)
+    : 
+     m_event_callback(std::move(std::move(callback)))
 {
 	// init glfw
 	lt_assert(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
@@ -57,7 +59,7 @@ void lWindow::on_event(const Event &event)
 	case EventType::WindowClosed: b_Closed = true; break;
 
 	/* resized */
-	case EventType::WindowResized: on_window_resize((const WindowResizedEvent &)event); break;
+	case EventType::WindowResized: on_window_resize(dynamic_cast<const WindowResizedEvent &>(event)); break;
 	}
 }
 
@@ -112,10 +114,11 @@ void lWindow::set_visibility(bool visible, bool toggle)
 {
 	m_properties.visible = toggle ? !m_properties.visible : visible;
 
-	if (m_properties.visible)
+	if (m_properties.visible) {
 		glfwShowWindow(m_handle);
-	else
+	} else {
 		glfwHideWindow(m_handle);
+}
 }
 
 void lWindow::bind_glfw_events()
@@ -130,8 +133,8 @@ void lWindow::bind_glfw_events()
 		callback(event);
 	});
 
-	glfwSetMouseButtonCallback(m_handle, [](GLFWwindow *window, int button, int action, int mods) {
-		std::function<void(Event &)> callback = *(std::function<void(Event &)> *)
+	glfwSetMouseButtonCallback(m_handle, [](GLFWwindow *window, int button, int action, int  /*mods*/) {
+		std::function<void(Event &)> const callback = *(std::function<void(Event &)> *)
 		                                            glfwGetWindowUserPointer(window);
 
 		if (action == GLFW_PRESS)
@@ -146,7 +149,7 @@ void lWindow::bind_glfw_events()
 		}
 	});
 
-	glfwSetScrollCallback(m_handle, [](GLFWwindow *window, double xoffset, double yoffset) {
+	glfwSetScrollCallback(m_handle, [](GLFWwindow *window, double  /*xoffset*/, double yoffset) {
 		auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
 		auto event = WheelScrolledEvent { static_cast<float>(yoffset) };
@@ -155,7 +158,7 @@ void lWindow::bind_glfw_events()
 
 	glfwSetKeyCallback(
 	    m_handle,
-	    [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+	    [](GLFWwindow *window, int key, int  /*scancode*/, int action, int  /*mods*/) {
 		    auto callback = *(std::function<void(Event &)> *)glfwGetWindowUserPointer(window);
 
 		    if (action == GLFW_PRESS)

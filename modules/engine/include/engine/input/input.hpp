@@ -31,19 +31,19 @@ public:
 		return s_context->m_mouse_buttons[code];
 	}
 
-	static auto get_mouse_position(int code) -> const glm::vec2 &
+	static auto get_mouse_position(int  /*code*/) -> const glm::vec2 &
 	{
 		return s_context->m_mouse_position;
 	}
 
 	void on_event(const Event &inputEvent);
 
-	auto is_receiving_input_events() const -> bool
+	[[nodiscard]] auto is_receiving_input_events() const -> bool
 	{
 		return m_user_interface_events;
 	}
 
-	auto is_receiving_game_events() const -> bool
+	[[nodiscard]] auto is_receiving_game_events() const -> bool
 	{
 		return m_game_events;
 	}
@@ -51,19 +51,19 @@ public:
 private:
 	static Input *s_context;
 
-	std::array<bool, 348> m_keyboad_keys;
+	std::array<bool, 348> m_keyboad_keys{};
 
-	std::array<bool, 8> m_mouse_buttons;
+	std::array<bool, 8> m_mouse_buttons{};
 
 	glm::vec2 m_mouse_position;
 
 	glm::vec2 m_mouse_delta;
 
-	float m_mouse_wheel_delta;
+	float m_mouse_wheel_delta{};
 
-	bool m_user_interface_events;
+	bool m_user_interface_events{true};
 
-	bool m_game_events;
+	bool m_game_events{true};
 
 	Input();
 

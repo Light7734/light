@@ -10,12 +10,12 @@ class Camera
 public:
 	Camera() = default;
 
-	auto get_projection() const -> const glm::mat4 &
+	[[nodiscard]] auto get_projection() const -> const glm::mat4 &
 	{
 		return m_projection;
 	}
 
-	auto get_background_color() const -> const glm::vec4 &
+	[[nodiscard]] auto get_background_color() const -> const glm::vec4 &
 	{
 		return m_background_color;
 	}
@@ -26,7 +26,7 @@ public:
 	}
 
 protected:
-	glm::mat4 m_projection;
+	glm::mat4 m_projection{};
 
 private:
 	glm::vec4 m_background_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);

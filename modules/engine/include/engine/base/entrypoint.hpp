@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 extern auto Light::create_application() -> Light::Scope<Light::Application>;
 
 // #todo: use linux specific stuff
-int main(int argc, char *argv[])
+int main(int  /*argc*/, char * /*argv*/[])
 {
 	auto application = Light::Scope<Light::Application> {};
 	int exitCode = 0;

@@ -7,14 +7,12 @@
 
 namespace Light {
 
-QuadRendererProgram::QuadRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext)
+QuadRendererProgram::QuadRendererProgram(unsigned int maxVertices, const Ref<SharedContext>& sharedContext)
     : m_shader(nullptr)
     , m_index_buffer(nullptr)
     , m_vertex_layout(nullptr)
-    , m_map_current(nullptr)
-    , m_map_end(nullptr)
-    , m_quad_count(0u)
-    , m_max_vertices(maxVertices)
+    , 
+     m_max_vertices(maxVertices)
 {
 	// #todo: don't use relative path
 	ResourceManager::load_shader(

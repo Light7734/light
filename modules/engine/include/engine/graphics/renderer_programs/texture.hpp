@@ -16,6 +16,7 @@ class SharedContext;
 class TextureRendererProgram: RendererProgram
 {
 public:
+virtual ~TextureRendererProgram() = default;
 	struct TextureVertexData
 	{
 		glm::vec4 position;
@@ -23,7 +24,7 @@ public:
 		glm::vec2 texcoord;
 	};
 
-	TextureRendererProgram(unsigned int maxVertices, Ref<SharedContext> sharedContext);
+	TextureRendererProgram(unsigned int maxVertices, const Ref<SharedContext>& sharedContext);
 
 	auto advance() -> bool;
 
@@ -38,12 +39,12 @@ public:
 		return m_map_current;
 	}
 
-	auto get_quad_count() const -> unsigned int
+	[[nodiscard]] auto get_quad_count() const -> unsigned int
 	{
 		return m_quad_count;
 	}
 
-	constexpr auto get_vertex_size() const -> unsigned int
+	[[nodiscard]] constexpr auto get_vertex_size() const -> unsigned int
 	{
 		return sizeof(TextureVertexData);
 	}
@@ -61,7 +62,7 @@ private:
 
 	TextureVertexData *m_map_end = nullptr;
 
-	unsigned int m_quad_count;
+	unsigned int m_quad_count{0u};
 
 	unsigned int m_max_vertices;
 };

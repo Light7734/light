@@ -16,7 +16,7 @@ public:
 	    const std::string &filePath
 	);
 
-	~glTexture();
+	~glTexture() override;
 
 	void bind(unsigned int slot = 0u) override;
 

@@ -12,7 +12,7 @@ namespace Light {
 
 auto Framebuffer::create(
     const FramebufferSpecification &specification,
-    Ref<SharedContext> sharedContext
+    const Ref<SharedContext>&  /*sharedContext*/
 ) -> Ref<Framebuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
