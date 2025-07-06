@@ -26,7 +26,7 @@ Entities:
       Rotation: [0, 0, 5.89921284]
       Scale: [89, 89, 89]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.49000001, 0.330000013, 0.649999976, 1]
   - Entity: 10812053304814388079
     TagComponent:
@@ -36,7 +36,7 @@ Entities:
       Rotation: [0, 0, 0.0872664601]
       Scale: [78, 78, 78]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.400000006, 0.109999999, 0.469999999, 1]
   - Entity: 7461483738169372575
     TagComponent:
@@ -46,7 +46,7 @@ Entities:
       Rotation: [0, 0, 0.418879032]
       Scale: [194, 194, 194]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.970000029, 0.649999976, 0.649999976, 1]
   - Entity: 3534157999811239206
     TagComponent:
@@ -56,7 +56,7 @@ Entities:
       Rotation: [0, 0, 4.11897707]
       Scale: [52, 52, 52]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.50999999, 0.870000005, 0.25999999, 1]
   - Entity: 591845304266942048
     TagComponent:
@@ -66,7 +66,7 @@ Entities:
       Rotation: [0, 0, 4.32841635]
       Scale: [112, 112, 112]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.930000007, 0.910000026, 0.150000006, 1]
   - Entity: 16908992420486107010
     TagComponent:
@@ -76,7 +76,7 @@ Entities:
       Rotation: [0, 0, 6.00393248]
       Scale: [46, 46, 46]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.170000002, 0.289999992, 0.159999996, 1]
   - Entity: 1765664708081981561
     TagComponent:
@@ -86,7 +86,7 @@ Entities:
       Rotation: [0, 0, 1.08210409]
       Scale: [55, 55, 55]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.730000019, 0.219999999, 0.479999989, 1]
   - Entity: 97063327653457004
     TagComponent:
@@ -96,7 +96,7 @@ Entities:
       Rotation: [0, 0, 3.85717773]
       Scale: [165, 165, 165]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0799999982, 0.720000029, 0.430000007, 1]
   - Entity: 15175167425994993805
     TagComponent:
@@ -106,7 +106,7 @@ Entities:
       Rotation: [0, 0, 0.488692194]
       Scale: [129, 129, 129]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.949999988, 0.779999971, 0.75999999, 1]
   - Entity: 570476062673155335
     TagComponent:
@@ -116,7 +116,7 @@ Entities:
       Rotation: [0, 0, 4.20624352]
       Scale: [116, 116, 116]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.779999971, 0.790000021, 0.579999983, 1]
   - Entity: 8140056387427274102
     TagComponent:
@@ -126,7 +126,7 @@ Entities:
       Rotation: [0, 0, 2.07694173]
       Scale: [82, 82, 82]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.230000004, 0.579999983, 0.0500000007, 1]
   - Entity: 12766026825323394533
     TagComponent:
@@ -136,7 +136,7 @@ Entities:
       Rotation: [0, 0, 0.471238881]
       Scale: [32, 32, 32]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.839999974, 0.400000006, 0.170000002, 1]
   - Entity: 14613778854038318838
     TagComponent:
@@ -146,7 +146,7 @@ Entities:
       Rotation: [0, 0, 0.401425719]
       Scale: [196, 196, 196]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.150000006, 0.0399999991, 0.99000001, 1]
   - Entity: 17362749499867687395
     TagComponent:
@@ -156,7 +156,7 @@ Entities:
       Rotation: [0, 0, 1.2915436]
       Scale: [83, 83, 83]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.319999993, 0.519999981, 0.409999996, 1]
   - Entity: 2098391627657815643
     TagComponent:
@@ -166,7 +166,7 @@ Entities:
       Rotation: [0, 0, 1.39626336]
       Scale: [74, 74, 74]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.109999999, 0.189999998, 0.610000014, 1]
   - Entity: 18350362249609215098
     TagComponent:
@@ -176,7 +176,7 @@ Entities:
       Rotation: [0, 0, 5.6548667]
       Scale: [8, 8, 8]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0799999982, 0.769999981, 0.0299999993, 1]
   - Entity: 13658579542004940722
     TagComponent:
@@ -186,7 +186,7 @@ Entities:
       Rotation: [0, 0, 5.48033381]
       Scale: [159, 159, 159]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.889999986, 0.589999974, 0.49000001, 1]
   - Entity: 7163645861584060529
     TagComponent:
@@ -196,7 +196,7 @@ Entities:
       Rotation: [0, 0, 3.21140575]
       Scale: [193, 193, 193]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.970000029, 0.25999999, 0.75999999, 1]
   - Entity: 18135172649021895402
     TagComponent:
@@ -206,7 +206,7 @@ Entities:
       Rotation: [0, 0, 4.99164152]
       Scale: [192, 192, 192]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.49000001, 0.779999971, 0.790000021, 1]
   - Entity: 15739842448472949789
     TagComponent:
@@ -216,7 +216,7 @@ Entities:
       Rotation: [0, 0, 0.785398185]
       Scale: [34, 34, 34]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.970000029, 0.850000024, 0.289999992, 1]
   - Entity: 15360404212784758147
     TagComponent:
@@ -226,7 +226,7 @@ Entities:
       Rotation: [0, 0, 3.94444418]
       Scale: [125, 125, 125]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.379999995, 0.920000017, 0.930000007, 1]
   - Entity: 14376068793920199265
     TagComponent:
@@ -236,7 +236,7 @@ Entities:
       Rotation: [0, 0, 3.2986722]
       Scale: [119, 119, 119]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.779999971, 0.310000002, 0.439999998, 1]
   - Entity: 7058004931415652203
     TagComponent:
@@ -246,7 +246,7 @@ Entities:
       Rotation: [0, 0, 1.08210409]
       Scale: [51, 51, 51]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.330000013, 0.910000026, 0, 1]
   - Entity: 14716341462397085578
     TagComponent:
@@ -256,7 +256,7 @@ Entities:
       Rotation: [0, 0, 2.02458191]
       Scale: [49, 49, 49]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.409999996, 0.889999986, 0, 1]
   - Entity: 1128448761043040059
     TagComponent:
@@ -266,7 +266,7 @@ Entities:
       Rotation: [0, 0, 2.77507353]
       Scale: [52, 52, 52]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.319999993, 0.349999994, 0.0799999982, 1]
   - Entity: 9152943246460692961
     TagComponent:
@@ -276,7 +276,7 @@ Entities:
       Rotation: [0, 0, 0.541052043]
       Scale: [92, 92, 92]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.280000001, 0.519999981, 0.689999998, 1]
   - Entity: 12166861121187003964
     TagComponent:
@@ -286,7 +286,7 @@ Entities:
       Rotation: [0, 0, 3.96189737]
       Scale: [92, 92, 92]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.400000006, 0.660000026, 0.349999994, 1]
   - Entity: 1723434924739069719
     TagComponent:
@@ -296,7 +296,7 @@ Entities:
       Rotation: [0, 0, 0.820304751]
       Scale: [75, 75, 75]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.860000014, 0.330000013, 0.600000024, 1]
   - Entity: 15336835637678028038
     TagComponent:
@@ -306,7 +306,7 @@ Entities:
       Rotation: [0, 0, 3.75245786]
       Scale: [61, 61, 61]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.560000002, 0.0700000003, 0.779999971, 1]
   - Entity: 7817498958655058760
     TagComponent:
@@ -316,7 +316,7 @@ Entities:
       Rotation: [0, 0, 2.93215322]
       Scale: [65, 65, 65]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.810000002, 0.569999993, 0.5, 1]
   - Entity: 4492884718296019158
     TagComponent:
@@ -326,7 +326,7 @@ Entities:
       Rotation: [0, 0, 2.86233997]
       Scale: [10, 10, 10]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.280000001, 0.340000004, 0.409999996, 1]
   - Entity: 12712796040746591141
     TagComponent:
@@ -336,7 +336,7 @@ Entities:
       Rotation: [0, 0, 4.64257574]
       Scale: [128, 128, 128]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.579999983, 0.129999995, 0.600000024, 1]
   - Entity: 16066356996100314143
     TagComponent:
@@ -346,7 +346,7 @@ Entities:
       Rotation: [0, 0, 3.40339208]
       Scale: [127, 127, 127]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.100000001, 0.819999993, 0.579999983, 1]
   - Entity: 7538597098420715622
     TagComponent:
@@ -356,7 +356,7 @@ Entities:
       Rotation: [0, 0, 1.32645023]
       Scale: [181, 181, 181]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.230000004, 0.370000005, 0.230000004, 1]
   - Entity: 1632267967620187891
     TagComponent:
@@ -366,7 +366,7 @@ Entities:
       Rotation: [0, 0, 2.26892805]
       Scale: [30, 30, 30]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.419999987, 0.769999981, 0.769999981, 1]
   - Entity: 1307904472006437965
     TagComponent:
@@ -376,7 +376,7 @@ Entities:
       Rotation: [0, 0, 3.15904593]
       Scale: [81, 81, 81]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.670000017, 0.129999995, 0.930000007, 1]
   - Entity: 5803072789131066931
     TagComponent:
@@ -386,7 +386,7 @@ Entities:
       Rotation: [0, 0, 6.23082542]
       Scale: [50, 50, 50]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.109999999, 0.5, 0.49000001, 1]
   - Entity: 17110141882294865451
     TagComponent:
@@ -396,7 +396,7 @@ Entities:
       Rotation: [0, 0, 3.03687286]
       Scale: [145, 145, 145]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.850000024, 0.379999995, 0.370000005, 1]
   - Entity: 12921992144486984886
     TagComponent:
@@ -406,7 +406,7 @@ Entities:
       Rotation: [0, 0, 6.05629253]
       Scale: [127, 127, 127]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.709999979, 0.970000029, 0.119999997, 1]
   - Entity: 5833367611205628223
     TagComponent:
@@ -416,7 +416,7 @@ Entities:
       Rotation: [0, 0, 4.18879032]
       Scale: [134, 134, 134]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.680000007, 0.680000007, 0.910000026, 1]
   - Entity: 232656549506766904
     TagComponent:
@@ -426,7 +426,7 @@ Entities:
       Rotation: [0, 0, 1.81514239]
       Scale: [56, 56, 56]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.25, 0.239999995, 0.860000014, 1]
   - Entity: 1941384042056408945
     TagComponent:
@@ -436,7 +436,7 @@ Entities:
       Rotation: [0, 0, 2.7576201]
       Scale: [148, 148, 148]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.819999993, 0.180000007, 0.75999999, 1]
   - Entity: 13815365869018529454
     TagComponent:
@@ -446,7 +446,7 @@ Entities:
       Rotation: [0, 0, 3.76991105]
       Scale: [174, 174, 174]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.209999993, 0.829999983, 0.219999999, 1]
   - Entity: 9433243479958074951
     TagComponent:
@@ -456,7 +456,7 @@ Entities:
       Rotation: [0, 0, 4.67748213]
       Scale: [6, 6, 6]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0, 0.670000017, 0.920000017, 1]
   - Entity: 5655537764525146526
     TagComponent:
@@ -466,7 +466,7 @@ Entities:
       Rotation: [0, 0, 4.72984219]
       Scale: [23, 23, 23]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.340000004, 0.0399999991, 0.860000014, 1]
   - Entity: 5711066309288935690
     TagComponent:
@@ -476,7 +476,7 @@ Entities:
       Rotation: [0, 0, 2.53072739]
       Scale: [39, 39, 39]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.119999997, 0.620000005, 0.670000017, 1]
   - Entity: 15982223128211841127
     TagComponent:
@@ -486,7 +486,7 @@ Entities:
       Rotation: [0, 0, 5.41052055]
       Scale: [195, 195, 195]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.5, 0.430000007, 0.540000021, 1]
   - Entity: 7034290522953300136
     TagComponent:
@@ -496,7 +496,7 @@ Entities:
       Rotation: [0, 0, 2.63544726]
       Scale: [74, 74, 74]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.209999993, 0.219999999, 0.469999999, 1]
   - Entity: 1782635875943603567
     TagComponent:
@@ -506,7 +506,7 @@ Entities:
       Rotation: [0, 0, 1.01229095]
       Scale: [191, 191, 191]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.639999986, 0.74000001, 0.639999986, 1]
   - Entity: 14480544680444006421
     TagComponent:
@@ -516,7 +516,7 @@ Entities:
       Rotation: [0, 0, 2.60054064]
       Scale: [26, 26, 26]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.219999999, 0.74000001, 0.790000021, 1]
   - Entity: 15891741555268837020
     TagComponent:
@@ -526,7 +526,7 @@ Entities:
       Rotation: [0, 0, 2.65290046]
       Scale: [173, 173, 173]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.610000014, 0.720000029, 0.680000007, 1]
   - Entity: 6067982281801993484
     TagComponent:
@@ -536,7 +536,7 @@ Entities:
       Rotation: [0, 0, 5.13126802]
       Scale: [9, 9, 9]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.660000026, 0.930000007, 0.74000001, 1]
   - Entity: 11515880442048163543
     TagComponent:
@@ -546,7 +546,7 @@ Entities:
       Rotation: [0, 0, 2.82743335]
       Scale: [89, 89, 89]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.649999976, 0.0500000007, 0.850000024, 1]
   - Entity: 18153409063061311032
     TagComponent:
@@ -556,7 +556,7 @@ Entities:
       Rotation: [0, 0, 2.54818058]
       Scale: [172, 172, 172]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.400000006, 0.74000001, 0.189999998, 1]
   - Entity: 13618510350545510164
     TagComponent:
@@ -566,7 +566,7 @@ Entities:
       Rotation: [0, 0, 3.08923268]
       Scale: [85, 85, 85]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.730000019, 0.519999981, 0.939999998, 1]
   - Entity: 2131129617537771806
     TagComponent:
@@ -576,7 +576,7 @@ Entities:
       Rotation: [0, 0, 3.17649913]
       Scale: [4, 4, 4]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.230000004, 0.639999986, 0.699999988, 1]
   - Entity: 5348535146797847919
     TagComponent:
@@ -586,7 +586,7 @@ Entities:
       Rotation: [0, 0, 3.47320509]
       Scale: [36, 36, 36]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.639999986, 0.910000026, 0.49000001, 1]
   - Entity: 8976264815022580889
     TagComponent:
@@ -596,7 +596,7 @@ Entities:
       Rotation: [0, 0, 5.37561417]
       Scale: [133, 133, 133]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.100000001, 0.370000005, 0.360000014, 1]
   - Entity: 14370492960419129876
     TagComponent:
@@ -606,7 +606,7 @@ Entities:
       Rotation: [0, 0, 2.79252672]
       Scale: [162, 162, 162]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.239999995, 0.49000001, 0.689999998, 1]
   - Entity: 13658555393195113697
     TagComponent:
@@ -616,7 +616,7 @@ Entities:
       Rotation: [0, 0, 3.10668612]
       Scale: [75, 75, 75]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.280000001, 0.340000004, 0.699999988, 1]
   - Entity: 12223867967837800830
     TagComponent:
@@ -626,7 +626,7 @@ Entities:
       Rotation: [0, 0, 0.122173049]
       Scale: [146, 146, 146]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.689999998, 0.379999995, 0.629999995, 1]
   - Entity: 11602304848579560444
     TagComponent:
@@ -636,7 +636,7 @@ Entities:
       Rotation: [0, 0, 3.70009804]
       Scale: [55, 55, 55]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.920000017, 0.610000014, 0.540000021, 1]
   - Entity: 7540551673781589429
     TagComponent:
@@ -646,7 +646,7 @@ Entities:
       Rotation: [0, 0, 5.21853447]
       Scale: [125, 125, 125]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.289999992, 0.200000003, 0.400000006, 1]
   - Entity: 11961406606787014063
     TagComponent:
@@ -656,7 +656,7 @@ Entities:
       Rotation: [0, 0, 3.22885919]
       Scale: [197, 197, 197]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.970000029, 0.280000001, 0.50999999, 1]
   - Entity: 3969817219486359698
     TagComponent:
@@ -666,7 +666,7 @@ Entities:
       Rotation: [0, 0, 4.18879032]
       Scale: [48, 48, 48]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.400000006, 0.150000006, 0.75, 1]
   - Entity: 15233237730944378775
     TagComponent:
@@ -676,7 +676,7 @@ Entities:
       Rotation: [0, 0, 2.60054064]
       Scale: [7, 7, 7]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.300000012, 0.920000017, 0, 1]
   - Entity: 7018644529513679537
     TagComponent:
@@ -686,7 +686,7 @@ Entities:
       Rotation: [0, 0, 1.20427716]
       Scale: [22, 22, 22]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.920000017, 0.370000005, 0.25, 1]
   - Entity: 8033282489730758253
     TagComponent:
@@ -696,7 +696,7 @@ Entities:
       Rotation: [0, 0, 1.18682384]
       Scale: [66, 66, 66]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.980000019, 0.860000014, 0.959999979, 1]
   - Entity: 11163887282759009028
     TagComponent:
@@ -706,7 +706,7 @@ Entities:
       Rotation: [0, 0, 3.03687286]
       Scale: [104, 104, 104]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.519999981, 0.689999998, 0.790000021, 1]
   - Entity: 10684042626880097185
     TagComponent:
@@ -716,7 +716,7 @@ Entities:
       Rotation: [0, 0, 5.42797375]
       Scale: [48, 48, 48]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.119999997, 0.310000002, 0.140000001, 1]
   - Entity: 13911229835861495738
     TagComponent:
@@ -726,7 +726,7 @@ Entities:
       Rotation: [0, 0, 1.46607661]
       Scale: [156, 156, 156]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.930000007, 0.959999979, 0.519999981, 1]
   - Entity: 17632992592328333448
     TagComponent:
@@ -736,7 +736,7 @@ Entities:
       Rotation: [0, 0, 2.54818058]
       Scale: [107, 107, 107]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.119999997, 0.360000014, 0.300000012, 1]
   - Entity: 17503036878334473964
     TagComponent:
@@ -746,7 +746,7 @@ Entities:
       Rotation: [0, 0, 1.08210409]
       Scale: [162, 162, 162]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.310000002, 0.0599999987, 0.680000007, 1]
   - Entity: 6522064110261981009
     TagComponent:
@@ -756,7 +756,7 @@ Entities:
       Rotation: [0, 0, 4.01425743]
       Scale: [64, 64, 64]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.150000006, 0.0199999996, 0.730000019, 1]
   - Entity: 13982541986721396312
     TagComponent:
@@ -766,7 +766,7 @@ Entities:
       Rotation: [0, 0, 0.663225114]
       Scale: [87, 87, 87]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.639999986, 0.400000006, 0.860000014, 1]
   - Entity: 4226889282136292864
     TagComponent:
@@ -776,7 +776,7 @@ Entities:
       Rotation: [0, 0, 5.96902609]
       Scale: [64, 64, 64]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0500000007, 0.25999999, 0.159999996, 1]
   - Entity: 11020087716049157634
     TagComponent:
@@ -786,7 +786,7 @@ Entities:
       Rotation: [0, 0, 0.331612557]
       Scale: [93, 93, 93]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.800000012, 0.159999996, 0.49000001, 1]
   - Entity: 5275080273303797468
     TagComponent:
@@ -796,7 +796,7 @@ Entities:
       Rotation: [0, 0, 3.78736448]
       Scale: [95, 95, 95]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.25, 0.75999999, 0.289999992, 1]
   - Entity: 3152628192295632766
     TagComponent:
@@ -806,7 +806,7 @@ Entities:
       Rotation: [0, 0, 0.785398185]
       Scale: [0, 0, 0]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.850000024, 0.74000001, 0.709999979, 1]
   - Entity: 1609533073632342280
     TagComponent:
@@ -816,7 +816,7 @@ Entities:
       Rotation: [0, 0, 0.296705961]
       Scale: [8, 8, 8]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.899999976, 0.230000004, 0.629999995, 1]
   - Entity: 2710226447841018849
     TagComponent:
@@ -826,7 +826,7 @@ Entities:
       Rotation: [0, 0, 1.69296932]
       Scale: [98, 98, 98]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.879999995, 0.769999981, 0.319999993, 1]
   - Entity: 105473689115065855
     TagComponent:
@@ -836,7 +836,7 @@ Entities:
       Rotation: [0, 0, 2.14675498]
       Scale: [174, 174, 174]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.150000006, 0.50999999, 0.409999996, 1]
   - Entity: 11052492383212253835
     TagComponent:
@@ -846,7 +846,7 @@ Entities:
       Rotation: [0, 0, 0.977384388]
       Scale: [39, 39, 39]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.879999995, 0.819999993, 0.540000021, 1]
   - Entity: 5762436197881223042
     TagComponent:
@@ -856,7 +856,7 @@ Entities:
       Rotation: [0, 0, 5.74213314]
       Scale: [100, 100, 100]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.639999986, 0.170000002, 0.150000006, 1]
   - Entity: 6364603660325909905
     TagComponent:
@@ -866,7 +866,7 @@ Entities:
       Rotation: [0, 0, 0.17453292]
       Scale: [161, 161, 161]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.930000007, 0.150000006, 0.689999998, 1]
   - Entity: 4659044881619852972
     TagComponent:
@@ -876,7 +876,7 @@ Entities:
       Rotation: [0, 0, 2.7401669]
       Scale: [189, 189, 189]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.379999995, 0.370000005, 0.100000001, 1]
   - Entity: 4132774267383881597
     TagComponent:
@@ -886,7 +886,7 @@ Entities:
       Rotation: [0, 0, 0.802851439]
       Scale: [3, 3, 3]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.810000002, 0.0399999991, 0.920000017, 1]
   - Entity: 16590747613663411190
     TagComponent:
@@ -896,7 +896,7 @@ Entities:
       Rotation: [0, 0, 4.20624352]
       Scale: [123, 123, 123]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.689999998, 0.779999971, 0.589999974, 1]
   - Entity: 15625900408424381444
     TagComponent:
@@ -906,7 +906,7 @@ Entities:
       Rotation: [0, 0, 2.23402143]
       Scale: [161, 161, 161]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.479999989, 0.819999993, 0.529999971, 1]
   - Entity: 17549158533614009220
     TagComponent:
@@ -916,7 +916,7 @@ Entities:
       Rotation: [0, 0, 2.23402143]
       Scale: [155, 155, 155]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.639999986, 0.0299999993, 0.75999999, 1]
   - Entity: 13761597936641881096
     TagComponent:
@@ -926,7 +926,7 @@ Entities:
       Rotation: [0, 0, 3.21140575]
       Scale: [13, 13, 13]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.280000001, 0, 0.800000012, 1]
   - Entity: 16624878441688131839
     TagComponent:
@@ -936,7 +936,7 @@ Entities:
       Rotation: [0, 0, 2.58308721]
       Scale: [54, 54, 54]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.340000004, 0.0299999993, 0.560000002, 1]
   - Entity: 620944922609850385
     TagComponent:
@@ -946,7 +946,7 @@ Entities:
       Rotation: [0, 0, 2.14675498]
       Scale: [34, 34, 34]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.529999971, 0.159999996, 0.519999981, 1]
   - Entity: 13610574894077769428
     TagComponent:
@@ -956,7 +956,7 @@ Entities:
       Rotation: [0, 0, 4.62512255]
       Scale: [41, 41, 41]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.109999999, 0.370000005, 0.860000014, 1]
   - Entity: 15693693679421193182
     TagComponent:
@@ -966,7 +966,7 @@ Entities:
       Rotation: [0, 0, 4.22369671]
       Scale: [52, 52, 52]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.379999995, 0.819999993, 0.550000012, 1]
   - Entity: 13420428051344717054
     TagComponent:
@@ -976,7 +976,7 @@ Entities:
       Rotation: [0, 0, 0.890117884]
       Scale: [93, 93, 93]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.360000014, 0.360000014, 0.409999996, 1]
   - Entity: 16695603115830870951
     TagComponent:
@@ -986,7 +986,7 @@ Entities:
       Rotation: [0, 0, 5.67231989]
       Scale: [6, 6, 6]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.289999992, 0.0399999991, 0.0500000007, 1]
   - Entity: 6358659853970082610
     TagComponent:
@@ -996,7 +996,7 @@ Entities:
       Rotation: [0, 0, 3.08923268]
       Scale: [142, 142, 142]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.129999995, 0.419999987, 0.959999979, 1]
   - Entity: 7258399542046219395
     TagComponent:
@@ -1006,7 +1006,7 @@ Entities:
       Rotation: [0, 0, 4.38077641]
       Scale: [25, 25, 25]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.00999999978, 0.49000001, 0.959999979, 1]
   - Entity: 11266098902963671089
     TagComponent:
@@ -1016,7 +1016,7 @@ Entities:
       Rotation: [0, 0, 5.3407073]
       Scale: [159, 159, 159]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.660000026, 0.439999998, 0.550000012, 1]
   - Entity: 9131317036642397911
     TagComponent:
@@ -1026,7 +1026,7 @@ Entities:
       Rotation: [0, 0, 1.86750233]
       Scale: [26, 26, 26]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.379999995, 0.529999971, 0.289999992, 1]
   - Entity: 16404278421261976789
     TagComponent:
@@ -1036,7 +1036,7 @@ Entities:
       Rotation: [0, 0, 4.34587002]
       Scale: [43, 43, 43]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.200000003, 0.479999989, 0.670000017, 1]
   - Entity: 3426438339125018013
     TagComponent:
@@ -1046,7 +1046,7 @@ Entities:
       Rotation: [0, 0, 0.69813168]
       Scale: [60, 60, 60]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.579999983, 0.540000021, 0.879999995, 1]
   - Entity: 6551301195271437361
     TagComponent:
@@ -1056,7 +1056,7 @@ Entities:
       Rotation: [0, 0, 2.63544726]
       Scale: [37, 37, 37]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.629999995, 0.49000001, 0.810000002, 1]
   - Entity: 15993783543127198078
     TagComponent:
@@ -1066,7 +1066,7 @@ Entities:
       Rotation: [0, 0, 0.244346097]
       Scale: [169, 169, 169]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.649999976, 0.280000001, 0.430000007, 1]
   - Entity: 12898352399644486717
     TagComponent:
@@ -1076,7 +1076,7 @@ Entities:
       Rotation: [0, 0, 3.64773822]
       Scale: [87, 87, 87]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.629999995, 0.00999999978, 0.0299999993, 1]
   - Entity: 6752404807294559033
     TagComponent:
@@ -1086,7 +1086,7 @@ Entities:
       Rotation: [0, 0, 5.51524019]
       Scale: [108, 108, 108]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.699999988, 0.00999999978, 0.230000004, 1]
   - Entity: 15054064093594241569
     TagComponent:
@@ -1096,7 +1096,7 @@ Entities:
       Rotation: [0, 0, 4.57276249]
       Scale: [62, 62, 62]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.850000024, 0.889999986, 0.439999998, 1]
   - Entity: 3079256095504439322
     TagComponent:
@@ -1106,7 +1106,7 @@ Entities:
       Rotation: [0, 0, 5.16617441]
       Scale: [64, 64, 64]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.75, 0.449999988, 0.119999997, 1]
   - Entity: 256258918669245813
     TagComponent:
@@ -1116,7 +1116,7 @@ Entities:
       Rotation: [0, 0, 5.28834772]
       Scale: [139, 139, 139]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.219999999, 0.980000019, 0.469999999, 1]
   - Entity: 241135199173998061
     TagComponent:
@@ -1126,7 +1126,7 @@ Entities:
       Rotation: [0, 0, 0.907571197]
       Scale: [113, 113, 113]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0399999991, 0.180000007, 0.319999993, 1]
   - Entity: 4102272397926171239
     TagComponent:
@@ -1136,7 +1136,7 @@ Entities:
       Rotation: [0, 0, 0.610865235]
       Scale: [163, 163, 163]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.709999979, 0.889999986, 0.400000006, 1]
   - Entity: 16216167832286912149
     TagComponent:
@@ -1146,7 +1146,7 @@ Entities:
       Rotation: [0, 0, 3.21140575]
       Scale: [170, 170, 170]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.469999999, 0.0399999991, 0.0299999993, 1]
   - Entity: 4743430902420847176
     TagComponent:
@@ -1156,7 +1156,7 @@ Entities:
       Rotation: [0, 0, 2.7401669]
       Scale: [159, 159, 159]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.280000001, 0.270000011, 0.839999974, 1]
   - Entity: 13441763591912637319
     TagComponent:
@@ -1166,7 +1166,7 @@ Entities:
       Rotation: [0, 0, 1.93731546]
       Scale: [77, 77, 77]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.829999983, 0.129999995, 0.920000017, 1]
   - Entity: 9479290518176437648
     TagComponent:
@@ -1176,7 +1176,7 @@ Entities:
       Rotation: [0, 0, 0.0872664601]
       Scale: [27, 27, 27]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.409999996, 0.289999992, 0.400000006, 1]
   - Entity: 10334247467689234320
     TagComponent:
@@ -1186,7 +1186,7 @@ Entities:
       Rotation: [0, 0, 1.41371667]
       Scale: [29, 29, 29]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0799999982, 0.920000017, 0.970000029, 1]
   - Entity: 13855510178633453864
     TagComponent:
@@ -1196,7 +1196,7 @@ Entities:
       Rotation: [0, 0, 5.84685278]
       Scale: [58, 58, 58]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.589999974, 0.920000017, 0.0500000007, 1]
   - Entity: 5430002680431400883
     TagComponent:
@@ -1206,7 +1206,7 @@ Entities:
       Rotation: [0, 0, 2.47836757]
       Scale: [189, 189, 189]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.449999988, 0.529999971, 0.140000001, 1]
   - Entity: 5015693937933013195
     TagComponent:
@@ -1216,7 +1216,7 @@ Entities:
       Rotation: [0, 0, 4.27605677]
       Scale: [95, 95, 95]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.310000002, 0.400000006, 0.879999995, 1]
   - Entity: 6214742454180280723
     TagComponent:
@@ -1226,7 +1226,7 @@ Entities:
       Rotation: [0, 0, 2.7401669]
       Scale: [113, 113, 113]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.720000029, 0.180000007, 0.100000001, 1]
   - Entity: 10856695256484423995
     TagComponent:
@@ -1236,7 +1236,7 @@ Entities:
       Rotation: [0, 0, 5.58505344]
       Scale: [77, 77, 77]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.779999971, 0.519999981, 0.430000007, 1]
   - Entity: 3862579525074043105
     TagComponent:
@@ -1246,7 +1246,7 @@ Entities:
       Rotation: [0, 0, 0.925024509]
       Scale: [100, 100, 100]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.409999996, 0.550000012, 0.550000012, 1]
   - Entity: 4301491820459625764
     TagComponent:
@@ -1256,7 +1256,7 @@ Entities:
       Rotation: [0, 0, 2.98451304]
       Scale: [134, 134, 134]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.930000007, 0.75999999, 0.0500000007, 1]
   - Entity: 14454181171965799771
     TagComponent:
@@ -1266,7 +1266,7 @@ Entities:
       Rotation: [0, 0, 2.72271371]
       Scale: [183, 183, 183]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.980000019, 0.790000021, 0.00999999978, 1]
   - Entity: 5526565342042576159
     TagComponent:
@@ -1276,7 +1276,7 @@ Entities:
       Rotation: [0, 0, 4.8520155]
       Scale: [175, 175, 175]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.25, 0.209999993, 0.699999988, 1]
   - Entity: 18338236628831622936
     TagComponent:
@@ -1286,7 +1286,7 @@ Entities:
       Rotation: [0, 0, 0.139626339]
       Scale: [48, 48, 48]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.379999995, 0.230000004, 0.419999987, 1]
   - Entity: 14393818882180083726
     TagComponent:
@@ -1296,7 +1296,7 @@ Entities:
       Rotation: [0, 0, 4.78220224]
       Scale: [169, 169, 169]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.629999995, 0.0700000003, 0.829999983, 1]
   - Entity: 4964622261769225867
     TagComponent:
@@ -1306,7 +1306,7 @@ Entities:
       Rotation: [0, 0, 3.59537816]
       Scale: [55, 55, 55]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.620000005, 0.839999974, 0.340000004, 1]
   - Entity: 6088942554726247044
     TagComponent:
@@ -1316,7 +1316,7 @@ Entities:
       Rotation: [0, 0, 0.191986218]
       Scale: [41, 41, 41]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.289999992, 0.289999992, 0.649999976, 1]
   - Entity: 18446734898559893879
     TagComponent:
@@ -1326,7 +1326,7 @@ Entities:
       Rotation: [0, 0, 5.77704]
       Scale: [161, 161, 161]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.219999999, 0.170000002, 0.119999997, 1]
   - Entity: 4174134253741650584
     TagComponent:
@@ -1336,7 +1336,7 @@ Entities:
       Rotation: [0, 0, 3.31612563]
       Scale: [16, 16, 16]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.569999993, 0.25999999, 0.569999993, 1]
   - Entity: 1449708485387024993
     TagComponent:
@@ -1346,7 +1346,7 @@ Entities:
       Rotation: [0, 0, 4.71238899]
       Scale: [104, 104, 104]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.560000002, 0.720000029, 0.5, 1]
   - Entity: 2275723441577065451
     TagComponent:
@@ -1356,7 +1356,7 @@ Entities:
       Rotation: [0, 0, 1.74532926]
       Scale: [50, 50, 50]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.280000001, 0.930000007, 0.839999974, 1]
   - Entity: 10222813513849606145
     TagComponent:
@@ -1366,7 +1366,7 @@ Entities:
       Rotation: [0, 0, 5.75958633]
       Scale: [160, 160, 160]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.239999995, 0.769999981, 0.0799999982, 1]
   - Entity: 10266796400089657612
     TagComponent:
@@ -1376,7 +1376,7 @@ Entities:
       Rotation: [0, 0, 1.88495553]
       Scale: [178, 178, 178]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0700000003, 0.769999981, 0, 1]
   - Entity: 8377358712379598697
     TagComponent:
@@ -1386,7 +1386,7 @@ Entities:
       Rotation: [0, 0, 4.76474905]
       Scale: [163, 163, 163]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.50999999, 0.620000005, 0.289999992, 1]
   - Entity: 1802757210026264712
     TagComponent:
@@ -1396,7 +1396,7 @@ Entities:
       Rotation: [0, 0, 5.37561417]
       Scale: [171, 171, 171]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.469999999, 0.529999971, 0.200000003, 1]
   - Entity: 18258127129514203104
     TagComponent:
@@ -1406,7 +1406,7 @@ Entities:
       Rotation: [0, 0, 3.26376557]
       Scale: [125, 125, 125]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.600000024, 0.0199999996, 0.159999996, 1]
   - Entity: 27586687066155049
     TagComponent:
@@ -1416,7 +1416,7 @@ Entities:
       Rotation: [0, 0, 1.41371667]
       Scale: [120, 120, 120]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.620000005, 0.230000004, 0.959999979, 1]
   - Entity: 14877092105158039710
     TagComponent:
@@ -1426,7 +1426,7 @@ Entities:
       Rotation: [0, 0, 2.42600775]
       Scale: [87, 87, 87]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.74000001, 0.25, 0.270000011, 1]
   - Entity: 10114946780134470358
     TagComponent:
@@ -1436,7 +1436,7 @@ Entities:
       Rotation: [0, 0, 3.42084527]
       Scale: [27, 27, 27]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.579999983, 0.639999986, 0.0900000036, 1]
   - Entity: 16210734854590916935
     TagComponent:
@@ -1446,7 +1446,7 @@ Entities:
       Rotation: [0, 0, 3.24631238]
       Scale: [87, 87, 87]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.25999999, 0.100000001, 0.569999993, 1]
   - Entity: 8334772636881276440
     TagComponent:
@@ -1456,7 +1456,7 @@ Entities:
       Rotation: [0, 0, 2.7401669]
       Scale: [193, 193, 193]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.839999974, 0.180000007, 0.639999986, 1]
   - Entity: 3309456793198122124
     TagComponent:
@@ -1466,7 +1466,7 @@ Entities:
       Rotation: [0, 0, 0.17453292]
       Scale: [125, 125, 125]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.939999998, 0.579999983, 0.0199999996, 1]
   - Entity: 9726232512534994400
     TagComponent:
@@ -1476,7 +1476,7 @@ Entities:
       Rotation: [0, 0, 1.83259571]
       Scale: [67, 67, 67]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.5, 0.400000006, 0.939999998, 1]
   - Entity: 7965096548323737804
     TagComponent:
@@ -1486,7 +1486,7 @@ Entities:
       Rotation: [0, 0, 4.6949358]
       Scale: [174, 174, 174]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.699999988, 0.349999994, 0.330000013, 1]
   - Entity: 5366670921179922360
     TagComponent:
@@ -1496,7 +1496,7 @@ Entities:
       Rotation: [0, 0, 6.09119892]
       Scale: [142, 142, 142]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.860000014, 0.639999986, 0, 1]
   - Entity: 4505186774746612091
     TagComponent:
@@ -1506,7 +1506,7 @@ Entities:
       Rotation: [0, 0, 2.25147462]
       Scale: [181, 181, 181]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.319999993, 0.0500000007, 0.930000007, 1]
   - Entity: 8288634432828391351
     TagComponent:
@@ -1516,7 +1516,7 @@ Entities:
       Rotation: [0, 0, 0.209439516]
       Scale: [99, 99, 99]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.25, 0.430000007, 0.239999995, 1]
   - Entity: 935644026625982489
     TagComponent:
@@ -1526,7 +1526,7 @@ Entities:
       Rotation: [0, 0, 5.56760025]
       Scale: [68, 68, 68]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.850000024, 0.0199999996, 0.800000012, 1]
   - Entity: 1715320074323358384
     TagComponent:
@@ -1536,7 +1536,7 @@ Entities:
       Rotation: [0, 0, 5.35816097]
       Scale: [70, 70, 70]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.970000029, 0.180000007, 0.769999981, 1]
   - Entity: 8375666554002063448
     TagComponent:
@@ -1546,7 +1546,7 @@ Entities:
       Rotation: [0, 0, 5.91666603]
       Scale: [14, 14, 14]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.239999995, 0.340000004, 0.74000001, 1]
   - Entity: 10299400456573619501
     TagComponent:
@@ -1556,7 +1556,7 @@ Entities:
       Rotation: [0, 0, 2.07694173]
       Scale: [18, 18, 18]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0500000007, 0.579999983, 0.910000026, 1]
   - Entity: 5000801137612921246
     TagComponent:
@@ -1566,7 +1566,7 @@ Entities:
       Rotation: [0, 0, 1.36135685]
       Scale: [110, 110, 110]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.49000001, 0.860000014, 0.129999995, 1]
   - Entity: 4588094700778188487
     TagComponent:
@@ -1576,7 +1576,7 @@ Entities:
       Rotation: [0, 0, 3.4382987]
       Scale: [66, 66, 66]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.589999974, 0.920000017, 0.389999986, 1]
   - Entity: 16959005075743855471
     TagComponent:
@@ -1586,7 +1586,7 @@ Entities:
       Rotation: [0, 0, 3.8397243]
       Scale: [144, 144, 144]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.219999999, 0.289999992, 0.610000014, 1]
   - Entity: 4911889962150284717
     TagComponent:
@@ -1596,7 +1596,7 @@ Entities:
       Rotation: [0, 0, 0.0872664601]
       Scale: [145, 145, 145]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.560000002, 0.209999993, 0.579999983, 1]
   - Entity: 17554545328724698473
     TagComponent:
@@ -1606,7 +1606,7 @@ Entities:
       Rotation: [0, 0, 0.0872664601]
       Scale: [63, 63, 63]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.550000012, 0.850000024, 0.529999971, 1]
   - Entity: 4500140634999914271
     TagComponent:
@@ -1616,7 +1616,7 @@ Entities:
       Rotation: [0, 0, 4.34587002]
       Scale: [82, 82, 82]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.340000004, 0.140000001, 0.00999999978, 1]
   - Entity: 2215108451286631344
     TagComponent:
@@ -1626,7 +1626,7 @@ Entities:
       Rotation: [0, 0, 3.36848545]
       Scale: [149, 149, 149]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.949999988, 0.970000029, 0.159999996, 1]
   - Entity: 1587001784443699261
     TagComponent:
@@ -1636,7 +1636,7 @@ Entities:
       Rotation: [0, 0, 2.16420817]
       Scale: [23, 23, 23]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.959999979, 0.870000005, 0.289999992, 1]
   - Entity: 2759739004171674131
     TagComponent:
@@ -1646,7 +1646,7 @@ Entities:
       Rotation: [0, 0, 4.5553093]
       Scale: [149, 149, 149]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.119999997, 0.449999988, 0.600000024, 1]
   - Entity: 373970409150855744
     TagComponent:
@@ -1656,7 +1656,7 @@ Entities:
       Rotation: [0, 0, 4.03171062]
       Scale: [189, 189, 189]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.289999992, 0.680000007, 0.920000017, 1]
   - Entity: 12409976085093462317
     TagComponent:
@@ -1666,7 +1666,7 @@ Entities:
       Rotation: [0, 0, 4.46804285]
       Scale: [26, 26, 26]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.569999993, 0.319999993, 0.319999993, 1]
   - Entity: 3865761370394658636
     TagComponent:
@@ -1676,7 +1676,7 @@ Entities:
       Rotation: [0, 0, 3.08923268]
       Scale: [189, 189, 189]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.230000004, 0.0199999996, 0.850000024, 1]
   - Entity: 9752647167054547950
     TagComponent:
@@ -1686,7 +1686,7 @@ Entities:
       Rotation: [0, 0, 1.51843643]
       Scale: [112, 112, 112]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.100000001, 0.0299999993, 0.689999998, 1]
   - Entity: 761260230478595581
     TagComponent:
@@ -1696,7 +1696,7 @@ Entities:
       Rotation: [0, 0, 5.72467995]
       Scale: [51, 51, 51]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.99000001, 0.569999993, 0.75999999, 1]
   - Entity: 12088576431429608920
     TagComponent:
@@ -1706,7 +1706,7 @@ Entities:
       Rotation: [0, 0, 1.2566371]
       Scale: [33, 33, 33]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.419999987, 0.439999998, 0.159999996, 1]
   - Entity: 3053795826939379457
     TagComponent:
@@ -1716,7 +1716,7 @@ Entities:
       Rotation: [0, 0, 3.82227111]
       Scale: [34, 34, 34]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.550000012, 0.280000001, 0.460000008, 1]
   - Entity: 8754113996136903122
     TagComponent:
@@ -1726,7 +1726,7 @@ Entities:
       Rotation: [0, 0, 1.04719758]
       Scale: [57, 57, 57]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.910000026, 0.150000006, 0.879999995, 1]
   - Entity: 16833366957099676457
     TagComponent:
@@ -1736,7 +1736,7 @@ Entities:
       Rotation: [0, 0, 0.157079637]
       Scale: [157, 157, 157]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.219999999, 0.379999995, 0.920000017, 1]
   - Entity: 1590781927152217803
     TagComponent:
@@ -1746,7 +1746,7 @@ Entities:
       Rotation: [0, 0, 2.0420351]
       Scale: [18, 18, 18]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.959999979, 0.980000019, 0.810000002, 1]
   - Entity: 13949836398821179363
     TagComponent:
@@ -1756,7 +1756,7 @@ Entities:
       Rotation: [0, 0, 0.139626339]
       Scale: [143, 143, 143]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.870000005, 0.140000001, 0.0299999993, 1]
   - Entity: 9772172789471356153
     TagComponent:
@@ -1766,7 +1766,7 @@ Entities:
       Rotation: [0, 0, 1.74532926]
       Scale: [8, 8, 8]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0900000036, 0.889999986, 0.0199999996, 1]
   - Entity: 10718829854870904666
     TagComponent:
@@ -1776,7 +1776,7 @@ Entities:
       Rotation: [0, 0, 2.39110112]
       Scale: [51, 51, 51]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.49000001, 0.189999998, 0.560000002, 1]
   - Entity: 11672126550767689241
     TagComponent:
@@ -1786,7 +1786,7 @@ Entities:
       Rotation: [0, 0, 5.39306736]
       Scale: [21, 21, 21]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.170000002, 0.129999995, 0.140000001, 1]
   - Entity: 1365943751220775717
     TagComponent:
@@ -1796,7 +1796,7 @@ Entities:
       Rotation: [0, 0, 3.08923268]
       Scale: [188, 188, 188]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.670000017, 0.280000001, 0.930000007, 1]
   - Entity: 15307509140044391738
     TagComponent:
@@ -1806,7 +1806,7 @@ Entities:
       Rotation: [0, 0, 0.418879032]
       Scale: [84, 84, 84]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.340000004, 0.529999971, 0.99000001, 1]
   - Entity: 12231071286652154294
     TagComponent:
@@ -1816,7 +1816,7 @@ Entities:
       Rotation: [0, 0, 0.69813168]
       Scale: [36, 36, 36]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.200000003, 0.959999979, 0.209999993, 1]
   - Entity: 11165182614323796721
     TagComponent:
@@ -1826,7 +1826,7 @@ Entities:
       Rotation: [0, 0, 0.139626339]
       Scale: [137, 137, 137]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.829999983, 0.949999988, 0.409999996, 1]
   - Entity: 138810606496594998
     TagComponent:
@@ -1836,7 +1836,7 @@ Entities:
       Rotation: [0, 0, 3.17649913]
       Scale: [168, 168, 168]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.910000026, 0.620000005, 0.550000012, 1]
   - Entity: 11216839041622685741
     TagComponent:
@@ -1846,7 +1846,7 @@ Entities:
       Rotation: [0, 0, 2.93215322]
       Scale: [158, 158, 158]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.879999995, 0.219999999, 0.460000008, 1]
   - Entity: 5804533259652289129
     TagComponent:
@@ -1856,7 +1856,7 @@ Entities:
       Rotation: [0, 0, 0.34906584]
       Scale: [137, 137, 137]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.870000005, 0.529999971, 0.829999983, 1]
   - Entity: 613901391197880040
     TagComponent:
@@ -1866,7 +1866,7 @@ Entities:
       Rotation: [0, 0, 1.18682384]
       Scale: [150, 150, 150]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.239999995, 0.660000026, 0.300000012, 1]
   - Entity: 2361886464741177891
     TagComponent:
@@ -1876,7 +1876,7 @@ Entities:
       Rotation: [0, 0, 1.69296932]
       Scale: [36, 36, 36]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.670000017, 0.550000012, 0.74000001, 1]
   - Entity: 2668109076849925796
     TagComponent:
@@ -1886,7 +1886,7 @@ Entities:
       Rotation: [0, 0, 3.68264461]
       Scale: [29, 29, 29]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.730000019, 0.970000029, 0.119999997, 1]
   - Entity: 3237910479343264424
     TagComponent:
@@ -1896,7 +1896,7 @@ Entities:
       Rotation: [0, 0, 1.41371667]
       Scale: [106, 106, 106]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.860000014, 0.209999993, 0.449999988, 1]
   - Entity: 13865949021997998122
     TagComponent:
@@ -1906,7 +1906,7 @@ Entities:
       Rotation: [0, 0, 2.8972466]
       Scale: [141, 141, 141]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.150000006, 0.389999986, 0.579999983, 1]
   - Entity: 9122324442683377886
     TagComponent:
@@ -1916,7 +1916,7 @@ Entities:
       Rotation: [0, 0, 3.73500466]
       Scale: [39, 39, 39]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.230000004, 0.370000005, 0.379999995, 1]
   - Entity: 4767512373968576013
     TagComponent:
@@ -1926,7 +1926,7 @@ Entities:
       Rotation: [0, 0, 1.53588974]
       Scale: [154, 154, 154]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.400000006, 0.660000026, 0.75999999, 1]
   - Entity: 8039704555041851557
     TagComponent:
@@ -1936,7 +1936,7 @@ Entities:
       Rotation: [0, 0, 5.00909472]
       Scale: [150, 150, 150]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.00999999978, 0.930000007, 0.479999989, 1]
   - Entity: 10941130867957050535
     TagComponent:
@@ -1946,7 +1946,7 @@ Entities:
       Rotation: [0, 0, 4.13643026]
       Scale: [142, 142, 142]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.479999989, 0.460000008, 0.0500000007, 1]
   - Entity: 16419864331028483820
     TagComponent:
@@ -1956,7 +1956,7 @@ Entities:
       Rotation: [0, 0, 1.91986215]
       Scale: [178, 178, 178]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.349999994, 0.899999976, 0.419999987, 1]
   - Entity: 16872204564501572430
     TagComponent:
@@ -1966,7 +1966,7 @@ Entities:
       Rotation: [0, 0, 6.14355898]
       Scale: [44, 44, 44]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.569999993, 0.370000005, 0.589999974, 1]
   - Entity: 15154763563364758795
     TagComponent:
@@ -1976,7 +1976,7 @@ Entities:
       Rotation: [0, 0, 1.43116999]
       Scale: [133, 133, 133]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.639999986, 0.409999996, 0.109999999, 1]
   - Entity: 11062650240707284731
     TagComponent:
@@ -1986,7 +1986,7 @@ Entities:
       Rotation: [0, 0, 3.10668612]
       Scale: [112, 112, 112]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.99000001, 0.349999994, 0.939999998, 1]
   - Entity: 12603759571182067999
     TagComponent:
@@ -1996,7 +1996,7 @@ Entities:
       Rotation: [0, 0, 5.7944932]
       Scale: [116, 116, 116]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.949999988, 0.469999999, 0.25999999, 1]
   - Entity: 12688113873573749946
     TagComponent:
@@ -2006,7 +2006,7 @@ Entities:
       Rotation: [0, 0, 1.41371667]
       Scale: [36, 36, 36]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.0399999991, 0.0199999996, 0.529999971, 1]
   - Entity: 11584475487000306831
     TagComponent:
@@ -2016,5 +2016,5 @@ Entities:
       Rotation: [0, 0, 5.32325411]
       Scale: [145, 145, 145]
     SpriteRendererComponent:
-      Texture: Assets/Textures/awesomeface.png
+      Texture: data/assets/textures/awesomeface.png
       Tint: [0.270000011, 0.610000014, 0.910000026, 1]

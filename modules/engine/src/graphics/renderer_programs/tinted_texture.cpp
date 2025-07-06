@@ -22,7 +22,7 @@ TintedTextureRendererProgram::TintedTextureRendererProgram(
 	// #todo: don't use relative path
 	ResourceManager::load_shader(
 	    "LT_ENGINE_RESOURCES_TINTED_TEXTURE_SHADER",
-	    "data/assets/shaders/tinted_texture/ps.glsl",
+	    "data/assets/shaders/tinted_texture/vs.glsl",
 	    "data/assets/shaders/tinted_texture/ps.glsl"
 	);
 

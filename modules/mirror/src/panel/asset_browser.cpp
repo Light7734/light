@@ -5,10 +5,10 @@
 
 namespace Light {
 
-AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> activeScene)
-    : m_current_directory("Assets")
-    , m_assets_path("Assets")
-    , m_active_scene(activeScene)
+AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> active_scene)
+    : m_current_directory("./data/assets")
+    , m_assets_path("./data/assets")
+    , m_active_scene(std::move(active_scene))
 {
 	ResourceManager::load_texture("_Assets_Directory", "data/engine/icons/asset/dir.png");
 	ResourceManager::load_texture("_Assets_Scene", "data/engine/icons/asset/scene.png");
@@ -26,7 +26,7 @@ void AssetBrowserPanel::on_user_interface_update()
 	ImGui::Begin("Content Browser");
 
 	// Parent directory button
-	if (m_current_directory != std::filesystem::path("Assets"))
+	if (m_current_directory != std::filesystem::path("data/assets"))
 	{
 		if (ImGui::Button(" <--  "))
 		{
@@ -52,19 +52,19 @@ void AssetBrowserPanel::on_user_interface_update()
 
 			// TODO: Tidy up
 			auto assetType = AssetType {};
-			assetType = extension.empty() ? AssetType::Directory :
+			assetType = extension.empty() ? AssetType::directory :
 
-			            extension == ".txt"  ? AssetType::Text :
-			            extension == ".glsl" ? AssetType::Text :
+			            extension == ".txt"  ? AssetType::text :
+			            extension == ".glsl" ? AssetType::text :
 
-			            extension == ".png" ? AssetType::Image :
+			            extension == ".png" ? AssetType::image :
 
-			            extension == ".scene" ? AssetType::Scene :
+			            extension == ".scene" ? AssetType::scene :
 
-			                                    AssetType::None;
+			                                    AssetType::none;
 
 			// Extension not supported
-			if (assetType == AssetType::None)
+			if (assetType == AssetType::none)
 			{
 				continue;
 			}
@@ -75,7 +75,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			switch (assetType)
 			{
 			// Directory
-			case AssetType::Directory:
+			case AssetType::directory:
 				if (ImGui::ImageButton(
 				        m_directory_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
@@ -91,7 +91,7 @@ void AssetBrowserPanel::on_user_interface_update()
 				break;
 
 			// Scene
-			case AssetType::Scene:
+			case AssetType::scene:
 				if (ImGui::ImageButton(
 				        m_scene_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
@@ -109,7 +109,7 @@ void AssetBrowserPanel::on_user_interface_update()
 				break;
 
 			// Image
-			case AssetType::Image:
+			case AssetType::image:
 				if (ImGui::ImageButton(
 				        m_image_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),
@@ -124,7 +124,7 @@ void AssetBrowserPanel::on_user_interface_update()
 				break;
 
 			// Text
-			case AssetType::Text:
+			case AssetType::text:
 				if (ImGui::ImageButton(
 				        m_text_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size),

@@ -9,18 +9,18 @@ namespace Light {
 class AssetBrowserPanel: public Panel
 {
 public:
-	AssetBrowserPanel(Ref<Scene> activeScene);
+	AssetBrowserPanel(Ref<Scene> active_scene);
 
 	void on_user_interface_update();
 
 private:
 	enum class AssetType
 	{
-		None = 0,
-		Scene,
-		Directory,
-		Text,
-		Image,
+		none = 0,
+		scene,
+		directory,
+		text,
+		image,
 	};
 
 	std::filesystem::path m_current_directory;
