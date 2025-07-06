@@ -5,12 +5,12 @@
 	#include <engine/engine.hpp>
 
 // to be defined in client project
-extern Light::Application *Light::create_application();
+extern auto Light::create_application() -> Light::Scope<Light::Application>;
 
 // #todo: use windows specific stuff
 int main(int argc, char *argv[])
 {
-	Light::Application *application = nullptr;
+	auto application = Light::Scope<Light::Application> {};
 	int exitCode = 0;
 
 	std::vector<std::string> args;
@@ -24,26 +24,26 @@ int main(int argc, char *argv[])
 		lt_assert(application, "Light::Application is not intialized");
 
 		for (int i = 0; i < argc; i++)
-			lt_log(info, "argv[{}]: {}", i, argv[i]);
+			log_inf("argv[{}]: {}", i, argv[i]);
 
 		application->game_loop();
 	}
 	// failed engine assertion
 	catch (Light::FailedAssertion)
 	{
-		lt_log(critical, "Terminating due to unhandled 'FailedEngineAssertion'");
+		log_crt("Terminating due to unhandled 'FailedEngineAssertion'");
 		exitCode = -1;
 	}
 	// gl exception
 	catch (Light::glException)
 	{
-		lt_log(critical, "Terminating due to unhandled 'glException'");
+		log_crt("Terminating due to unhandled 'glException'");
 		exitCode = -3;
 	}
 	// dx exception
 	catch (Light::dxException)
 	{
-		lt_log(critical, "Terminating due to unhandled 'dxException'");
+		log_crt("Terminating due to unhandled 'dxException'");
 		exitCode = -4;
 	}
 
@@ -56,12 +56,12 @@ int main(int argc, char *argv[])
 	#include <engine/engine.hpp>
 
 // to be defined in client project
-extern Light::Application *Light::create_application();
+extern auto Light::create_application() -> Light::Scope<Light::Application>;
 
 // #todo: use linux specific stuff
 int main(int argc, char *argv[])
 {
-	Light::Application *application = nullptr;
+	auto application = Light::Scope<Light::Application> {};
 	int exitCode = 0;
 
 	try
@@ -74,17 +74,16 @@ int main(int argc, char *argv[])
 	// failed engine assertion
 	catch (Light::FailedAssertion)
 	{
-		lt_log(critical, "Exitting due to unhandled 'FailedEngineAssertion'");
+		log_crt("Exitting due to unhandled 'FailedEngineAssertion'");
 		exitCode = -1;
 	}
 	// gl exception
 	catch (Light::glException)
 	{
-		lt_log(critical, "main: exitting due to unhandled 'glException'");
+		log_crt("main: exitting due to unhandled 'glException'");
 		exitCode = -3;
 	}
 
-	delete application;
 	return exitCode;
 }
 

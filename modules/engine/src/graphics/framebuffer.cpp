@@ -23,14 +23,15 @@ auto Framebuffer::create(
 		lt_win(return create_ref<dxFramebuffer>(
 		                  specification,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		););
 
-		    default
-		    : lt_assert(
-		          false,
-		          "Invalid/unsupported 'GraphicsAPI' {}",
-		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		      );
+	default:
+		lt_assert(
+		    false,
+		    "Invalid/unsupported 'GraphicsAPI' {}",
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		);
+
 		return nullptr;
 	}
 }

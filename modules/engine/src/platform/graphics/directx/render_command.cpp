@@ -15,8 +15,8 @@ void dxRenderCommand::swap_buffers()
 	{
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{
-			lt_log(critical, "dxRenderCommand::swap_buffers: DeviceRemoved:");
-			lt_log(critical, "        {}", m_context->get_device()->GetDeviceRemovedReason());
+			log_crt("dxRenderCommand::swap_buffers: DeviceRemoved:");
+			log_crt("        {}", m_context->get_device()->GetDeviceRemovedReason());
 			throw dxException(hr, __FILE__, __LINE__);
 		}
 	}

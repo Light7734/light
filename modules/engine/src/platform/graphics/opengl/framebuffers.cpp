@@ -32,7 +32,7 @@ void glFramebuffer::bind_as_target(const glm::vec4 &clearColor)
 
 void glFramebuffer::bind_as_resource()
 {
-	lt_log(err, "NO_IMPLEMENT!");
+	log_err("NO_IMPLEMENT!");
 }
 
 void glFramebuffer::resize(const glm::uvec2 &size)

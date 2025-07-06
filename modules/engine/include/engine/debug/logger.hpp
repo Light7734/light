@@ -1,57 +1,101 @@
 #pragma once
-#ifndef LIGHT_LOGGER_H
-	#define LIGHT_LOGGER_H
 
-	#include <engine/base/base.hpp>
-	#include <spdlog/spdlog.h>
+#include <any>
+#include <format>
+#include <memory>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
-	#define LT_LOG_FILE_LOCATION "Logs/logger.txt"
-
-	#ifndef LIGHT_DIST
-		#define lt_log(logLevel, ...)                 \
-			SPDLOG_LOGGER_CALL(                       \
-			    ::Light::logger::get_engine_logger(), \
-			    spdlog::level::logLevel,              \
-			    __VA_ARGS__                           \
-			)
-	#else
-		#define lt_log(logLevel, ...)               \
-			SPDLOG_LOGGER_CALL(                     \
-			    ::Light::logger::get_file_logger(), \
-			    spdlog::level::logLevel,            \
-			    __VA_ARGS__                         \
-			)
-	#endif
-
-namespace Light {
-
-class logger
+/** @brief Severity of a log message.
+ *
+ * @note Values reflect spdlog::lvl
+ */
+enum class LogLvl : uint8_t
 {
-public:
-	static Scope<logger> create();
+	/** Lowest and most vebose log level, for tracing execution paths and events */
+	trace = 0,
 
-	static auto get_engine_logger() -> Ref<spdlog::logger>
-	{
-		return s_context->m_engine_logger;
-	}
+	/** Vebose log level, for enabling temporarily to debug */
+	debug = 1,
 
-	static auto get_file_logger() -> Ref<spdlog::logger>
-	{
-		return s_context->m_file_logger;
-	}
+	/** General information */
+	info = 2,
 
-	void log_debug_data();
+	/** Things we should to be aware of and edge cases */
+	warn = 3,
 
-private:
-	static logger *s_context;
+	/** Defects, bugs and undesired behaviour */
+	error = 4,
 
-	Ref<spdlog::logger> m_engine_logger, m_file_logger;
+	/** Unrecoverable errors */
+	critical = 5,
 
-	std::string m_log_file_path;
-
-	logger();
+	/** No logging */
+	off = 6,
 };
 
-} // namespace Light
+namespace spdlog {
+class logger;
+}
 
-#endif
+/** Responsible for logging */
+class Logger
+{
+public:
+	void static show_imgui_window();
+
+	template<typename... Args>
+	void static log(LogLvl lvl, std::format_string<Args...> fmt, Args &&...args)
+	{
+		instance().spd_logger->log(
+		    (spdlog::level::level_enum)lvl,
+		    std::format(fmt, std::forward<Args>(args)...)
+		);
+	}
+
+private:
+	Logger();
+
+	~Logger();
+
+	auto static instance() -> Logger &;
+
+	std::shared_ptr<spdlog::logger> spd_logger;
+};
+
+template<typename... Args>
+void log_trc(std::format_string<Args...> fmt, Args &&...args)
+{
+	Logger::log(LogLvl::trace, fmt, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+void log_dbg(std::format_string<Args...> fmt, Args &&...args)
+{
+	Logger::log(LogLvl::debug, fmt, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+void log_inf(std::format_string<Args...> fmt, Args &&...args)
+{
+	Logger::log(LogLvl::info, fmt, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+void log_wrn(std::format_string<Args...> fmt, Args &&...args)
+{
+	Logger::log(LogLvl::warn, fmt, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+void log_err(std::format_string<Args...> fmt, Args &&...args)
+{
+	Logger::log(LogLvl::error, fmt, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+void log_crt(std::format_string<Args...> fmt, Args &&...args)
+{
+	Logger::log(LogLvl::critical, fmt, std::forward<Args>(args)...);
+}

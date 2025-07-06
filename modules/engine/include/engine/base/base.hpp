@@ -38,43 +38,74 @@ constexpr std::unique_ptr<t> make_scope(t *rawPointer)
 
 } // namespace Light
 
-//========== PLATFORM ==========//
 #define lt_win(x) // windows
 #define lt_lin(x) // linux
 #define lt_mac(x) // mac
 
+
+enum class Platform : uint8_t
+{
+	windows,
+
+	/** Named like so because "linux" is a built-in identifier. */
+	gnu,
+
+	mac,
+};
+
+
+namespace constants {
+
 #if defined(LIGHT_PLATFORM_WINDOWS)
-	#define LT_BUILD_PLATFORM "Windows"
-	#define lt_win(x)         x
+	#define lt_win(x) x
+constexpr auto platform = Platform::windows;
+constexpr auto platform_name = "windows";
 
 #elif defined(LIGHT_PLATFORM_LINUX)
-	#define LT_BUILD_PLATFORM "Linux"
-	#define lt_lin(x)         x
+	#define lt_lin(x) x
+constexpr auto platform = Platform::gnu;
+constexpr auto platform_name = "linux";
 
 #elif defined(LIGHT_PLATFORM_MAC)
-	#error "Unsupported platform: MAC"
 	#define lt_mac(x) x
+constexpr auto platform = Platform::mac;
+constexpr auto platform_name = "mac";
 
 #else
 	#error "Unsupported platform: Unknown"
-#endif
-//========== PLATFORM ==========//
 
-//====================================================================== OPERATIONS
-//======================================================================//
-/* assertions */
-#define lt_assert(x, ...)                                          \
+#endif
+
+
+} // namespace constants
+
+template<typename T = void>
+concept is_linux = true;
+
+auto linux_only(auto value)
+    requires is_linux<void>
+{
+	if constexpr (is_linux)
+	{
+		return value;
+	}
+}
+
+#define lt_assert(x, ...)                                       \
 	{                                                           \
 		if (!(x))                                               \
 		{                                                       \
-			lt_log(critical, __VA_ARGS__);                         \
+			log_crt(__VA_ARGS__);                      \
 			lt_debug_trap();                                    \
 			throw ::Light::FailedAssertion(__FILE__, __LINE__); \
 		}                                                       \
 	}
 
 /* bit-wise */
-#define bit(x) 1 << x
+constexpr auto bit(auto x)
+{
+	return 1 << x;
+}
 
 /* token */
 #define lt_pair_token_value_to_name(token) { token, #token }

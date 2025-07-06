@@ -120,7 +120,7 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 	// advance
 	if (!m_quad_renderer.advance())
 	{
-		lt_log(warn, "Exceeded LT_MAX_QUAD_RENDERER_VERTICES: {}", LT_MAX_QUAD_RENDERER_VERTICES);
+		log_wrn("Exceeded LT_MAX_QUAD_RENDERER_VERTICES: {}", LT_MAX_QUAD_RENDERER_VERTICES);
 		flush_scene();
 	}
 }
@@ -155,11 +155,7 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, Ref<Texture> texture)
 	// advance
 	if (!m_texture_renderer.advance())
 	{
-		lt_log(
-		    warn,
-		    "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}",
-		    LT_MAX_TEXTURE_RENDERER_VERTICES
-		);
+		log_wrn("Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES);
 		flush_scene();
 	}
 }
@@ -201,11 +197,7 @@ void Renderer::draw_quad_impl(
 	// advance
 	if (!m_tinted_texture_renderer.advance())
 	{
-		lt_log(
-		    warn,
-		    "Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}",
-		    LT_MAX_TEXTURE_RENDERER_VERTICES
-		);
+		log_wrn("Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES);
 		flush_scene();
 	}
 }

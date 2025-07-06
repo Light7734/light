@@ -127,7 +127,7 @@ static inline void lt_debug_trap(void)
 		#elif defined(LIGHT_DIST)
 			#ifdef _MSC_VER
 				#define lt_debug_trap()                                    \
-					lt_log(critical,                                          \
+					log_crt(                                         \
 					    "DEBUG_TRAP REQUESTED AT: {}, FILE: {}, LINE: {}", \
 					    __FUNCSIG__,                                       \
 					    __FILE__,                                          \
@@ -135,13 +135,13 @@ static inline void lt_debug_trap(void)
 
 			#else
 				#define lt_debug_trap() \
-					lt_log(critical, "DEBUG_TRAP REQUESTED AT: {}", __PRETTY_FUNCTION__)
+					log_crt("DEBUG_TRAP REQUESTED AT: {}", __PRETTY_FUNCTION__)
 
 			#endif
 		#else /* !defined(LIGHT_DIST) */
 			#ifdef _MSC_VER
 				#define lt_debug_trap()                                    \
-					lt_log(critical,                                          \
+					log_crt(                                         \
 					    "DEBUG_TRAP REQUESTED AT: {}, FILE: {}, LINE: {}", \
 					    __FUNCSIG__,                                       \
 					    __FILE__,                                          \
@@ -149,7 +149,7 @@ static inline void lt_debug_trap(void)
 
 			#else
 				#define lt_debug_trap() \
-					lt_log(critical, "DEBUG_TRAP REQUESTED AT: {}", __PRETTY_FUNCTION__)
+					log_crt("DEBUG_TRAP REQUESTED AT: {}", __PRETTY_FUNCTION__)
 
 			#endif
 		#endif

@@ -118,7 +118,7 @@ dxIndexBuffer::dxIndexBuffer(
 		// check
 		if (count % 6 != 0)
 		{
-			lt_log(warn, "'indices' can only be null if count is multiple of 6");
+			log_wrn("'indices' can only be null if count is multiple of 6");
 			lt_log(
 			    warn,
 			    "Adding {} to 'count' -> {}",

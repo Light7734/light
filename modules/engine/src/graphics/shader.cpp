@@ -26,14 +26,14 @@ auto Shader::create(
 		                  vertexFile,
 		                  pixelFile,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		););
 
-		    default
-		    : lt_assert(
-		          false,
-		          "Invalid/unsupported 'GraphicsAPI' {}",
-		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())
-		      );
+	default:
+		lt_assert(
+		    false,
+		    "Invalid/unsupported 'GraphicsAPI' {}",
+		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
+		);
 		return nullptr;
 	}
 }

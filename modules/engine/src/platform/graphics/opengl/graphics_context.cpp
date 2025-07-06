@@ -16,13 +16,8 @@ namespace Light {
 
 glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(windowHandle)
 {
-	// set 'GraphicsAPI'
 	m_graphics_api = GraphicsAPI::OpenGL;
-
-	// make context current
 	glfwMakeContextCurrent(windowHandle);
-
-	// load opengl (glad)
 	lt_assert(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
 
 	set_debug_message_callback();
@@ -30,13 +25,10 @@ glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(
 
 void glGraphicsContext::log_debug_data()
 {
-	// #todo: log more information
-	lt_log(info, "________________________________________");
-	lt_log(info, "GraphicsContext::");
-	lt_log(info, "        API     : OpenGL");
-	// lt_log(info, "        Version : {}", glGetString(GL_VERSION));
-	// lt_log(info, "        renderer: {}", glGetString(GL_RENDERER));
-	lt_log(info, "________________________________________");
+	log_inf("________________________________________");
+	log_inf("GraphicsContext::");
+	log_inf("        API     : OpenGL");
+	log_inf("________________________________________");
 }
 
 void glGraphicsContext::set_debug_message_callback()
@@ -89,23 +81,25 @@ void glGraphicsContext::set_debug_message_callback()
 
 		    case GL_DEBUG_SEVERITY_MEDIUM:
 		    case GL_DEBUG_SEVERITY_LOW:
-			    lt_log(warn,
+			    log_wrn(
 			        "glMessageCallback: Severity: {} :: Source: {} :: Type: {} :: ID: {}",
 			        Stringifier::glDebugMsgSeverity(severity),
 			        Stringifier::glDebugMsgSource(source),
 			        Stringifier::glDebugMsgType(type),
-			        id);
-			    lt_log(warn, "      {}", message);
+			        id
+			    );
+			    log_wrn("      {}", message);
 			    return;
 
 		    case GL_DEBUG_SEVERITY_NOTIFICATION:
-			    lt_log(trace,
+			    log_wrn(
 			        "Severity: {} :: Source: {} :: Type: {} :: ID: {}",
 			        Stringifier::glDebugMsgSeverity(severity),
 			        Stringifier::glDebugMsgSource(source),
 			        Stringifier::glDebugMsgType(type),
-			        id);
-			    lt_log(trace, "        {}", message);
+			        id
+			    );
+			    log_trc("        {}", message);
 			    return;
 		    }
 	    },

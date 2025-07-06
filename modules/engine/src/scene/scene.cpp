@@ -93,12 +93,12 @@ auto Scene::get_entity_by_tag(const std::string &tag) -> Entity
 	});
 
 	if (entity.is_valid())
-		return entity;
-	else
 	{
-		lt_assert("Scene::get_entity_by_tag: failed to find entity by tag: {}", tag);
-		return {};
+		return entity;
 	}
+
+	lt_assert(false, "Scene::get_entity_by_tag: failed to find entity by tag: {}", tag);
+	return {};
 }
 
 auto Scene::create_entity_with_uuid(

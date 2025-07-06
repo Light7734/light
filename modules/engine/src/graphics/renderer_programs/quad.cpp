@@ -44,7 +44,7 @@ auto QuadRendererProgram::advance() -> bool
 
 	if (m_map_current >= m_map_end)
 	{
-		lt_log(warn, "'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
+		log_wrn("'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
 		return false;
 	}
 

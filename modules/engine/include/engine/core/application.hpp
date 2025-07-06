@@ -31,9 +31,11 @@ protected:
 	Scope<Window> m_window;
 
 private:
-	static Application *s_context;
+	void on_event(const Event &event);
 
-	Scope<logger> m_logger;
+	void log_debug_data();
+
+	static Application *s_context;
 
 	Scope<Instrumentor> m_instrumentor;
 
@@ -42,12 +44,8 @@ private:
 	Scope<Input> m_input;
 
 	Scope<ResourceManager> m_resource_manager;
-
-	void on_event(const Event &event);
-
-	void log_debug_data();
 };
 
-extern Application *create_application();
+extern Light::Scope<Application> create_application();
 
 } // namespace Light

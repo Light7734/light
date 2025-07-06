@@ -8,6 +8,7 @@
 #include <engine/layer/layer.hpp>
 #include <engine/time/timer.hpp>
 #include <engine/user_interface/user_interface.hpp>
+#include <ranges>
 
 namespace Light {
 
@@ -22,7 +23,6 @@ Application::Application()
 	lt_assert(!s_context, "Repeated singleton construction");
 	s_context = this;
 
-	m_logger = logger::create();
 	log_debug_data();
 
 	m_instrumentor = Instrumentor::create();
@@ -38,8 +38,8 @@ Application::Application()
 
 Application::~Application()
 {
-	lt_log(trace, "Application::~Application()");
-	m_instrumentor->end_session(); // ProfileResults_Termination //
+	log_trc("Application::~Application()");
+	m_instrumentor->end_session();
 }
 
 void Application::game_loop()
@@ -48,14 +48,13 @@ void Application::game_loop()
 	lt_assert(!m_layer_stack->is_empty(), "layer_stack is empty");
 
 	// log debug data
-	m_logger->log_debug_data();
 	m_window->get_graphics_context()->log_debug_data();
 	m_window->get_graphics_context()->get_user_interface()->log_debug_data();
 
 	// reveal window
 	m_window->set_visibility(true);
 
-	m_instrumentor->end_session(); // ProfileResults_GameLoop //
+	m_instrumentor->end_session();
 	m_instrumentor->begin_session("Logs/ProfileResults_GameLoop.json");
 
 	/* game loop */
@@ -102,7 +101,7 @@ void Application::game_loop()
 		delta_timer.update();
 	}
 
-	m_instrumentor->end_session(); // ProfileResults_GameLoop //
+	m_instrumentor->end_session();
 	m_instrumentor->begin_session("Logs/ProfileResults_Termination.json");
 }
 
@@ -129,25 +128,30 @@ void Application::on_event(const Event &event)
 	{
 		m_input->on_event(event);
 
-		if (!m_input->is_receiving_game_events()) // return if the event is an input event and
-		                                          // 'Input' has disabled the game events
+		if (!m_input->is_receiving_game_events())
+		{
 			return;
+		}
 	}
 
-	/* layers */
-	for (auto it = m_layer_stack->rbegin(); it != m_layer_stack->rend(); it++)
-		if ((*it)->on_event(event))
+	for (auto &it : std::ranges::reverse_view(*m_layer_stack))
+	{
+		if (it->on_event(event))
+		{
 			return;
+		}
+	}
 }
 
 void Application::log_debug_data()
 {
 	// #todo: log more information
-	lt_log(info, "________________________________________");
-	lt_log(info, "Platform::");
-	lt_log(info, "        OS: {}", LT_BUILD_PLATFORM);
-	lt_log(info, "       DIR: {}", std::filesystem::current_path().generic_string());
-	lt_log(info, "________________________________________");
+	log_inf("________________________________________");
+	log_inf("Platform::");
+	log_inf("       Platform name: {}", constants::platform_name);
+	log_inf("       Platform identifier: {}", std::to_underlying(constants::platform));
+	log_inf("       CWD: {}", std::filesystem::current_path().generic_string());
+	log_inf("________________________________________");
 }
 
 } // namespace Light

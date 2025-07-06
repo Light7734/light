@@ -113,7 +113,7 @@ void AssetBrowserPanel::on_user_interface_update()
 				    ))
 				{
 					auto serializer = SceneSerializer { m_active_scene };
-					lt_log(info, "Attempting to deserialize: {}", path.string());
+					log_inf("Attempting to deserialize: {}", path.string());
 					serializer.deserialize(path.string());
 				}
 				break;

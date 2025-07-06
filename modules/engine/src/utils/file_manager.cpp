@@ -39,9 +39,9 @@ auto FileManager::read_text_file(const std::string &path) -> BasicFileHandle
 	// check
 	if (!file)
 	{
-		lt_log(warn, "Failed to load text file: {}", path);
+		log_wrn("Failed to load text file: {}", path);
 		file.close();
-		return NULL;
+		return nullptr;
 	}
 
 	// fetch file size
@@ -50,7 +50,9 @@ auto FileManager::read_text_file(const std::string &path) -> BasicFileHandle
 	file.seekg(0, std::ios::beg);
 
 	if (!size)
-		lt_log(warn, "Empty text file: {}", path);
+	{
+		log_wrn("Empty text file: {}", path);
+	}
 
 	// read file
 	auto *data = new uint8_t[size];
@@ -75,15 +77,18 @@ auto FileManager::read_image_file(const std::string &path, int32_t desiredCompon
 
 	// check
 	if (!pixels)
-		lt_log(warn, "Failed to load image file: <{}>", path);
+	{
+		log_wrn("Failed to load image file: <{}>", path);
+	}
 	else if (fetchedComponents != desiredComponents)
-		lt_log(
-		    warn,
+	{
+		log_wrn(
 		    "Mismatch of fetched/desired components: <{}> ({}/{})",
 		    name + '.' + extension,
 		    fetchedComponents,
 		    desiredComponents
 		);
+	}
 
 	return ImageFileHandle(
 	    pixels,

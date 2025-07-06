@@ -30,7 +30,7 @@ void Instrumentor::begin_session_impl(const std::string &outputPath)
 void Instrumentor::end_session_impl()
 {
 	if (m_current_session_count == 0u)
-		lt_log(warn, "0 profiling for the ended session");
+		log_wrn("0 profiling for the ended session");
 
 	m_current_session_count = 0u;
 

@@ -36,7 +36,7 @@ void LayerStack::attach_layer_impl(Layer *layer)
 	m_begin = m_layers.begin();
 	m_end = m_layers.end();
 
-	lt_log(trace, "Attached [{}]", layer->get_name());
+	log_trc("Attached [{}]", layer->get_name());
 }
 
 void LayerStack::detach_layer_impl(Layer *layer)
@@ -46,7 +46,7 @@ void LayerStack::detach_layer_impl(Layer *layer)
 	m_begin = m_layers.begin();
 	m_end = m_layers.end();
 
-	lt_log(trace, "Detached [{}]", layer->get_name());
+	log_trc("Detached [{}]", layer->get_name());
 }
 
 } // namespace Light

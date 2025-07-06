@@ -156,10 +156,10 @@ void dxGraphicsContext::log_debug_data()
 	DXGIAdapter->release();
 
 	// #todo: log more information
-	lt_log(info, "________________________________________");
-	lt_log(info, "dxGraphicsContext:");
-	lt_log(info, "        renderer: {}", adapterDesc);
-	lt_log(info, "________________________________________");
+	log_inf("________________________________________");
+	log_inf("dxGraphicsContext:");
+	log_inf("        renderer: {}", adapterDesc);
+	log_inf("________________________________________");
 }
 
 } // namespace Light

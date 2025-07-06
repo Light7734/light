@@ -55,12 +55,12 @@ void dxUserInterface::end()
 void dxUserInterface::log_debug_data()
 {
 	// #todo: improve
-	lt_log(info, "________________________________________");
-	lt_log(info, "UserInterface::");
-	lt_log(info, "       API    : ImGui");
-	lt_log(info, "       Version: {}", ImGui::GetVersion());
-	lt_log(info, "  GraphicsAPI : DirectX");
-	lt_log(info, "________________________________________");
+	log_inf("________________________________________");
+	log_inf("UserInterface::");
+	log_inf("       API    : ImGui");
+	log_inf("       Version: {}", ImGui::GetVersion());
+	log_inf("  GraphicsAPI : DirectX");
+	log_inf("________________________________________");
 }
 
 } // namespace Light

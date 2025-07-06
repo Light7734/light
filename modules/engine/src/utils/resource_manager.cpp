@@ -77,7 +77,7 @@ void ResourceManager::release_texture_impl(const std::string &name)
 {
 	if (!m_textures[name])
 	{
-		lt_log(warn, "Failed to find texture named: {}", name);
+		log_wrn("Failed to find texture named: {}", name);
 		return;
 	}
 

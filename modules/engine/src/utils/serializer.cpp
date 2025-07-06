@@ -87,7 +87,9 @@ void SceneSerializer::serialize(const std::string &filePath)
 	{
 		auto entity = Entity { static_cast<entt::entity>(entityID), m_scene.get() };
 		if (!entity.is_valid())
+		{
 			return;
+		}
 
 		serialize_entity(out, entity);
 	};
@@ -98,30 +100,32 @@ void SceneSerializer::serialize(const std::string &filePath)
 
 	auto fout = std::ofstream { filePath };
 	if (!fout.is_open())
-		lt_log(trace, "Failed to create fout at: {}", filePath);
+	{
+		log_trc("Failed to create fout at: {}", filePath);
+	}
 
 	fout << out.c_str();
 }
 
-auto SceneSerializer::deserialize(const std::string &filePath) -> bool
+auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 {
-	auto stream = std::ifstream { filePath };
+	auto stream = std::ifstream { file_path };
 	auto ss = std::stringstream {};
 	ss << stream.rdbuf();
 
 	auto data = YAML::Load(ss.str());
 	if (!data["Scene"])
+	{
 		return false;
+	}
 
 	auto sceneName = data["Scene"].as<std::string>();
-	lt_log(trace, "Deserializing scene: '{}'", sceneName);
+	log_trc("Deserializing scene: '{}'", sceneName);
 
 	auto entities = data["Entities"];
 	if (entities)
 	{
-		/* #TEMPORARY SOLUTION# */
 		auto texturePaths = std::unordered_set<std::string> {};
-		/* #TEMPORARY SOLUTION# */
 
 		for (auto entity : entities)
 		{
@@ -130,14 +134,16 @@ auto SceneSerializer::deserialize(const std::string &filePath) -> bool
 			auto name = std::string {};
 			auto tagComponent = entity["TagComponent"];
 			if (tagComponent)
+			{
 				name = tagComponent["Tag"].as<std::string>();
+			}
 
-			lt_log(trace, "Deserialized entity '{}' : '{}'", uuid, name);
+			log_trc("Deserialized entity '{}' : '{}'", uuid, name);
 
 			auto deserializedEntity = m_scene->create_entity_with_uuid(name, uuid);
 
 			auto gg = deserializedEntity.get_component<TagComponent>();
-			lt_log(trace, gg.tag);
+			log_trc("tag: {}", gg.tag);
 			auto transformComponent = entity["TransformComponent"];
 			if (transformComponent)
 			{
@@ -217,12 +223,12 @@ auto SceneSerializer::deserialize(const std::string &filePath) -> bool
 
 void SceneSerializer::serialize_binary(const std::string &filePath)
 {
-	lt_log(err, "NO_IMPLEMENT");
+	log_err("NO_IMPLEMENT");
 }
 
 auto SceneSerializer::deserialize_binary(const std::string &filePath) -> bool
 {
-	lt_log(err, "NO_IMPLEMENT");
+	log_err("NO_IMPLEMENT");
 	return false;
 }
 
