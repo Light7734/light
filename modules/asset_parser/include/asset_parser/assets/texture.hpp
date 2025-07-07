@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AssetParser.hpp"
+#include <asset_parser/parser.hpp>
 
 namespace Assets {
 
@@ -19,15 +19,15 @@ struct TextureInfo
 	std::string original_file;
 };
 
-TextureInfo read_texture_info(AssetFile* file);
+TextureInfo read_texture_info(AssetFile *file);
 
 void unpack_texture(
-  TextureInfo* info,
-  const void* source_buffer,
-  size_t source_size,
-  void* destination
+    TextureInfo *info,
+    const void *source_buffer,
+    size_t source_size,
+    void *destination
 );
 
-AssetFile pack_texture(TextureInfo* info, void* pixel_data);
+AssetFile pack_texture(TextureInfo *info, void *pixel_data);
 
 } // namespace Assets

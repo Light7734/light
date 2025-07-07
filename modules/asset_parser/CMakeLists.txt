@@ -1,16 +1,10 @@
-add_library(AssetParser 
-    ${CMAKE_CURRENT_SOURCE_DIR}/AssetParser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/TextureAsset.cpp
-)
-
-target_include_directories(
-    AssetParser
-    PRIVATE ${CMAKE_SOURCE_DIR}/Vendor/nlohmann/single_include
-    PRIVATE ${CMAKE_SOURCE_DIR}/Vendor/lz4/lib/
+add_library_module(asset_parser 
+    parser.cpp
+    assets/texture.cpp
 )
 
 target_link_libraries(
-    AssetParser
-    PRIVATE lz4_static
-    PRIVATE nlohmann_json::nlohmann_json
+    asset_parser
+    PRIVATE LZ4::lz4_static 
+    PRIVATE nlohmann_json::nlohmann_json 
 )

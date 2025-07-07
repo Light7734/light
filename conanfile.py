@@ -26,6 +26,8 @@ class LightRecipe(ConanFile):
         self.requires("stb/cci.20240531")
         self.requires("volk/1.3.296.0")
         self.requires("yaml-cpp/0.8.0")
+        self.requires("nlohmann_json/3.12.0")
+        self.requires("lz4/1.10.0")
 
     def layout(self):
         cmake_layout(self)

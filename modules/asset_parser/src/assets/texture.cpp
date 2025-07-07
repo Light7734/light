@@ -1,5 +1,4 @@
-#include "TextureAsset.hpp"
-
+#include <asset_parser/assets/texture.hpp>
 #include <lz4.h>
 #include <nlohmann/json.hpp>
 
@@ -7,7 +6,7 @@ namespace Assets {
 
 using namespace nlohmann;
 
-TextureInfo read_texture_info(AssetFile* file)
+TextureInfo read_texture_info(AssetFile *file)
 {
 	json texture_meta_data = json::parse(file->json);
 
@@ -25,19 +24,19 @@ TextureInfo read_texture_info(AssetFile* file)
 }
 
 void unpack_texture(
-  TextureInfo* info,
-  const void* source_buffer,
-  size_t source_size,
-  void* destination
+    TextureInfo *info,
+    const void *source_buffer,
+    size_t source_size,
+    void *destination
 )
 {
 	if (info->compression_mode == CompressionMode::LZ4)
 	{
 		LZ4_decompress_safe(
-		  (const char*)source_buffer,
-		  (char*)destination,
-		  source_size,
-		  info->size
+		    (const char *)source_buffer,
+		    (char *)destination,
+		    source_size,
+		    info->size
 		);
 	}
 	else
@@ -46,27 +45,27 @@ void unpack_texture(
 	}
 }
 
-AssetFile pack_texture(TextureInfo* info, void* pixel_data)
+AssetFile pack_texture(TextureInfo *info, void *pixel_data)
 {
 	json metadata;
-	metadata["format"]       = info->format;
-	metadata["width"]        = info->pixel_size[0];
-	metadata["height"]       = info->pixel_size[1];
-	metadata["bufferSize"]   = info->size;
+	metadata["format"] = info->format;
+	metadata["width"] = info->pixel_size[0];
+	metadata["height"] = info->pixel_size[1];
+	metadata["bufferSize"] = info->size;
 	metadata["originalFile"] = info->original_file;
-	metadata["compression"]  = CompressionMode::LZ4;
+	metadata["compression"] = CompressionMode::LZ4;
 
 	AssetFile file;
-	file.type    = AssetFile::Type::Texture;
+	file.type = AssetFile::Type::Texture;
 	file.version = 1u;
 
 	const int compress_staging = LZ4_compressBound(info->size);
 	file.blob.resize(compress_staging);
 	const int compression_size = LZ4_compress_default(
-	  (const char*)pixel_data,
-	  (char*)file.blob.data(),
-	  info->size,
-	  compress_staging
+	    (const char *)pixel_data,
+	    (char *)file.blob.data(),
+	    info->size,
+	    compress_staging
 	);
 	file.blob.resize(compression_size);
 

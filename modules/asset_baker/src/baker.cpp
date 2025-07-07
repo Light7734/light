@@ -1,40 +1,31 @@
-#include <AssetParser.hpp>
-#include <TextureAsset.hpp>
+#include <asset_parser/assets/texture.hpp>
+#include <asset_parser/parser.hpp>
 #include <filesystem>
 #include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#define ASSERT(x, ...) \
-	if (!(x))            \
-	{                    \
-		log(__VA_ARGS__);  \
-		return -1;         \
+#define ASSERT(x, ...)    \
+	if (!(x))             \
+	{                     \
+		log(__VA_ARGS__); \
+		return -1;        \
 	}
 
 
 template<typename... Args>
-void log(Args&&... args)
+void log(Args &&...args)
 {
 	(std::cout << ... << args);
 	std::cout << '\n';
 }
 
-bool convert_image(
-  const std::filesystem::path& input,
-  const std::filesystem::path& output
-)
+bool convert_image(const std::filesystem::path &input, const std::filesystem::path &output)
 {
 	int width, height, channels;
 
-	stbi_uc* pixels = stbi_load(
-	  input.string().c_str(),
-	  &width,
-	  &height,
-	  &channels,
-	  4
-	);
+	stbi_uc *pixels = stbi_load(input.string().c_str(), &width, &height, &channels, 4);
 
 	if (!pixels)
 		return false;
@@ -59,16 +50,16 @@ bool convert_image(
 	return true;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	std::ios_base::sync_with_stdio(false);
 
 	ASSERT(
-	  argc == 3,
-	  "Argc MUST be 3, 1: execution-path(implicit), 2: input-directory, 3: output-directory"
+	    argc == 3,
+	    "Argc MUST be 3, 1: execution-path(implicit), 2: input-directory, 3: output-directory"
 	);
 
-	for (auto& p : std::filesystem::directory_iterator(argv[1]))
+	for (auto &p : std::filesystem::directory_iterator(argv[1]))
 	{
 		if (p.path().extension() == ".png")
 		{
