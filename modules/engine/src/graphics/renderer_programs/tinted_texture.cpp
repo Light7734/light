@@ -8,14 +8,13 @@
 namespace Light {
 
 TintedTextureRendererProgram::TintedTextureRendererProgram(
-    unsigned int maxVertices,
-    const Ref<SharedContext>& sharedContext
+    unsigned int max_vertices,
+    const Ref<SharedContext> &shared_context
 )
     : m_shader(nullptr)
     , m_index_buffer(nullptr)
     , m_vertex_layout(nullptr)
-    , 
-     m_max_vertices(maxVertices)
+    , m_max_vertices(max_vertices)
 {
 	// #todo: don't use relative path
 	ResourceManager::load_shader(
@@ -26,10 +25,10 @@ TintedTextureRendererProgram::TintedTextureRendererProgram(
 
 	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_TINTED_TEXTURE_SHADER");
 	m_vertex_buffer = Ref<VertexBuffer>(
-	    VertexBuffer::create(nullptr, sizeof(TintedTextureVertexData), maxVertices, sharedContext)
+	    VertexBuffer::create(nullptr, sizeof(TintedTextureVertexData), max_vertices, shared_context)
 	);
 	m_index_buffer = Ref<IndexBuffer>(
-	    IndexBuffer::create(nullptr, (maxVertices / 4) * 6, sharedContext)
+	    IndexBuffer::create(nullptr, (max_vertices / 4) * 6, shared_context)
 	);
 	m_vertex_layout = Ref<VertexLayout>(VertexLayout::create(
 	    m_vertex_buffer,
@@ -37,15 +36,14 @@ TintedTextureRendererProgram::TintedTextureRendererProgram(
 	    { { "POSITION", VertexElementType::Float4 },
 	      { "TINT", VertexElementType::Float4 },
 	      { "TEXCOORD", VertexElementType::Float2 } },
-	    sharedContext
+	    shared_context
 	));
 }
 
 auto TintedTextureRendererProgram::advance() -> bool
 {
-	m_map_current += 4;
-
-	if (m_map_current >= m_map_end)
+	m_idx += 4;
+	if (m_idx >= m_map.size())
 	{
 		log_wrn("'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
 		return false;
@@ -57,10 +55,13 @@ auto TintedTextureRendererProgram::advance() -> bool
 
 void TintedTextureRendererProgram::map()
 {
-	m_quad_count = 0u;
+	m_map = std::span<TintedTextureVertexData> {
+		static_cast<TintedTextureVertexData *>(m_vertex_buffer->map()),
+		m_max_vertices,
+	};
 
-	m_map_current = (TintedTextureRendererProgram::TintedTextureVertexData *)m_vertex_buffer->map();
-	m_map_end = m_map_current + m_max_vertices;
+	m_quad_count = 0u;
+	m_idx = {};
 }
 
 void TintedTextureRendererProgram::un_map()

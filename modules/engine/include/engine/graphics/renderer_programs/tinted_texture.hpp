@@ -16,7 +16,7 @@ class SharedContext;
 class TintedTextureRendererProgram: RendererProgram
 {
 public:
-virtual ~TintedTextureRendererProgram() = default;
+	virtual ~TintedTextureRendererProgram() = default;
 	struct TintedTextureVertexData
 	{
 		glm::vec4 position;
@@ -26,7 +26,7 @@ virtual ~TintedTextureRendererProgram() = default;
 		glm::vec2 texcoord;
 	};
 
-	TintedTextureRendererProgram(unsigned int maxVertices, const Ref<SharedContext>& sharedContext);
+	TintedTextureRendererProgram(unsigned int maxVertices, const Ref<SharedContext> &sharedContext);
 
 	auto advance() -> bool;
 
@@ -38,7 +38,7 @@ virtual ~TintedTextureRendererProgram() = default;
 
 	auto get_map_current() -> TintedTextureVertexData *
 	{
-		return m_map_current;
+		return &m_map[m_idx];
 	}
 
 	[[nodiscard]] auto get_quad_count() const -> unsigned int
@@ -60,11 +60,11 @@ private:
 
 	Ref<VertexLayout> m_vertex_layout;
 
-	TintedTextureVertexData *m_map_current = nullptr;
+	std::span<TintedTextureVertexData> m_map;
 
-	TintedTextureVertexData *m_map_end = nullptr;
+	size_t m_idx {};
 
-	unsigned int m_quad_count{0u};
+	unsigned int m_quad_count { 0u };
 
 	unsigned int m_max_vertices;
 };

@@ -25,7 +25,6 @@ if(NOT WIN32)
         input/input.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
-        math/random.cpp
         platform/graphics/opengl/blender.cpp
         platform/graphics/opengl/buffers.cpp
         platform/graphics/opengl/framebuffers.cpp
@@ -70,7 +69,6 @@ else()
         input/input.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
-        math/random.cpp
         platform/graphics/directx/blender.cpp
         platform/graphics/directx/buffers.cpp
         platform/graphics/directx/framebuffers.cpp

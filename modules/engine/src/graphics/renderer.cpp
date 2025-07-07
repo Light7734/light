@@ -98,24 +98,24 @@ void Renderer::draw_quad_impl(
 //==================== DRAW_QUAD_TINT ====================//
 void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 {
-	// locals
-	QuadRendererProgram::QuadVertexData *bufferMap = m_quad_renderer.get_map_current();
+	auto map = std::span<QuadRendererProgram::QuadVertexData> { m_quad_renderer.get_map_current(),
+		                                                        4 };
 
 	// top left
-	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-	bufferMap[0].tint = tint;
+	map[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	map[0].tint = tint;
 
 	// top right
-	bufferMap[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
-	bufferMap[1].tint = tint;
+	map[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
+	map[1].tint = tint;
 
 	// bottom right
-	bufferMap[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
-	bufferMap[2].tint = tint;
+	map[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	map[2].tint = tint;
 
 	// bottom left
-	bufferMap[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
-	bufferMap[3].tint = tint;
+	map[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+	map[3].tint = tint;
 
 	// advance
 	if (!m_quad_renderer.advance())
@@ -124,33 +124,32 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 		flush_scene();
 	}
 }
-//==================== DRAW_QUAD_TINT ====================//
 
-//==================== DRAW_QUAD_TEXTURE ====================//
 void Renderer::draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &texture)
 {
-	// #todo: implement a proper binding
 	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
-	texture->bind();
 
-	// locals
-	TextureRendererProgram::TextureVertexData *bufferMap = m_texture_renderer.get_map_current();
+	texture->bind();
+	auto map = std::span<TextureRendererProgram::TextureVertexData> {
+		m_texture_renderer.get_map_current(),
+		4
+	};
 
 	// top left
-	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-	bufferMap[0].texcoord = { 0.0f, 0.0f };
+	map[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	map[0].texcoord = { 0.0f, 0.0f };
 
 	// top right
-	bufferMap[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
-	bufferMap[1].texcoord = { 1.0f, 0.0f };
+	map[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
+	map[1].texcoord = { 1.0f, 0.0f };
 
 	// bottom right
-	bufferMap[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
-	bufferMap[2].texcoord = { 1.0f, 1.0f };
+	map[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	map[2].texcoord = { 1.0f, 1.0f };
 
 	// bottom left
-	bufferMap[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
-	bufferMap[3].texcoord = { 0.0f, 1.0f };
+	map[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+	map[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
 	if (!m_texture_renderer.advance())
@@ -166,43 +165,40 @@ void Renderer::draw_quad_impl(
     const Ref<Texture> &texture
 )
 {
-	// #todo: implement a proper binding
 	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
-	texture->bind();
 
-	// locals
-	TintedTextureRendererProgram::TintedTextureVertexData *bufferMap = m_tinted_texture_renderer
-	                                                                       .get_map_current();
+	texture->bind();
+	auto map = std::span<TintedTextureRendererProgram::TintedTextureVertexData> {
+		m_tinted_texture_renderer.get_map_current(),
+		4
+	};
 
 	// top left
-	bufferMap[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-	bufferMap[0].tint = tint;
-	bufferMap[0].texcoord = { 0.0f, 0.0f };
+	map[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	map[0].tint = tint;
+	map[0].texcoord = { 0.0f, 0.0f };
 
 	// top right
-	bufferMap[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
-	bufferMap[1].tint = tint;
-	bufferMap[1].texcoord = { 1.0f, 0.0f };
+	map[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
+	map[1].tint = tint;
+	map[1].texcoord = { 1.0f, 0.0f };
 
 	// bottom right
-	bufferMap[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
-	bufferMap[2].tint = tint;
-	bufferMap[2].texcoord = { 1.0f, 1.0f };
+	map[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	map[2].tint = tint;
+	map[2].texcoord = { 1.0f, 1.0f };
 
 	// bottom left
-	bufferMap[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
-	bufferMap[3].tint = tint;
-	bufferMap[3].texcoord = { 0.0f, 1.0f };
+	map[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+	map[3].tint = tint;
+	map[3].texcoord = { 0.0f, 1.0f };
 
-	// advance
 	if (!m_tinted_texture_renderer.advance())
 	{
 		log_wrn("Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES);
 		flush_scene();
 	}
 }
-
-//==================== DRAW_QUAD_TEXTURE ====================//
 
 void Renderer::begin_frame()
 {

@@ -12,8 +12,6 @@ class Entity
 public:
 	Entity(entt::entity handle = entt::null, Scene *scene = nullptr);
 
-	~Entity();
-
 	template<typename t, typename... Args>
 	auto add_component(Args &&...args) -> t &
 	{

@@ -16,14 +16,15 @@ class SharedContext;
 class QuadRendererProgram: RendererProgram
 {
 public:
-virtual ~QuadRendererProgram() = default;
+	virtual ~QuadRendererProgram() = default;
 	struct QuadVertexData
 	{
 		glm::vec4 position;
+
 		glm::vec4 tint;
 	};
 
-	QuadRendererProgram(unsigned int maxVertices, const Ref<SharedContext>& sharedContext);
+	QuadRendererProgram(unsigned int maxVertices, const Ref<SharedContext> &sharedContext);
 
 	auto advance() -> bool;
 
@@ -35,7 +36,7 @@ virtual ~QuadRendererProgram() = default;
 
 	auto get_map_current() -> QuadVertexData *
 	{
-		return m_map_current;
+		return &m_map[m_idx];
 	}
 
 	[[nodiscard]] auto get_quad_count() const -> unsigned int
@@ -57,9 +58,9 @@ private:
 
 	Ref<VertexLayout> m_vertex_layout;
 
-	QuadVertexData *m_map_current = nullptr;
+	std::span<QuadVertexData> m_map;
 
-	QuadVertexData *m_map_end = nullptr;
+	size_t m_idx {};
 
 	unsigned int m_quad_count = 0u;
 

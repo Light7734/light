@@ -2,6 +2,8 @@
 #include <engine/core/window.hpp>
 #include <engine/debug/instrumentor.hpp>
 #include <engine/events/event.hpp>
+#include <engine/events/keyboard.hpp>
+#include <engine/events/window.hpp>
 #include <engine/graphics/graphics_context.hpp>
 #include <engine/graphics/render_command.hpp>
 #include <engine/graphics/renderer.hpp>
@@ -48,7 +50,7 @@ void Application::game_loop()
 	Instrumentor::begin_session("Logs/ProfileResults_GameLoop.json");
 
 	/* game loop */
-	auto delta_timer = DeltaTimer {};
+	auto timer = Timer {};
 	while (!m_window->is_closed())
 	{
 		{
@@ -57,8 +59,11 @@ void Application::game_loop()
 
 			for (auto &it : LayerStack::instance())
 			{
-				it->on_update(delta_timer.get_delta_time());
+				it->on_update(timer.get_elapsed_time());
 			}
+
+			// TODO: each layer should have their own "delta time"
+			timer.reset();
 		}
 
 		{
@@ -92,9 +97,6 @@ void Application::game_loop()
 			lt_profile_scope("game_loop::Events");
 			m_window->poll_events();
 		}
-
-		/// update delta time
-		delta_timer.update();
 	}
 
 	Instrumentor::end_session();
@@ -116,7 +118,7 @@ void Application::on_event(const Event &event)
 		if (event.get_event_type() == EventType::WindowResized)
 		{
 			m_window->get_graphics_context()->get_renderer()->on_window_resize(
-			    (const WindowResizedEvent &)event
+			    dynamic_cast<const WindowResizedEvent &>(event)
 			);
 		}
 	}

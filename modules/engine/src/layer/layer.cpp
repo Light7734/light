@@ -15,21 +15,32 @@ auto Layer::on_event(const Event &event) -> bool
 {
 	switch (event.get_event_type())
 	{
-	case EventType::MouseMoved: return on_mouse_moved((MouseMovedEvent &)event);
-	case EventType::ButtonPressed: return on_button_pressed((ButtonPressedEvent &)event);
-	case EventType::ButtonReleased: return on_button_released((ButtonReleasedEvent &)event);
-	case EventType::WheelScrolled: return on_wheel_scrolled((WheelScrolledEvent &)event);
+	case EventType::MouseMoved: return on_mouse_moved(dynamic_cast<const MouseMovedEvent &>(event));
+	case EventType::ButtonPressed:
+		return on_button_pressed(dynamic_cast<const ButtonPressedEvent &>(event));
+	case EventType::ButtonReleased:
+		return on_button_released(dynamic_cast<const ButtonReleasedEvent &>(event));
+	case EventType::WheelScrolled:
+		return on_wheel_scrolled(dynamic_cast<const WheelScrolledEvent &>(event));
 
-	case EventType::KeyPressed: return on_key_pressed((KeyPressedEvent &)event);
-	case EventType::KeyRepeated: return on_key_repeat((KeyRepeatEvent &)event);
-	case EventType::KeyReleased: return on_key_released((KeyReleasedEvent &)event);
-	case EventType::SetChar: return on_set_char((SetCharEvent &)event);
+	case EventType::KeyPressed: return on_key_pressed(dynamic_cast<const KeyPressedEvent &>(event));
+	case EventType::KeyRepeated: return on_key_repeat(dynamic_cast<const KeyRepeatEvent &>(event));
+	case EventType::KeyReleased:
+		return on_key_released(dynamic_cast<const KeyReleasedEvent &>(event));
+	case EventType::SetChar: return on_set_char(dynamic_cast<const SetCharEvent &>(event));
 
-	case EventType::WindowClosed: return on_window_closed((WindowClosedEvent &)event);
-	case EventType::WindowResized: return on_window_resized((WindowResizedEvent &)event);
-	case EventType::WindowMoved: return on_window_moved((WindowMovedEvent &)event);
-	case EventType::WindowLostFocus: return on_window_lost_focus((WindowLostFocusEvent &)event);
-	case EventType::WindowGainFocus: return on_window_gain_focus((WindowGainFocusEvent &)event);
+	case EventType::WindowClosed:
+		return on_window_closed(dynamic_cast<const WindowClosedEvent &>(event));
+	case EventType::WindowResized:
+		return on_window_resized(dynamic_cast<const WindowResizedEvent &>(event));
+	case EventType::WindowMoved:
+		return on_window_moved(dynamic_cast<const WindowMovedEvent &>(event));
+	case EventType::WindowLostFocus:
+		return on_window_lost_focus(dynamic_cast<const WindowLostFocusEvent &>(event));
+	case EventType::WindowGainFocus:
+		return on_window_gain_focus(dynamic_cast<const WindowGainFocusEvent &>(event));
+
+	default: lt_assert(false, "Invalid event: {}", event.get_info_lt_log());
 	}
 }
 

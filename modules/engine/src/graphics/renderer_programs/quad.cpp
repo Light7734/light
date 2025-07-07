@@ -7,12 +7,14 @@
 
 namespace Light {
 
-QuadRendererProgram::QuadRendererProgram(unsigned int maxVertices, const Ref<SharedContext>& sharedContext)
+QuadRendererProgram::QuadRendererProgram(
+    unsigned int max_vertices,
+    const Ref<SharedContext> &shared_context
+)
     : m_shader(nullptr)
     , m_index_buffer(nullptr)
     , m_vertex_layout(nullptr)
-    , 
-     m_max_vertices(maxVertices)
+    , m_max_vertices(max_vertices)
 {
 	// #todo: don't use relative path
 	ResourceManager::load_shader(
@@ -23,24 +25,23 @@ QuadRendererProgram::QuadRendererProgram(unsigned int maxVertices, const Ref<Sha
 
 	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_QUAD_SHADER");
 	m_vertex_buffer = Ref<VertexBuffer>(
-	    VertexBuffer::create(nullptr, sizeof(QuadVertexData), maxVertices, sharedContext)
+	    VertexBuffer::create(nullptr, sizeof(QuadVertexData), max_vertices, shared_context)
 	);
 	m_index_buffer = Ref<IndexBuffer>(
-	    IndexBuffer::create(nullptr, (maxVertices / 4) * 6, sharedContext)
+	    IndexBuffer::create(nullptr, (max_vertices / 4) * 6, shared_context)
 	);
 	m_vertex_layout = Ref<VertexLayout>(VertexLayout::create(
 	    m_vertex_buffer,
 	    m_shader,
 	    { { "POSITION", VertexElementType::Float4 }, { "COLOR", VertexElementType::Float4 } },
-	    sharedContext
+	    shared_context
 	));
 }
 
 auto QuadRendererProgram::advance() -> bool
 {
-	m_map_current += 4;
-
-	if (m_map_current >= m_map_end)
+	m_idx += 4;
+	if (m_idx >= m_map.size())
 	{
 		log_wrn("'VertexBuffer' map went beyond 'MaxVertices': {}", m_max_vertices);
 		return false;
@@ -52,15 +53,19 @@ auto QuadRendererProgram::advance() -> bool
 
 void QuadRendererProgram::map()
 {
-	m_quad_count = 0u;
+	m_map = std::span<QuadVertexData> {
+		static_cast<QuadRendererProgram::QuadVertexData *>(m_vertex_buffer->map()),
+		m_max_vertices,
+	};
 
-	m_map_current = (QuadRendererProgram::QuadVertexData *)m_vertex_buffer->map();
-	m_map_end = m_map_current + m_max_vertices;
+	m_quad_count = 0u;
+	m_idx = {};
 }
 
 void QuadRendererProgram::un_map()
 {
 	m_vertex_buffer->un_map();
+	m_idx = {};
 }
 
 void QuadRendererProgram::bind()

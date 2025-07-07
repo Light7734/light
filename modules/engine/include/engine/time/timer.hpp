@@ -12,11 +12,12 @@ public:
 
 	[[nodiscard]] auto get_elapsed_time() const -> float
 	{
-		return (std::chrono::duration_cast<std::chrono::milliseconds>(
-		            std::chrono::steady_clock::now() - m_start
-		       )
-		            .count())
-		       / 1000.;
+		using std::chrono::duration_cast;
+		using std::chrono::milliseconds;
+		using std::chrono::steady_clock;
+
+		auto rep = duration_cast<milliseconds>(steady_clock::now() - m_start).count();
+		return static_cast<float>(rep) / 1000.f;
 	}
 
 	void reset()
@@ -26,26 +27,6 @@ public:
 
 private:
 	std::chrono::time_point<std::chrono::steady_clock> m_start;
-};
-
-class DeltaTimer
-{
-public:
-	DeltaTimer();
-
-	void update();
-
-	[[nodiscard]] auto get_delta_time() const -> float
-	{
-		return m_delta_time;
-	}
-
-private:
-	Timer timer;
-
-	float m_previous_frame;
-
-	float m_delta_time;
 };
 
 } // namespace Light

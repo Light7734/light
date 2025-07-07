@@ -6,15 +6,15 @@ namespace Light {
 
 OrthographicCamera::OrthographicCamera(
     const glm::vec2 &position,
-    float aspectRatio,
-    float zoomLevel,
-    const glm::vec4 &clearColor /* = glm::vec4(0.1f, 0.3f, 0.7f, 1.0f) */
+    float aspect_ratio,
+    float zoom_level,
+    const glm::vec4 &clear_color /* = glm::vec4(0.1f, 0.3f, 0.7f, 1.0f) */
 )
     : m_up(0.0f, 1.0f, 0.0f)
     , m_position(position)
-    , m_aspect_ratio(aspectRatio)
-    , m_zoom_level(zoomLevel)
-    , m_clear_color(clearColor)
+    , m_aspect_ratio(aspect_ratio)
+    , m_zoom_level(zoom_level)
+    , m_clear_color(clear_color)
 {
 }
 

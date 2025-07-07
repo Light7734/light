@@ -6,13 +6,6 @@
 
 namespace Light {
 
-Scene::Scene() 
-{
-}
-
-Scene::~Scene()
-= default;
-
 void Scene::on_create()
 {
 	/* native scripts */

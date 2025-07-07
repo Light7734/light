@@ -156,6 +156,7 @@ void Input::on_event(const Event &inputEvent)
 
 		return;
 	}
+	default: log_trc("Dropped event");
 	}
 }
 

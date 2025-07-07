@@ -15,6 +15,12 @@
 #include <imgui.h>
 #include <utility>
 
+
+inline ImGuiDockNodeFlags_ operator|(ImGuiDockNodeFlags_ a, ImGuiDockNodeFlags_ b)
+{
+	return static_cast<ImGuiDockNodeFlags_>(std::to_underlying(a) | std::to_underlying(b));
+}
+
 namespace Light {
 
 UserInterface *UserInterface::s_context = nullptr;
@@ -44,11 +50,13 @@ auto UserInterface::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedCo
 }
 
 UserInterface::UserInterface()
+    // NOLINTBEGIN
     : m_dockspace_flags(
           ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
           | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
           | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
       )
+// NOLINTEND
 {
 	lt_assert(
 	    !s_context,
@@ -66,13 +74,13 @@ void UserInterface::init(GLFWwindow *windowHandle, Ref<SharedContext> sharedCont
 
 	// configure io
 	ImGuiIO &io = ImGui::GetIO();
+	// NOLINTBEGIN
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
 	io.ConfigFlags |= ImGuiBackendFlags_PlatformHasViewports;
 	io.ConfigFlags |= ImGuiBackendFlags_RendererHasViewports;
+	// NOLINTEND
 
 	// #todo: handle this in a better way
 	if (std::filesystem::exists("user_gui_layout.ini"))
@@ -117,8 +125,9 @@ void UserInterface::dockspace_begin()
 	ImGui::DockSpace(
 	    ImGui::GetID("MyDockSpace"),
 	    ImVec2(0.0f, 0.0f),
-	    ImGuiDockNodeFlags_None | ImGuiWindowFlags_NoBackground
+	    ImGuiDockNodeFlags_None | ImGuiWindowFlags_NoBackground // NOLINT
 	);
+
 	style.WindowMinSize.x = minWinSizeX;
 }
 

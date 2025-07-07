@@ -14,10 +14,6 @@ class Framebuffer;
 class Scene
 {
 public:
-	Scene();
-
-	~Scene();
-
 	void on_create();
 
 	void on_update(float deltaTime);
