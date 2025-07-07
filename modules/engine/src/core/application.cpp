@@ -23,7 +23,7 @@ Application::Application(): m_window(nullptr)
 
 	log_debug_data();
 
-	Light::Instrumentor::begin_session("Logs/ProfileResults_Startup.json");
+	Light::Instrumentor::begin_session("data/logs/profile_startup.json");
 
 	m_window = Window::create([this](auto &&PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
 }
@@ -47,7 +47,7 @@ void Application::game_loop()
 	m_window->set_visibility(true);
 
 	Instrumentor::end_session();
-	Instrumentor::begin_session("Logs/ProfileResults_GameLoop.json");
+	Instrumentor::begin_session("data/logs/profile_game_loop.json");
 
 	/* game loop */
 	auto timer = Timer {};
@@ -100,7 +100,7 @@ void Application::game_loop()
 	}
 
 	Instrumentor::end_session();
-	Instrumentor::begin_session("Logs/ProfileResults_Termination.json");
+	Instrumentor::begin_session("data/logs/profile_cleanup.json");
 }
 
 void Application::quit()
