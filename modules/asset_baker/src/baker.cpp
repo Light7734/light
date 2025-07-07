@@ -21,16 +21,18 @@ void log(Args &&...args)
 	std::cout << '\n';
 }
 
-bool convert_image(const std::filesystem::path &input, const std::filesystem::path &output)
+auto convert_image(const std::filesystem::path &input, const std::filesystem::path &output) -> bool
 {
-	int width, height, channels;
+	auto width = int {};
+	auto height = int {};
+	auto channels = int {};
 
-	stbi_uc *pixels = stbi_load(input.string().c_str(), &width, &height, &channels, 4);
+	auto *pixels = stbi_load(input.string().c_str(), &width, &height, &channels, 4);
 
 	if (!pixels)
 		return false;
 
-	Assets::TextureInfo texInfo {
+	auto texture_info = Assets::TextureInfo {
 		.size       = static_cast<size_t>(width * height * 4),
 		.format     = Assets::TextureFormat::RGBA8,
 		.pixel_size = {
@@ -41,7 +43,7 @@ bool convert_image(const std::filesystem::path &input, const std::filesystem::pa
 		.original_file = input.string(),
 	};
 
-	Assets::AssetFile file = Assets::pack_texture(&texInfo, pixels);
+	auto file = Assets::pack_texture(&texture_info, pixels);
 
 	stbi_image_free(pixels);
 
@@ -59,7 +61,7 @@ int main(int argc, char *argv[])
 	    "Argc MUST be 3, 1: execution-path(implicit), 2: input-directory, 3: output-directory"
 	);
 
-	for (auto &p : std::filesystem::directory_iterator(argv[1]))
+	for (const auto &p : std::filesystem::directory_iterator(argv[1]))
 	{
 		if (p.path().extension() == ".png")
 		{

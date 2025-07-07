@@ -6,7 +6,7 @@ namespace Assets {
 
 using namespace nlohmann;
 
-TextureInfo read_texture_info(AssetFile *file)
+auto read_texture_info(AssetFile *file) -> TextureInfo
 {
 	json texture_meta_data = json::parse(file->json);
 
@@ -45,7 +45,7 @@ void unpack_texture(
 	}
 }
 
-AssetFile pack_texture(TextureInfo *info, void *pixel_data)
+auto pack_texture(TextureInfo *info, void *pixel_data) -> AssetFile
 {
 	json metadata;
 	metadata["format"] = info->format;

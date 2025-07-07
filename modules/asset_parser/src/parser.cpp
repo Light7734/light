@@ -5,7 +5,7 @@
 
 namespace Assets {
 
-bool save_binary_file(const char *path, const AssetFile &file)
+auto save_binary_file(const char *path, const AssetFile &file) -> bool
 {
 	std::ofstream outstream(path, std::ios::binary | std::ios::out);
 
@@ -27,7 +27,7 @@ bool save_binary_file(const char *path, const AssetFile &file)
 	return true;
 }
 
-bool load_binary_file(const char *path, AssetFile &out_file)
+auto load_binary_file(const char *path, AssetFile &out_file) -> bool
 {
 	std::ifstream instream(path, std::ios::binary);
 	instream.seekg(0ull);

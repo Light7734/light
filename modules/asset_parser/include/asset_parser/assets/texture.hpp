@@ -1,10 +1,11 @@
 #pragma once
 
+#include <array>
 #include <asset_parser/parser.hpp>
 
 namespace Assets {
 
-enum class TextureFormat
+enum class TextureFormat : uint8_t
 {
 	None = 0,
 	RGBA8,
@@ -15,11 +16,11 @@ struct TextureInfo
 	size_t size;
 	CompressionMode compression_mode;
 	TextureFormat format;
-	uint32_t pixel_size[3];
+	std::array<uint32_t, 3> pixel_size;
 	std::string original_file;
 };
 
-TextureInfo read_texture_info(AssetFile *file);
+auto read_texture_info(AssetFile *file) -> TextureInfo;
 
 void unpack_texture(
     TextureInfo *info,
@@ -28,6 +29,6 @@ void unpack_texture(
     void *destination
 );
 
-AssetFile pack_texture(TextureInfo *info, void *pixel_data);
+auto pack_texture(TextureInfo *info, void *pixel_data) -> AssetFile;
 
 } // namespace Assets
