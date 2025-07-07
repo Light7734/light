@@ -95,7 +95,7 @@ auto linux_only(auto value)
 	{                                                           \
 		if (!(x))                                               \
 		{                                                       \
-			log_crt(__VA_ARGS__);                      \
+			log_crt(__VA_ARGS__);                               \
 			lt_debug_trap();                                    \
 			throw ::Light::FailedAssertion(__FILE__, __LINE__); \
 		}                                                       \
@@ -122,7 +122,7 @@ constexpr auto bit(auto x)
 
 /* debug */
 #ifndef LIGHT_LOGGER_H
-	#include <engine/debug/logger.hpp>
+	#include <logger/logger.hpp>
 #endif
 #include <engine/debug/exceptions.hpp>
 

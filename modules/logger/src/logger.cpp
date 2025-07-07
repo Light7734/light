@@ -1,7 +1,4 @@
-#include <engine/debug/logger.hpp>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
+#include <logger/logger.hpp>
 
 Logger::Logger(): spd_logger(spdlog::stdout_color_mt("Logger"))
 {

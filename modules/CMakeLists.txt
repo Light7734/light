@@ -1,3 +1,5 @@
+add_subdirectory(./logger)
+
 add_subdirectory(./asset_baker)
 add_subdirectory(./asset_parser)
 

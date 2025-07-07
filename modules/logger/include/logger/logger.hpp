@@ -1,6 +1,5 @@
 #pragma once
 
-#include <any>
 #include <format>
 #include <memory>
 #include <spdlog/sinks/basic_file_sink.h>

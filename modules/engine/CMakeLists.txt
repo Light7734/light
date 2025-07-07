@@ -9,7 +9,6 @@ if(NOT WIN32)
         core/uuid.cpp
         debug/exceptions.cpp
         debug/instrumentor.cpp
-        debug/logger.cpp
         graphics/blender.cpp
         graphics/buffers.cpp
         graphics/framebuffer.cpp
@@ -53,7 +52,6 @@ else()
         core/uuid.cpp
         debug/exceptions.cpp
         debug/instrumentor.cpp
-        debug/logger.cpp
         graphics/blender.cpp
         graphics/buffers.cpp
         graphics/framebuffer.cpp
@@ -102,9 +100,9 @@ endif()
 target_link_libraries(
   engine
   PUBLIC glad
+  PUBLIC logger
   PUBLIC opengl::opengl
   PUBLIC glfw
-  PUBLIC spdlog::spdlog
   PUBLIC imgui
   PUBLIC stb::stb
   PUBLIC yaml-cpp::yaml-cpp

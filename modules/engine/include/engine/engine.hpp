@@ -8,7 +8,7 @@
 #include <engine/camera/camera.hpp>
 
 // debug
-#include <engine/debug/logger.hpp>
+#include <logger/logger.hpp>
 
 // events
 #include <engine/events/char.hpp>
