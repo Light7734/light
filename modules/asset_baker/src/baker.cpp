@@ -1,85 +1,70 @@
+#include <asset_baker/bakers.hpp>
 #include <asset_parser/assets/texture.hpp>
 #include <asset_parser/parser.hpp>
 #include <filesystem>
-#include <iostream>
+#include <logger/logger.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#define ASSERT(x, ...)    \
-	if (!(x))             \
-	{                     \
-		log(__VA_ARGS__); \
-		return -1;        \
-	}
-
-
-template<typename... Args>
-void log(Args &&...args)
+void try_packing_texture(
+    const std::filesystem::path &in_path,
+    const std::filesystem::path &out_path
+)
 {
-	(std::cout << ... << args);
-	std::cout << '\n';
-}
-
-auto convert_image(const std::filesystem::path &input, const std::filesystem::path &output) -> bool
-{
-	auto width = int {};
-	auto height = int {};
-	auto channels = int {};
-
-	auto *pixels = stbi_load(input.string().c_str(), &width, &height, &channels, 4);
-
-	if (!pixels)
-		return false;
-
-	auto texture_info = Assets::TextureInfo {
-		.size       = static_cast<size_t>(width * height * 4),
-		.format     = Assets::TextureFormat::RGBA8,
-		.pixel_size = {
-		    static_cast<uint32_t>(width),
-		    static_cast<uint32_t>(height),
-		    0ul,
-		},
-		.original_file = input.string(),
-	};
-
-	auto file = Assets::pack_texture(&texture_info, pixels);
-
-	stbi_image_free(pixels);
-
-	Assets::save_binary_file(output.string().c_str(), file);
-
-	return true;
-}
-
-int main(int argc, char *argv[])
-{
-	std::ios_base::sync_with_stdio(false);
-
-	ASSERT(
-	    argc == 3,
-	    "Argc MUST be 3, 1: execution-path(implicit), 2: input-directory, 3: output-directory"
-	);
-
-	for (const auto &p : std::filesystem::directory_iterator(argv[1]))
+	auto texture_loader = lt::TextureLoaderFactory::create(in_path.extension().string());
+	if (!texture_loader)
 	{
-		if (p.path().extension() == ".png")
-		{
-			log("Found a texture: ", p);
-
-			auto newp = p.path();
-			newp.replace_extension(".asset_texture");
-			convert_image(p.path(), newp);
-		}
-		else if (p.path().extension() == ".obj")
-		{
-			log("Found a mesh -> ", p, " (unsupported)");
-		}
-		else
-		{
-			log("Unknown -> ", p);
-		}
+		// Don't log anything; this is expected.
+		return;
 	}
 
-	return 0;
+	try
+	{
+		Assets::TextureAsset::pack(texture_loader->load(in_path), out_path);
+
+		log_inf("Packed a texture:");
+		log_inf("\tloader  : {}", texture_loader->get_name());
+		log_inf("\tin  path: {}", in_path.string());
+		log_inf("\tout path: {}", out_path.string());
+	}
+	catch (const std::exception &exp)
+	{
+		log_err("Failed to pack texture:");
+		log_err("\tloader  : {}", texture_loader->get_name());
+		log_err("\tin path : {}", in_path.string());
+		log_err("\tout path: {}", out_path.string());
+		log_err("\texp.what: {}", exp.what());
+	}
+}
+
+auto main(int argc, char *argv[]) -> int32_t
+try
+{
+	if (argc != 2)
+	{
+		throw std::logic_error("Argc should be 2 -- exe dir (implicit) and target dir");
+	}
+
+	for (const auto &directory_iterator :
+	     std::filesystem::recursive_directory_iterator(argv[1])) // NOLINT
+	{
+		if (directory_iterator.is_directory())
+		{
+			continue;
+		}
+
+		const auto &in_path = directory_iterator.path();
+
+		auto out_path = in_path;
+		out_path.replace_extension(".asset");
+
+		try_packing_texture(in_path, out_path);
+	}
+
+	return EXIT_SUCCESS;
+}
+catch (const std::exception &exp)
+{
+	log_crt("Terminating due to uncaught exception:");
+	log_crt("\texception.what: {}:", exp.what());
+
+	return EXIT_FAILURE;
 }

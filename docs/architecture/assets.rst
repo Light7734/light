@@ -5,6 +5,7 @@ Layout
 {version}              | 4 bytes, ie. uint32_t
 {general metadata}     | sizeof(AssetMetadata)
 {specialized metadata} | sizeof(XXXAssetMetadata), eg. TextureAssetMetadata
+{n}                    | 4 bytes, ie. uint32_t
 {blob_0...n metadata}  | n * sizeof(BlobMetadata)
 {blob_0...n data}      | variable size based on actual data
 {end marker}           | 8 byte, ie size_t for marking the END
@@ -13,7 +14,8 @@ Sections
 ---------------------------------------------------------------------------------------------------
 version              -> The version of the asset for forward compatibility
 general metadata     -> Common asset metadata such as file-path, asset-type, creator, etc.
-specialized metadata -> Metadata specific to the asset, eg. texture dimensions for Textures
+specialized metadata -> Metadata specific to the asset, eg. texture dimensions for Textures.
+n                    -> The number of blobs.
 blob_0...n metadata  -> Metadata specifying how the actual data is packed, required for unpacking.
 blob_0...n data      -> The actual data, packed and compressed to be reacdy for direct engine consumption.
 

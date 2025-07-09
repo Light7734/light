@@ -1,56 +1,62 @@
 #include <asset_parser/parser.hpp>
+#include <format>
 #include <fstream>
-#include <istream>
-#include <ostream>
+#include <utility>
 
 namespace Assets {
 
-auto save_binary_file(const char *path, const AssetFile &file) -> bool
-{
-	std::ofstream outstream(path, std::ios::binary | std::ios::out);
-
-	outstream.write((const char *)&file.version, sizeof(uint32_t));
-	outstream.write((const char *)&file.type, sizeof(AssetFile::Type));
-
-	uint32_t json_size = file.json.size();
-	uint32_t blob_size = file.blob.size();
-	outstream.write((const char *)&json_size, sizeof(uint32_t));
-	outstream.write((const char *)&blob_size, sizeof(uint32_t));
-
-	outstream.write(file.json.c_str(), json_size);
-	outstream.write((const char *)file.blob.data(), blob_size);
-
-	outstream.close();
-
-	outstream.close();
-
-	return true;
-}
-
-auto load_binary_file(const char *path, AssetFile &out_file) -> bool
-{
-	std::ifstream instream(path, std::ios::binary);
-	instream.seekg(0ull);
-
-	if (!instream.is_open())
-		return false;
-
-	instream.read((char *)&out_file.version, sizeof(uint32_t));
-	instream.read((char *)&out_file.type, sizeof(AssetFile::Type));
-
-	uint32_t json_size;
-	uint32_t blob_size;
-	instream.read((char *)&json_size, sizeof(uint32_t));
-	instream.read((char *)&blob_size, sizeof(uint32_t));
-
-	out_file.json.resize(json_size);
-	out_file.blob.resize(blob_size);
-	instream.read((char *)out_file.json.data(), json_size);
-	instream.read((char *)out_file.blob.data(), blob_size);
-
-	instream.close();
-
-	return true;
-}
+// void Asset::unpack(std::byte *destination)
+// {
+// 	if (!m_stream.is_open())
+// 	{
+// 		throw std::logic_error {
+// 			"Failed to unpack asset: "
+// 			"ifstream is closed",
+// 		};
+// 	}
+//
+// 	switch (m_metadata.blob_compression_type)
+// 	{
+// 	case CompressionType::None:
+// 		if (m_metadata.packed_size != m_metadata.unpacked_size)
+// 		{
+// 			throw std::logic_error {
+// 				"Failed to unpack asset: "
+// 				"compression type set to none but packed/unpacked sizes differ",
+// 			};
+// 		}
+//
+// 		m_stream.read(
+// 		    std::bit_cast<char *>(destination),
+// 		    static_cast<long>(m_metadata.packed_size)
+// 		);
+// 		m_stream.close();
+//
+// 	case CompressionType::LZ4:
+// 		m_stream.close();
+// 		throw std::logic_error {
+// 			"Failed to unpack asset: "
+// 			"LZ4 compression is not implemented yet",
+// 		};
+//
+//
+// 	case CompressionType::LZ4HC:
+// 		m_stream.close();
+// 		throw std::logic_error {
+// 			"Failed to unpack asset: "
+// 			"LZ4HC compression is not implemented yet",
+// 		};
+//
+// 	default:
+// 		m_stream.close();
+// 		throw std::logic_error {
+// 			std::format(
+// 			    "Failed to unpack asset: "
+// 			    "Compression type was not recognized: {}",
+// 			    std::to_underlying(m_metadata.blob_compression_type)
+// 			),
+// 		};
+// 	}
+// }
 
 } // namespace Assets

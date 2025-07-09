@@ -10,10 +10,10 @@ AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> active_scene)
     , m_assets_path("./data/assets")
     , m_active_scene(std::move(active_scene))
 {
-	ResourceManager::load_texture("_Assets_Directory", "data/engine/icons/asset/dir.png");
-	ResourceManager::load_texture("_Assets_Scene", "data/engine/icons/asset/scene.png");
-	ResourceManager::load_texture("_Assets_Image", "data/engine/icons/asset/img.png");
-	ResourceManager::load_texture("_Assets_Text", "data/engine/icons/asset/txt.png");
+	ResourceManager::load_texture("_Assets_Directory", "data/engine/icons/asset/dir.asset");
+	ResourceManager::load_texture("_Assets_Scene", "data/engine/icons/asset/scene.asset");
+	ResourceManager::load_texture("_Assets_Image", "data/engine/icons/asset/img.asset");
+	ResourceManager::load_texture("_Assets_Text", "data/engine/icons/asset/txt.asset");
 
 	m_directory_texture = ResourceManager::get_texture("_Assets_Directory");
 	m_scene_texture = ResourceManager::get_texture("_Assets_Scene");

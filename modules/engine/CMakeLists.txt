@@ -104,7 +104,7 @@ target_link_libraries(
   PUBLIC opengl::opengl
   PUBLIC glfw
   PUBLIC imgui
-  PUBLIC stb::stb
+  PUBLIC asset_parser
   PUBLIC yaml-cpp::yaml-cpp
   PUBLIC EnTT::EnTT
 )

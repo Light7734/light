@@ -1,3 +1,5 @@
+#include <asset_parser/assets/texture.hpp>
+#include <asset_parser/parser.hpp>
 #include <engine/graphics/graphics_context.hpp>
 #include <engine/graphics/shader.hpp>
 #include <engine/graphics/texture.hpp>
@@ -12,49 +14,44 @@ void ResourceManager::load_shader_impl(
     const std::string &pixelPath
 )
 {
-	// check
 	lt_assert(!vertexPath.empty(), "Empty 'vertexPath'");
 	lt_assert(!pixelPath.empty(), "Empty 'pixelPath'");
 
-	// load files
 	auto vertexFile = FileManager::read_text_file(vertexPath);
 	auto pixelFile = FileManager::read_text_file(pixelPath);
 
-	// check
 	lt_assert(vertexFile.is_valid(), "Failed to read vertex file: {}", vertexPath);
 	lt_assert(pixelFile.is_valid(), "Failed to read vertex file: {}", pixelPath);
 
-	// create shader
 	m_shaders[name] = Ref<Shader>(
 	    Shader::create(vertexFile, pixelFile, GraphicsContext::get_shared_context())
 	);
 
-	// free file
 	vertexFile.release();
 	pixelFile.release();
 }
 
-void ResourceManager::load_texture_impl(
-    const std::string &name,
-    const std::string &path,
-    unsigned int desiredComponents /* = 4u */
-)
+void ResourceManager::load_texture_impl(const std::string &name, const std::filesystem::path &path)
 {
-	// load file
-	auto imgFile = FileManager::read_image_file(path, desiredComponents);
+	log_trc("Loading texture:");
+	log_trc("\tname: {}", name);
+	log_trc("\tpath: {}", path.string());
 
-	// create texture
+	auto asset = Assets::TextureAsset { path };
+	const auto metadata = asset.get_metadata();
+	const auto blob_metadata = asset.get_blob_metadata(Assets::BlobMetadata::Tag::color);
+
+	auto blob = std::vector<std::byte>(blob_metadata.uncompressed_size);
+	asset.unpack_blob(blob_metadata.tag, blob.data(), blob.size());
+
 	m_textures[name] = Ref<Texture>(Texture::create(
-	    imgFile.get_width(),
-	    imgFile.get_height(),
-	    imgFile.get_components(),
-	    imgFile.get_data(),
+	    metadata.pixel_size[0],
+	    metadata.pixel_size[1],
+	    metadata.num_components,
+	    std::bit_cast<unsigned char *>(blob.data()),
 	    GraphicsContext::get_shared_context(),
 	    path
 	));
-
-	// free file
-	imgFile.release();
 }
 
 void ResourceManager::release_texture_impl(const std::string &name)

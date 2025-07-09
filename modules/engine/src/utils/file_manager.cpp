@@ -1,7 +1,5 @@
-#define STB_IMAGE_IMPLEMENTATION
 #include <engine/utils/file_manager.hpp>
 #include <utility>
-#include <stb_image.h>
 
 namespace Light {
 
@@ -26,7 +24,6 @@ void BasicFileHandle::release()
 	m_data = nullptr;
 	m_size = 0ull;
 }
-
 
 auto FileManager::read_text_file(const std::string &path) -> BasicFileHandle
 {
@@ -63,52 +60,52 @@ auto FileManager::read_text_file(const std::string &path) -> BasicFileHandle
 	return { data, static_cast<unsigned int>(size), path, name, extension };
 }
 
-auto FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
-    -> ImageFileHandle
-{
-	// parse path info
-	auto name = path.substr(0, path.find('.') + -1);
-	auto extension = path.substr(path.find('.') + 1);
+// auto FileManager::read_image_file(const std::string &path, int32_t desiredComponents)
+//     -> ImageFileHandle
+// {
+// 	// parse path info
+// 	auto name = path.substr(0, path.find('.') + -1);
+// 	auto extension = path.substr(path.find('.') + 1);
+//
+// 	// load image
+// 	auto width = 0;
+// 	auto height = 0;
+// 	auto fetchedComponents = 0;
+// 	auto *pixels = stbi_load(path.c_str(), &width, &height, &fetchedComponents, desiredComponents);
+//
+// 	// check
+// 	if (!pixels)
+// 	{
+// 		log_wrn("Failed to load image file: <{}>", path);
+// 	}
+// 	else if (fetchedComponents != desiredComponents)
+// 	{
+// 		log_wrn(
+// 		    "Mismatch of fetched/desired components: <{}> ({}/{})",
+// 		    name + '.' + extension,
+// 		    fetchedComponents,
+// 		    desiredComponents
+// 		);
+// 	}
+//
+// 	return ImageFileHandle(
+// 	    pixels,
+// 	    width * height,
+// 	    path,
+// 	    name,
+// 	    extension,
+// 	    width,
+// 	    height,
+// 	    fetchedComponents,
+// 	    desiredComponents
+// 	);
+// }
 
-	// load image
-	auto width = 0;
-	auto height = 0;
-	auto fetchedComponents = 0;
-	auto *pixels = stbi_load(path.c_str(), &width, &height, &fetchedComponents, desiredComponents);
-
-	// check
-	if (!pixels)
-	{
-		log_wrn("Failed to load image file: <{}>", path);
-	}
-	else if (fetchedComponents != desiredComponents)
-	{
-		log_wrn(
-		    "Mismatch of fetched/desired components: <{}> ({}/{})",
-		    name + '.' + extension,
-		    fetchedComponents,
-		    desiredComponents
-		);
-	}
-
-	return ImageFileHandle(
-	    pixels,
-	    width * height,
-	    path,
-	    name,
-	    extension,
-	    width,
-	    height,
-	    fetchedComponents,
-	    desiredComponents
-	);
-}
-
-void ImageFileHandle::release()
-{
-	stbi_image_free(reinterpret_cast<void *>(m_data));
-	m_data = nullptr;
-	m_size = 0ull;
-}
+// void ImageFileHandle::release()
+// {
+// 	stbi_image_free(reinterpret_cast<void *>(m_data));
+// 	m_data = nullptr;
+// 	m_size = 0ull;
+// }
 
 } // namespace Light

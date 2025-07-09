@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/base/base.hpp>
+#include <filesystem>
 
 namespace Light {
 
@@ -26,13 +27,9 @@ public:
 		instance().load_shader_impl(name, vertexPath, pixelPath);
 	}
 
-	static void load_texture(
-	    const std::string &name,
-	    const std::string &path,
-	    unsigned int desiredComponents = 4u
-	)
+	static void load_texture(const std::string &name, const std::string &path)
 	{
-		instance().load_texture_impl(name, path, desiredComponents);
+		instance().load_texture_impl(name, path);
 	}
 
 	static void release_texture(const std::string &name)
@@ -59,11 +56,7 @@ private:
 	    const std::string &pixelPath
 	);
 
-	void load_texture_impl(
-	    const std::string &name,
-	    const std::string &path,
-	    unsigned int desiredComponents = 4u
-	);
+	void load_texture_impl(const std::string &name, const std::filesystem::path &path);
 
 	void release_texture_impl(const std::string &name);
 

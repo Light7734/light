@@ -7,4 +7,5 @@ target_link_libraries(
     asset_parser
     PRIVATE LZ4::lz4_static 
     PRIVATE nlohmann_json::nlohmann_json 
+    PRIVATE logger
 )
