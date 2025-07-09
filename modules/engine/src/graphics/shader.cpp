@@ -11,15 +11,18 @@
 namespace Light {
 
 auto Shader::create(
-    const BasicFileHandle& vertexFile,
-    const BasicFileHandle& pixelFile,
-    const Ref<SharedContext>&  /*sharedContext*/
+    Assets::Blob vertex_blob,
+    Assets::Blob pixel_blob,
+    const Ref<SharedContext> &shared_context
 ) -> Ref<Shader>
 {
+	std::ignore = shared_context;
+
 	// load shader source
 	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return create_ref<glShader>(vertexFile, pixelFile);
+	case GraphicsAPI::OpenGL:
+		return create_ref<glShader>(std::move(vertex_blob), std::move(pixel_blob));
 
 	case GraphicsAPI::DirectX:
 		lt_win(return create_ref<dxShader>(

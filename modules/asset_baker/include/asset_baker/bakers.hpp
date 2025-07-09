@@ -1,5 +1,6 @@
 #pragma once
 
+#include <asset_parser/assets/text.hpp>
 #include <asset_parser/assets/texture.hpp>
 #include <filesystem>
 #include <logger/logger.hpp>
@@ -111,6 +112,68 @@ public:
 		if (StbLoader::get_supported_extensions().contains(file_extension))
 		{
 			return std::make_unique<StbLoader>();
+		}
+
+		return {};
+	}
+};
+
+class TextLoader: Loader
+{
+public:
+	[[nodiscard]] static auto get_supported_extensions() -> std::unordered_set<std::string_view>
+	{
+		return { ".glsl", ".txt", ".hlsl" };
+	}
+
+	[[nodiscard]] auto get_name() const -> std::string_view override
+	{
+		return "TextLoader";
+	}
+
+	[[nodiscard]] auto load(std::filesystem::path file_path) const -> Assets::TextAsset::PackageData
+	{
+		auto stream = std::ifstream { file_path, std::ios::binary };
+		if (!stream.good())
+		{
+			throw std::runtime_error {
+				std::format(
+				    "Failed to open ifstream for text loading of file: {}",
+				    file_path.string()
+				),
+			};
+		}
+
+		auto file_size = std::filesystem::file_size(file_path);
+
+		auto text_blob = Assets::Blob(file_size);
+
+		stream.read((char *)(text_blob.data()), static_cast<long>(file_size)); // NOLINT
+
+		const auto metadata = Assets::Asset::Metadata {
+			.type = Assets::Asset::Type::Text,
+		};
+
+		const auto text_metadata = Assets::TextAsset::Metadata {
+			.lines = {},
+		};
+
+		return Assets::TextAsset::PackageData {
+			.metadata = metadata,
+			.text_metadata = {},
+			.text_blob = std::move(text_blob),
+		};
+	}
+};
+
+class TextLoaderFactory
+{
+public:
+	static auto create(std::string_view file_extension) -> std::unique_ptr<TextLoader>
+	{
+		if (TextLoader::get_supported_extensions().contains(file_extension))
+		{
+			return std::make_unique<TextLoader>();
 		}
 
 		return {};

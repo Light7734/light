@@ -3,7 +3,6 @@
 #include <d3d11.h>
 #include <engine/base/base.hpp>
 #include <engine/graphics/shader.hpp>
-#include <engine/utils/file_manager.hpp>
 #include <wrl.h>
 
 namespace Light {

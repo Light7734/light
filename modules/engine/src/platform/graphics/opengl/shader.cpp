@@ -6,27 +6,29 @@
 
 namespace Light {
 
-glShader::glShader(BasicFileHandle vertexFile, BasicFileHandle pixelFile) 
+glShader::glShader(Assets::Blob vertex_blob, Assets::Blob pixel_blob)
+    : m_shader_id(glCreateProgram())
 {
-	// create
-	m_shader_id = glCreateProgram();
+	auto vertex_source = std::string {
+		vertex_blob.data(),
+		vertex_blob.data() + vertex_blob.size(), // NOLINT
+	};
 
-	std::string const vertexSource(vertexFile.get_data(), vertexFile.get_data() + vertexFile.get_size());
-	std::string const pixelSource(pixelFile.get_data(), pixelFile.get_data() + pixelFile.get_size());
+	auto pixel_source = std::string {
+		pixel_blob.data(),
+		pixel_blob.data() + pixel_blob.size(), // NOLINT
+	};
 
-	unsigned int const vertexShader = compile_shader(vertexSource, Shader::Stage::VERTEX);
-	unsigned int const pixelShader = compile_shader(pixelSource, Shader::Stage::PIXEL);
+	const auto vertex_shader = compile_shader(vertex_source, Shader::Stage::vertex);
+	const auto pixel_shader = compile_shader(pixel_source, Shader::Stage::pixel);
 
-	// attach shaders
-	glAttachShader(m_shader_id, vertexShader);
-	glAttachShader(m_shader_id, pixelShader);
+	glAttachShader(m_shader_id, vertex_shader);
+	glAttachShader(m_shader_id, pixel_shader);
 
-	// link shader program
 	glLinkProgram(m_shader_id);
 
-	// delete shaders (free memory)
-	glDeleteShader(vertexShader);
-	glDeleteShader(pixelShader);
+	glDeleteShader(vertex_shader);
+	glDeleteShader(pixel_shader);
 }
 
 glShader::~glShader()
@@ -44,38 +46,14 @@ void glShader::un_bind()
 	glUseProgram(NULL);
 }
 
-// shaderc::SpvCompilationResult glShader::compile_glsl(basic_file_handle file, Shader::Stage stage)
-// {
-// 	// compile options
-// 	shaderc::CompileOptions options;
-// 	options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-// 	options.SetOptimizationLevel(shaderc_optimization_level_performance);
-//
-// 	// compile
-// 	shaderc::Compiler compiler;
-// 	shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(reinterpret_cast<const
-// char*>(file.GetData()), stage == Shader::Stage::VERTEX ?
-// shaderc_shader_kind::shaderc_vertex_shader : shaderc_shader_kind::shaderc_fragment_shader,
-// file.GetName().c_str(), options);
-//
-// 	// log error
-// 	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-// 	{
-// 		log_err("Failed to compile {} shader at {}...", stage == Shader::Stage::VERTEX ?
-// "vertex" : "pixel", file.GetPath()); 		log_err("    {}", result.GetErrorMessage());
-// 	}
-//
-// 	return result;
-// }
-
-auto glShader::compile_shader(const std::string& source, Shader::Stage stage) -> unsigned int
+auto glShader::compile_shader(const std::string &source, Shader::Stage stage) -> unsigned int
 {
 	// &(address of) needs an lvalue
 	const auto *lvalue_source = source.c_str();
 	auto shader = glCreateShader(
-	    stage == Shader::Stage::VERTEX   ? GL_VERTEX_SHADER :
-	    stage == Shader::Stage::PIXEL    ? GL_FRAGMENT_SHADER :
-	    stage == Shader::Stage::GEOMETRY ? GL_GEOMETRY_SHADER :
+	    stage == Shader::Stage::vertex   ? GL_VERTEX_SHADER :
+	    stage == Shader::Stage::pixel    ? GL_FRAGMENT_SHADER :
+	    stage == Shader::Stage::geometry ? GL_GEOMETRY_SHADER :
 	                                       NULL
 	);
 
@@ -96,7 +74,7 @@ auto glShader::compile_shader(const std::string& source, Shader::Stage stage) ->
 
 		log_err(
 		    "glShader::glShader: failed to compile {} shader:\n        {}",
-		    stage == Shader::Stage::VERTEX ? "Vertex" : "Pixel",
+		    stage == Shader::Stage::vertex ? "Vertex" : "Pixel",
 		    errorLog
 		);
 

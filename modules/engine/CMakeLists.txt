@@ -38,7 +38,6 @@ if(NOT WIN32)
         scene/scene.cpp
         time/timer.cpp
         user_interface/user_interface.cpp
-        utils/file_manager.cpp
         utils/resource_manager.cpp
         utils/serializer.cpp
         utils/stringifier.cpp
@@ -90,7 +89,6 @@ else()
         scene/scene.cpp
         time/timer.cpp
         user_interface/user_interface.cpp
-        utils/file_manager.cpp
         utils/resource_manager.cpp
         utils/serializer.cpp
         utils/stringifier.cpp

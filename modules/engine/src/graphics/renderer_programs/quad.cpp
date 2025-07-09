@@ -19,8 +19,8 @@ QuadRendererProgram::QuadRendererProgram(
 	// #todo: don't use relative path
 	ResourceManager::load_shader(
 	    "LT_ENGINE_RESOURCES_QUAD_SHADER",
-	    "data/assets/shaders/quads/vs.glsl",
-	    "data/assets/shaders/quads/ps.glsl"
+	    "data/assets/shaders/quads/vs.asset",
+	    "data/assets/shaders/quads/ps.asset"
 	);
 
 	m_shader = ResourceManager::get_shader("LT_ENGINE_RESOURCES_QUAD_SHADER");

@@ -1,6 +1,7 @@
 add_library_module(asset_parser 
     parser.cpp
     assets/texture.cpp
+    assets/text.cpp
 )
 
 target_link_libraries(

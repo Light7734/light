@@ -19,4 +19,3 @@ void main()
 	vso_Tint = a_Tint;
 	vso_TexCoord = a_TexCoord;
 }
-

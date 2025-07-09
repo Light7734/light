@@ -1,7 +1,7 @@
 #pragma once
 
+#include <asset_parser/assets/text.hpp>
 #include <engine/base/base.hpp>
-#include <engine/utils/file_manager.hpp>
 #include <glm/glm.hpp>
 
 namespace Light {
@@ -13,16 +13,17 @@ class Shader
 public:
 	enum Stage
 	{
-		NONE = 0,
-		VERTEX = 1,
-		PIXEL = 2,
-		GEOMETRY = 3
+		none = 0,
+
+		vertex,
+		pixel,
+		geometry,
 	};
 
 	static auto create(
-	    const BasicFileHandle& vertexFile,
-	    const BasicFileHandle& pixelFile,
-	    const Ref<SharedContext>& sharedContext
+	    Assets::Blob vertex_blob,
+	    Assets::Blob pixel_blob,
+	    const Ref<SharedContext> &shared_context
 	) -> Ref<Shader>;
 
 	virtual ~Shader() = default;

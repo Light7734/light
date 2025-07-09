@@ -20,21 +20,16 @@ public:
 
 	static void load_shader(
 	    const std::string &name,
-	    const std::string &vertexPath,
-	    const std::string &pixelPath
+	    const std::filesystem::path &vertex_path,
+	    const std::filesystem::path &pixel_path
 	)
 	{
-		instance().load_shader_impl(name, vertexPath, pixelPath);
+		instance().load_shader_impl(name, vertex_path, pixel_path);
 	}
 
-	static void load_texture(const std::string &name, const std::string &path)
+	static void load_texture(const std::string &name, const std::filesystem::path &path)
 	{
 		instance().load_texture_impl(name, path);
-	}
-
-	static void release_texture(const std::string &name)
-	{
-		instance().release_texture_impl(name);
 	}
 
 	static auto get_shader(const std::string &name) -> Ref<Shader>
@@ -52,13 +47,11 @@ private:
 
 	void load_shader_impl(
 	    const std::string &name,
-	    const std::string &vertexPath,
-	    const std::string &pixelPath
+	    const std::filesystem::path &vertex_path,
+	    const std::filesystem::path &pixel_path
 	);
 
 	void load_texture_impl(const std::string &name, const std::filesystem::path &path);
-
-	void release_texture_impl(const std::string &name);
 
 	std::unordered_map<std::string, Ref<Shader>> m_shaders;
 
