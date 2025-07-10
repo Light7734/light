@@ -1,9 +1,9 @@
 #include <asset_manager/asset_manager.hpp>
 #include <ecs/scene.hpp>
 #include <ecs/serializer.hpp>
-#include <engine/engine.hpp>
 #include <imgui.h>
 #include <mirror/panel/asset_browser.hpp>
+#include <renderer/texture.hpp>
 
 namespace lt {
 

@@ -8,7 +8,7 @@ add_executable_module(mirror
 
 target_link_libraries(
   mirror
-  PUBLIC engine
+  PUBLIC app
   PUBLIC opengl::opengl
   PUBLIC ui
   PUBLIC imgui

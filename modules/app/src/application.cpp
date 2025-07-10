@@ -1,8 +1,8 @@
+#include <app/application.hpp>
+#include <app/layer.hpp>
+#include <app/layer_stack.hpp>
 #include <asset_manager/asset_manager.hpp>
 #include <debug/assertions.hpp>
-#include <engine/core/application.hpp>
-#include <engine/layer/layer.hpp>
-#include <engine/layer/layer_stack.hpp>
 #include <input/events/event.hpp>
 #include <input/events/keyboard.hpp>
 #include <input/events/window.hpp>

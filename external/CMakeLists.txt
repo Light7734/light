@@ -5,7 +5,6 @@ add_subdirectory(./glad)
 cmake_minimum_required(VERSION 3.14)
 
 set(MIRROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/mirror/)
-set(ENGINE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/engine/)
 set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/)
 
 if (CMAKE_COMPILER_IS_GNUCC)

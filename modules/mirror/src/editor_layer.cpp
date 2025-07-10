@@ -1,3 +1,4 @@
+#include <app/application.hpp>
 #include <asset_manager/asset_manager.hpp>
 #include <camera/component.hpp>
 #include <ecs/components.hpp>
@@ -6,6 +7,9 @@
 #include <input/input.hpp>
 #include <input/key_codes.hpp>
 #include <mirror/editor_layer.hpp>
+#include <renderer/framebuffer.hpp>
+#include <renderer/graphics_context.hpp>
+#include <renderer/texture.hpp>
 #include <ui/ui.hpp>
 
 namespace lt {

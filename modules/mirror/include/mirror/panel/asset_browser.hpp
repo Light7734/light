@@ -1,8 +1,8 @@
 #pragma once
 
-#include <engine/engine.hpp>
 #include <filesystem>
 #include <mirror/panel/panel.hpp>
+#include <renderer/texture.hpp>
 
 namespace lt {
 

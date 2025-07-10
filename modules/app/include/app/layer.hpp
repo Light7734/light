@@ -1,12 +1,9 @@
 #pragma once
 
-
-
 namespace lt {
 
 class Event;
 
-// mouse
 class MouseMovedEvent;
 class ButtonPressedEvent;
 class ButtonReleasedEvent;
@@ -36,6 +33,7 @@ public:
 	virtual void on_update(float deltaTime)
 	{
 	}
+
 	virtual void on_user_interface_update()
 	{
 	}

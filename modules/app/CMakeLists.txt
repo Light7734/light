@@ -1,0 +1,21 @@
+add_library_module(app
+    application.cpp
+    layer.cpp
+    layer_stack.cpp
+)
+
+target_link_libraries(app
+PUBLIC 
+    renderer
+    logger
+    ui
+    asset_parser
+    asset_manager
+    lt_debug 
+    ecs 
+    window
+    glad
+    time
+    opengl::opengl
+    EnTT::EnTT
+)

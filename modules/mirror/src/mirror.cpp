@@ -5,7 +5,9 @@
 #include <window/window.hpp>
 
 //
-#include <engine/engine.hpp>
+#include <app/application.hpp>
+#include <app/entrypoint.hpp>
+#include <app/layer_stack.hpp>
 
 namespace lt {
 

@@ -1,3 +1,4 @@
+# engine
 add_subdirectory(./base)
 add_subdirectory(./time)
 add_subdirectory(./logger)
@@ -14,7 +15,9 @@ add_subdirectory(./ui)
 add_subdirectory(./window)
 add_subdirectory(./renderer)
 add_subdirectory(./ecs)
-add_subdirectory(./engine)
 
+add_subdirectory(./app)
+
+# apps 
 add_subdirectory(./mirror)
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine.hpp>
+#include <app/application.hpp>
 
 int main(int argc, char *argv[]) // NOLINT
 try
