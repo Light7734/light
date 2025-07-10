@@ -7,9 +7,9 @@
 #include <renderer/renderer.hpp>
 ///
 
-#include <renderer/renderer_programs/quad.hpp>
-#include <renderer/renderer_programs/texture.hpp>
-#include <renderer/renderer_programs/tinted_texture.hpp>
+#include <renderer/programs/quad.hpp>
+#include <renderer/programs/texture.hpp>
+#include <renderer/programs/tinted_texture.hpp>
 #include <utility>
 
 #define LT_MAX_QUAD_RENDERER_VERTICES           (1028u * 4u)

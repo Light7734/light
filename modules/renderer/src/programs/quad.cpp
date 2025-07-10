@@ -1,6 +1,6 @@
 #include <camera/camera.hpp>
 #include <renderer/buffers.hpp>
-#include <renderer/renderer_programs/quad.hpp>
+#include <renderer/programs/quad.hpp>
 #include <renderer/shader.hpp>
 #include <renderer/vertex_layout.hpp>
 

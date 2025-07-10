@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <renderer/renderer_programs/renderer_program.hpp>
+#include <renderer/programs/renderer_program.hpp>
 
 namespace lt {
 

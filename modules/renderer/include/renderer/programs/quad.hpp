@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <renderer/renderer_programs/renderer_program.hpp>
+#include <renderer/programs/renderer_program.hpp>
 
 namespace lt {
 
@@ -11,23 +11,22 @@ class IndexBuffer;
 class VertexLayout;
 class OrthographicCamera;
 class SharedContext;
+class Shader;
 
-class TintedTextureRendererProgram: RendererProgram
+class QuadRendererProgram: RendererProgram
 {
 public:
-	virtual ~TintedTextureRendererProgram() = default;
-	struct TintedTextureVertexData
+	virtual ~QuadRendererProgram() = default;
+	struct QuadVertexData
 	{
 		glm::vec4 position;
 
 		glm::vec4 tint;
-
-		glm::vec2 texcoord;
 	};
 
-	TintedTextureRendererProgram(
+	QuadRendererProgram(
 	    unsigned int maxVertices,
-	    const Ref<SharedContext> &sharedContext,
+	    const Ref<SharedContext> &shared_context,
 	    Ref<Shader> shader
 	);
 
@@ -39,7 +38,7 @@ public:
 
 	void bind() override;
 
-	auto get_map_current() -> TintedTextureVertexData *
+	auto get_map_current() -> QuadVertexData *
 	{
 		return &m_map[m_idx];
 	}
@@ -51,7 +50,7 @@ public:
 
 	[[nodiscard]] constexpr auto get_vertex_size() const -> unsigned int
 	{
-		return sizeof(TintedTextureVertexData);
+		return sizeof(QuadVertexData);
 	}
 
 private:
@@ -63,13 +62,13 @@ private:
 
 	Ref<VertexLayout> m_vertex_layout;
 
-	std::span<TintedTextureVertexData> m_map;
+	std::span<QuadVertexData> m_map;
 
 	size_t m_idx {};
 
-	unsigned int m_quad_count { 0u };
+	unsigned int m_quad_count = 0u;
 
-	unsigned int m_max_vertices;
+	unsigned int m_max_vertices = 0u;
 };
 
 } // namespace lt

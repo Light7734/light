@@ -1,6 +1,6 @@
 #include <camera/camera.hpp>
 #include <renderer/buffers.hpp>
-#include <renderer/renderer_programs/texture.hpp>
+#include <renderer/programs/texture.hpp>
 #include <renderer/shader.hpp>
 #include <renderer/vertex_layout.hpp>
 

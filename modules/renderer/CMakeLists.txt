@@ -5,12 +5,12 @@ add_library_module(renderer
     graphics_context.cpp
     render_command.cpp
     renderer.cpp
-    renderer_programs/quad.cpp
-    renderer_programs/texture.cpp
-    renderer_programs/tinted_texture.cpp
     shader.cpp
     texture.cpp
     vertex_layout.cpp
+    programs/quad.cpp
+    programs/texture.cpp
+    programs/tinted_texture.cpp
     gl/blender.cpp
     gl/buffers.cpp
     gl/framebuffers.cpp
