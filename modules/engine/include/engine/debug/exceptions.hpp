@@ -9,7 +9,7 @@
 	if (FAILED(hr##line = x))         \
 	throw dxException(hr##line, __FILE__, line)
 
-namespace Light {
+namespace lt {
 
 #ifdef LIGHT_PLATFORM_WINDOWS
 // DirectX
@@ -19,4 +19,4 @@ struct dxException: std::exception
 };
 #endif
 
-} // namespace Light
+} // namespace lt

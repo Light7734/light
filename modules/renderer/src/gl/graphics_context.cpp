@@ -10,7 +10,7 @@
 	#include <GLFW/glfw3.h>
 #endif
 
-namespace Light {
+namespace lt {
 
 glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(windowHandle)
 {
@@ -107,4 +107,4 @@ void glGraphicsContext::set_debug_message_callback()
 	);
 }
 
-} // namespace Light
+} // namespace lt

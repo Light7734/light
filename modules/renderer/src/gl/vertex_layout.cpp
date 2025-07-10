@@ -3,7 +3,7 @@
 #include <renderer/gl/buffers.hpp>
 #include <renderer/gl/vertex_layout.hpp>
 
-namespace Light {
+namespace lt {
 
 glVertexLayout::glVertexLayout(
     const Ref<VertexBuffer> &buffer,
@@ -74,25 +74,25 @@ auto glVertexLayout::get_element_desc(VertexElementType type, unsigned int offse
 	switch (type)
 	{
 	/* byte */
-	case Light::VertexElementType::Byte1:
+	case lt::VertexElementType::Byte1:
 		return { .type = GL_BYTE, .count = 1u, .typeSize = sizeof(GLbyte), .offset = offset };
-	case Light::VertexElementType::Byte2:
+	case lt::VertexElementType::Byte2:
 		return { .type = GL_BYTE, .count = 1u, .typeSize = sizeof(GLbyte), .offset = offset };
-	case Light::VertexElementType::Byte4:
+	case lt::VertexElementType::Byte4:
 		return { .type = GL_BYTE, .count = 1u, .typeSize = sizeof(GLbyte), .offset = offset };
 
 	/* ubyte */
-	case Light::VertexElementType::UByte1:
+	case lt::VertexElementType::UByte1:
 		return { .type = GL_UNSIGNED_BYTE,
 			     .count = 1u,
 			     .typeSize = sizeof(GLubyte),
 			     .offset = offset };
-	case Light::VertexElementType::UByte2:
+	case lt::VertexElementType::UByte2:
 		return { .type = GL_UNSIGNED_BYTE,
 			     .count = 2u,
 			     .typeSize = sizeof(GLubyte),
 			     .offset = offset };
-	case Light::VertexElementType::UByte4:
+	case lt::VertexElementType::UByte4:
 		return { .type = GL_UNSIGNED_BYTE,
 			     .count = 4u,
 			     .typeSize = sizeof(GLubyte),
@@ -144,4 +144,4 @@ auto glVertexLayout::get_element_desc(VertexElementType type, unsigned int offse
 	}
 }
 
-} // namespace Light
+} // namespace lt

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Light::Key {
+namespace lt::Key {
 
 enum : uint16_t
 {

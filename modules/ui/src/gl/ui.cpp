@@ -5,7 +5,7 @@
 #include <input/key_codes.hpp>
 #include <ui/gl/ui.hpp>
 
-namespace Light {
+namespace lt {
 
 void glUserInterface::platform_implementation(
     GLFWwindow *windowHandle,
@@ -61,4 +61,4 @@ void glUserInterface::log_debug_data()
 	log_inf("________________________________________");
 }
 
-} // namespace Light
+} // namespace lt

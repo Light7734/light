@@ -7,7 +7,7 @@
 #include <imgui_internal.h>
 #include <mirror/panel/properties.hpp>
 
-namespace Light {
+namespace lt {
 
 void PropertiesPanel::on_user_interface_update()
 {
@@ -48,7 +48,7 @@ void PropertiesPanel::on_user_interface_update()
 			    ))
 			{
 				m_entity_context.add_component<SpriteRendererComponent>(
-				    Light::AssetManager::get_texture("awesomeface")
+				    lt::AssetManager::get_texture("awesomeface")
 				);
 			}
 
@@ -310,4 +310,4 @@ void PropertiesPanel::draw_component(
 	}
 }
 
-} // namespace Light
+} // namespace lt

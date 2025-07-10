@@ -10,7 +10,7 @@ class TextureAsset;
 
 } // namespace Assets
 
-namespace Light {
+namespace lt {
 
 class Shader;
 class Texture;
@@ -75,4 +75,4 @@ private:
 	std::unordered_map<std::string, Ref<Texture>> m_textures;
 };
 
-} // namespace Light
+} // namespace lt

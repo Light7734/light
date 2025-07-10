@@ -2,7 +2,7 @@
 
 
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 
@@ -71,4 +71,4 @@ protected:
 	IndexBuffer() = default;
 };
 
-} // namespace Light
+} // namespace lt

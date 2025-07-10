@@ -8,7 +8,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 auto Framebuffer::create(
     const FramebufferSpecification &specification,
@@ -36,4 +36,4 @@ auto Framebuffer::create(
 	}
 }
 
-} // namespace Light
+} // namespace lt

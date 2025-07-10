@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class glGraphicsContext: public GraphicsContext
 {
@@ -20,4 +20,4 @@ private:
 	void set_debug_message_callback();
 };
 
-} // namespace Light
+} // namespace lt

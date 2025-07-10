@@ -15,7 +15,7 @@
 #include <renderer/renderer.hpp>
 #include <ui/ui.hpp>
 
-namespace Light {
+namespace lt {
 
 Application *Application::s_instance = nullptr;
 
@@ -26,7 +26,7 @@ Application::Application(): m_window(nullptr)
 
 	log_debug_data();
 
-	Light::Instrumentor::begin_session("data/logs/profile_startup.json");
+	lt::Instrumentor::begin_session("data/logs/profile_startup.json");
 
 	m_window = Window::create([this](auto &&PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
 
@@ -194,4 +194,4 @@ void Application::log_debug_data()
 	log_inf("       CWD: {}", std::filesystem::current_path().generic_string());
 }
 
-} // namespace Light
+} // namespace lt

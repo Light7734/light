@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class glRenderCommand: public RenderCommand
 {
@@ -29,4 +29,4 @@ private:
 	GLFWwindow *m_window_handle;
 };
 
-} // namespace Light
+} // namespace lt

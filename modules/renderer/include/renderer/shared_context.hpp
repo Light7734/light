@@ -2,7 +2,7 @@
 
 
 
-namespace Light {
+namespace lt {
 
 class SharedContext
 {
@@ -10,4 +10,4 @@ public:
 	virtual ~SharedContext() = default;
 };
 
-} // namespace Light
+} // namespace lt

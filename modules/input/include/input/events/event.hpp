@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Light {
+namespace lt {
 
 enum class EventType
 {
@@ -37,7 +37,7 @@ enum EventCategory
 #define event_type(type)                      \
 	EventType get_event_type() const override \
 	{                                         \
-		return ::Light::EventType::type;      \
+		return ::lt::EventType::type;      \
 	}
 
 #define event_category(eCategory)                                   \
@@ -65,4 +65,4 @@ public:
 	}
 };
 
-} // namespace Light
+} // namespace lt

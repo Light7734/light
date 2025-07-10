@@ -3,7 +3,7 @@
 
 #include <renderer/blender.hpp>
 
-namespace Light {
+namespace lt {
 
 class glBlender: public Blender
 {
@@ -19,4 +19,4 @@ private:
 	std::unordered_map<BlendFactor, unsigned int> m_factor_map;
 };
 
-} // namespace Light
+} // namespace lt

@@ -3,7 +3,7 @@
 
 #include <engine/scene/entity.hpp>
 
-namespace Light {
+namespace lt {
 
 class NativeScript
 {
@@ -44,4 +44,4 @@ private:
 	unsigned int m_unique_identifier = 0; // :#todo
 };
 
-} // namespace Light
+} // namespace lt

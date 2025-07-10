@@ -1,9 +1,9 @@
 #include <engine/time/timer.hpp>
 
-namespace Light {
+namespace lt {
 
 Timer::Timer(): m_start(std::chrono::steady_clock::now())
 {
 }
 
-} // namespace Light
+} // namespace lt

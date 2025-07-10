@@ -3,7 +3,7 @@
 
 #include <renderer/framebuffer.hpp>
 
-namespace Light {
+namespace lt {
 
 class glFramebuffer: public Framebuffer
 {
@@ -33,4 +33,4 @@ private:
 	unsigned int m_depth_stencil_attachment_id;
 };
 
-} // namespace Light
+} // namespace lt

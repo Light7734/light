@@ -21,7 +21,7 @@ inline ImGuiDockNodeFlags_ operator|(ImGuiDockNodeFlags_ a, ImGuiDockNodeFlags_ 
 	return static_cast<ImGuiDockNodeFlags_>(std::to_underlying(a) | std::to_underlying(b));
 }
 
-namespace Light {
+namespace lt {
 
 UserInterface *UserInterface::s_context = nullptr;
 
@@ -220,4 +220,4 @@ void UserInterface::set_dark_theme_colors()
 	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 }
 
-} // namespace Light
+} // namespace lt

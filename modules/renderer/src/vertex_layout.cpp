@@ -9,7 +9,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 auto VertexLayout::create(
     const Ref<VertexBuffer> &vertexBuffer,
@@ -39,4 +39,4 @@ auto VertexLayout::create(
 	}
 }
 
-} // namespace Light
+} // namespace lt

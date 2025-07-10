@@ -5,7 +5,7 @@
 #include <engine/scene/scene.hpp>
 #include <entt/entt.hpp>
 
-namespace Light {
+namespace lt {
 
 class Entity
 {
@@ -57,4 +57,4 @@ private:
 	Scene *m_scene;
 };
 
-} // namespace Light
+} // namespace lt

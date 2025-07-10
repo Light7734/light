@@ -6,7 +6,7 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
-namespace Light {
+namespace lt {
 
 class Entity;
 class Framebuffer;
@@ -43,4 +43,4 @@ private:
 	) -> Entity;
 };
 
-} // namespace Light
+} // namespace lt

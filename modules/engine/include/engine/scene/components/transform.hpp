@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-namespace Light {
+namespace lt {
 
 struct TransformComponent
 {
@@ -43,4 +43,4 @@ struct TransformComponent
 	glm::vec3 rotation;
 };
 
-} // namespace Light
+} // namespace lt

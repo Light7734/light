@@ -1,7 +1,7 @@
 #include <renderer/dx/buffers.hpp>
 #include <renderer/dx/shared_context.hpp>
 
-namespace Light {
+namespace lt {
 
 //======================================== CONSTANT_BUFFER
 //========================================//
@@ -185,4 +185,4 @@ void dxIndexBuffer::un_bind()
 }
 //======================================== INDEX_BUFFER ========================================//
 
-} // namespace Light
+} // namespace lt

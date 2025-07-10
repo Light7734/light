@@ -4,7 +4,7 @@
 #include <mirror/panel/properties.hpp>
 #include <mirror/panel/scene_hierarchy.hpp>
 
-namespace Light {
+namespace lt {
 
 SceneHierarchyPanel::SceneHierarchyPanel(): m_context(nullptr), m_properties_panel_context(nullptr)
 {
@@ -76,4 +76,4 @@ void SceneHierarchyPanel::draw_node(Entity entity, const std::string &label)
 	}
 }
 
-} // namespace Light
+} // namespace lt

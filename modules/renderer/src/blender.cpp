@@ -8,7 +8,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 auto Blender::create(const Ref<SharedContext> & /*sharedContext*/) -> Scope<Blender>
 {
@@ -30,4 +30,4 @@ auto Blender::create(const Ref<SharedContext> & /*sharedContext*/) -> Scope<Blen
 	}
 }
 
-} // namespace Light
+} // namespace lt

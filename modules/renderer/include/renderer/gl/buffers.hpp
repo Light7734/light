@@ -3,7 +3,7 @@
 
 #include <renderer/buffers.hpp>
 
-namespace Light {
+namespace lt {
 
 class glConstantBuffer: public ConstantBuffer
 {
@@ -58,4 +58,4 @@ private:
 	unsigned int m_buffer_id;
 };
 
-} // namespace Light
+} // namespace lt

@@ -6,7 +6,7 @@
 //
 #include <engine/engine.hpp>
 
-namespace Light {
+namespace lt {
 
 class Mirror: public Application
 {
@@ -32,4 +32,4 @@ auto create_application() -> Scope<Application>
 	return create_scope<Mirror>();
 }
 
-} // namespace Light
+} // namespace lt

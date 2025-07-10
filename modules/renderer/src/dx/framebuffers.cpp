@@ -1,7 +1,7 @@
 #include <renderer/dx/framebuffers.hpp>
 #include <renderer/dx/shared_context.hpp>
 
-namespace Light {
+namespace lt {
 
 dxFramebuffer::dxFramebuffer(
     const FramebufferSpecification &specification,
@@ -106,4 +106,4 @@ void dxFramebuffer::resize(const glm::uvec2 &size)
 	);
 }
 
-} // namespace Light
+} // namespace lt

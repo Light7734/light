@@ -3,7 +3,7 @@
 #include <engine/scene/entity.hpp>
 #include <mirror/panel/panel.hpp>
 
-namespace Light {
+namespace lt {
 
 class PropertiesPanel: public Panel
 {
@@ -29,4 +29,4 @@ private:
 };
 
 
-} // namespace Light
+} // namespace lt

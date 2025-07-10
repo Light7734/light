@@ -4,7 +4,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class Event;
 class SharedContext;
@@ -49,4 +49,4 @@ private:
 	ImGuiWindowFlags m_dockspace_flags;
 };
 
-} // namespace Light
+} // namespace lt

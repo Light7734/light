@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-namespace Light {
+namespace lt {
 
 class Camera
 {
@@ -31,4 +31,4 @@ private:
 	glm::vec4 m_background_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 };
 
-} // namespace Light
+} // namespace lt

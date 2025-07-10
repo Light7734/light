@@ -2,7 +2,7 @@
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 
-namespace Light {
+namespace lt {
 
 glFramebuffer::glFramebuffer(const FramebufferSpecification &specification)
     : m_specification(specification)
@@ -93,4 +93,4 @@ void glFramebuffer::resize(const glm::uvec2 &size)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-} // namespace Light
+} // namespace lt

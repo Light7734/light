@@ -6,7 +6,7 @@
 #include <mirror/panel/properties.hpp>
 #include <mirror/panel/scene_hierarchy.hpp>
 
-namespace Light {
+namespace lt {
 
 class EditorLayer: public Layer
 {
@@ -51,4 +51,4 @@ private:
 	ImVec2 m_available_content_region_prev;
 };
 
-} // namespace Light
+} // namespace lt

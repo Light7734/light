@@ -4,7 +4,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class Event;
 class WindowResizedEvent;
@@ -46,4 +46,4 @@ private:
 	void bind_glfw_events();
 };
 
-} // namespace Light
+} // namespace lt

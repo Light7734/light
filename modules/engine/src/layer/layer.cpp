@@ -5,7 +5,7 @@
 #include <input/events/mouse.hpp>
 #include <input/events/window.hpp>
 
-namespace Light {
+namespace lt {
 
 Layer::Layer(std::string name): m_layer_name(std::move(name))
 {
@@ -44,4 +44,4 @@ auto Layer::on_event(const Event &event) -> bool
 	}
 }
 
-} // namespace Light
+} // namespace lt

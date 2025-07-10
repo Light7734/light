@@ -6,7 +6,7 @@ class TextureAsset;
 
 }
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 
@@ -36,4 +36,4 @@ protected:
 	Texture() = default;
 };
 
-} // namespace Light
+} // namespace lt

@@ -9,7 +9,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 /* static */ auto Shader::create(
     Ref<Assets::TextAsset> vertex_asset,
@@ -42,4 +42,4 @@ namespace Light {
 	}
 }
 
-} // namespace Light
+} // namespace lt

@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class glUserInterface: public UserInterface
 {
@@ -27,4 +27,4 @@ private:
 	GLFWwindow *m_window_handle {};
 };
 
-} // namespace Light
+} // namespace lt

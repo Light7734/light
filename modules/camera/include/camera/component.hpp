@@ -3,7 +3,7 @@
 #include <camera/scene.hpp>
 #include <glm/glm.hpp>
 
-namespace Light {
+namespace lt {
 
 struct CameraComponent
 {
@@ -27,4 +27,4 @@ struct CameraComponent
 	bool isPrimary {};
 };
 
-} // namespace Light
+} // namespace lt

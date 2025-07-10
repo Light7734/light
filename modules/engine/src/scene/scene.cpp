@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <renderer/renderer.hpp>
 
-namespace Light {
+namespace lt {
 
 void Scene::on_create()
 {
@@ -108,4 +108,4 @@ auto Scene::create_entity_with_uuid(
 	return entity;
 }
 
-} // namespace Light
+} // namespace lt

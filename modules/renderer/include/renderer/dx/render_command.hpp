@@ -5,7 +5,7 @@
 #include <renderer/render_command.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -37,4 +37,4 @@ private:
 	void set_resolution(unsigned int width, unsigned int height);
 };
 
-} // namespace Light
+} // namespace lt

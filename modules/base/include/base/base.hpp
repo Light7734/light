@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace Light {
+namespace lt {
 
 // Ref (Ref)
 template<typename t>
@@ -36,7 +36,7 @@ constexpr std::unique_ptr<t> make_scope(t *rawPointer)
 	return std::unique_ptr<t>(rawPointer);
 }
 
-} // namespace Light
+} // namespace lt
 
 #define lt_win(x) // windows
 #define lt_lin(x) // linux

@@ -1,7 +1,7 @@
 #include <renderer/dx/blender.hpp>
 #include <renderer/dx/shared_context.hpp>
 
-namespace Light {
+namespace lt {
 
 dxBlender::dxBlender(Ref<dxSharedContext> sharedContext)
     : m_context(sharedContext), m_factor_map { // constants
@@ -78,4 +78,4 @@ void dxBlender::disable()
 	m_context->get_device_context()->OMSetBlendState(m_blend_state.Get(), nullptr, 0xffffffff);
 }
 
-} // namespace Light
+} // namespace lt

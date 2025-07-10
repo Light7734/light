@@ -3,7 +3,7 @@
 
 #include <renderer/vertex_layout.hpp>
 
-namespace Light {
+namespace lt {
 
 class VertexBuffer;
 
@@ -38,4 +38,4 @@ private:
 	unsigned int m_array_id;
 };
 
-} // namespace Light
+} // namespace lt

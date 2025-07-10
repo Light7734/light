@@ -1,7 +1,7 @@
 #include <renderer/dx/shared_context.hpp>
 #include <renderer/dx/texture.hpp>
 
-namespace Light {
+namespace lt {
 
 dxTexture::dxTexture(
     unsigned int width,
@@ -77,4 +77,4 @@ void dxTexture::bind(unsigned int slot /* = 0u */)
 	    ->PSSetShaderResources(slot, 1u, m_shader_resource_view.GetAddressOf());
 }
 
-} // namespace Light
+} // namespace lt

@@ -5,7 +5,7 @@
 #include <renderer/shader.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -39,4 +39,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3DBlob> m_vertex_blob;
 };
 
-} // namespace Light
+} // namespace lt

@@ -10,7 +10,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 auto ConstantBuffer::create(
     ConstantBufferIndex index,
@@ -95,4 +95,4 @@ auto IndexBuffer::create(
 	}
 }
 
-} // namespace Light
+} // namespace lt

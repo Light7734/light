@@ -9,7 +9,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 /* static */ auto Texture::create(
     Ref<Assets::TextureAsset> asset,
@@ -40,4 +40,4 @@ namespace Light {
 	}
 }
 
-} // namespace Light
+} // namespace lt

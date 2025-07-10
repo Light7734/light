@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <mirror/panel/panel.hpp>
 
-namespace Light {
+namespace lt {
 
 class AssetBrowserPanel: public Panel
 {
@@ -42,4 +42,4 @@ private:
 	Ref<Texture> m_text_texture;
 };
 
-} // namespace Light
+} // namespace lt

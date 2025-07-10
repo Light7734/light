@@ -2,7 +2,7 @@
 
 #include <renderer/texture.hpp>
 
-namespace Light {
+namespace lt {
 
 class glTexture: public Texture
 {
@@ -23,4 +23,4 @@ private:
 	uint32_t m_texture_id {};
 };
 
-} // namespace Light
+} // namespace lt

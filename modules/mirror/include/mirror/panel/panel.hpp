@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Light {
+namespace lt {
 
 class Panel
 {
@@ -10,4 +10,4 @@ public:
 	virtual ~Panel() = default;
 };
 
-} // namespace Light
+} // namespace lt

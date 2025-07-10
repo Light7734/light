@@ -2,7 +2,7 @@
 
 
 
-namespace Light {
+namespace lt {
 
 class Event;
 
@@ -115,4 +115,4 @@ protected:
 	}
 };
 
-} // namespace Light
+} // namespace lt

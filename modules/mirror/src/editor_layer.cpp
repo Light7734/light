@@ -5,7 +5,7 @@
 #include <mirror/editor_layer.hpp>
 #include <ui/ui.hpp>
 
-namespace Light {
+namespace lt {
 
 EditorLayer::EditorLayer(const std::string &name)
     : Layer(name)
@@ -148,4 +148,4 @@ void EditorLayer::on_user_interface_update()
 	UserInterface::dockspace_end();
 }
 
-} // namespace Light
+} // namespace lt

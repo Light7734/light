@@ -2,7 +2,7 @@
 
 
 
-namespace Light {
+namespace lt {
 
 class Layer;
 class Event;
@@ -67,4 +67,4 @@ private:
 	void detach_layer_impl(const Ref<Layer> &layer);
 };
 
-} // namespace Light
+} // namespace lt

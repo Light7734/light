@@ -4,7 +4,7 @@
 #include <renderer/shader.hpp>
 #include <renderer/vertex_layout.hpp>
 
-namespace Light {
+namespace lt {
 
 TintedTextureRendererProgram::TintedTextureRendererProgram(
     unsigned int max_vertices,
@@ -70,4 +70,4 @@ void TintedTextureRendererProgram::bind()
 	m_index_buffer->bind();
 }
 
-} // namespace Light
+} // namespace lt

@@ -7,7 +7,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class dxGraphicsContext: public GraphicsContext
 {
@@ -28,4 +28,4 @@ private:
 	void setup_debug_interface();
 };
 
-} // namespace Light
+} // namespace lt

@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <utility>
 
-namespace Light {
+namespace lt {
 
 class Texture;
 
@@ -33,4 +33,4 @@ struct SpriteRendererComponent
 	glm::vec4 tint {};
 };
 
-} // namespace Light
+} // namespace lt

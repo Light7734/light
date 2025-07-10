@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 
@@ -37,4 +37,4 @@ protected:
 	Framebuffer() = default;
 };
 
-} // namespace Light
+} // namespace lt

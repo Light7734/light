@@ -1,6 +1,6 @@
 #include <engine/debug/instrumentor.hpp>
 
-namespace Light {
+namespace lt {
 
 void Instrumentor::begin_session_impl(const std::string &outputPath)
 {
@@ -67,4 +67,4 @@ InstrumentorTimer::~InstrumentorTimer()
 	Instrumentor::submit_scope_profile(m_result);
 }
 
-} // namespace Light
+} // namespace lt

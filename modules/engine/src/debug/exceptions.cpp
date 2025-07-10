@@ -5,7 +5,7 @@
 	#include <Windows.h>
 #endif
 
-namespace Light {
+namespace lt {
 
 FailedAssertion::FailedAssertion(const char *file, int line)
 {
@@ -55,4 +55,4 @@ dxException::dxException(long hr, const char *file, int line)
 }
 #endif
 
-} // namespace Light
+} // namespace lt

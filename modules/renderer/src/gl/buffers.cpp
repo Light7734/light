@@ -3,7 +3,7 @@
 #include <logger/logger.hpp>
 #include <renderer/gl/buffers.hpp>
 
-namespace Light {
+namespace lt {
 
 //==================== CONSTANT_BUFFER ====================//
 glConstantBuffer::glConstantBuffer(ConstantBufferIndex index, unsigned int size)
@@ -136,4 +136,4 @@ void glIndexBuffer::un_bind()
 }
 //==================== INDEX_BUFFER ====================//
 
-} // namespace Light
+} // namespace lt

@@ -9,7 +9,7 @@
 #include <glfw/glfw3native.h>
 #include <imgui.h>
 
-namespace Light {
+namespace lt {
 
 void dxUserInterface::platform_implementation(
     GLFWwindow *windowHandle,
@@ -63,4 +63,4 @@ void dxUserInterface::log_debug_data()
 	log_inf("________________________________________");
 }
 
-} // namespace Light
+} // namespace lt

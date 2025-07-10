@@ -5,7 +5,7 @@
 #include <renderer/vertex_layout.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class Shader;
 class dxSharedContext;
@@ -33,4 +33,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_input_layout;
 };
 
-} // namespace Light
+} // namespace lt

@@ -5,7 +5,7 @@
 #include <renderer/texture.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -33,4 +33,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler_state;
 };
 
-} // namespace Light
+} // namespace lt

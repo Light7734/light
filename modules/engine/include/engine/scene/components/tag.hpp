@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace Light {
+namespace lt {
 
 struct TagComponent
 {
@@ -28,4 +28,4 @@ struct TagComponent
 	std::string tag = "Unnamed";
 };
 
-} // namespace Light
+} // namespace lt

@@ -2,7 +2,7 @@
 
 #include <random>
 
-namespace Light {
+namespace lt {
 
 class UUID
 {
@@ -22,14 +22,14 @@ private:
 	uint64_t m_uuid;
 };
 
-} // namespace Light
+} // namespace lt
 
 namespace std {
 
 template<>
-struct hash<Light::UUID>
+struct hash<lt::UUID>
 {
-	std::size_t operator()(const Light::UUID &uuid) const
+	std::size_t operator()(const lt::UUID &uuid) const
 	{
 		return hash<uint64_t>()(static_cast<uint64_t>(uuid));
 	}

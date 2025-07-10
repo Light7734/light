@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include <mirror/panel/asset_browser.hpp>
 
-namespace Light {
+namespace lt {
 
 AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> active_scene)
     : m_current_directory("./data/assets")
@@ -162,4 +162,4 @@ void AssetBrowserPanel::on_user_interface_update()
 	ImGui::End();
 }
 
-} // namespace Light
+} // namespace lt

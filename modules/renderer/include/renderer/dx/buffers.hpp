@@ -5,7 +5,7 @@
 #include <renderer/buffers.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -81,4 +81,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
 };
 
-} // namespace Light
+} // namespace lt

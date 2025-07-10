@@ -3,7 +3,7 @@
 
 #include <engine/core/uuid.hpp>
 
-namespace Light {
+namespace lt {
 
 struct UUIDComponent
 {
@@ -16,4 +16,4 @@ struct UUIDComponent
 	UUID uuid;
 };
 
-} // namespace Light
+} // namespace lt

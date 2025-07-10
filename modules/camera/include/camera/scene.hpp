@@ -2,7 +2,7 @@
 
 #include <camera/camera.hpp>
 
-namespace Light {
+namespace lt {
 
 class SceneCamera: public Camera
 {
@@ -97,4 +97,4 @@ private:
 	void calculate_projection();
 };
 
-} // namespace Light
+} // namespace lt

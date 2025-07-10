@@ -4,7 +4,7 @@
 #include <renderer/blender.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -27,4 +27,4 @@ private:
 	D3D11_BLEND_DESC m_desc;
 };
 
-} // namespace Light
+} // namespace lt

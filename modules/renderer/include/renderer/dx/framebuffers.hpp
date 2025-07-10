@@ -5,7 +5,7 @@
 #include <renderer/framebuffer.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -44,4 +44,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depth_stencil_view;
 };
 
-} // namespace Light
+} // namespace lt

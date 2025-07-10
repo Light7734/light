@@ -4,7 +4,7 @@
 #include <renderer/shader.hpp>
 #include <renderer/vertex_layout.hpp>
 
-namespace Light {
+namespace lt {
 
 QuadRendererProgram::QuadRendererProgram(
     unsigned int max_vertices,
@@ -68,4 +68,4 @@ void QuadRendererProgram::bind()
 	m_index_buffer->bind();
 }
 
-} // namespace Light
+} // namespace lt

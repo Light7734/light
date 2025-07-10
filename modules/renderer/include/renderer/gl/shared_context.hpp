@@ -3,10 +3,10 @@
 
 #include <renderer/shared_context.hpp>
 
-namespace Light {
+namespace lt {
 
 class glSharedContext: public SharedContext
 {
 };
 
-} // namespace Light
+} // namespace lt

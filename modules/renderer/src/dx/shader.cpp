@@ -2,7 +2,7 @@
 #include <renderer/dx/shader.hpp>
 #include <renderer/dx/shared_context.hpp>
 
-namespace Light {
+namespace lt {
 
 dxShader::dxShader(
     BasicFileHandle vertexFile,
@@ -81,4 +81,4 @@ void dxShader::un_bind()
 	m_context->get_device_context()->PSSetShader(nullptr, nullptr, 0u);
 }
 
-} // namespace Light
+} // namespace lt

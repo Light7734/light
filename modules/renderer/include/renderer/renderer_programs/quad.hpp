@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <renderer/renderer_programs/renderer_program.hpp>
 
-namespace Light {
+namespace lt {
 
 class Shader;
 class VertexBuffer;
@@ -71,4 +71,4 @@ private:
 	unsigned int m_max_vertices = 0u;
 };
 
-} // namespace Light
+} // namespace lt

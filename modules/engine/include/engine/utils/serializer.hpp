@@ -5,7 +5,7 @@
 #include <engine/scene/scene.hpp>
 #include <yaml-cpp/yaml.h>
 
-namespace Light {
+namespace lt {
 
 class SceneSerializer
 {
@@ -27,4 +27,4 @@ private:
 };
 
 
-} // namespace Light
+} // namespace lt

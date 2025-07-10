@@ -7,7 +7,7 @@
 #include <input/events/window.hpp>
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 auto Window::create(const std::function<void(Event &)> &callback) -> Scope<Window>
 {
@@ -222,4 +222,4 @@ void lWindow::bind_glfw_events()
 	});
 }
 
-} // namespace Light
+} // namespace lt

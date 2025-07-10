@@ -2,7 +2,7 @@
 
 
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 
@@ -48,4 +48,4 @@ protected:
 	Blender() = default;
 };
 
-} // namespace Light
+} // namespace lt

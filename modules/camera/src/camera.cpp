@@ -1,6 +1,6 @@
 #include <camera/camera.hpp>
 
-namespace Light {
+namespace lt {
 
 
 }

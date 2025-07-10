@@ -5,7 +5,7 @@
 #include <renderer/shared_context.hpp>
 #include <wrl.h>
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext: public SharedContext
 {
@@ -60,4 +60,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_render_target_view = nullptr;
 };
 
-} // namespace Light
+} // namespace lt

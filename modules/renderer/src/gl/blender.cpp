@@ -1,7 +1,7 @@
 #include <renderer/gl/blender.hpp>
 #include <glad/gl.h>
 
-namespace Light {
+namespace lt {
 
 glBlender::glBlender()
     : m_factor_map { // constants
@@ -43,4 +43,4 @@ void glBlender::disable()
 	glDisable(GL_BLEND);
 }
 
-} // namespace Light
+} // namespace lt

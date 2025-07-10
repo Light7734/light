@@ -9,7 +9,7 @@
 
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 auto RenderCommand::create(GLFWwindow *windowHandle, const Ref<SharedContext> & /*sharedContext*/)
     -> Scope<RenderCommand>
@@ -33,4 +33,4 @@ auto RenderCommand::create(GLFWwindow *windowHandle, const Ref<SharedContext> & 
 	}
 }
 
-} // namespace Light
+} // namespace lt

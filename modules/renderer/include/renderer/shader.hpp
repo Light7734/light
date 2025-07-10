@@ -8,7 +8,7 @@ class TextAsset;
 
 } // namespace Assets
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 
@@ -40,4 +40,4 @@ protected:
 	Shader() = default;
 };
 
-} // namespace Light
+} // namespace lt

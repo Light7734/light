@@ -3,7 +3,7 @@
 #include <array>
 #include <glm/glm.hpp>
 
-namespace Light {
+namespace lt {
 
 class Event;
 
@@ -77,4 +77,4 @@ private:
 	bool m_game_events { true };
 };
 
-} // namespace Light
+} // namespace lt

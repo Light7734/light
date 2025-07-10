@@ -1,7 +1,7 @@
 #include <camera/scene.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Light {
+namespace lt {
 
 SceneCamera::SceneCamera()
     : m_orthographic_specification { .size = 1000.0f, .near_plane = -1.0f, .far_plane = 10000.0f }
@@ -86,4 +86,4 @@ void SceneCamera::calculate_projection()
 	}
 }
 
-} // namespace Light
+} // namespace lt

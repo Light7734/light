@@ -11,7 +11,7 @@
 #include <glfw/glfw3.h>
 #include <glfw/glfw3native.h>
 
-namespace Light {
+namespace lt {
 
 dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
     : m_window_handle(windowHandle)
@@ -161,4 +161,4 @@ void dxGraphicsContext::log_debug_data()
 	log_inf("________________________________________");
 }
 
-} // namespace Light
+} // namespace lt

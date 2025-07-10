@@ -4,7 +4,7 @@
 	#include <GLFW/glfw3.h>
 #endif
 
-namespace Light {
+namespace lt {
 
 glRenderCommand::glRenderCommand(GLFWwindow *windowHandle): m_window_handle(windowHandle)
 {
@@ -46,4 +46,4 @@ void glRenderCommand::set_viewport(
 	glViewport(x, y, width, height);
 }
 
-} // namespace Light
+} // namespace lt

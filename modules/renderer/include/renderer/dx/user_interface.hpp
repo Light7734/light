@@ -6,7 +6,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class dxSharedContext;
 
@@ -27,4 +27,4 @@ public:
 	void log_debug_data() override;
 };
 
-} // namespace Light
+} // namespace lt

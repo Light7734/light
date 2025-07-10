@@ -13,7 +13,7 @@
 #include <renderer/texture.hpp>
 #include <utility>
 
-namespace Light {
+namespace lt {
 
 Renderer *Renderer::s_context = nullptr;
 
@@ -334,4 +334,4 @@ void Renderer::end_scene_impl()
 	}
 }
 
-} // namespace Light
+} // namespace lt

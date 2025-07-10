@@ -2,7 +2,7 @@
 
 #include <renderer/shader.hpp>
 
-namespace Light {
+namespace lt {
 
 class glShader: public Shader
 {
@@ -21,4 +21,4 @@ private:
 	unsigned int m_shader_id { 0u };
 };
 
-} // namespace Light
+} // namespace lt

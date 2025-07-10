@@ -18,7 +18,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class ConstantBuffer;
 class Framebuffer;
@@ -157,4 +157,4 @@ private:
 	void end_scene_impl();
 };
 
-} // namespace Light
+} // namespace lt

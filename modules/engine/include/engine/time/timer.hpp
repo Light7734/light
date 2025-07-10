@@ -3,7 +3,7 @@
 #include <chrono>
 
 
-namespace Light {
+namespace lt {
 
 class Timer
 {
@@ -29,4 +29,4 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> m_start;
 };
 
-} // namespace Light
+} // namespace lt

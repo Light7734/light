@@ -3,7 +3,7 @@
 #include <glad/gl.h>
 #include <renderer/gl/texture.hpp>
 
-namespace Light {
+namespace lt {
 
 glTexture::glTexture(const Ref<Assets::TextureAsset> &asset)
 {
@@ -79,4 +79,4 @@ auto glTexture::get_texture() -> void *
 	return {};
 }
 
-} // namespace Light
+} // namespace lt

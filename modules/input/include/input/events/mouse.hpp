@@ -4,7 +4,7 @@
 #include <input/events/event.hpp>
 #include <sstream>
 
-namespace Light {
+namespace lt {
 
 class MouseMovedEvent: public Event
 {
@@ -124,4 +124,4 @@ private:
 	const int m_button;
 };
 
-} // namespace Light
+} // namespace lt

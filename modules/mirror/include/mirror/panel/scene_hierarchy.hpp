@@ -5,7 +5,7 @@
 #include <engine/scene/scene.hpp>
 #include <mirror/panel/panel.hpp>
 
-namespace Light {
+namespace lt {
 
 class PropertiesPanel;
 
@@ -30,4 +30,4 @@ private:
 	Entity m_selection_context;
 };
 
-} // namespace Light
+} // namespace lt

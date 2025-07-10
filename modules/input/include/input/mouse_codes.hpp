@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Light::Mouse {
+namespace lt::Mouse {
 
 enum : uint8_t
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Light {
+namespace lt {
 
 class RendererProgram
 {
@@ -14,4 +14,4 @@ public:
 	virtual ~RendererProgram() = default;
 };
 
-} // namespace Light
+} // namespace lt

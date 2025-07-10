@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-namespace Light {
+namespace lt {
 
 struct ScopeProfileResult
 {
@@ -63,7 +63,7 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> m_start;
 };
 
-} // namespace Light
+} // namespace lt
 
 /* scope */
 #define lt_profile_scope(name)                        lt_profile_scope_no_redifinition(name, __LINE__)
@@ -74,5 +74,5 @@ private:
 #define LT_PROFILE_FUNCTION lt_profile_scope(__FUNCSIG__)
 
 /* session */
-#define lt_profile_begin_session(outputPath) ::Light::Instrumentor::begin_session(outputPath)
-#define lt_profile_end_session()             ::Light::Instrumentor::end_session()
+#define lt_profile_begin_session(outputPath) ::lt::Instrumentor::begin_session(outputPath)
+#define lt_profile_end_session()             ::lt::Instrumentor::end_session()

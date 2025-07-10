@@ -4,7 +4,7 @@
 #include <input/events/event.hpp>
 #include <sstream>
 
-namespace Light {
+namespace lt {
 
 class WindowClosedEvent: public Event
 {
@@ -100,4 +100,4 @@ public:
 	event_category(WindowEventCategory);
 };
 
-} // namespace Light
+} // namespace lt

@@ -3,7 +3,7 @@
 #include <input/events/event.hpp>
 #include <sstream>
 
-namespace Light {
+namespace lt {
 
 class SetCharEvent: public Event
 {
@@ -32,4 +32,4 @@ private:
 	const unsigned int m_character;
 };
 
-} // namespace Light
+} // namespace lt

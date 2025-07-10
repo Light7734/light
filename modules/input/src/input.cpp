@@ -7,7 +7,7 @@
 #include <input/key_codes.hpp>
 #include <logger/logger.hpp>
 
-namespace Light {
+namespace lt {
 
 Input::Input(): m_mouse_position {}, m_mouse_delta {}
 
@@ -161,4 +161,4 @@ void Input::on_event(const Event &inputEvent)
 	}
 }
 
-} // namespace Light
+} // namespace lt

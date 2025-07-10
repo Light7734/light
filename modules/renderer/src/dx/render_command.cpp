@@ -1,7 +1,7 @@
 #include <renderer/dx/render_command.hpp>
 #include <renderer/dx/shared_context.hpp>
 
-namespace Light {
+namespace lt {
 
 dxRenderCommand::dxRenderCommand(Ref<dxSharedContext> sharedContext): m_context(sharedContext)
 {
@@ -102,4 +102,4 @@ void dxRenderCommand::set_resolution(unsigned int width, unsigned int height)
 	    ->OMSetRenderTargets(1u, m_context->get_render_target_view().GetAddressOf(), nullptr);
 }
 
-} // namespace Light
+} // namespace lt

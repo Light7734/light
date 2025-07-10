@@ -2,7 +2,7 @@
 
 #include <debug/assertions.hpp>
 
-namespace Light {
+namespace lt {
 
 class VertexBuffer;
 class Shader;
@@ -50,4 +50,4 @@ protected:
 	VertexLayout() = default;
 };
 
-} // namespace Light
+} // namespace lt

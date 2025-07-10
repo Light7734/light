@@ -6,7 +6,7 @@
 #include <renderer/shader.hpp>
 #include <renderer/texture.hpp>
 
-namespace Light {
+namespace lt {
 
 /* static */ auto AssetManager::instance() -> AssetManager &
 {
@@ -89,4 +89,4 @@ auto AssetManager::get_or_load_texture_asset(const std::filesystem::path &path)
 }
 
 
-} // namespace Light
+} // namespace lt

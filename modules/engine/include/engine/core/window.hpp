@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <renderer/graphics_context.hpp>
 
-namespace Light {
+namespace lt {
 
 class Event;
 
@@ -93,4 +93,4 @@ protected:
 	bool b_Closed { false };
 };
 
-} // namespace Light
+} // namespace lt

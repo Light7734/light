@@ -2,7 +2,7 @@
 
 #include <logger/logger.hpp>
 
-namespace Light {
+namespace lt {
 
 struct FailedAssertion: std::exception
 {
@@ -20,8 +20,8 @@ struct glException: std::exception
 		if (!(x))                                               \
 		{                                                       \
 			log_crt(__VA_ARGS__);                               \
-			throw ::Light::FailedAssertion(__FILE__, __LINE__); \
+			throw ::lt::FailedAssertion(__FILE__, __LINE__); \
 		}                                                       \
 	}
 
-} // namespace Light
+} // namespace lt

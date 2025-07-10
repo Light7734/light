@@ -2,7 +2,7 @@
 #include <renderer/dx/shared_context.hpp>
 #include <renderer/dx/vertex_layout.hpp>
 
-namespace Light {
+namespace lt {
 
 dxVertexLayout::dxVertexLayout(
     Ref<Shader> shader,
@@ -61,35 +61,35 @@ auto dxVertexLayout::get_dxgi_format(VertexElementType type) -> DXGI_FORMAT
 	switch (type)
 	{
 	/* byte */
-	case Light::VertexElementType::Byte1: return DXGI_FORMAT_R8_SINT;
-	case Light::VertexElementType::Byte2: return DXGI_FORMAT_R8G8_SINT;
-	case Light::VertexElementType::Byte4: return DXGI_FORMAT_R8_SINT;
+	case lt::VertexElementType::Byte1: return DXGI_FORMAT_R8_SINT;
+	case lt::VertexElementType::Byte2: return DXGI_FORMAT_R8G8_SINT;
+	case lt::VertexElementType::Byte4: return DXGI_FORMAT_R8_SINT;
 
 	/* ubyte */
-	case Light::VertexElementType::UByte1: return DXGI_FORMAT_R8_UINT;
-	case Light::VertexElementType::UByte2: return DXGI_FORMAT_R8G8_UINT;
-	case Light::VertexElementType::UByte4: return DXGI_FORMAT_R8G8B8A8_UINT;
+	case lt::VertexElementType::UByte1: return DXGI_FORMAT_R8_UINT;
+	case lt::VertexElementType::UByte2: return DXGI_FORMAT_R8G8_UINT;
+	case lt::VertexElementType::UByte4: return DXGI_FORMAT_R8G8B8A8_UINT;
 
 	/* int */
-	case Light::VertexElementType::Int1: return DXGI_FORMAT_R32_SINT;
-	case Light::VertexElementType::Int2: return DXGI_FORMAT_R32G32_SINT;
-	case Light::VertexElementType::Int3: return DXGI_FORMAT_R32G32B32_SINT;
-	case Light::VertexElementType::Int4: return DXGI_FORMAT_R32G32B32A32_SINT;
+	case lt::VertexElementType::Int1: return DXGI_FORMAT_R32_SINT;
+	case lt::VertexElementType::Int2: return DXGI_FORMAT_R32G32_SINT;
+	case lt::VertexElementType::Int3: return DXGI_FORMAT_R32G32B32_SINT;
+	case lt::VertexElementType::Int4: return DXGI_FORMAT_R32G32B32A32_SINT;
 
 	/* uint */
-	case Light::VertexElementType::UInt1: return DXGI_FORMAT_R32_UINT;
-	case Light::VertexElementType::UInt2: return DXGI_FORMAT_R32G32_UINT;
-	case Light::VertexElementType::UInt3: return DXGI_FORMAT_R32G32B32_UINT;
-	case Light::VertexElementType::UInt4: return DXGI_FORMAT_R32G32B32A32_UINT;
+	case lt::VertexElementType::UInt1: return DXGI_FORMAT_R32_UINT;
+	case lt::VertexElementType::UInt2: return DXGI_FORMAT_R32G32_UINT;
+	case lt::VertexElementType::UInt3: return DXGI_FORMAT_R32G32B32_UINT;
+	case lt::VertexElementType::UInt4: return DXGI_FORMAT_R32G32B32A32_UINT;
 
 	/* float */
-	case Light::VertexElementType::Float1: return DXGI_FORMAT_R32_FLOAT;
-	case Light::VertexElementType::Float2: return DXGI_FORMAT_R32G32_FLOAT;
-	case Light::VertexElementType::Float3: return DXGI_FORMAT_R32G32B32_FLOAT;
-	case Light::VertexElementType::Float4: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	case lt::VertexElementType::Float1: return DXGI_FORMAT_R32_FLOAT;
+	case lt::VertexElementType::Float2: return DXGI_FORMAT_R32G32_FLOAT;
+	case lt::VertexElementType::Float3: return DXGI_FORMAT_R32G32B32_FLOAT;
+	case lt::VertexElementType::Float4: return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
 	default: lt_assert(false, "Invalid 'VertexElementType'"); return DXGI_FORMAT_UNKNOWN;
 	}
 }
 
-} // namespace Light
+} // namespace lt

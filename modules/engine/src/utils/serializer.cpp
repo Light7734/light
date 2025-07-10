@@ -61,7 +61,7 @@ struct convert<glm::vec4>
 };
 } // namespace YAML
 
-namespace Light {
+namespace lt {
 
 auto operator<<(YAML::Emitter &out, const glm::vec3 &v) -> YAML::Emitter &
 {
@@ -319,4 +319,4 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 	out << YAML::EndMap; // entity
 }
 
-} // namespace Light
+} // namespace lt

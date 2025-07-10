@@ -3,7 +3,7 @@
 
 #include <engine/scene/components/scriptable_entity.hpp>
 
-namespace Light {
+namespace lt {
 
 struct NativeScriptComponent
 {
@@ -26,4 +26,4 @@ struct NativeScriptComponent
 	NativeScript *instance;
 };
 
-} // namespace Light
+} // namespace lt

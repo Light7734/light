@@ -5,7 +5,7 @@
 #include <glm/matrix.hpp>
 #include <renderer/gl/shader.hpp>
 
-namespace Light {
+namespace lt {
 
 glShader::glShader(
     const Ref<Assets::TextAsset> &vertex_asset,
@@ -112,4 +112,4 @@ auto glShader::compile_shader(const std::string &source, Shader::Stage stage) ->
 	return shader;
 }
 
-} // namespace Light
+} // namespace lt

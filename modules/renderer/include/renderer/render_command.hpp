@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 
@@ -42,4 +42,4 @@ protected:
 	RenderCommand() = default;
 };
 
-} // namespace Light
+} // namespace lt

@@ -2,7 +2,7 @@
 
 struct GLFWwindow;
 
-namespace Light {
+namespace lt {
 
 class SharedContext;
 class WindowResizedEvent;
@@ -54,4 +54,4 @@ private:
 	static GraphicsContext *s_context;
 };
 
-} // namespace Light
+} // namespace lt

@@ -14,7 +14,7 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;   // AMD
 }
 
-namespace Light {
+namespace lt {
 
 Scope<Window> Window::create(std::function<void(Event &)> callback)
 {
@@ -241,4 +241,4 @@ void wWindow::bind_glfw_events()
 	});
 	//============================== WINDOW_EVENTS ==============================//	}
 }
-} // namespace Light
+} // namespace lt

@@ -3,7 +3,7 @@
 #include <input/events/event.hpp>
 #include <sstream>
 
-namespace Light {
+namespace lt {
 
 class KeyPressedEvent: public Event
 {
@@ -86,4 +86,4 @@ private:
 	const int m_key;
 };
 
-} // namespace Light
+} // namespace lt

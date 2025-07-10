@@ -4,7 +4,7 @@
 #include <engine/layer/layer_stack.hpp>
 #include <input/input.hpp>
 
-namespace Light {
+namespace lt {
 
 class Renderer;
 class Window;
@@ -56,4 +56,4 @@ private:
 };
 
 
-} // namespace Light
+} // namespace lt

@@ -5,7 +5,7 @@
 #include <input/events/mouse.hpp>
 #include <input/events/window.hpp>
 
-namespace Light {
+namespace lt {
 
 void LayerStack::attach_layer_impl(Ref<Layer> layer)
 {
@@ -19,4 +19,4 @@ void LayerStack::detach_layer_impl(const Ref<Layer> &layer)
 	m_layers.erase(std::find(m_layers.begin(), m_layers.end(), layer));
 }
 
-} // namespace Light
+} // namespace lt

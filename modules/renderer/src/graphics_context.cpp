@@ -6,7 +6,7 @@
 	#include <renderer/dx/shared_context.hpp>
 #endif
 
-namespace Light {
+namespace lt {
 
 GraphicsContext *GraphicsContext::s_context = nullptr;
 
@@ -54,4 +54,4 @@ auto GraphicsContext::create(GraphicsAPI api, GLFWwindow *window_handle) -> Scop
 	return std::move(scope_gfx);
 }
 
-} // namespace Light
+} // namespace lt
