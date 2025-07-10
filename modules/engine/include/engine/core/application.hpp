@@ -1,9 +1,6 @@
 #pragma once
 
-#include <engine/layer/layer_stack.hpp>
 #include <engine/time/timer.hpp>
-#include <input/input.hpp>
-#include <ui/ui.hpp>
 
 namespace lt {
 
@@ -11,6 +8,8 @@ class Renderer;
 class Window;
 class Event;
 class GraphicsContext;
+class UserInterface;
+class LayerStack;
 
 extern Scope<class Application> create_application();
 
@@ -25,7 +24,7 @@ public:
 
 	auto operator=(Application &&) -> Application & = delete;
 
-	virtual ~Application() = default;
+	virtual ~Application();
 
 	[[nodiscard]] auto sanity_check() const -> bool;
 

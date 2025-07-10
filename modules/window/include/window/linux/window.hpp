@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include <engine/core/window.hpp>
+#include <window/window.hpp>
 
 struct GLFWwindow;
 
@@ -10,12 +9,12 @@ namespace lt {
 class Event;
 class WindowResizedEvent;
 
-class wWindow: public Window
+class lWindow: public Window
 {
 public:
-	wWindow(std::function<void(Event &)> callback);
+	lWindow(std::function<void(Event &)> callback);
 
-	~wWindow();
+	~lWindow() override;
 
 	void poll_events() override;
 
@@ -32,8 +31,13 @@ public:
 
 	void set_visibility(bool visible, bool toggle = false) override;
 
+	[[nodiscard]] auto get_handle() -> void * override
+	{
+		return m_handle;
+	}
+
 private:
-	GLFWwindow *m_handle;
+	GLFWwindow *m_handle { nullptr };
 
 	std::function<void(Event &)> m_event_callback;
 

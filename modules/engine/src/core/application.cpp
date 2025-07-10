@@ -1,18 +1,20 @@
 #include <asset_manager/asset_manager.hpp>
 #include <debug/assertions.hpp>
 #include <engine/core/application.hpp>
-#include <engine/core/window.hpp>
 #include <engine/layer/layer.hpp>
+#include <engine/layer/layer_stack.hpp>
 #include <engine/time/timer.hpp>
 #include <input/events/event.hpp>
 #include <input/events/keyboard.hpp>
 #include <input/events/window.hpp>
+#include <input/input.hpp>
 #include <ranges>
 #include <renderer/blender.hpp>
 #include <renderer/graphics_context.hpp>
 #include <renderer/render_command.hpp>
 #include <renderer/renderer.hpp>
 #include <ui/ui.hpp>
+#include <window/linux/window.hpp>
 
 namespace lt {
 
@@ -68,6 +70,13 @@ Application::Application(): m_window(nullptr)
 	);
 
 	m_layer_stack = create_scope<LayerStack>();
+}
+
+Application::~Application()
+{
+	/** This is required to make forward-declarations possible:
+	 * https://stackoverflow.com/questions/34072862/why-is-error-invalid-application-of-sizeof-to-an-incomplete-type-using-uniqu
+	 */
 }
 
 void Application::game_loop()

@@ -2,6 +2,7 @@
 
 //
 #include <mirror/editor_layer.hpp>
+#include <window/window.hpp>
 
 //
 #include <engine/engine.hpp>

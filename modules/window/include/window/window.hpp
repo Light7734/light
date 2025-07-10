@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include <glm/glm.hpp>
-#include <renderer/graphics_context.hpp>
 
 namespace lt {
 
@@ -22,15 +20,13 @@ class Window
 public:
 	static Scope<Window> create(const std::function<void(Event &)> &callback);
 
-	Window(): m_properties {}
-	{
-	}
+	Window() = default;
 
 	Window(const Window &) = delete;
 
 	Window &operator=(const Window &) = delete;
 
-	virtual ~Window() = default;
+	virtual ~Window();
 
 	virtual void poll_events() = 0;
 
@@ -88,9 +84,9 @@ public:
 	virtual auto get_handle() -> void * = 0;
 
 protected:
-	WindowProperties m_properties;
+	WindowProperties m_properties {};
 
-	bool b_Closed { false };
+	bool b_Closed {};
 };
 
 } // namespace lt

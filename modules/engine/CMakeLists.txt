@@ -5,7 +5,6 @@ if(NOT WIN32)
         debug/instrumentor.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
-        os/linux/l_window.cpp
         time/timer.cpp
         utils/serializer.cpp
     )
@@ -16,24 +15,25 @@ else()
         debug/instrumentor.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
-        os/windows/w_window.cpp
         time/timer.cpp
         utils/serializer.cpp
     )
 endif()
 
-target_link_libraries(
-  engine
-  PUBLIC renderer
-  PUBLIC glad
-  PUBLIC logger
-  PUBLIC opengl::opengl
-  PUBLIC glfw
-  PUBLIC ui
-  PUBLIC asset_parser
-  PUBLIC asset_manager
-  PUBLIC yaml-cpp::yaml-cpp
-  PUBLIC EnTT::EnTT
-  PUBLIC lt_debug 
-  PUBLIC ecs 
+target_link_libraries(engine 
+PUBLIC 
+    renderer
+    logger
+    ui
+    asset_parser
+    asset_manager
+    lt_debug 
+    ecs 
+    window
+
+    glad
+
+    opengl::opengl
+    yaml-cpp::yaml-cpp
+    EnTT::EnTT
 )

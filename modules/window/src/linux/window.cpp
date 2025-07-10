@@ -1,13 +1,16 @@
 #include <GLFW/glfw3.h>
-#include <engine/os/linux/l_window.hpp>
 #include <input/events/char.hpp>
 #include <input/events/event.hpp>
 #include <input/events/keyboard.hpp>
 #include <input/events/mouse.hpp>
 #include <input/events/window.hpp>
-#include <renderer/graphics_context.hpp>
+#include <window/linux/window.hpp>
 
 namespace lt {
+
+Window::~Window()
+{
+}
 
 auto Window::create(const std::function<void(Event &)> &callback) -> Scope<Window>
 {
@@ -29,7 +32,6 @@ lWindow::lWindow(std::function<void(Event &)> callback)
 	m_handle = glfwCreateWindow(1u, 1u, "", nullptr, nullptr);
 	lt_assert(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
 
-	// bind event stuff
 	glfwSetWindowUserPointer(m_handle, &m_event_callback);
 	bind_glfw_events();
 }

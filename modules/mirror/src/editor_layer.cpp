@@ -3,6 +3,7 @@
 #include <ecs/components.hpp>
 #include <ecs/scene.hpp>
 #include <engine/utils/serializer.hpp>
+#include <input/input.hpp>
 #include <input/key_codes.hpp>
 #include <mirror/editor_layer.hpp>
 #include <ui/ui.hpp>
