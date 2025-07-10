@@ -1,4 +1,5 @@
 #include <asset_manager/asset_manager.hpp>
+#include <ecs/scene.hpp>
 #include <engine/engine.hpp>
 #include <engine/utils/serializer.hpp>
 #include <imgui.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/scene/entity.hpp>
+#include <ecs/entity.hpp>
 #include <mirror/panel/panel.hpp>
 
 namespace lt {

@@ -11,6 +11,7 @@ add_subdirectory(./input)
 add_subdirectory(./ui)
 
 add_subdirectory(./renderer)
+add_subdirectory(./ecs)
 add_subdirectory(./engine)
 
 add_subdirectory(./mirror)

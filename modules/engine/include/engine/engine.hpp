@@ -26,11 +26,6 @@
 // third party
 #include <imgui.h>
 
-// scene
-#include <engine/scene/components.hpp>
-#include <engine/scene/entity.hpp>
-#include <engine/scene/scene.hpp>
-
 // entry point
 #ifdef LIGHT_ENTRY_POINT
 	#include <engine/core/entrypoint.hpp>

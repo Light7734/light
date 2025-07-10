@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <engine/scene/entity.hpp>
-#include <engine/scene/scene.hpp>
+#include <ecs/entity.hpp>
+#include <ecs/scene.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace lt {

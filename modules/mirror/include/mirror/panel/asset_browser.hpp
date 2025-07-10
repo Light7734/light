@@ -6,6 +6,8 @@
 
 namespace lt {
 
+class Scene;
+
 class AssetBrowserPanel: public Panel
 {
 public:

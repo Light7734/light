@@ -1,7 +1,7 @@
 #include <camera/component.hpp>
-#include <engine/scene/components.hpp>
-#include <engine/scene/entity.hpp>
-#include <engine/scene/scene.hpp>
+#include <ecs/components.hpp>
+#include <ecs/entity.hpp>
+#include <ecs/scene.hpp>
 #include <glm/glm.hpp>
 #include <renderer/renderer.hpp>
 

@@ -8,6 +8,8 @@
 
 namespace lt {
 
+class Scene;
+
 class EditorLayer: public Layer
 {
 public:

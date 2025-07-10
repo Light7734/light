@@ -1,5 +1,5 @@
-#include <engine/scene/entity.hpp>
-#include <engine/scene/scene.hpp>
+#include <ecs/entity.hpp>
+#include <ecs/scene.hpp>
 
 namespace lt {
 

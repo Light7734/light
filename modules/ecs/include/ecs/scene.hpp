@@ -1,8 +1,7 @@
 #pragma once
 
-
-#include <engine/core/uuid.hpp>
-#include <engine/scene/components/transform.hpp>
+#include <ecs/components/transform.hpp>
+#include <ecs/uuid.hpp>
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 

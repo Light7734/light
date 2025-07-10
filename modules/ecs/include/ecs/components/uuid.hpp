@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include <engine/core/uuid.hpp>
+#include <ecs/uuid.hpp>
 
 namespace lt {
 

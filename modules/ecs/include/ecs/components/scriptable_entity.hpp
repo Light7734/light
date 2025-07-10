@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include <engine/scene/entity.hpp>
+#include <ecs/entity.hpp>
 
 namespace lt {
 

@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include <engine/scene/components/scriptable_entity.hpp>
+#include <ecs/components/scriptable_entity.hpp>
 
 namespace lt {
 

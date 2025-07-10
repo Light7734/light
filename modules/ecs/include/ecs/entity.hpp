@@ -1,8 +1,7 @@
 #pragma once
 
-
-#include <engine/scene/components/uuid.hpp>
-#include <engine/scene/scene.hpp>
+#include <ecs/components/uuid.hpp>
+#include <ecs/scene.hpp>
 #include <entt/entt.hpp>
 
 namespace lt {

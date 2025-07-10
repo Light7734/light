@@ -1,6 +1,6 @@
 #include <asset_manager/asset_manager.hpp>
 #include <camera/component.hpp>
-#include <engine/scene/components.hpp>
+#include <ecs/components.hpp>
 #include <engine/utils/serializer.hpp>
 #include <renderer/texture.hpp>
 
