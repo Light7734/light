@@ -1,7 +1,6 @@
 if(NOT WIN32)
     add_library_module(engine 
         core/application.cpp
-        debug/exceptions.cpp
         debug/instrumentor.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
@@ -11,7 +10,6 @@ if(NOT WIN32)
 else()
     add_library_module(engine 
         core/application.cpp
-        debug/exceptions.cpp
         debug/instrumentor.cpp
         layer/layer.cpp
         layer/layer_stack.cpp

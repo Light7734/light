@@ -6,7 +6,10 @@ namespace lt {
 
 struct FailedAssertion: std::exception
 {
-	FailedAssertion(const char *file, int line);
+	FailedAssertion(const char *file, int line)
+	{
+		log_crt("Assertion failed in: {} (line {})", file, line);
+	}
 };
 
 #define lt_assert(x, ...)                                    \
