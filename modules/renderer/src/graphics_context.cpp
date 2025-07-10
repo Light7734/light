@@ -42,7 +42,7 @@ auto GraphicsContext::create(GraphicsAPI api, GLFWwindow *window_handle) -> Scop
 		       break;)
 
 		    default
-		    : lt_assert(
+		    : ensure(
 		          false,
 		          "Invalid/unsupported 'GraphicsAPI' {}",
 		          // TODO(Light): Stringifier::graphics_api_to_string(api),

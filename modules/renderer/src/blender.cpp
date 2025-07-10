@@ -22,7 +22,7 @@ auto Blender::create(const Ref<SharedContext> & /*sharedContext*/) -> Scope<Blen
 		);)
 
 		    default
-		    : lt_assert(
+		    : ensure(
 		          false,
 		          "Invalid/unsupported 'GraphicsAPI' {}",
 		          static_cast<uint32_t>(GraphicsContext::get_graphics_api())

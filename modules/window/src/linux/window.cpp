@@ -21,7 +21,7 @@ lWindow::lWindow(std::function<void(Event &)> callback)
     : m_event_callback(std::move(std::move(callback)))
 {
 	// init glfw
-	lt_assert(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
+	ensure(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
 
 	// create window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -30,7 +30,7 @@ lWindow::lWindow(std::function<void(Event &)> callback)
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	m_handle = glfwCreateWindow(1u, 1u, "", nullptr, nullptr);
-	lt_assert(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
+	ensure(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
 
 	glfwSetWindowUserPointer(m_handle, &m_event_callback);
 	bind_glfw_events();

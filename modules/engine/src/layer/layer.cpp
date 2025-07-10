@@ -40,7 +40,7 @@ auto Layer::on_event(const Event &event) -> bool
 	case EventType::WindowGainFocus:
 		return on_window_gain_focus(dynamic_cast<const WindowGainFocusEvent &>(event));
 
-	default: lt_assert(false, "Invalid event: {}", event.get_info_lt_log());
+	default: ensure(false, "Invalid event: {}", event.get_info_lt_log());
 	}
 }
 

@@ -22,7 +22,7 @@ Application *Application::s_instance = nullptr;
 
 Application::Application(): m_window(nullptr)
 {
-	lt_assert(!s_instance, "Application constructed twice");
+	ensure(!s_instance, "Application constructed twice");
 	s_instance = this;
 
 	m_window = Window::create([this](auto &&PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
@@ -62,7 +62,7 @@ Application::Application(): m_window(nullptr)
 	                                                                   "TEXTURE_SHADER"),
 	    }
 	);
-	lt_assert(m_graphics_context, "lWindow::lWindow: failed to create 'GraphicsContext'");
+	ensure(m_graphics_context, "lWindow::lWindow: failed to create 'GraphicsContext'");
 
 	m_user_interface = UserInterface::create(
 	    (GLFWwindow *)m_window->get_handle(),
@@ -173,13 +173,13 @@ void Application::on_event(const Event &event)
 [[nodiscard]] auto Application::sanity_check() const -> bool
 {
 	log_inf("Checking application sanity...");
-	lt_assert(s_instance, "Application not constructed!?");
-	lt_assert(m_window, "Window is not initialized");
-	lt_assert(m_user_interface, "User interface is not initialized");
-	lt_assert(m_graphics_context, "Graphics context is not initialized");
-	lt_assert(m_renderer, "Renderer is not initialized");
-	lt_assert(m_layer_stack, "Layer_stack is not initialized");
-	lt_assert(!m_layer_stack->is_empty(), "Layer_stack is empty");
+	ensure(s_instance, "Application not constructed!?");
+	ensure(m_window, "Window is not initialized");
+	ensure(m_user_interface, "User interface is not initialized");
+	ensure(m_graphics_context, "Graphics context is not initialized");
+	ensure(m_renderer, "Renderer is not initialized");
+	ensure(m_layer_stack, "Layer_stack is not initialized");
+	ensure(!m_layer_stack->is_empty(), "Layer_stack is empty");
 
 	log_inf("Logging application state...");
 	this->log_debug_data();

@@ -37,7 +37,7 @@ auto UserInterface::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedCo
 	case GraphicsAPI::DirectX: lt_win(scopeUserInterface = create_scope<dxUserInterface>();) break;
 
 	default:
-		lt_assert(
+		ensure(
 		    false,
 		    "UserInterface::create: invalid/unsupported 'GraphicsAPI' {}",
 		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())
@@ -58,7 +58,7 @@ UserInterface::UserInterface()
       )
 // NOLINTEND
 {
-	lt_assert(
+	ensure(
 	    !s_context,
 	    "UserInterface::UserInterface: an instance of 'UserInterface' already exists, do not "
 	    "construct this class!"

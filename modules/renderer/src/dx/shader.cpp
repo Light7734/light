@@ -48,8 +48,8 @@ dxShader::dxShader(
 	);
 
 	// check
-	lt_assert(!vsErr.Get(), "Vertex shader compile error: {}", (char *)vsErr->GetBufferPointer());
-	lt_assert(!psErr.Get(), "Pixels shader compile error: {}", (char *)psErr->GetBufferPointer());
+	ensure(!vsErr.Get(), "Vertex shader compile error: {}", (char *)vsErr->GetBufferPointer());
+	ensure(!psErr.Get(), "Pixels shader compile error: {}", (char *)psErr->GetBufferPointer());
 
 	// create shaders
 	auto hr = HRESULT {};

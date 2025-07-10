@@ -90,7 +90,7 @@ auto Scene::get_entity_by_tag(const std::string &tag) -> Entity
 		return entity;
 	}
 
-	lt_assert(false, "Scene::get_entity_by_tag: failed to find entity by tag: {}", tag);
+	ensure(false, "Scene::get_entity_by_tag: failed to find entity by tag: {}", tag);
 	return {};
 }
 

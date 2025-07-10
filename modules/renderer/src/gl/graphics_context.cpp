@@ -16,7 +16,7 @@ glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(
 {
 	m_graphics_api = GraphicsAPI::OpenGL;
 	glfwMakeContextCurrent(windowHandle);
-	lt_assert(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
+	ensure(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
 
 	set_debug_message_callback();
 }

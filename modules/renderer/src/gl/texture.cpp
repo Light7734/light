@@ -58,7 +58,7 @@ auto glTexture::get_texture() -> void *
 	case 3u: return GL_RGB;
 	case 2u: return GL_RG;
 	case 1u: return GL_RED;
-	default: lt_assert(false, "Invalid number of components: {}", num_components);
+	default: ensure(false, "Invalid number of components: {}", num_components);
 	}
 
 	return {};
@@ -73,7 +73,7 @@ auto glTexture::get_texture() -> void *
 	case 3u: return GL_RGB8;
 	case 2u: return GL_RG8;
 	case 1u: return GL_R8;
-	default: lt_assert(false, "Invalid number of components: {}", num_components);
+	default: ensure(false, "Invalid number of components: {}", num_components);
 	}
 
 	return {};

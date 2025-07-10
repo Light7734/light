@@ -12,11 +12,11 @@ glVertexLayout::glVertexLayout(
     : m_array_id(NULL)
 {
 	// check
-	lt_assert(
+	ensure(
 	    std::dynamic_pointer_cast<glVertexBuffer>(buffer),
 	    "Failed to cast 'VertexBuffer' to 'glVertexBuffer'"
 	);
-	lt_assert(!elements.empty(), "'elements' is empty");
+	ensure(!elements.empty(), "'elements' is empty");
 
 	// local
 	auto elementsDesc = std::vector<glVertexElementDesc> {};
@@ -140,7 +140,7 @@ auto glVertexLayout::get_element_desc(VertexElementType type, unsigned int offse
 	case VertexElementType::Float4:
 		return { .type = GL_FLOAT, .count = 4u, .typeSize = sizeof(GLfloat), .offset = offset };
 
-	default: lt_assert(false, "Invalid 'VertexElementType'"); return {};
+	default: ensure(false, "Invalid 'VertexElementType'"); return {};
 	}
 }
 

@@ -26,7 +26,7 @@ auto Framebuffer::create(
 		););
 
 	default:
-		lt_assert(
+		ensure(
 		    false,
 		    "Invalid/unsupported 'GraphicsAPI' {}",
 		    static_cast<uint32_t>(GraphicsContext::get_graphics_api())

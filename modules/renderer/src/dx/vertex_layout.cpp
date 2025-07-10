@@ -28,7 +28,7 @@ dxVertexLayout::dxVertexLayout(
 	}
 
 	auto dxpShader = std::dynamic_pointer_cast<dxShader>(shader);
-	lt_assert(dxpShader, "Failed to cast 'Shader' to 'dxShader'");
+	ensure(dxpShader, "Failed to cast 'Shader' to 'dxShader'");
 
 	// create input layout (vertex layout)
 	auto hr = HRESULT {};
@@ -88,7 +88,7 @@ auto dxVertexLayout::get_dxgi_format(VertexElementType type) -> DXGI_FORMAT
 	case lt::VertexElementType::Float3: return DXGI_FORMAT_R32G32B32_FLOAT;
 	case lt::VertexElementType::Float4: return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-	default: lt_assert(false, "Invalid 'VertexElementType'"); return DXGI_FORMAT_UNKNOWN;
+	default: ensure(false, "Invalid 'VertexElementType'"); return DXGI_FORMAT_UNKNOWN;
 	}
 }
 

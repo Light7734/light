@@ -43,7 +43,7 @@ Renderer::Renderer(
     , m_target_framebuffer(nullptr)
 
 {
-	lt_assert(!s_context, "An instance of 'renderer' already exists, do not construct this class!");
+	ensure(!s_context, "An instance of 'renderer' already exists, do not construct this class!");
 	s_context = this;
 
 	m_view_projection_buffer = ConstantBuffer::create(
@@ -151,7 +151,7 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 
 void Renderer::draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &texture)
 {
-	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
+	ensure(texture, "Texture passed to renderer::draw_quad_impl");
 
 	texture->bind();
 	auto map = std::span<TextureRendererProgram::TextureVertexData> {
@@ -189,7 +189,7 @@ void Renderer::draw_quad_impl(
     const Ref<Texture> &texture
 )
 {
-	lt_assert(texture, "Texture passed to renderer::draw_quad_impl");
+	ensure(texture, "Texture passed to renderer::draw_quad_impl");
 
 	texture->bind();
 	auto map = std::span<TintedTextureRendererProgram::TintedTextureVertexData> {

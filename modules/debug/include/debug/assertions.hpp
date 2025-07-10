@@ -14,7 +14,7 @@ struct FailedAssertion: std::exception
 
 
 template<typename Expression_T, typename... Args>
-constexpr void lt_assert(Expression_T &&expression, std::format_string<Args...> fmt, Args &&...args)
+constexpr void ensure(Expression_T &&expression, std::format_string<Args...> fmt, Args &&...args)
 {
 	if (!static_cast<bool>(expression))
 	{
@@ -24,7 +24,7 @@ constexpr void lt_assert(Expression_T &&expression, std::format_string<Args...> 
 }
 
 template<typename Expression_T>
-constexpr void lt_assert(Expression_T &&expression, const char *message)
+constexpr void ensure(Expression_T &&expression, const char *message)
 {
 	if (!static_cast<bool>(expression))
 	{

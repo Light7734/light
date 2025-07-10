@@ -46,7 +46,7 @@ EditorLayer::EditorLayer(const std::string &name)
 	else
 	{
 		auto serializer = SceneSerializer { m_scene };
-		lt_assert(serializer.deserialize(m_scene_dir), "Failed to de-serialize: {}", m_scene_dir);
+		ensure(serializer.deserialize(m_scene_dir), "Failed to de-serialize: {}", m_scene_dir);
 
 		// m_camera_entity = m_scene->GetEntityByTag("Game Camera");
 	}

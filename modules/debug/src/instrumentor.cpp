@@ -1,4 +1,5 @@
 #include <debug/instrumentor.hpp>
+#include <logger/logger.hpp>
 
 namespace lt {
 

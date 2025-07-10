@@ -85,7 +85,7 @@ void glFramebuffer::resize(const glm::uvec2 &size)
 	// m_specification.width, m_specification.height); 	glFramebufferTexture2D(GL_FRAMEBUFFER,
 	// GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depth_stencil_attachment_id, 0);
 
-	lt_assert(
+	ensure(
 	    (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE),
 	    "Framebuffer is incomplete"
 	);
