@@ -1,13 +1,8 @@
-#define LIGHT_ENTRY_POINT
-
-//
-#include <mirror/editor_layer.hpp>
-#include <window/window.hpp>
-
-//
 #include <app/application.hpp>
 #include <app/entrypoint.hpp>
 #include <app/layer_stack.hpp>
+#include <mirror/editor_layer.hpp>
+#include <window/window.hpp>
 
 namespace lt {
 
