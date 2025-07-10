@@ -2,7 +2,7 @@
 #ifndef LIGHT_STRINGIFIER_H
 	#define LIGHT_STRINGIFIER_H
 
-	#include <engine/base/base.hpp>
+	
 
 namespace Light {
 

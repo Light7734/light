@@ -1,9 +1,9 @@
-#include <engine/events/char.hpp>
-#include <engine/events/event.hpp>
-#include <engine/events/keyboard.hpp>
-#include <engine/events/mouse.hpp>
-#include <engine/events/window.hpp>
 #include <engine/layer/layer.hpp>
+#include <input/events/char.hpp>
+#include <input/events/event.hpp>
+#include <input/events/keyboard.hpp>
+#include <input/events/mouse.hpp>
+#include <input/events/window.hpp>
 
 namespace Light {
 

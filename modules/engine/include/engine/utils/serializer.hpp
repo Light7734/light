@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/base/base.hpp>
+
 #include <engine/scene/entity.hpp>
 #include <engine/scene/scene.hpp>
 #include <yaml-cpp/yaml.h>

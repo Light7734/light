@@ -1,4 +1,4 @@
-#include <engine/graphics/graphics_context.hpp>
+#include <renderer/graphics_context.hpp>
 #include <engine/utils/stringifier.hpp>
 #include <glad/gl.h>
 #include <spdlog/common.h>

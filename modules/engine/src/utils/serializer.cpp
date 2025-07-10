@@ -1,6 +1,6 @@
-#include <engine/graphics/texture.hpp>
+#include <renderer/texture.hpp>
 #include <engine/scene/components.hpp>
-#include <engine/utils/resource_manager.hpp>
+#include <asset_manager/asset_manager.hpp>
 #include <engine/utils/serializer.hpp>
 
 namespace YAML {
@@ -173,11 +173,11 @@ auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 
 				if (!texturePaths.contains(texturePath))
 				{
-					ResourceManager::load_texture(texturePath, texturePath);
+					AssetManager::load_texture(texturePath, texturePath);
 					texturePaths.insert(texturePath);
 				}
 
-				entitySpriteRendererComponent.texture = ResourceManager::get_texture(texturePath);
+				entitySpriteRendererComponent.texture = AssetManager::get_texture(texturePath);
 			}
 			/* #TEMPORARY SOLUTION# */
 

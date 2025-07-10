@@ -1,13 +1,16 @@
 #pragma once
 
-#include <engine/base/base.hpp>
-#include <engine/input/input.hpp>
+
 #include <engine/layer/layer_stack.hpp>
+#include <input/input.hpp>
 
 namespace Light {
 
+class Renderer;
 class Window;
 class Event;
+class UserInterface;
+class GraphicsContext;
 
 extern Scope<class Application> create_application();
 
@@ -42,6 +45,12 @@ private:
 	void log_debug_data();
 
 	Scope<Window> m_window;
+
+	Scope<UserInterface> m_user_interface;
+
+	Scope<GraphicsContext> m_graphics_context;
+
+	Scope<Renderer> m_renderer;
 
 	static Application *s_instance;
 };

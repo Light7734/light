@@ -1,3 +1,4 @@
+#include <asset_manager/asset_manager.hpp>
 #include <engine/engine.hpp>
 #include <engine/utils/serializer.hpp>
 #include <imgui.h>
@@ -10,15 +11,15 @@ AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> active_scene)
     , m_assets_path("./data/assets")
     , m_active_scene(std::move(active_scene))
 {
-	ResourceManager::load_texture("_Assets_Directory", "data/engine/icons/asset/dir.asset");
-	ResourceManager::load_texture("_Assets_Scene", "data/engine/icons/asset/scene.asset");
-	ResourceManager::load_texture("_Assets_Image", "data/engine/icons/asset/img.asset");
-	ResourceManager::load_texture("_Assets_Text", "data/engine/icons/asset/txt.asset");
+	AssetManager::load_texture("_Assets_Directory", "data/engine/icons/asset/dir.asset");
+	AssetManager::load_texture("_Assets_Scene", "data/engine/icons/asset/scene.asset");
+	AssetManager::load_texture("_Assets_Image", "data/engine/icons/asset/img.asset");
+	AssetManager::load_texture("_Assets_Text", "data/engine/icons/asset/txt.asset");
 
-	m_directory_texture = ResourceManager::get_texture("_Assets_Directory");
-	m_scene_texture = ResourceManager::get_texture("_Assets_Scene");
-	m_image_texture = ResourceManager::get_texture("_Assets_Image");
-	m_text_texture = ResourceManager::get_texture("_Assets_Text");
+	m_directory_texture = AssetManager::get_texture("_Assets_Directory");
+	m_scene_texture = AssetManager::get_texture("_Assets_Scene");
+	m_image_texture = AssetManager::get_texture("_Assets_Image");
+	m_text_texture = AssetManager::get_texture("_Assets_Text");
 }
 
 void AssetBrowserPanel::on_user_interface_update()

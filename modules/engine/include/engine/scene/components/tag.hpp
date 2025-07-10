@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/base/base.hpp>
+
 #include <utility>
 
 namespace Light {

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <engine/base/base.hpp>
-#include <engine/camera/scene.hpp>
+#include <camera/scene.hpp>
 #include <glm/glm.hpp>
 
 namespace Light {
@@ -25,7 +24,7 @@ struct CameraComponent
 
 	SceneCamera camera;
 
-	bool isPrimary{};
+	bool isPrimary {};
 };
 
 } // namespace Light

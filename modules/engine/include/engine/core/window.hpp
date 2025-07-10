@@ -1,8 +1,8 @@
 #pragma once
 
-#include <engine/base/base.hpp>
-#include <engine/graphics/graphics_context.hpp>
+
 #include <glm/glm.hpp>
+#include <renderer/graphics_context.hpp>
 
 namespace Light {
 
@@ -20,9 +20,9 @@ struct WindowProperties
 class Window
 {
 public:
-	static Scope<Window> create(const std::function<void(Event &)>& callback);
+	static Scope<Window> create(const std::function<void(Event &)> &callback);
 
-	Window(): m_graphics_context(nullptr), m_properties {} 
+	Window(): m_properties {}
 	{
 	}
 
@@ -55,11 +55,6 @@ public:
 
 	virtual void set_visibility(bool visible, bool toggle = false) = 0;
 
-	[[nodiscard]] auto get_graphics_context() const -> GraphicsContext *
-	{
-		return m_graphics_context.get();
-	}
-
 	[[nodiscard]] auto get_properties() const -> const WindowProperties &
 	{
 		return m_properties;
@@ -90,12 +85,12 @@ public:
 		return m_properties.visible;
 	}
 
-protected:
-	Scope<GraphicsContext> m_graphics_context;
+	virtual auto get_handle() -> void * = 0;
 
+protected:
 	WindowProperties m_properties;
 
-	bool b_Closed{false};
+	bool b_Closed { false };
 };
 
 } // namespace Light

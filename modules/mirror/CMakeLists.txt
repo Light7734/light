@@ -10,5 +10,7 @@ target_link_libraries(
   mirror
   PUBLIC engine
   PUBLIC opengl::opengl
+  PUBLIC ui
   PUBLIC imgui
+  PUBLIC input
 )

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/base/base.hpp>
+
 #include <engine/scene/components/uuid.hpp>
 #include <engine/scene/scene.hpp>
 #include <entt/entt.hpp>

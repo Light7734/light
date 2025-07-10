@@ -1,5 +1,8 @@
+#include <asset_manager/asset_manager.hpp>
 #include <engine/utils/serializer.hpp>
+#include <input/key_codes.hpp>
 #include <mirror/editor_layer.hpp>
+#include <ui/ui.hpp>
 
 namespace Light {
 
@@ -28,11 +31,11 @@ EditorLayer::EditorLayer(const std::string &name)
 		m_camera_entity = m_scene->create_entity("Camera");
 		m_camera_entity.add_component<CameraComponent>(SceneCamera(), true);
 
-		ResourceManager::load_texture("Awesomeface", "data/assets/textures/awesomeface.asset");
+		AssetManager::load_texture("Awesomeface", "data/assets/textures/awesomeface.asset");
 
 		auto entity = Entity { m_scene->create_entity("Awesomeface", {}) };
 		entity.add_component<SpriteRendererComponent>(
-		    ResourceManager::get_texture("Awesomeface"),
+		    AssetManager::get_texture("Awesomeface"),
 		    glm::vec4 { 0.0f, 1.0f, 1.0f, 1.0f }
 		);
 	}

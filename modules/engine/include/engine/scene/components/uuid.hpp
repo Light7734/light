@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/base/base.hpp>
+
 #include <engine/core/uuid.hpp>
 
 namespace Light {

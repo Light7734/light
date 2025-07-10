@@ -1,5 +1,5 @@
 #include <engine/scene/components.hpp>
-#include <engine/utils/resource_manager.hpp>
+#include <asset_manager/asset_manager.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
@@ -47,7 +47,7 @@ void PropertiesPanel::on_user_interface_update()
 			    ))
 			{
 				m_entity_context.add_component<SpriteRendererComponent>(
-				    Light::ResourceManager::get_texture("awesomeface")
+				    Light::AssetManager::get_texture("awesomeface")
 				);
 			}
 

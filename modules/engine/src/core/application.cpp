@@ -1,16 +1,19 @@
+#include <asset_manager/asset_manager.hpp>
 #include <engine/core/application.hpp>
 #include <engine/core/window.hpp>
 #include <engine/debug/instrumentor.hpp>
-#include <engine/events/event.hpp>
-#include <engine/events/keyboard.hpp>
-#include <engine/events/window.hpp>
-#include <engine/graphics/graphics_context.hpp>
-#include <engine/graphics/render_command.hpp>
-#include <engine/graphics/renderer.hpp>
 #include <engine/layer/layer.hpp>
 #include <engine/time/timer.hpp>
-#include <engine/user_interface/user_interface.hpp>
+#include <input/events/event.hpp>
+#include <input/events/keyboard.hpp>
+#include <input/events/window.hpp>
+#include <ltdebug/assertions.hpp>
 #include <ranges>
+#include <renderer/blender.hpp>
+#include <renderer/graphics_context.hpp>
+#include <renderer/render_command.hpp>
+#include <renderer/renderer.hpp>
+#include <ui/ui.hpp>
 
 namespace Light {
 
@@ -26,6 +29,48 @@ Application::Application(): m_window(nullptr)
 	Light::Instrumentor::begin_session("data/logs/profile_startup.json");
 
 	m_window = Window::create([this](auto &&PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
+
+	// create graphics context
+	m_graphics_context = GraphicsContext::create(
+	    GraphicsAPI::OpenGL,
+	    (GLFWwindow *)m_window->get_handle()
+	);
+
+	AssetManager::load_shader(
+	    "LT_ENGINE_RESOURCES_TEXTURE_SHADER",
+	    "data/assets/shaders/texture/vs.asset",
+	    "data/assets/shaders/texture/ps.asset"
+	);
+
+	AssetManager::load_shader(
+	    "LT_ENGINE_RESOURCES_TINTED_TEXTURE_SHADER",
+	    "data/assets/shaders/tinted_texture/vs.asset",
+	    "data/assets/shaders/tinted_texture/ps.asset"
+	);
+
+	AssetManager::load_shader(
+	    "LT_ENGINE_RESOURCES_QUAD_SHADER",
+	    "data/assets/shaders/quads/vs.asset",
+	    "data/assets/shaders/quads/ps.asset"
+	);
+
+	m_renderer = Renderer::create(
+	    (GLFWwindow *)m_window->get_handle(),
+	    m_graphics_context->get_shared_context(),
+	    Renderer::CreateInfo {
+	        .quad_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_QUAD_SHADER"),
+	        .texture_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_TEXTURE_SHADER"
+	        ),
+	        .tinted_texture_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_TINTED_"
+	                                                                   "TEXTURE_SHADER"),
+	    }
+	);
+	lt_assert(m_graphics_context, "lWindow::lWindow: failed to create 'GraphicsContext'");
+
+	m_user_interface = UserInterface::create(
+	    (GLFWwindow *)m_window->get_handle(),
+	    m_graphics_context->get_shared_context()
+	);
 }
 
 Application::~Application()
@@ -40,8 +85,8 @@ void Application::game_loop()
 	lt_assert(!LayerStack::instance().is_empty(), "layer_stack is empty");
 
 	// log debug data
-	m_window->get_graphics_context()->log_debug_data();
-	m_window->get_graphics_context()->get_user_interface()->log_debug_data();
+	m_graphics_context->log_debug_data();
+	m_user_interface->log_debug_data();
 
 	// reveal window
 	m_window->set_visibility(true);
@@ -69,27 +114,27 @@ void Application::game_loop()
 		{
 			// render layers
 			lt_profile_scope("game_loop::Render");
-			m_window->get_graphics_context()->get_renderer()->begin_frame();
+			m_renderer->begin_frame();
 
 			for (auto &it : LayerStack::instance())
 			{
 				it->on_render();
 			}
 
-			m_window->get_graphics_context()->get_renderer()->end_frame();
+			m_renderer->end_frame();
 		}
 
 		{
 			// render user interface
 			lt_profile_scope("game_loop::UserInterface");
-			m_window->get_graphics_context()->get_user_interface()->begin();
+			m_user_interface->begin();
 
 			for (auto &it : LayerStack::instance())
 			{
 				it->on_user_interface_update();
 			}
 
-			m_window->get_graphics_context()->get_user_interface()->end();
+			m_user_interface->end();
 		}
 
 		{
@@ -117,9 +162,7 @@ void Application::on_event(const Event &event)
 
 		if (event.get_event_type() == EventType::WindowResized)
 		{
-			m_window->get_graphics_context()->get_renderer()->on_window_resize(
-			    dynamic_cast<const WindowResizedEvent &>(event)
-			);
+			m_renderer->on_window_resize(dynamic_cast<const WindowResizedEvent &>(event));
 		}
 	}
 

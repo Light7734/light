@@ -1,4 +1,4 @@
-#include <engine/graphics/renderer.hpp>
+#include <renderer/renderer.hpp>
 #include <engine/scene/components.hpp>
 #include <engine/scene/entity.hpp>
 #include <engine/scene/scene.hpp>
