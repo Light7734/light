@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-
 #include <fstream>
 
 namespace lt {
