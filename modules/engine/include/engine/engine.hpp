@@ -33,5 +33,5 @@
 
 // entry point
 #ifdef LIGHT_ENTRY_POINT
-	#include <engine/base/entrypoint.hpp>
+	#include <engine/core/entrypoint.hpp>
 #endif
