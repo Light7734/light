@@ -4,7 +4,6 @@ if(NOT WIN32)
         layer/layer.cpp
         layer/layer_stack.cpp
         time/timer.cpp
-        utils/serializer.cpp
     )
 else()
     add_library_module(engine 
@@ -12,7 +11,6 @@ else()
         layer/layer.cpp
         layer/layer_stack.cpp
         time/timer.cpp
-        utils/serializer.cpp
     )
 endif()
 
@@ -26,10 +24,7 @@ PUBLIC
     lt_debug 
     ecs 
     window
-
     glad
-
     opengl::opengl
-    yaml-cpp::yaml-cpp
     EnTT::EnTT
 )

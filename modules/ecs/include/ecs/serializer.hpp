@@ -1,9 +1,13 @@
 #pragma once
 
-
 #include <ecs/entity.hpp>
 #include <ecs/scene.hpp>
-#include <yaml-cpp/yaml.h>
+
+namespace YAML {
+
+class Emitter;
+
+}
 
 namespace lt {
 

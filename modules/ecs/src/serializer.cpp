@@ -1,8 +1,8 @@
 #include <asset_manager/asset_manager.hpp>
 #include <camera/component.hpp>
 #include <ecs/components.hpp>
-#include <engine/utils/serializer.hpp>
-#include <renderer/texture.hpp>
+#include <ecs/serializer.hpp>
+#include <yaml-cpp/yaml.h>
 
 namespace YAML {
 
