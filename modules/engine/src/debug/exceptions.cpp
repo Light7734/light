@@ -1,5 +1,4 @@
 #include <engine/debug/exceptions.hpp>
-#include <engine/utils/stringifier.hpp>
 #include <glad/gl.h>
 
 #ifdef LIGHT_PLATFORM_WINDOWS
@@ -20,8 +19,8 @@ glException::glException(unsigned int source, unsigned int type, unsigned int id
 	log_crt("glException::glException::");
 	// log_crt("        Severity: {}",
 	// Stringifier::glDebugMsgSeverity(GL_DEBUG_SEVERITY_HIGH));
-	log_crt("        Source  : {}", Stringifier::glDebugMsgSource(source));
-	log_crt("        Type    : {}", Stringifier::glDebugMsgType(type));
+	// log_crt("        Source  : {}", Stringifier::glDebugMsgSource(source));
+	// log_crt("        Type    : {}", Stringifier::glDebugMsgType(type));
 	log_crt("        ID      : {}", id);
 	// log_crt("        Vendor  : {}", glGetString(GL_VENDOR));
 	// log_crt("        renderer: {}", glGetString(GL_RENDERER));

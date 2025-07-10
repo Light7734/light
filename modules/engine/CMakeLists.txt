@@ -11,7 +11,6 @@ if(NOT WIN32)
         scene/scene.cpp
         time/timer.cpp
         utils/serializer.cpp
-        utils/stringifier.cpp
     )
 else()
     add_library_module(engine 
@@ -26,7 +25,6 @@ else()
         scene/scene.cpp
         time/timer.cpp
         utils/serializer.cpp
-        utils/stringifier.cpp
     )
 endif()
 
