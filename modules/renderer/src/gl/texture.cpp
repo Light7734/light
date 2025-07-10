@@ -1,58 +1,35 @@
-#include <glad/gl.h>
+#include <asset_parser/assets/texture.hpp>
 #include <debug/assertions.hpp>
+#include <glad/gl.h>
 #include <renderer/gl/texture.hpp>
 
 namespace Light {
 
-glTexture::glTexture(
-    unsigned int width,
-    unsigned int height,
-    unsigned int components,
-    unsigned char *pixels,
-    const std::string &filePath
-)
-    : Texture(filePath)
-    , m_texture_id(NULL)
+glTexture::glTexture(const Ref<Assets::TextureAsset> &asset)
 {
-	// create texture
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_texture_id);
+	const auto metadata = asset->get_metadata();
+	const auto blob_metadata = asset->get_blob_metadata(Assets::BlobMetadata::Tag::color);
 
-	// set texture parameters
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_texture_id);
 	glTextureParameteri(m_texture_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTextureParameteri(m_texture_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTextureParameteri(m_texture_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTextureParameteri(m_texture_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// determine formats
-	auto format = components == 4u ? GL_RGBA :
-	              components == 3u ? GL_RGB :
-	              components == 2u ? GL_RG :
-	              components == 1u ? GL_RED :
-	                                 NULL;
+	auto blob = std::vector<std::byte>(blob_metadata.uncompressed_size);
+	asset->unpack_blob(blob_metadata.tag, blob.data(), blob.size());
 
-	auto internalFormat = format == GL_RGBA ? GL_RGBA8 :
-	                      format == GL_RGB  ? GL_RGB8 :
-	                      format == GL_RG   ? GL_RG8 :
-	                      format == GL_RED  ? GL_R8 :
-	                                          NULL;
-
-	// check
-	lt_assert(format, "Invalid number of components: {}", components);
-
-
-	// #todo: isn't there something like glTextureImage2D ???
-	// create texture and mipsmaps
 	bind();
 	glTexImage2D(
 	    GL_TEXTURE_2D,
 	    0,
-	    internalFormat,
-	    width,
-	    height,
+	    map_num_components_to_internal_format(metadata.num_components),
+	    static_cast<int>(metadata.pixel_size[0]),
+	    static_cast<int>(metadata.pixel_size[1]),
 	    0,
-	    format,
+	    map_num_components_to_format(metadata.num_components),
 	    GL_UNSIGNED_BYTE,
-	    pixels
+	    std::bit_cast<unsigned char *>(blob.data())
 	);
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
@@ -71,6 +48,35 @@ void glTexture::bind(unsigned int slot /* = 0u */)
 auto glTexture::get_texture() -> void *
 {
 	return (void *)(intptr_t)m_texture_id;
+}
+
+[[nodiscard]] auto glTexture::map_num_components_to_format(uint32_t num_components) const -> int
+{
+	switch (num_components)
+	{
+	case 4u: return GL_RGBA;
+	case 3u: return GL_RGB;
+	case 2u: return GL_RG;
+	case 1u: return GL_RED;
+	default: lt_assert(false, "Invalid number of components: {}", num_components);
+	}
+
+	return {};
+}
+
+[[nodiscard]] auto glTexture::map_num_components_to_internal_format(uint32_t num_components) const
+    -> int
+{
+	switch (num_components)
+	{
+	case 4u: return GL_RGBA8;
+	case 3u: return GL_RGB8;
+	case 2u: return GL_RG8;
+	case 1u: return GL_R8;
+	default: lt_assert(false, "Invalid number of components: {}", num_components);
+	}
+
+	return {};
 }
 
 } // namespace Light

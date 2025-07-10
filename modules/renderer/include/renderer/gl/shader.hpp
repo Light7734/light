@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <renderer/shader.hpp>
 
 namespace Light {
@@ -8,7 +7,7 @@ namespace Light {
 class glShader: public Shader
 {
 public:
-	glShader(Assets::Blob vertex_blob, Assets::Blob pixel_blob);
+	glShader(const Ref<Assets::TextAsset> &vertex_asset, const Ref<Assets::TextAsset> &pixel_asset);
 
 	~glShader() override;
 

@@ -8,23 +8,17 @@
 #endif
 
 #include <renderer/graphics_context.hpp>
-#include <utility>
 
 namespace Light {
 
-auto Texture::create(
-    unsigned int width,
-    unsigned int height,
-    unsigned int components,
-    unsigned char *pixels,
-    const Ref<SharedContext> & /*sharedContext*/,
-    const std::string &filePath
+/* static */ auto Texture::create(
+    Ref<Assets::TextureAsset> asset,
+    const Ref<SharedContext> &shared_context
 ) -> Ref<Texture>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL:
-		return create_ref<glTexture>(width, height, components, pixels, filePath);
+	case GraphicsAPI::OpenGL: return create_ref<glTexture>(std::move(asset));
 
 	case GraphicsAPI::DirectX:
 		lt_win(return create_ref<dxTexture>(
@@ -44,10 +38,6 @@ auto Texture::create(
 		      );
 		return nullptr;
 	}
-}
-
-Texture::Texture(std::string filePath): m_file_path(std::move(filePath))
-{
 }
 
 } // namespace Light

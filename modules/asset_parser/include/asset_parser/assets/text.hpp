@@ -31,7 +31,8 @@ public:
 
 	TextAsset(const std::filesystem::path &path);
 
-	void unpack_blob(BlobMetadata::Tag tag, std::byte *destination, size_t destination_capacity);
+	void unpack_blob(BlobMetadata::Tag tag, std::byte *destination, size_t destination_capacity)
+	    const;
 
 	[[nodiscard]] auto get_asset_metadata() const -> const Asset::Metadata &;
 
@@ -48,7 +49,7 @@ private:
 
 	BlobMetadata m_text_blob_metadata {};
 
-	std::ifstream m_stream;
+	mutable std::ifstream m_stream;
 };
 
 } // namespace Assets

@@ -2,20 +2,29 @@
 
 #include <filesystem>
 
+namespace Assets {
+
+class TextAsset;
+
+class TextureAsset;
+
+} // namespace Assets
+
 namespace Light {
 
 class Shader;
 class Texture;
 
+/**
+ * Asset is the data on the disk.
+ * Resource is the data on the gpu/cpu
+ *
+ * eg. TextureAsset is the file on the disk
+ * eg. Texture is the representation of it in the GPU
+ */
 class AssetManager
 {
 public:
-	static auto instance() -> AssetManager &
-	{
-		static auto instance = AssetManager {};
-		return instance;
-	}
-
 	static void load_shader(
 	    const std::string &name,
 	    const std::filesystem::path &vertex_path,
@@ -43,6 +52,8 @@ public:
 private:
 	AssetManager() = default;
 
+	static auto instance() -> AssetManager &;
+
 	void load_shader_impl(
 	    const std::string &name,
 	    const std::filesystem::path &vertex_path,
@@ -50,6 +61,14 @@ private:
 	);
 
 	void load_texture_impl(const std::string &name, const std::filesystem::path &path);
+
+	auto get_or_load_text_asset(const std::filesystem::path &path) -> Ref<Assets::TextAsset>;
+
+	auto get_or_load_texture_asset(const std::filesystem::path &path) -> Ref<Assets::TextureAsset>;
+
+	std::unordered_map<std::string, Ref<Assets::TextAsset>> m_text_assets;
+
+	std::unordered_map<std::string, Ref<Assets::TextureAsset>> m_texture_assets;
 
 	std::unordered_map<std::string, Ref<Shader>> m_shaders;
 

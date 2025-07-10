@@ -269,16 +269,17 @@ void SceneSerializer::serialize_entity(YAML::Emitter &out, Entity entity)
 
 	if (entity.has_component<SpriteRendererComponent>())
 	{
-		out << YAML::Key << "SpriteRendererComponent";
-		out << YAML::BeginMap; // sprite renderer component;
+		// TODO(Light): get scene serialization/de-serialization working.
+		// out << YAML::Key << "SpriteRendererComponent";
+		// out << YAML::BeginMap; // sprite renderer component;
 
-		auto &spriteRendererComponent = entity.get_component<SpriteRendererComponent>();
+		// auto &spriteRendererComponent = entity.get_component<SpriteRendererComponent>();
 
-		out << YAML::Key << "Texture" << YAML::Value
-		    << spriteRendererComponent.texture->GetFilePath();
-		out << YAML::Key << "Tint" << YAML::Value << spriteRendererComponent.tint;
+		// out << YAML::Key << "Texture" << YAML::Value
+		//     << spriteRendererComponent.texture->GetFilePath();
+		// out << YAML::Key << "Tint" << YAML::Value << spriteRendererComponent.tint;
 
-		out << YAML::EndMap; // sprite renderer component
+		// out << YAML::EndMap; // sprite renderer component
 	}
 
 	// #todo:

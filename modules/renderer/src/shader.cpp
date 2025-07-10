@@ -1,5 +1,6 @@
-#include <renderer/shader.hpp>
+#include <asset_parser/assets/text.hpp>
 #include <renderer/gl/shader.hpp>
+#include <renderer/shader.hpp>
 
 #ifdef LIGHT_PLATFORM_WINDOWS
 	#include <renderer/dx/shader.hpp>
@@ -10,9 +11,9 @@
 
 namespace Light {
 
-auto Shader::create(
-    Assets::Blob vertex_blob,
-    Assets::Blob pixel_blob,
+/* static */ auto Shader::create(
+    Ref<Assets::TextAsset> vertex_asset,
+    Ref<Assets::TextAsset> pixel_asset,
     const Ref<SharedContext> &shared_context
 ) -> Ref<Shader>
 {
@@ -22,12 +23,12 @@ auto Shader::create(
 	switch (GraphicsContext::get_graphics_api())
 	{
 	case GraphicsAPI::OpenGL:
-		return create_ref<glShader>(std::move(vertex_blob), std::move(pixel_blob));
+		return create_ref<glShader>(std::move(vertex_asset), std::move(pixel_asset));
 
 	case GraphicsAPI::DirectX:
 		lt_win(return create_ref<dxShader>(
-		                  vertexFile,
-		                  pixelFile,
+		                  vertex_asset,
+		                  pixel_asset,
 		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
 		););
 

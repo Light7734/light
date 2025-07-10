@@ -1,8 +1,12 @@
 #pragma once
 
-#include <asset_parser/assets/text.hpp>
-
 #include <glm/glm.hpp>
+
+namespace Assets {
+
+class TextAsset;
+
+} // namespace Assets
 
 namespace Light {
 
@@ -11,7 +15,7 @@ class SharedContext;
 class Shader
 {
 public:
-	enum Stage
+	enum Stage : uint8_t
 	{
 		none = 0,
 
@@ -21,8 +25,8 @@ public:
 	};
 
 	static auto create(
-	    Assets::Blob vertex_blob,
-	    Assets::Blob pixel_blob,
+	    Ref<Assets::TextAsset> vertex_asset,
+	    Ref<Assets::TextAsset> pixel_asset,
 	    const Ref<SharedContext> &shared_context
 	) -> Ref<Shader>;
 

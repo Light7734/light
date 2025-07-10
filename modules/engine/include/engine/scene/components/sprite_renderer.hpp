@@ -3,7 +3,6 @@
 
 #include <glm/glm.hpp>
 #include <utility>
-#include <utility>
 
 namespace Light {
 
@@ -31,7 +30,7 @@ struct SpriteRendererComponent
 
 	Ref<Texture> texture;
 
-	glm::vec4 tint{};
+	glm::vec4 tint {};
 };
 
 } // namespace Light

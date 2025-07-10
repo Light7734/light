@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <renderer/texture.hpp>
 
 namespace Light {
@@ -8,13 +7,7 @@ namespace Light {
 class glTexture: public Texture
 {
 public:
-	glTexture(
-	    unsigned int width,
-	    unsigned int height,
-	    unsigned int components,
-	    unsigned char *pixels,
-	    const std::string &filePath
-	);
+	glTexture(const Ref<Assets::TextureAsset> &asset);
 
 	~glTexture() override;
 
@@ -23,7 +16,11 @@ public:
 	auto get_texture() -> void * override;
 
 private:
-	unsigned int m_texture_id;
+	[[nodiscard]] auto map_num_components_to_format(uint32_t num_components) const -> int;
+
+	[[nodiscard]] auto map_num_components_to_internal_format(uint32_t num_components) const -> int;
+
+	uint32_t m_texture_id {};
 };
 
 } // namespace Light

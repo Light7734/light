@@ -80,7 +80,7 @@ void TextAsset::unpack_blob(
     BlobMetadata::Tag tag,
     std::byte *destination,
     size_t destination_capacity
-)
+) const
 {
 	if (tag != BlobMetadata::Tag::text)
 	{

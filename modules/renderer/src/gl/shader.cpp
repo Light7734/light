@@ -1,14 +1,27 @@
-#include <renderer/gl/shader.hpp>
+#include <asset_parser/assets/text.hpp>
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
+#include <renderer/gl/shader.hpp>
 
 namespace Light {
 
-glShader::glShader(Assets::Blob vertex_blob, Assets::Blob pixel_blob)
+glShader::glShader(
+    const Ref<Assets::TextAsset> &vertex_asset,
+    const Ref<Assets::TextAsset> &pixel_asset
+)
     : m_shader_id(glCreateProgram())
 {
+	auto vertex_blob_metadata = vertex_asset->get_blob_metadata(Assets::BlobMetadata::Tag::text);
+	auto pixel_blob_metadata = pixel_asset->get_blob_metadata(Assets::BlobMetadata::Tag::text);
+
+	auto vertex_blob = Assets::Blob(vertex_blob_metadata.uncompressed_size);
+	auto pixel_blob = Assets::Blob(pixel_blob_metadata.uncompressed_size);
+
+	vertex_asset->unpack_blob(vertex_blob_metadata.tag, vertex_blob.data(), vertex_blob.size());
+	pixel_asset->unpack_blob(pixel_blob_metadata.tag, pixel_blob.data(), pixel_blob.size());
+
 	auto vertex_source = std::string {
 		vertex_blob.data(),
 		vertex_blob.data() + vertex_blob.size(), // NOLINT
