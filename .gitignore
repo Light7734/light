@@ -25,6 +25,7 @@ Makefile
 **/Sandbox.txt
 
 **/Logs/**
+**/logs/**
 **.ini
 !**/default_gui_layout.ini
 
