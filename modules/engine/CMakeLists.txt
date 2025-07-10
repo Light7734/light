@@ -3,14 +3,12 @@ if(NOT WIN32)
         core/application.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
-        time/timer.cpp
     )
 else()
     add_library_module(engine 
         core/application.cpp
         layer/layer.cpp
         layer/layer_stack.cpp
-        time/timer.cpp
     )
 endif()
 
@@ -25,6 +23,7 @@ PUBLIC
     ecs 
     window
     glad
+    time
     opengl::opengl
     EnTT::EnTT
 )

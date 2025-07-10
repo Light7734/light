@@ -2,6 +2,7 @@
 
 #include <engine/engine.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui.h>
 #include <mirror/panel/asset_browser.hpp>
 #include <mirror/panel/properties.hpp>
 #include <mirror/panel/scene_hierarchy.hpp>
