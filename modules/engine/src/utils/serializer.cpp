@@ -1,7 +1,8 @@
-#include <renderer/texture.hpp>
-#include <engine/scene/components.hpp>
 #include <asset_manager/asset_manager.hpp>
+#include <camera/component.hpp>
+#include <engine/scene/components.hpp>
 #include <engine/utils/serializer.hpp>
+#include <renderer/texture.hpp>
 
 namespace YAML {
 

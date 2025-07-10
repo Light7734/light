@@ -1,8 +1,9 @@
-#include <renderer/renderer.hpp>
+#include <camera/component.hpp>
 #include <engine/scene/components.hpp>
 #include <engine/scene/entity.hpp>
 #include <engine/scene/scene.hpp>
 #include <glm/glm.hpp>
+#include <renderer/renderer.hpp>
 
 namespace Light {
 

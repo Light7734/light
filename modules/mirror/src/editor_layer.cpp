@@ -1,4 +1,5 @@
 #include <asset_manager/asset_manager.hpp>
+#include <camera/component.hpp>
 #include <engine/utils/serializer.hpp>
 #include <input/key_codes.hpp>
 #include <mirror/editor_layer.hpp>
