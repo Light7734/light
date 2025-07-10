@@ -2,7 +2,6 @@
 #include <debug/assertions.hpp>
 #include <engine/core/application.hpp>
 #include <engine/core/window.hpp>
-#include <engine/debug/instrumentor.hpp>
 #include <engine/layer/layer.hpp>
 #include <engine/time/timer.hpp>
 #include <input/events/event.hpp>
@@ -23,10 +22,6 @@ Application::Application(): m_window(nullptr)
 {
 	lt_assert(!s_instance, "Application constructed twice");
 	s_instance = this;
-
-	log_debug_data();
-
-	lt::Instrumentor::begin_session("data/logs/profile_startup.json");
 
 	m_window = Window::create([this](auto &&PH1) { on_event(std::forward<decltype(PH1)>(PH1)); });
 
@@ -73,84 +68,62 @@ Application::Application(): m_window(nullptr)
 	);
 }
 
-Application::~Application()
-{
-	log_trc("Application::~Application()");
-	Instrumentor::end_session();
-}
-
 void Application::game_loop()
 {
-	// check
-	lt_assert(!LayerStack::instance().is_empty(), "layer_stack is empty");
-
-	// log debug data
-	m_graphics_context->log_debug_data();
-	m_user_interface->log_debug_data();
-
-	// reveal window
 	m_window->set_visibility(true);
 
-	Instrumentor::end_session();
-	Instrumentor::begin_session("data/logs/profile_game_loop.json");
-
-	/* game loop */
-	auto timer = Timer {};
 	while (!m_window->is_closed())
 	{
-		{
-			// update layers
-			lt_profile_scope("game_loop::update");
-
-			for (auto &it : LayerStack::instance())
-			{
-				it->on_update(timer.get_elapsed_time());
-			}
-
-			// TODO: each layer should have their own "delta time"
-			timer.reset();
-		}
-
-		{
-			// render layers
-			lt_profile_scope("game_loop::Render");
-			m_renderer->begin_frame();
-
-			for (auto &it : LayerStack::instance())
-			{
-				it->on_render();
-			}
-
-			m_renderer->end_frame();
-		}
-
-		{
-			// render user interface
-			lt_profile_scope("game_loop::UserInterface");
-			m_user_interface->begin();
-
-			for (auto &it : LayerStack::instance())
-			{
-				it->on_user_interface_update();
-			}
-
-			m_user_interface->end();
-		}
-
-		{
-			// poll events
-			lt_profile_scope("game_loop::Events");
-			m_window->poll_events();
-		}
+		update_layers();
+		render_layers();
+		render_user_interface();
+		poll_events();
 	}
-
-	Instrumentor::end_session();
-	Instrumentor::begin_session("data/logs/profile_cleanup.json");
 }
 
 void Application::quit()
 {
 	s_instance->m_window->close();
+}
+
+void Application::update_layers()
+{
+	for (auto &it : LayerStack::instance())
+	{
+		it->on_update(m_timer.get_elapsed_time());
+	}
+
+	// TODO(Light): each layer should have their own "delta time"
+	m_timer.reset();
+}
+
+void Application::render_layers()
+{
+	m_renderer->begin_frame();
+
+	for (auto &it : LayerStack::instance())
+	{
+		it->on_render();
+	}
+
+	m_renderer->end_frame();
+}
+
+void Application::render_user_interface()
+{
+	m_user_interface->begin();
+
+	for (auto &it : LayerStack::instance())
+	{
+		it->on_user_interface_update();
+	}
+
+	m_user_interface->end();
+}
+
+void Application::poll_events()
+{
+	m_window->poll_events();
 }
 
 void Application::on_event(const Event &event)
@@ -188,11 +161,23 @@ void Application::on_event(const Event &event)
 
 [[nodiscard]] auto Application::sanity_check() const -> bool
 {
-	// TODO(Light): verify sanity of the application state
+	log_inf("Checking application sanity...");
+	lt_assert(s_instance, "Application not constructed!?");
+	lt_assert(m_window, "Window is not initialized");
+	lt_assert(m_user_interface, "User interface is not initialized");
+	lt_assert(m_graphics_context, "Graphics context is not initialized");
+	lt_assert(m_renderer, "Renderer is not initialized");
+	lt_assert(!LayerStack::instance().is_empty(), "Layer_stack is empty");
+
+	log_inf("Logging application state...");
+	this->log_debug_data();
+	m_graphics_context->log_debug_data();
+	m_user_interface->log_debug_data();
+
 	return true;
 }
 
-void Application::log_debug_data()
+void Application::log_debug_data() const
 {
 	log_inf("Platform::");
 	log_inf("       Platform name: {}", constants::platform_name);

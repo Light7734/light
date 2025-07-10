@@ -1,15 +1,15 @@
 #pragma once
 
-
 #include <engine/layer/layer_stack.hpp>
+#include <engine/time/timer.hpp>
 #include <input/input.hpp>
+#include <ui/ui.hpp>
 
 namespace lt {
 
 class Renderer;
 class Window;
 class Event;
-class UserInterface;
 class GraphicsContext;
 
 extern Scope<class Application> create_application();
@@ -25,7 +25,7 @@ public:
 
 	auto operator=(Application &&) -> Application & = delete;
 
-	virtual ~Application();
+	virtual ~Application() = default;
 
 	[[nodiscard]] auto sanity_check() const -> bool;
 
@@ -42,9 +42,19 @@ protected:
 	Application();
 
 private:
+	void update_layers();
+
+	void render_layers();
+
+	void render_user_interface();
+
+	void poll_events();
+
 	void on_event(const Event &event);
 
-	void log_debug_data();
+	void log_debug_data() const;
+
+	Timer m_timer;
 
 	Scope<Window> m_window;
 
