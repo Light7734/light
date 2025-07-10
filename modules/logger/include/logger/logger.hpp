@@ -53,6 +53,12 @@ public:
 		);
 	}
 
+	void static log(LogLvl lvl, const char *message)
+	{
+		instance().spd_logger->log((spdlog::level::level_enum)lvl, message);
+	}
+
+
 private:
 	Logger();
 

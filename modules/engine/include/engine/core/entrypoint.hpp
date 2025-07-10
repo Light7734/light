@@ -12,8 +12,8 @@ try
 
 	application = lt::create_application();
 
-	lt_assert(application, "Failed to create application");
-	lt_assert(application->sanity_check(), "Failed to verify the sanity of the application");
+	lt::lt_assert(application, "Failed to create application");
+	lt::lt_assert(application->sanity_check(), "Failed to verify the sanity of the application");
 
 	application->game_loop();
 
