@@ -12,24 +12,6 @@ FailedAssertion::FailedAssertion(const char *file, int line)
 	log_crt("Assertion failed in: {} (line {})", file, line);
 }
 
-glException::glException(unsigned int source, unsigned int type, unsigned int id, const char *msg)
-{
-	// #todo: improve
-	log_crt("________________________________________");
-	log_crt("glException::glException::");
-	// log_crt("        Severity: {}",
-	// Stringifier::glDebugMsgSeverity(GL_DEBUG_SEVERITY_HIGH));
-	// log_crt("        Source  : {}", Stringifier::glDebugMsgSource(source));
-	// log_crt("        Type    : {}", Stringifier::glDebugMsgType(type));
-	log_crt("        ID      : {}", id);
-	// log_crt("        Vendor  : {}", glGetString(GL_VENDOR));
-	// log_crt("        renderer: {}", glGetString(GL_RENDERER));
-	// log_crt("        Version : {}", glGetString(GL_VERSION));
-	// log_crt("        critical, SVersion: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
-	log_crt("        {}", msg);
-	log_crt("________________________________________");
-}
-
 #ifdef LIGHT_PLATFORM_WINDOWS
 dxException::dxException(long hr, const char *file, int line)
 {

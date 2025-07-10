@@ -1,4 +1,5 @@
 #include <asset_manager/asset_manager.hpp>
+#include <debug/assertions.hpp>
 #include <engine/core/application.hpp>
 #include <engine/core/window.hpp>
 #include <engine/debug/instrumentor.hpp>
@@ -7,7 +8,6 @@
 #include <input/events/event.hpp>
 #include <input/events/keyboard.hpp>
 #include <input/events/window.hpp>
-#include <debug/assertions.hpp>
 #include <ranges>
 #include <renderer/blender.hpp>
 #include <renderer/graphics_context.hpp>
@@ -184,6 +184,12 @@ void Application::on_event(const Event &event)
 			return;
 		}
 	}
+}
+
+[[nodiscard]] auto Application::sanity_check() const -> bool
+{
+	// TODO(Light): verify sanity of the application state
+	return true;
 }
 
 void Application::log_debug_data()

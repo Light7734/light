@@ -27,6 +27,8 @@ public:
 
 	virtual ~Application();
 
+	[[nodiscard]] auto sanity_check() const -> bool;
+
 	void game_loop();
 
 	[[nodiscard]] auto get_window() -> Window &

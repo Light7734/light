@@ -74,7 +74,8 @@ void glGraphicsContext::set_debug_message_callback()
 		    switch (severity)
 		    {
 		    case GL_DEBUG_SEVERITY_HIGH:
-			    // throw glException(source, type, id, message);
+			    // TODO(Light): Add gl exception class
+			    throw std::runtime_error { "gl exception" };
 			    return;
 
 		    case GL_DEBUG_SEVERITY_MEDIUM:
