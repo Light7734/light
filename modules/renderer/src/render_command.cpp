@@ -1,4 +1,4 @@
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 #include <renderer/gl/render_command.hpp>
 #include <renderer/render_command.hpp>
 

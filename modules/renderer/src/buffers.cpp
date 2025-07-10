@@ -1,4 +1,4 @@
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 #include <renderer/buffers.hpp>
 #include <renderer/gl/buffers.hpp>
 #include <renderer/shared_context.hpp>

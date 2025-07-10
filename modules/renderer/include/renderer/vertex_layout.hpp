@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 
 namespace Light {
 

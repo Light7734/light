@@ -1,5 +1,5 @@
 #include <glad/gl.h>
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 #include <renderer/gl/texture.hpp>
 
 namespace Light {

@@ -7,7 +7,7 @@
 #include <input/events/event.hpp>
 #include <input/events/keyboard.hpp>
 #include <input/events/window.hpp>
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 #include <ranges>
 #include <renderer/blender.hpp>
 #include <renderer/graphics_context.hpp>

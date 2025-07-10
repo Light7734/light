@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
 #include <input/events/window.hpp>
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 #include <renderer/blender.hpp>
 #include <renderer/buffers.hpp>
 #include <renderer/framebuffer.hpp>

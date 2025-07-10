@@ -1,4 +1,4 @@
-#include <ltdebug/assertions.hpp>
+#include <debug/assertions.hpp>
 #include <renderer/gl/vertex_layout.hpp>
 #include <renderer/vertex_layout.hpp>
 
