@@ -66,6 +66,8 @@ Application::Application(): m_window(nullptr)
 	    (GLFWwindow *)m_window->get_handle(),
 	    m_graphics_context->get_shared_context()
 	);
+
+	m_layer_stack = create_scope<LayerStack>();
 }
 
 void Application::game_loop()
@@ -88,7 +90,7 @@ void Application::quit()
 
 void Application::update_layers()
 {
-	for (auto &it : LayerStack::instance())
+	for (auto &it : *m_layer_stack)
 	{
 		it->on_update(m_timer.get_elapsed_time());
 	}
@@ -101,7 +103,7 @@ void Application::render_layers()
 {
 	m_renderer->begin_frame();
 
-	for (auto &it : LayerStack::instance())
+	for (auto &it : *m_layer_stack)
 	{
 		it->on_render();
 	}
@@ -113,7 +115,7 @@ void Application::render_user_interface()
 {
 	m_user_interface->begin();
 
-	for (auto &it : LayerStack::instance())
+	for (auto &it : *m_layer_stack)
 	{
 		it->on_user_interface_update();
 	}
@@ -150,7 +152,7 @@ void Application::on_event(const Event &event)
 		}
 	}
 
-	for (auto &it : std::ranges::reverse_view(LayerStack::instance()))
+	for (auto &it : std::ranges::reverse_view(*m_layer_stack))
 	{
 		if (it->on_event(event))
 		{
@@ -167,7 +169,8 @@ void Application::on_event(const Event &event)
 	lt_assert(m_user_interface, "User interface is not initialized");
 	lt_assert(m_graphics_context, "Graphics context is not initialized");
 	lt_assert(m_renderer, "Renderer is not initialized");
-	lt_assert(!LayerStack::instance().is_empty(), "Layer_stack is empty");
+	lt_assert(m_layer_stack, "Layer_stack is not initialized");
+	lt_assert(!m_layer_stack->is_empty(), "Layer_stack is empty");
 
 	log_inf("Logging application state...");
 	this->log_debug_data();

@@ -36,6 +36,11 @@ public:
 		return *m_window;
 	}
 
+	[[nodiscard]] auto get_layer_stack() -> LayerStack &
+	{
+		return *m_layer_stack;
+	}
+
 	static void quit();
 
 protected:
@@ -63,6 +68,8 @@ private:
 	Scope<GraphicsContext> m_graphics_context;
 
 	Scope<Renderer> m_renderer;
+
+	Scope<LayerStack> m_layer_stack;
 
 	static Application *s_instance;
 };
