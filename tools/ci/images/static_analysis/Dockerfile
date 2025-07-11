@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     python3 \
     py3-pip
 
-RUN pip install --no-cache-dir conan
+
+RUN pip install --no-cache-dir --break-system-packages conan gitpython
 
 RUN clang --version  \
     && conan --version \
