@@ -7,6 +7,4 @@ RUN apk add --no-cache \
     git \
     libc6-compat \
     tar \
-    clang-extra-tools
-
-RUN clang-format --version && exit 1
+    clang-extra-tools 
