@@ -11,9 +11,11 @@ class LightRecipe(ConanFile):
     generators = "CMakeDeps"
 
     options = {
+        "enable_static_analysis": [True, False],
     }
 
     default_options = {
+        "enable_static_analysis": False,
     }
 
     def requirements(self):
@@ -36,7 +38,9 @@ class LightRecipe(ConanFile):
         tc = CMakeToolchain(self)
 
         tc.variables["CMAKE_BUILD_TYPE"] = self.settings.build_type
+
         tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = True
+        tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
 
         repo = git.Repo(search_parent_directories=True)
         tc.cache_variables["GIT_HASH"] = repo.head.object.hexsha

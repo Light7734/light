@@ -4,6 +4,12 @@ set(CMAKE_CXX_STANDARD 23)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/macros.cmake)
 
+add_option(ENABLE_STATIC_ANALYSIS "Enables clang-tidy static analysis")
+
+if (ENABLE_STATIC_ANALYSIS)
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;--warnings-as-errors=*;--allow-no-checks")
+endif ()
+
 if(WIN32)
   add_compile_definitions(LIGHT_PLATFORM_WINDOWS)
 elseif(UNIX)
