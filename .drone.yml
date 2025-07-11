@@ -1,8 +1,6 @@
 kind: pipeline
 type: docker
 name: clang format
-clone:
-  recursive: true
 
 trigger:
   branch:
@@ -46,3 +44,7 @@ steps:
   privileged: true
   commands:
     - conan build . -s build_type=Release -o enable_static_analysis=True --build=missing
+
+---
+clone:
+  recursive: true
