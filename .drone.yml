@@ -24,3 +24,21 @@ steps:
       done
 
       echo "✅ All files are properly formatted"
+
+---
+
+kind: pipeline
+type: docker
+name: static analysis
+
+trigger:
+  branch:
+  - main
+
+steps:
+- name: static_analysis
+  image: static_analysis:latest
+  pull: if-not-exists
+  privileged: true
+  commands:
+    - conan build . -s build_type=Release -o enable_static_analysis=True --build=missing
