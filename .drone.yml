@@ -47,4 +47,5 @@ steps:
   pull: if-not-exists
   privileged: true
   commands:
+    - git submodule update --init --recursive
     - conan build . -s build_type=Release -o enable_static_analysis=True --build=missing
