@@ -9,6 +9,7 @@ trigger:
 steps:
 - name: clang format
   image: clang_format:latest
+  pull: if-not-exists
   commands:
     - |
       set -e
