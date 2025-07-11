@@ -1,6 +1,8 @@
 kind: pipeline
 type: docker
 name: clang format
+clone:
+  recursive: true
 
 trigger:
   branch:
@@ -30,6 +32,8 @@ steps:
 kind: pipeline
 type: docker
 name: static analysis
+clone:
+  recursive: true
 
 trigger:
   branch:
