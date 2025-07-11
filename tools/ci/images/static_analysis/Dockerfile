@@ -12,7 +12,8 @@ RUN apk add --no-cache \
     py3-pip \
     mesa-dev \
     mesa-gl \
-    pkgconf
+    pkgconf \
+    clang-extra-tools 
 
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
@@ -21,7 +22,10 @@ RUN pip install --no-cache-dir --break-system-packages conan gitpython \
 RUN clang --version  \
     && conan --version \
     && pip --version \
-    && cmake --version
+    && cmake --version \
+    && clang --version \
+    && clang-tidy --version
+
 
 RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
     && cd light \
