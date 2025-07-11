@@ -22,4 +22,7 @@ RUN clang --version  \
 
 RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
     && cd light \
-    && conan install . -o enable_static_analysis=True --build=missing
+    && conan install . \
+        -c tools.system.package_manager:mode=install \
+        -o enable_static_analysis=True \
+        --build=missing
