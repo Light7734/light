@@ -1,5 +1,5 @@
-#include <renderer/gl/render_command.hpp>
 #include <glad/gl.h>
+#include <renderer/gl/render_command.hpp>
 #ifndef DONT_FUCKING_ORDER_THESSE_PLEASE_FOR_THE_LOVE_OF_GOD_CLANG_FORMAT
 	#include <GLFW/glfw3.h>
 #endif

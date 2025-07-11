@@ -94,9 +94,11 @@ void dxGraphicsContext::setup_render_targets()
 	auto backBuffer = Microsoft::WRL::ComPtr<ID3D11Resource> {};
 
 	dxc(context->get_swap_chain()->GetBuffer(0u, __uuidof(ID3D11Resource), &backBuffer));
-	dxc(context->get_device()
-	        ->CreateRenderTargetView(backBuffer.Get(), nullptr, &context->GetRenderTargetViewRef())
-	);
+	dxc(context->get_device()->CreateRenderTargetView(
+	    backBuffer.Get(),
+	    nullptr,
+	    &context->GetRenderTargetViewRef()
+	));
 
 	// set render target view
 	context->get_device_context()

@@ -1,9 +1,9 @@
 #include <camera/scene.hpp>
+#include <debug/assertions.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
 #include <input/events/window.hpp>
-#include <debug/assertions.hpp>
 #include <renderer/blender.hpp>
 #include <renderer/buffers.hpp>
 #include <renderer/framebuffer.hpp>

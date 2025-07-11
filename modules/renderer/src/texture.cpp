@@ -21,14 +21,16 @@ namespace lt {
 	case GraphicsAPI::OpenGL: return create_ref<glTexture>(std::move(asset));
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_ref<dxTexture>(
-		                  width,
-		                  height,
-		                  components,
-		                  pixels,
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext),
-		                  filePath
-		);)
+		lt_win(
+		    return create_ref<dxTexture>(
+		               width,
+		               height,
+		               components,
+		               pixels,
+		               std::static_pointer_cast<dxSharedContext>(sharedContext),
+		               filePath
+		    );
+		)
 
 		    default
 		    : ensure(

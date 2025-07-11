@@ -12,7 +12,7 @@ namespace lt {
 
 auto Framebuffer::create(
     const FramebufferSpecification &specification,
-    const Ref<SharedContext>&  /*sharedContext*/
+    const Ref<SharedContext> & /*sharedContext*/
 ) -> Ref<Framebuffer>
 {
 	switch (GraphicsContext::get_graphics_api())
@@ -20,10 +20,12 @@ auto Framebuffer::create(
 	case GraphicsAPI::OpenGL: return create_ref<glFramebuffer>(specification);
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_ref<dxFramebuffer>(
-		                  specification,
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		););
+		lt_win(
+		    return create_ref<dxFramebuffer>(
+		               specification,
+		               std::static_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		);
 
 	default:
 		ensure(

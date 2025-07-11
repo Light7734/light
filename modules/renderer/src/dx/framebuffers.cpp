@@ -36,9 +36,11 @@ dxFramebuffer::dxFramebuffer(
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	dxc(m_context->get_device()
-	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view)
-	);
+	dxc(m_context->get_device()->CreateShaderResourceView(
+	    m_color_attachment.Get(),
+	    &srvDesc,
+	    &m_shader_resource_view
+	));
 
 	auto rtvDesc = D3D11_RENDER_TARGET_VIEW_DESC {};
 	rtvDesc.Format = t2dDesc.Format;
@@ -101,9 +103,11 @@ void dxFramebuffer::resize(const glm::uvec2 &size)
 	dxc(m_context->get_device()->CreateTexture2D(&textureDesc, nullptr, &m_color_attachment));
 	dxc(m_context->get_device()
 	        ->CreateRenderTargetView(m_color_attachment.Get(), &rtvDesc, &m_render_target_view));
-	dxc(m_context->get_device()
-	        ->CreateShaderResourceView(m_color_attachment.Get(), &srvDesc, &m_shader_resource_view)
-	);
+	dxc(m_context->get_device()->CreateShaderResourceView(
+	    m_color_attachment.Get(),
+	    &srvDesc,
+	    &m_shader_resource_view
+	));
 }
 
 } // namespace lt

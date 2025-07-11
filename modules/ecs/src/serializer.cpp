@@ -167,8 +167,8 @@ auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 			{
 				auto &entitySpriteRendererComponent = deserializedEntity
 				                                          .add_component<SpriteRendererComponent>();
-				entitySpriteRendererComponent.tint = spriteRendererComponent["Tint"].as<glm::vec4>(
-				);
+				entitySpriteRendererComponent.tint = spriteRendererComponent["Tint"]
+				                                         .as<glm::vec4>();
 
 				auto texturePath = spriteRendererComponent["Texture"].as<std::string>();
 

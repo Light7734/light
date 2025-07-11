@@ -26,11 +26,13 @@ namespace lt {
 		return create_ref<glShader>(std::move(vertex_asset), std::move(pixel_asset));
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_ref<dxShader>(
-		                  vertex_asset,
-		                  pixel_asset,
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		););
+		lt_win(
+		    return create_ref<dxShader>(
+		               vertex_asset,
+		               pixel_asset,
+		               std::static_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		);
 
 	default:
 		ensure(

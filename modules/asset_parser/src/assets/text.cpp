@@ -95,22 +95,28 @@ void TextAsset::unpack_blob(
 	case Assets::CompressionType::None:
 		if (m_text_blob_metadata.uncompressed_size != m_text_blob_metadata.compressed_size)
 		{
-			throw std::runtime_error("Failed to unpack blob from TextAsset: "
-			                         "compressed/uncompressed size mismatch for no compression "
-			                         "type");
+			throw std::runtime_error(
+			    "Failed to unpack blob from TextAsset: "
+			    "compressed/uncompressed size mismatch for no compression "
+			    "type"
+			);
 		}
 
 		if (m_text_blob_metadata.uncompressed_size > destination_capacity)
 		{
-			throw std::runtime_error("Failed to unpack blob from TextAsset: "
-			                         "uncompressed_size > destination_capacity, unpacking "
-			                         "would result in segfault");
+			throw std::runtime_error(
+			    "Failed to unpack blob from TextAsset: "
+			    "uncompressed_size > destination_capacity, unpacking "
+			    "would result in segfault"
+			);
 		}
 
 		if (!m_stream.is_open())
 		{
-			throw std::runtime_error("Failed to unpack blob from TextAsset: ifstream is "
-			                         "closed");
+			throw std::runtime_error(
+			    "Failed to unpack blob from TextAsset: ifstream is "
+			    "closed"
+			);
 		}
 
 		m_stream.read(
@@ -122,11 +128,13 @@ void TextAsset::unpack_blob(
 		return;
 
 	default:
-		throw std::runtime_error(std::format(
-		    "Failed to unpack blob from TextAsset: unsupported "
-		    "compression type: {}",
-		    std::to_underlying(m_text_blob_metadata.compression_type)
-		));
+		throw std::runtime_error(
+		    std::format(
+		        "Failed to unpack blob from TextAsset: unsupported "
+		        "compression type: {}",
+		        std::to_underlying(m_text_blob_metadata.compression_type)
+		    )
+		);
 	}
 }
 

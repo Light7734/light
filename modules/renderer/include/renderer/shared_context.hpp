@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 namespace lt {
 
 class SharedContext

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d3d11.h>
-
 #include <renderer/graphics_context.hpp>
 #include <wrl.h>
 

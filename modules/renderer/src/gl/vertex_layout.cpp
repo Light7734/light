@@ -1,5 +1,5 @@
-#include <glad/gl.h>
 #include <debug/assertions.hpp>
+#include <glad/gl.h>
 #include <renderer/gl/buffers.hpp>
 #include <renderer/gl/vertex_layout.hpp>
 

@@ -19,9 +19,11 @@ auto RenderCommand::create(GLFWwindow *windowHandle, const Ref<SharedContext> & 
 	case GraphicsAPI::OpenGL: return create_scope<glRenderCommand>(windowHandle);
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_scope<dxRenderCommand>(
-		                  (std::static_pointer_cast<dxSharedContext>)(sharedContext)
-		);)
+		lt_win(
+		    return create_scope<dxRenderCommand>(
+		               (std::static_pointer_cast<dxSharedContext>)(sharedContext)
+		    );
+		)
 
 		    default
 		    : ensure(

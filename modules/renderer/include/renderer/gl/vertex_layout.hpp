@@ -22,7 +22,7 @@ class glVertexLayout: public VertexLayout
 {
 public:
 	glVertexLayout(
-	    const Ref<VertexBuffer>& buffer,
+	    const Ref<VertexBuffer> &buffer,
 	    const std::vector<std::pair<std::string, VertexElementType>> &elements
 	);
 

@@ -136,8 +136,9 @@ void lWindow::bind_glfw_events()
 	glfwSetMouseButtonCallback(
 	    m_handle,
 	    [](GLFWwindow *window, int button, int action, int /*mods*/) {
-		    std::function<void(Event &)> const callback = *(std::function<void(Event &)> *)
-		                                                      glfwGetWindowUserPointer(window);
+		    std::function<void(Event &)> const callback = *(
+		        std::function<void(Event &)> *
+		    )glfwGetWindowUserPointer(window);
 
 		    if (action == GLFW_PRESS)
 		    {

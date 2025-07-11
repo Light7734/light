@@ -8,7 +8,7 @@ namespace lt {
 class glBlender: public Blender
 {
 public:
-virtual ~glBlender() = default;
+	virtual ~glBlender() = default;
 	glBlender();
 
 	void enable(BlendFactor srcFactor, BlendFactor dstFactor) override;

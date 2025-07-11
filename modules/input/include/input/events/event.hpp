@@ -37,7 +37,7 @@ enum EventCategory
 #define event_type(type)                      \
 	EventType get_event_type() const override \
 	{                                         \
-		return ::lt::EventType::type;      \
+		return ::lt::EventType::type;         \
 	}
 
 #define event_category(eCategory)                                   \

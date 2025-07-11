@@ -22,8 +22,12 @@ public:
 
 	void default_target_framebuffer() override;
 
-	void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
-	    override;
+	void set_viewport(
+	    unsigned int x,
+	    unsigned int y,
+	    unsigned int width,
+	    unsigned int height
+	) override;
 
 private:
 	GLFWwindow *m_window_handle;

@@ -13,8 +13,10 @@ public:
 
 	~glUserInterface() override;
 
-	void platform_implementation(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
-	    override;
+	void platform_implementation(
+	    GLFWwindow *windowHandle,
+	    Ref<SharedContext> sharedContext
+	) override;
 
 	void begin() override;
 

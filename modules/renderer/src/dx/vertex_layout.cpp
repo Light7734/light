@@ -18,13 +18,15 @@ dxVertexLayout::dxVertexLayout(
 	// extract elements desc
 	for (const auto &element : elements)
 	{
-		inputElementsDesc.emplace_back(D3D11_INPUT_ELEMENT_DESC { element.first.c_str(),
-		                                                          NULL,
-		                                                          get_dxgi_format(element.second),
-		                                                          0u,
-		                                                          D3D11_APPEND_ALIGNED_ELEMENT,
-		                                                          D3D11_INPUT_PER_VERTEX_DATA,
-		                                                          0u });
+		inputElementsDesc.emplace_back(
+		    D3D11_INPUT_ELEMENT_DESC { element.first.c_str(),
+		                               NULL,
+		                               get_dxgi_format(element.second),
+		                               0u,
+		                               D3D11_APPEND_ALIGNED_ELEMENT,
+		                               D3D11_INPUT_PER_VERTEX_DATA,
+		                               0u }
+		);
 	}
 
 	auto dxpShader = std::dynamic_pointer_cast<dxShader>(shader);

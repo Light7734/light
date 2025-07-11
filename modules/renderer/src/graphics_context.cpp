@@ -37,9 +37,10 @@ auto GraphicsContext::create(GraphicsAPI api, GLFWwindow *window_handle) -> Scop
 		break;
 	// directx
 	case GraphicsAPI::DirectX:
-		lt_win(scope_gfx = create_scope<dxGraphicsContext>(window_handle);
-		       s_context = scope_gfx.get();
-		       break;)
+		lt_win(
+		    scope_gfx = create_scope<dxGraphicsContext>(window_handle); s_context = scope_gfx.get();
+		    break;
+		)
 
 		    default
 		    : ensure(

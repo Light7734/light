@@ -55,10 +55,13 @@ Application::Application(): m_window(nullptr)
 	    m_graphics_context->get_shared_context(),
 	    Renderer::CreateInfo {
 	        .quad_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_QUAD_SHADER"),
-	        .texture_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_TEXTURE_SHADER"
+	        .texture_renderer_shader = AssetManager::get_shader(
+	            "LT_ENGINE_RESOURCES_TEXTURE_SHADER"
 	        ),
-	        .tinted_texture_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_TINTED_"
-	                                                                   "TEXTURE_SHADER"),
+	        .tinted_texture_renderer_shader = AssetManager::get_shader(
+	            "LT_ENGINE_RESOURCES_TINTED_"
+	            "TEXTURE_SHADER"
+	        ),
 	    }
 	);
 	ensure(m_graphics_context, "lWindow::lWindow: failed to create 'GraphicsContext'");

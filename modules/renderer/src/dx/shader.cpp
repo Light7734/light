@@ -59,7 +59,8 @@ dxShader::dxShader(
 	    NULL,
 	    &m_vertex_shader
 	));
-	dxc(m_context->get_device()
+	dxc(
+	    m_context->get_device()
 	        ->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), NULL, &m_pixel_shader)
 	);
 }

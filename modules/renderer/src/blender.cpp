@@ -17,9 +17,11 @@ auto Blender::create(const Ref<SharedContext> & /*sharedContext*/) -> Scope<Blen
 	case GraphicsAPI::OpenGL: return create_scope<glBlender>();
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_scope<dxBlender>(
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		lt_win(
+		    return create_scope<dxBlender>(
+		               std::static_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		)
 
 		    default
 		    : ensure(

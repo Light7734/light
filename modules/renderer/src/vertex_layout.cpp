@@ -23,11 +23,13 @@ auto VertexLayout::create(
 	case GraphicsAPI::OpenGL: return create_ref<glVertexLayout>(vertexBuffer, elements);
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_ref<dxVertexLayout>(
-		                  shader,
-		                  elements,
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		lt_win(
+		    return create_ref<dxVertexLayout>(
+		               shader,
+		               elements,
+		               std::static_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		)
 
 		    default
 		    : ensure(

@@ -23,11 +23,13 @@ auto ConstantBuffer::create(
 	case GraphicsAPI::OpenGL: return create_scope<glConstantBuffer>(index, size);
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_scope<dxConstantBuffer>(
-		                  index,
-		                  size,
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		lt_win(
+		    return create_scope<dxConstantBuffer>(
+		               index,
+		               size,
+		               std::static_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		)
 
 		    default
 		    : ensure(
@@ -51,12 +53,14 @@ auto VertexBuffer::create(
 	case GraphicsAPI::OpenGL: return create_ref<glVertexBuffer>(vertices, stride, count);
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_ref<dxVertexBuffer>(
-		                  vertices,
-		                  stride,
-		                  count,
-		                  std::static_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		lt_win(
+		    return create_ref<dxVertexBuffer>(
+		               vertices,
+		               stride,
+		               count,
+		               std::static_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		)
 
 		    default
 		    : ensure(
@@ -79,11 +83,13 @@ auto IndexBuffer::create(
 	case GraphicsAPI::OpenGL: return create_ref<glIndexBuffer>(indices, count);
 
 	case GraphicsAPI::DirectX:
-		lt_win(return create_ref<dxIndexBuffer>(
-		                  indices,
-		                  count,
-		                  std::dynamic_pointer_cast<dxSharedContext>(sharedContext)
-		);)
+		lt_win(
+		    return create_ref<dxIndexBuffer>(
+		               indices,
+		               count,
+		               std::dynamic_pointer_cast<dxSharedContext>(sharedContext)
+		    );
+		)
 
 		    default
 		    : ensure(

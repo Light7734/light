@@ -20,8 +20,10 @@ public:
 
 	void on_event(const Event &event) override;
 
-	void set_properties(const WindowProperties &properties, bool overrideVisibility = false)
-	    override;
+	void set_properties(
+	    const WindowProperties &properties,
+	    bool overrideVisibility = false
+	) override;
 
 	void set_title(const std::string &title) override;
 

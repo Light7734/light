@@ -31,8 +31,11 @@ public:
 
 	TextAsset(const std::filesystem::path &path);
 
-	void unpack_blob(BlobMetadata::Tag tag, std::byte *destination, size_t destination_capacity)
-	    const;
+	void unpack_blob(
+	    BlobMetadata::Tag tag,
+	    std::byte *destination,
+	    size_t destination_capacity
+	) const;
 
 	[[nodiscard]] auto get_asset_metadata() const -> const Asset::Metadata &;
 
