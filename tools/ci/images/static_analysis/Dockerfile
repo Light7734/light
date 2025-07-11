@@ -9,7 +9,10 @@ RUN apk add --no-cache \
     make \
     g++ \
     python3 \
-    py3-pip
+    py3-pip \
+    mesa-dev \
+    mesa-gl \
+    pkgconf
 
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
