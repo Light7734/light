@@ -1,6 +1,9 @@
 kind: pipeline
 type: docker
 name: clang format
+clone:
+  recursive: true
+  submodule_update_remote: true
 
 trigger:
   branch:
@@ -32,6 +35,7 @@ type: docker
 name: static analysis
 clone:
   recursive: true
+  submodule_update_remote: true
 
 trigger:
   branch:
@@ -44,7 +48,3 @@ steps:
   privileged: true
   commands:
     - conan build . -s build_type=Release -o enable_static_analysis=True --build=missing
-
----
-clone:
-  recursive: true
