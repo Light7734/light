@@ -55,9 +55,11 @@ enum class Platform : uint8_t
 namespace constants {
 
 #if defined(LIGHT_PLATFORM_WINDOWS)
-	#define lt_win(x) x
+	#define lt_win(x)
 constexpr auto platform = Platform::windows;
 constexpr auto platform_name = "windows";
+
+#undef LIGHT_PLATFORM_WINDOWS
 
 #elif defined(LIGHT_PLATFORM_LINUX)
 	#define lt_lin(x) x
@@ -76,18 +78,6 @@ constexpr auto platform_name = "mac";
 
 
 } // namespace constants
-
-template<typename T = void>
-concept is_linux = true;
-
-auto linux_only(auto value)
-    requires is_linux<void>
-{
-	if constexpr (is_linux)
-	{
-		return value;
-	}
-}
 
 /* bit-wise */
 constexpr auto bit(auto x)

@@ -11,6 +11,7 @@
 
 /** Stdlib */
 #include <algorithm>
+#include <span>
 #include <array>
 #include <atomic>
 #include <bitset>

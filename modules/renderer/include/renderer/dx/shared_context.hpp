@@ -29,22 +29,22 @@ public:
 		return m_render_target_view;
 	}
 
-	[[nodiscard]] auto &GetDeviceRef() -> Microsoft::WRL::ComPtr<ID3D11Device>
+	[[nodiscard]] auto GetDeviceRef() -> Microsoft::WRL::ComPtr<ID3D11Device>
 	{
 		return m_device;
 	}
 
-	[[nodiscard]] auto &GetDeviceContextRef() -> Microsoft::WRL::ComPtr<ID3D11DeviceContext>
+	[[nodiscard]] auto GetDeviceContextRef() -> Microsoft::WRL::ComPtr<ID3D11DeviceContext>
 	{
 		return m_deviceContext;
 	}
 
-	[[nodiscard]] auto &GetSwapChainRef() -> Microsoft::WRL::ComPtr<IDXGISwapChain>
+	[[nodiscard]] auto GetSwapChainRef() -> Microsoft::WRL::ComPtr<IDXGISwapChain>
 	{
 		return m_swap_chain;
 	}
 
-	[[nodiscard]] auto &GetRenderTargetViewRef() -> Microsoft::WRL::ComPtr<ID3D11RenderTargetView>
+	[[nodiscard]] auto GetRenderTargetViewRef() -> Microsoft::WRL::ComPtr<ID3D11RenderTargetView>
 	{
 		return m_render_target_view;
 	}

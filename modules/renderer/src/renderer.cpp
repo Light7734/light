@@ -12,6 +12,7 @@
 #include <renderer/shader.hpp>
 #include <renderer/texture.hpp>
 #include <utility>
+#include <span>
 
 namespace lt {
 
