@@ -11,8 +11,8 @@
 #include <renderer/renderer.hpp>
 #include <renderer/shader.hpp>
 #include <renderer/texture.hpp>
-#include <utility>
 #include <span>
+#include <utility>
 
 namespace lt {
 

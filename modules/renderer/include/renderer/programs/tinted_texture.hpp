@@ -1,8 +1,8 @@
 #pragma once
 
-#include <span>
 #include <glm/glm.hpp>
 #include <renderer/programs/renderer_program.hpp>
+#include <span>
 
 namespace lt {
 

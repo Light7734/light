@@ -59,7 +59,7 @@ namespace constants {
 constexpr auto platform = Platform::windows;
 constexpr auto platform_name = "windows";
 
-#undef LIGHT_PLATFORM_WINDOWS
+	#undef LIGHT_PLATFORM_WINDOWS
 
 #elif defined(LIGHT_PLATFORM_LINUX)
 	#define lt_lin(x) x

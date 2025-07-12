@@ -23,13 +23,13 @@ glShader::glShader(
 	pixel_asset->unpack_blob(pixel_blob_metadata.tag, pixel_blob.data(), pixel_blob.size());
 
 	auto vertex_source = std::string {
-		reinterpret_cast<char*>(vertex_blob.data()),
-		reinterpret_cast<char*>(vertex_blob.data()) + vertex_blob.size(), // NOLINT
+		reinterpret_cast<char *>(vertex_blob.data()),
+		reinterpret_cast<char *>(vertex_blob.data()) + vertex_blob.size(), // NOLINT
 	};
 
 	auto pixel_source = std::string {
-		reinterpret_cast<char*>(pixel_blob.data()),
-		reinterpret_cast<char*>(pixel_blob.data()) + pixel_blob.size(), // NOLINT
+		reinterpret_cast<char *>(pixel_blob.data()),
+		reinterpret_cast<char *>(pixel_blob.data()) + pixel_blob.size(), // NOLINT
 	};
 
 	const auto vertex_shader = compile_shader(vertex_source, Shader::Stage::vertex);

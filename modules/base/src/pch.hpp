@@ -11,7 +11,6 @@
 
 /** Stdlib */
 #include <algorithm>
-#include <span>
 #include <array>
 #include <atomic>
 #include <bitset>
@@ -24,6 +23,7 @@
 #include <math.h>
 #include <memory>
 #include <set>
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>

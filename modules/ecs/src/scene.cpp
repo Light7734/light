@@ -33,8 +33,8 @@ void Scene::on_update(float deltaTime)
 
 void Scene::on_render(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
 {
-	auto *sceneCamera = (Camera *) nullptr;
-	auto *sceneCameraTransform = (TransformComponent *) nullptr;
+	auto *sceneCamera = (Camera *)nullptr;
+	auto *sceneCameraTransform = (TransformComponent *)nullptr;
 
 	/* scene camera */
 	{
