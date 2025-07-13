@@ -12,9 +12,11 @@ class LightRecipe(ConanFile):
 
     options = {
         "enable_static_analysis": [True, False],
+        "export_compile_commands": [True, False],
     }
 
     default_options = {
+        "export_compile_commands": True,
         "enable_static_analysis": False,
     }
 
@@ -39,7 +41,7 @@ class LightRecipe(ConanFile):
 
         tc.variables["CMAKE_BUILD_TYPE"] = self.settings.build_type
 
-        tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = True
+        tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = self.options.export_compile_commands
         tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
 
         repo = git.Repo(search_parent_directories=True)
