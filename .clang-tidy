@@ -239,7 +239,6 @@ misc-header-include-cycle,
 misc-definitions-in-headers,
 misc-coroutine-hostile-raii,
 misc-const-correctness,
-misc-confusable-identifiers,
 
 hicpp-signed-bitwise,
 hicpp-no-assembler,

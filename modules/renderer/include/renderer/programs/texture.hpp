@@ -25,7 +25,7 @@ public:
 	};
 
 	TextureRendererProgram(
-	    unsigned int maxVertices,
+	    unsigned int max_vertices,
 	    const Ref<SharedContext> &shared_context,
 	    Ref<Shader> shader
 	);

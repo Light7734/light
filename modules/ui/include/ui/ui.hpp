@@ -12,7 +12,7 @@ class SharedContext;
 class UserInterface
 {
 public:
-	static auto create(GLFWwindow *window_handle, Ref<SharedContext> shared_context)
+	static auto create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
 	    -> Scope<UserInterface>;
 
 	static void dockspace_begin();
@@ -25,7 +25,7 @@ public:
 
 	virtual ~UserInterface() = default;
 
-	void init(GLFWwindow *window_handle, Ref<SharedContext> sharedContext);
+	void init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext);
 
 	virtual void platform_implementation(
 	    GLFWwindow *window_handle,

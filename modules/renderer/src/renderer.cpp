@@ -20,7 +20,7 @@ Renderer *Renderer::s_context = nullptr;
 
 Renderer::Renderer(
     GLFWwindow *window_handle,
-    Ref<SharedContext> shared_context,
+    const Ref<SharedContext>& shared_context,
     CreateInfo create_info
 )
     : m_quad_renderer(

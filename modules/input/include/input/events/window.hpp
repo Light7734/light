@@ -14,9 +14,15 @@ public:
 		return "WindowClosedEvent";
 	}
 
-	event_type(WindowClosed);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::WindowClosed;
+	}
 
-	event_category(WindowEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(WindowEventCategory) & category;
+	}
 };
 
 class WindowMovedEvent: public Event
@@ -39,9 +45,15 @@ public:
 		;
 	}
 
-	event_type(WindowMoved);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::WindowMoved;
+	}
 
-	event_category(WindowEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(WindowEventCategory) & category;
+	}
 
 private:
 	const glm::ivec2 m_position;
@@ -66,9 +78,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(WindowResized);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::WindowResized;
+	}
 
-	event_category(WindowEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(WindowEventCategory) & category;
+	}
 
 private:
 	const glm::uvec2 m_size;
@@ -82,9 +100,15 @@ public:
 		return "WindowLostFocus";
 	}
 
-	event_type(WindowLostFocus);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::WindowLostFocus;
+	}
 
-	event_category(WindowEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(WindowEventCategory) & category;
+	}
 };
 
 class WindowGainFocusEvent: public Event
@@ -95,9 +119,15 @@ public:
 		return "WindowGainFocus";
 	}
 
-	event_type(WindowGainFocus);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::WindowGainFocus;
+	}
 
-	event_category(WindowEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(WindowEventCategory) & category;
+	}
 };
 
 } // namespace lt

@@ -131,7 +131,7 @@ public:
 		return "TextLoader";
 	}
 
-	[[nodiscard]] auto load(std::filesystem::path file_path) const -> Assets::TextAsset::PackageData
+	[[nodiscard]] auto load(const std::filesystem::path& file_path) const -> Assets::TextAsset::PackageData
 	{
 		auto stream = std::ifstream { file_path, std::ios::binary };
 		if (!stream.good())

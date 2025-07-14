@@ -6,5 +6,4 @@ RUN apk add --no-cache \
     findutils \
     git \
     libc6-compat \
-    tar \
     clang-extra-tools 

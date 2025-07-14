@@ -1,9 +1,6 @@
 # GLAD #
 add_subdirectory(./glad)
 
-# IMGUI #
-cmake_minimum_required(VERSION 3.14)
-
 set(MIRROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/mirror/)
 set(DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/)
 

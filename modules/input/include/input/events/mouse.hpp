@@ -35,9 +35,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(MouseMoved);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::MouseMoved;
+	}
 
-	event_category(InputEventCategory | MouseEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | MouseEventCategory) & category;
+	}
 
 private:
 	const glm::vec2 m_position;
@@ -62,9 +68,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(WheelScrolled);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::WheelScrolled;
+	}
 
-	event_category(InputEventCategory | MouseEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | MouseEventCategory) & category;
+	}
 
 private:
 	const float m_offset;
@@ -89,9 +101,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(ButtonPressed);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::ButtonPressed;
+	}
 
-	event_category(InputEventCategory | MouseEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | MouseEventCategory) & category;
+	}
 
 private:
 	const int m_button;
@@ -116,9 +134,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(ButtonReleased);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::ButtonReleased;
+	}
 
-	event_category(InputEventCategory | MouseEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | MouseEventCategory) & category;
+	}
 
 private:
 	const int m_button;

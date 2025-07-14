@@ -16,7 +16,7 @@ class Shader;
 class QuadRendererProgram: RendererProgram
 {
 public:
-	virtual ~QuadRendererProgram() = default;
+	~QuadRendererProgram() override = default;
 	struct QuadVertexData
 	{
 		glm::vec4 position;
@@ -25,7 +25,7 @@ public:
 	};
 
 	QuadRendererProgram(
-	    unsigned int maxVertices,
+	    unsigned int max_vertices,
 	    const Ref<SharedContext> &shared_context,
 	    Ref<Shader> shader
 	);

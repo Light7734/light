@@ -10,7 +10,7 @@ class glConstantBuffer: public ConstantBuffer
 public:
 	glConstantBuffer(ConstantBufferIndex index, unsigned int size);
 
-	virtual ~glConstantBuffer();
+	~glConstantBuffer() override;
 
 	void bind() override;
 

@@ -35,19 +35,19 @@ public:
 
 	void set_viewport_size(unsigned int width, unsigned int height);
 
-	void set_projection_type(ProjectionType projectionType);
+	void set_projection_type(ProjectionType projection_type);
 
 	void set_orthographic_size(float size);
 
-	void set_orthographic_far_plane(float farPlane);
+	void set_orthographic_far_plane(float far_plane);
 
-	void set_orthographic_near_plane(float nearPlane);
+	void set_orthographic_near_plane(float near_plane);
 
-	void set_perspective_vertical_fov(float verticalFov);
+	void set_perspective_vertical_fov(float vertical_fov);
 
-	void set_perspective_far_plane(float farPlane);
+	void set_perspective_far_plane(float far_plane);
 
-	void set_perspective_near_plane(float nearPlane);
+	void set_perspective_near_plane(float near_plane);
 
 	[[nodiscard]] auto get_orthographic_size() const -> float
 	{

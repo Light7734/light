@@ -42,8 +42,8 @@ public:
 	};
 
 	static auto create(
-	    GLFWwindow *window_handle,
-	    Ref<SharedContext> shared_context,
+	    GLFWwindow *windowHandle,
+	    Ref<SharedContext> sharedContext,
 	    CreateInfo create_info
 	) -> Scope<Renderer>;
 
@@ -67,9 +67,13 @@ public:
 		s_context->draw_quad_impl(position, size, std::move(texture));
 	}
 
-	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint, Ref<Texture> texture)
+	static void draw_quad(
+	    const glm::mat4 &transform,
+	    const glm::vec4 &tint,
+	    const Ref<Texture> &texture
+	)
 	{
-		s_context->draw_quad_impl(transform, tint, std::move(texture));
+		s_context->draw_quad_impl(transform, tint, texture);
 	}
 
 	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint)
@@ -77,9 +81,9 @@ public:
 		s_context->draw_quad_impl(transform, tint);
 	}
 
-	static void draw_quad(const glm::mat4 &transform, Ref<Texture> texture)
+	static void draw_quad(const glm::mat4 &transform, const Ref<Texture> &texture)
 	{
-		s_context->draw_quad_impl(transform, std::move(texture));
+		s_context->draw_quad_impl(transform, texture);
 	}
 
 	static void begin_scene(
@@ -123,7 +127,11 @@ private:
 
 	bool m_should_clear_backbuffer { false };
 
-	Renderer(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext, CreateInfo create_info);
+	Renderer(
+	    GLFWwindow *window_handle,
+	    const Ref<SharedContext> &shared_context,
+	    CreateInfo create_info
+	);
 
 	void draw_quad_impl(
 	    const glm::vec3 &position,

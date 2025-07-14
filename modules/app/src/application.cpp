@@ -52,7 +52,7 @@ Application::Application(): m_window(nullptr)
 
 	m_renderer = Renderer::create(
 	    (GLFWwindow *)m_window->get_handle(),
-	    m_graphics_context->get_shared_context(),
+	    lt::GraphicsContext::get_shared_context(),
 	    Renderer::CreateInfo {
 	        .quad_renderer_shader = AssetManager::get_shader("LT_ENGINE_RESOURCES_QUAD_SHADER"),
 	        .texture_renderer_shader = AssetManager::get_shader(
@@ -68,7 +68,7 @@ Application::Application(): m_window(nullptr)
 
 	m_user_interface = UserInterface::create(
 	    (GLFWwindow *)m_window->get_handle(),
-	    m_graphics_context->get_shared_context()
+	    lt::GraphicsContext::get_shared_context()
 	);
 
 	m_layer_stack = create_scope<LayerStack>();

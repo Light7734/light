@@ -16,7 +16,7 @@ class SharedContext;
 class TintedTextureRendererProgram: RendererProgram
 {
 public:
-	virtual ~TintedTextureRendererProgram() = default;
+	~TintedTextureRendererProgram() override = default;
 	struct TintedTextureVertexData
 	{
 		glm::vec4 position;
@@ -27,8 +27,8 @@ public:
 	};
 
 	TintedTextureRendererProgram(
-	    unsigned int maxVertices,
-	    const Ref<SharedContext> &sharedContext,
+	    unsigned int max_vertices,
+	    const Ref<SharedContext> &shared_context,
 	    Ref<Shader> shader
 	);
 

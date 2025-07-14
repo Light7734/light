@@ -2,7 +2,7 @@
 
 namespace lt {
 
-enum class EventType
+enum class EventType : uint8_t
 {
 	None = 0,
 
@@ -24,7 +24,7 @@ enum class EventType
 	WindowGainFocus,
 };
 
-enum EventCategory
+enum EventCategory : uint8_t
 {
 	None = 0,
 
@@ -33,18 +33,6 @@ enum EventCategory
 	KeyboardEventCategory = bit(2),
 	MouseEventCategory = bit(3),
 };
-
-#define event_type(type)                      \
-	EventType get_event_type() const override \
-	{                                         \
-		return ::lt::EventType::type;         \
-	}
-
-#define event_category(eCategory)                                   \
-	inline bool has_category(EventCategory category) const override \
-	{                                                               \
-		return (eCategory) & category;                              \
-	}
 
 class Event
 {

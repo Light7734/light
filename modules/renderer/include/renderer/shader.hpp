@@ -25,8 +25,8 @@ public:
 	};
 
 	static auto create(
-	    Ref<Assets::TextAsset> vertex_asset,
-	    Ref<Assets::TextAsset> pixel_asset,
+	    const Ref<Assets::TextAsset>& vertex_asset,
+	    const Ref<Assets::TextAsset>& pixel_asset,
 	    const Ref<SharedContext> &shared_context
 	) -> Ref<Shader>;
 

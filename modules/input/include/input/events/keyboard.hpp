@@ -24,9 +24,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(KeyPressed);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::KeyPressed;
+	}
 
-	event_category(InputEventCategory | KeyboardEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | KeyboardEventCategory) & category;
+	}
 
 private:
 	const int m_key;
@@ -51,9 +57,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(KeyRepeated);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::KeyRepeated;
+	}
 
-	event_category(InputEventCategory | KeyboardEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | KeyboardEventCategory) & category;
+	}
 
 private:
 	const int m_key;
@@ -78,9 +90,15 @@ public:
 		return ss.str();
 	}
 
-	event_type(KeyReleased);
+	[[nodiscard]] auto get_event_type() const -> EventType override
+	{
+		return ::lt::EventType::KeyReleased;
+	}
 
-	event_category(InputEventCategory | KeyboardEventCategory);
+	[[nodiscard]] auto has_category(EventCategory category) const -> bool override
+	{
+		return static_cast<uint8_t>(InputEventCategory | KeyboardEventCategory) & category;
+	}
 
 private:
 	const int m_key;

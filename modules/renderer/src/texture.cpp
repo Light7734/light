@@ -12,8 +12,8 @@
 namespace lt {
 
 /* static */ auto Texture::create(
-    Ref<Assets::TextureAsset> asset,
-    const Ref<SharedContext> &shared_context
+    const Ref<Assets::TextureAsset>& asset,
+    const Ref<SharedContext> & /*shared_context*/
 ) -> Ref<Texture>
 {
 	switch (GraphicsContext::get_graphics_api())

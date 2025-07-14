@@ -9,8 +9,7 @@
 namespace lt {
 
 Window::~Window()
-{
-}
+= default;
 
 auto Window::create(const std::function<void(Event &)> &callback) -> Scope<Window>
 {
@@ -18,7 +17,7 @@ auto Window::create(const std::function<void(Event &)> &callback) -> Scope<Windo
 }
 
 lWindow::lWindow(std::function<void(Event &)> callback)
-    : m_event_callback(std::move(std::move(callback)))
+    : m_handle(glfwCreateWindow(1u, 1u, "", nullptr, nullptr)), m_event_callback(std::move(std::move(callback)))
 {
 	// init glfw
 	ensure(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
@@ -29,7 +28,7 @@ lWindow::lWindow(std::function<void(Event &)> callback)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-	m_handle = glfwCreateWindow(1u, 1u, "", nullptr, nullptr);
+	
 	ensure(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
 
 	glfwSetWindowUserPointer(m_handle, &m_event_callback);
