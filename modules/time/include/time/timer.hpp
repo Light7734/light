@@ -4,28 +4,22 @@
 
 namespace lt {
 
+/** Simple timer class to keep track of the elapsed time */
 class Timer
 {
 public:
-	Timer();
+	using Timepoint = std::chrono::time_point<std::chrono::steady_clock>;
+	using Duration = std::chrono::duration<double>;
+	using Clock = std::chrono::steady_clock;
 
-	[[nodiscard]] auto get_elapsed_time() const -> float
-	{
-		using std::chrono::duration_cast;
-		using std::chrono::milliseconds;
-		using std::chrono::steady_clock;
+	Timer(Timepoint start = Clock::now());
 
-		auto rep = duration_cast<milliseconds>(steady_clock::now() - m_start).count();
-		return static_cast<float>(rep) / 1000.f;
-	}
+	void reset(Timepoint start = Clock::now());
 
-	void reset()
-	{
-		m_start = std::chrono::steady_clock::now();
-	}
+	[[nodiscard]] auto elapsed_time() const -> Duration;
 
 private:
-	std::chrono::time_point<std::chrono::steady_clock> m_start;
+	Timepoint m_start;
 };
 
 } // namespace lt

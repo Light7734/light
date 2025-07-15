@@ -103,7 +103,8 @@ void Application::update_layers()
 {
 	for (auto &it : *m_layer_stack)
 	{
-		it->on_update(m_timer.get_elapsed_time());
+		// narrowing double -> float
+		it->on_update(static_cast<float>(m_timer.elapsed_time().count()));
 	}
 
 	// TODO(Light): each layer should have their own "delta time"
