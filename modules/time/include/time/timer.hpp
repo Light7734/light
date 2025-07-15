@@ -4,13 +4,15 @@
 
 namespace lt {
 
-/** Simple timer class to keep track of the elapsed time */
+/** Simple timer class to keep track of the elapsed time. */
 class Timer
 {
 public:
-	using Timepoint = std::chrono::time_point<std::chrono::steady_clock>;
-	using Duration = std::chrono::duration<double>;
 	using Clock = std::chrono::steady_clock;
+
+	using Duration = std::chrono::duration<double>;
+
+	using Timepoint = std::chrono::time_point<std::chrono::steady_clock>;
 
 	Timer(Timepoint start = Clock::now());
 

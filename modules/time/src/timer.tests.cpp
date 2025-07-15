@@ -7,37 +7,57 @@ namespace lt {
 using lt::test::expect_le;
 
 lt::test::Suite raii = [] {
+	using std::chrono::microseconds;
+
 	lt::test::Case { "default" } = [] {
-		auto timer = Timer {};
+		Timer {};
+	};
+
+	lt::test::Case { "unhappy path throws" } = [] {
 	};
 
 	lt::test::Case { "plenty" } = [] {
-		for (auto i : std::views::iota(0, 101))
+		for (auto i : std::views::iota(0, 100'001))
 		{
-			auto timer = Timer {};
+			Timer {};
 		}
-	};
-
-	lt::test::Case { "unhappy" } = [] {
-	};
-
-	lt::test::Case { "has sane elapsed time" } = [] {
-		auto elapsed_time = Timer {}.elapsed_time();
-		expect_le(elapsed_time, std::chrono::seconds { 1 });
 	};
 };
 
-lt::test::Suite reset = [] {
-	lt::test::Case { "non-throwing" } = [] {
-		auto timer = Timer {};
-		timer.reset();
+lt::test::Suite reset_and_elapsed_time = [] {
+	using std::chrono::hours;
+	using std::chrono::microseconds;
+
+	lt::test::Case { "won't throw" } = [] {
+		Timer {}.reset();
+		std::ignore = Timer {}.elapsed_time();
 	};
 
-	lt::test::Case { "resets elapsed time" } = [] {
-		auto timer = Timer {};
-		auto elapsed_time = timer.elapsed_time();
+	lt::test::Case { "elapsed time is sane" } = [] {
+		expect_le(Timer {}.elapsed_time(), microseconds { 1 });
+	};
 
+	lt::test::Case { "elapsed time is sane - constructed with old now" } = [] {
+		const auto timepoint = Timer::Clock::now() - hours { 1 };
+
+		// This fails sometimes in debug if error-range is under 10us
+		expect_le(Timer { timepoint }.elapsed_time(), hours { 1 } + microseconds { 30 });
+	};
+
+	lt::test::Case { "reset -> elapsed time is sane - constructed with old now" } = [] {
+		auto timer = Timer { Timer::Clock::now() - microseconds { 100 } };
+		const auto old_elapsed_time = timer.elapsed_time();
 		timer.reset();
+
+		expect_le(timer.elapsed_time() - old_elapsed_time, microseconds { 101 });
+	};
+
+	lt::test::Case { "reset -> elapsed time is sane - reset with future now" } = [] {
+		auto timer = Timer {};
+		const auto old_elapsed_time = timer.elapsed_time();
+		timer.reset(Timer::Clock::now() + microseconds { 100 });
+
+		expect_le(timer.elapsed_time() - old_elapsed_time, microseconds { 101 });
 	};
 };
 
