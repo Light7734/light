@@ -18,16 +18,21 @@ steps:
       set -e
       clang-format --version
 
+      has_fomatting_issues=0
+
       find ./modules -name '*.?pp' | while read -r file; do
         echo "Checking format for $file"
         if ! clang-format --dry-run --Werror "$file"; then
           echo "❌ Formatting issue detected in $file"
-          exit 1
+          has_fomatting_issues=1
         fi
       done
 
-      echo "✅ All files are properly formatted"
+      if [ "$has_errors" -eq 0 ]; then
+        echo "✅ All files are properly formatted! Well done! ^~^"
+      fi
 
+      exit ${has_fomatting_issues}
 ---
 
 kind: pipeline
