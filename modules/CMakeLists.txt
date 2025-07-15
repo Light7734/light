@@ -21,3 +21,4 @@ add_subdirectory(./app)
 # apps 
 add_subdirectory(./mirror)
 
+add_subdirectory(test)
