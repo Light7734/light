@@ -29,8 +29,6 @@ steps:
 
       if [ "$has_fomatting_issues" -eq 0 ]; then
         echo "✅ All files are properly formatted! Well done! ^~^"
-      else
-      echo "❌ Formatting issues found in some files :("
       fi
 
       exit ${has_fomatting_issues}
