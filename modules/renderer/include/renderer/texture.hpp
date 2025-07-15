@@ -14,7 +14,7 @@ class Texture
 {
 public:
 	static Ref<Texture> create(
-	    const Ref<Assets::TextureAsset>& asset,
+	    const Ref<Assets::TextureAsset> &asset,
 	    const Ref<SharedContext> &shared_context
 	);
 

@@ -12,7 +12,7 @@
 namespace lt {
 
 /* static */ auto Texture::create(
-    const Ref<Assets::TextureAsset>& asset,
+    const Ref<Assets::TextureAsset> &asset,
     const Ref<SharedContext> & /*shared_context*/
 ) -> Ref<Texture>
 {
