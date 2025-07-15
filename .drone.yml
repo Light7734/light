@@ -17,7 +17,6 @@ steps:
     - |
       set -e
       clang-format --version
-
       has_fomatting_issues=0
 
       find ./modules -name '*.?pp' | while read -r file; do
@@ -28,7 +27,7 @@ steps:
         fi
       done
 
-      if [ "$has_errors" -eq 0 ]; then
+      if [ "$has_fomatting_issues" -eq 0 ]; then
         echo "✅ All files are properly formatted! Well done! ^~^"
       fi
 
