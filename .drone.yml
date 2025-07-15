@@ -19,7 +19,7 @@ steps:
       clang-format --version
       has_fomatting_issues=0
 
-      find ./modules -name '*.?pp' | while read -r file; do
+      for file in $(find ./modules -name '*.?pp'); do
         echo "Checking format for $file"
         if ! clang-format --dry-run --Werror "$file"; then
           echo "❌ Formatting issue detected in $file"
