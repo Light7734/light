@@ -12,7 +12,7 @@ public:
 	Mirror()
 	{
 		get_window().set_properties(
-		    WindowProperties {
+		    Window::Properties {
 		        .title = "Mirror",
 		        .size = glm::uvec2(1280u, 720u),
 		        .vsync = true,

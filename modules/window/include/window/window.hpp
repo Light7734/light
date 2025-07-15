@@ -6,41 +6,42 @@ namespace lt {
 
 class Event;
 
-struct WindowProperties
-{
-	std::string title;
-
-	glm::uvec2 size;
-
-	bool vsync, visible;
-};
 
 class Window
 {
 public:
+	struct Properties
+	{
+		std::string title;
+
+		glm::uvec2 size;
+
+		bool vsync, visible;
+	};
+
 	static Scope<Window> create(const std::function<void(Event &)> &callback);
 
 	Window() = default;
 
+	virtual ~Window();
+
+	Window(Window &&) = delete;
+
 	Window(const Window &) = delete;
 
-	Window &operator=(const Window &) = delete;
+	auto operator=(Window &&) -> Window & = delete;
 
-	virtual ~Window();
+	auto operator=(const Window &) -> Window & = delete;
 
 	virtual void poll_events() = 0;
 
 	virtual void on_event(const Event &event) = 0;
 
-	virtual void set_properties(
-	    const WindowProperties &properties,
-	    bool affectVisibility = false
-	) = 0;
+	virtual void set_properties(const Properties &properties, bool affectVisibility = false) = 0;
 
 	virtual void set_title(const std::string &title) = 0;
 
-	/** pass 0 for width or height for single dimension resizing */
-	virtual void set_size(const glm::uvec2 &size, bool additive = false) = 0;
+	virtual void set_size(const glm::uvec2 &size) = 0;
 
 	void close()
 	{
@@ -51,7 +52,7 @@ public:
 
 	virtual void set_visibility(bool visible, bool toggle = false) = 0;
 
-	[[nodiscard]] auto get_properties() const -> const WindowProperties &
+	[[nodiscard]] auto get_properties() const -> const Properties &
 	{
 		return m_properties;
 	}
@@ -84,7 +85,13 @@ public:
 	virtual auto get_handle() -> void * = 0;
 
 protected:
-	WindowProperties m_properties {};
+	auto get_properties_handle() -> Properties &
+	{
+		return m_properties;
+	}
+
+private:
+	Properties m_properties {};
 
 	bool b_Closed {};
 };

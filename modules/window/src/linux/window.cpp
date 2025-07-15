@@ -8,8 +8,7 @@
 
 namespace lt {
 
-Window::~Window()
-= default;
+Window::~Window() = default;
 
 auto Window::create(const std::function<void(Event &)> &callback) -> Scope<Window>
 {
@@ -17,19 +16,18 @@ auto Window::create(const std::function<void(Event &)> &callback) -> Scope<Windo
 }
 
 lWindow::lWindow(std::function<void(Event &)> callback)
-    : m_handle(glfwCreateWindow(1u, 1u, "", nullptr, nullptr)), m_event_callback(std::move(std::move(callback)))
+    : m_handle(glfwCreateWindow(1u, 1u, "", nullptr, nullptr))
+    , m_event_callback(std::move(std::move(callback)))
 {
-	// init glfw
-	ensure(glfwInit(), "lWindow::lWindow: failed to initialize 'glfw'");
+	ensure(glfwInit(), "Failed to initialize 'glfw'");
 
-	// create window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-	
-	ensure(m_handle, "lWindow::lWindow: failed to create 'GLFWwindow'");
+
+	ensure(m_handle, "Failed to create 'GLFWwindow'");
 
 	glfwSetWindowUserPointer(m_handle, &m_event_callback);
 	bind_glfw_events();
@@ -56,6 +54,8 @@ void lWindow::on_event(const Event &event)
 	case EventType::WindowResized:
 		on_window_resize(dynamic_cast<const WindowResizedEvent &>(event));
 		break;
+
+	default:
 	}
 }
 
@@ -64,8 +64,7 @@ void lWindow::on_window_resize(const WindowResizedEvent &event)
 	m_properties.size = event.get_size();
 }
 
-void lWindow::
-    set_properties(const WindowProperties &properties, bool overrideVisibility /* = false */)
+void lWindow::set_properties(const Properties &properties, bool overrideVisibility /* = false */)
 {
 	// save the visibility status and re-assign if 'overrideVisibility' is false
 	auto visible = overrideVisibility ? properties.visible : m_properties.visible;
@@ -86,17 +85,10 @@ void lWindow::set_title(const std::string &title)
 	glfwSetWindowTitle(m_handle, title.c_str());
 }
 
-void lWindow::set_size(const glm::uvec2 &size, bool additive /* = false */)
+void lWindow::set_size(const glm::uvec2 &size)
 {
-	m_properties.size.x = size.x == 0u ? m_properties.size.x :
-	                      additive     ? m_properties.size.x + size.x :
-	                                     size.x;
-	m_properties.size.y = size.y == 0u ? m_properties.size.y :
-	                      additive     ? m_properties.size.y + size.y :
-	                                     size.y;
-
-
-	glfwSetWindowSize(m_handle, size.x, size.y);
+	m_properties.size = size;
+	glfwSetWindowSize(m_handle, static_cast<int>(size.x), static_cast<int>(size.y));
 }
 
 void lWindow::set_v_sync(bool vsync, bool toggle /* = false */)
