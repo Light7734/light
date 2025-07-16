@@ -6,7 +6,7 @@ try
 	using namespace ::lt::test;
 	using namespace ::lt::test::details;
 
-	Registry::run_all();
+	return Registry::run_all();
 }
 catch (const std::exception &exp)
 {
