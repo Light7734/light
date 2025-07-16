@@ -154,7 +154,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			default: break;
 			}
 			// Label
-			ImGui::TextUnformatted(fmt::format("{}", path.filename().string()).c_str());
+			ImGui::TextUnformatted(std::format("{}", path.filename().string()).c_str());
 			ImGui::PopID();
 		}
 

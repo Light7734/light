@@ -1,6 +1,5 @@
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
-find_package(spdlog REQUIRED)
 find_package(stb REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(EnTT REQUIRED)

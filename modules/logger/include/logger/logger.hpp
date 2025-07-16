@@ -1,15 +1,9 @@
 #pragma once
 
 #include <format>
-#include <memory>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
+#include <print>
 
-/** @brief Severity of a log message.
- *
- * @note Values reflect spdlog::lvl
- */
+/** Severity of a log message. */
 enum class LogLvl : uint8_t
 {
 	/** Lowest and most vebose log level, for tracing execution paths and events */
@@ -34,11 +28,7 @@ enum class LogLvl : uint8_t
 	off = 6,
 };
 
-namespace spdlog {
-class logger;
-}
-
-/** Responsible for logging */
+/** Simple console logger */
 class Logger
 {
 public:
@@ -47,26 +37,19 @@ public:
 	template<typename... Args>
 	void static log(LogLvl lvl, std::format_string<Args...> fmt, Args &&...args)
 	{
-		instance().spd_logger->log(
-		    (spdlog::level::level_enum)lvl,
-		    std::format(fmt, std::forward<Args>(args)...)
-		);
+		std::ignore = lvl;
+		std::println(fmt, std::forward<Args>(args)...);
 	}
 
 	void static log(LogLvl lvl, const char *message)
 	{
-		instance().spd_logger->log((spdlog::level::level_enum)lvl, message);
+		std::ignore = lvl;
+		std::println("{}", message);
 	}
 
 
 private:
-	Logger();
-
-	~Logger();
-
-	auto static instance() -> Logger &;
-
-	std::shared_ptr<spdlog::logger> spd_logger;
+	Logger() = default;
 };
 
 template<typename... Args>
