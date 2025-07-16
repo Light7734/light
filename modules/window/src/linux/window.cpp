@@ -55,7 +55,7 @@ void lWindow::on_event(const Event &event)
 		on_window_resize(dynamic_cast<const WindowResizedEvent &>(event));
 		break;
 
-	default:
+	default: break;
 	}
 }
 
