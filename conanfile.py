@@ -27,7 +27,6 @@ class LightRecipe(ConanFile):
         self.requires("glfw/3.4")
         self.requires("glm/1.0.1")
         self.requires("spdlog/1.15.3")
-        self.requires("spirv-cross/1.4.313.0")
         self.requires("stb/cci.20240531")
         self.requires("volk/1.3.296.0")
         self.requires("yaml-cpp/0.8.0")
