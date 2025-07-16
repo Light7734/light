@@ -51,8 +51,9 @@ steps:
   pull: if-not-exists
   commands:
     - |
-      git submodule update --init --recursive
+      set -e
 
+      git submodule update --init --recursive
       conan build . \
         -c tools.system.package_manager:mode=install \
         -s build_type=Release \
@@ -60,13 +61,10 @@ steps:
         -o enable_tests=True \
         --build=missing
 
-      find ./build \
-        -type f \
-        -name '*_tests' \
-        -executable \
-        -exec sh -c \
-        '{}' \
-        \;
+      for test in $(find ./build -type f -name '*_tests' -executable); do
+        echo "Running $test"
+        "$test"
+      done
 
 ---
 kind: pipeline
