@@ -23,7 +23,6 @@ class LightRecipe(ConanFile):
     }
 
     def requirements(self):
-        self.requires("gtest/1.16.0")
         self.requires("entt/3.15.0")
         self.requires("glfw/3.4")
         self.requires("glm/1.0.1")
