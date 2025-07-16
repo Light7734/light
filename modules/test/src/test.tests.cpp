@@ -2,6 +2,7 @@
 
 lt::test::Suite meta = []() {
 	using lt::test::expect_eq;
+	using lt::test::expect_true;
 
 	lt::test::Case { "test_1" } = [] {
 		expect_eq(5, 5);
@@ -12,7 +13,18 @@ lt::test::Suite meta = []() {
 	};
 
 	lt::test::Case { "test_3" } = [] {
-		expect_eq(true, false);
+		auto exception_thrown = false;
+
+		try
+		{
+			expect_eq(true, false);
+		}
+		catch (const std::exception &exp)
+		{
+			exception_thrown = true;
+		}
+
+		expect_true(exception_thrown);
 	};
 
 	lt::test::Case { "test_4" } = [] {
@@ -20,6 +32,5 @@ lt::test::Suite meta = []() {
 	};
 
 	lt::test::Case { "test_5" } = [] {
-		throw std::runtime_error("Uncaught std exception!");
 	};
 };
