@@ -9,7 +9,7 @@ glVertexLayout::glVertexLayout(
     const Ref<VertexBuffer> &buffer,
     const std::vector<std::pair<std::string, VertexElementType>> &elements
 )
-    : m_array_id(NULL)
+    : m_array_id()
 {
 	// check
 	ensure(
@@ -65,7 +65,7 @@ void glVertexLayout::bind()
 
 void glVertexLayout::un_bind()
 {
-	glBindVertexArray(NULL);
+	glBindVertexArray({});
 }
 
 auto glVertexLayout::get_element_desc(VertexElementType type, unsigned int offset)

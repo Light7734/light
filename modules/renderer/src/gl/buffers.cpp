@@ -7,7 +7,7 @@ namespace lt {
 
 //==================== CONSTANT_BUFFER ====================//
 glConstantBuffer::glConstantBuffer(ConstantBufferIndex index, unsigned int size)
-    : m_buffer_id(NULL)
+    : m_buffer_id()
     , m_index(static_cast<int>(index))
 {
 	glCreateBuffers(1, &m_buffer_id);
@@ -40,7 +40,7 @@ void glConstantBuffer::un_map()
 
 //==================== VERTEX_BUFFER ====================//
 glVertexBuffer::glVertexBuffer(float *vertices, unsigned int stride, unsigned int count)
-    : m_buffer_id(NULL)
+    : m_buffer_id()
 {
 	glCreateBuffers(1, &m_buffer_id);
 	glNamedBufferData(
@@ -63,7 +63,7 @@ void glVertexBuffer::bind()
 
 void glVertexBuffer::un_bind()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, {});
 }
 
 auto glVertexBuffer::map() -> void *
@@ -78,7 +78,7 @@ void glVertexBuffer::un_map()
 //==================== VERTEX_BUFFER ====================//
 
 //==================== INDEX_BUFFER ====================//
-glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_buffer_id(NULL)
+glIndexBuffer::glIndexBuffer(unsigned int *indices, unsigned int count): m_buffer_id()
 {
 	// generate indices if not provided
 	auto hasIndices = !!indices;
@@ -132,7 +132,7 @@ void glIndexBuffer::bind()
 
 void glIndexBuffer::un_bind()
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, {});
 }
 //==================== INDEX_BUFFER ====================//
 

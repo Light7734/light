@@ -33,7 +33,7 @@ void glRenderCommand::draw_indexed(unsigned int count)
 
 void glRenderCommand::default_target_framebuffer()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, NULL);
+	glBindFramebuffer(GL_FRAMEBUFFER, {});
 }
 
 void glRenderCommand::set_viewport(

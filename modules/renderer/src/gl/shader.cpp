@@ -56,7 +56,7 @@ void glShader::bind()
 
 void glShader::un_bind()
 {
-	glUseProgram(NULL);
+	glUseProgram({});
 }
 
 auto glShader::compile_shader(const std::string &source, Shader::Stage stage) -> unsigned int
@@ -67,7 +67,7 @@ auto glShader::compile_shader(const std::string &source, Shader::Stage stage) ->
 	    stage == Shader::Stage::vertex   ? GL_VERTEX_SHADER :
 	    stage == Shader::Stage::pixel    ? GL_FRAGMENT_SHADER :
 	    stage == Shader::Stage::geometry ? GL_GEOMETRY_SHADER :
-	                                       NULL
+	                                       0
 	);
 
 	// compile
@@ -91,7 +91,7 @@ auto glShader::compile_shader(const std::string &source, Shader::Stage stage) ->
 		    errorLog
 		);
 
-		return NULL;
+		return {};
 	}
 #define LIGHT_OPENGL_ENABLE_SHADER_INFO_LOG
 #ifdef LIGHT_OPENGL_ENABLE_SHADER_INFO_LOG

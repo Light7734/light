@@ -6,9 +6,9 @@ namespace lt {
 
 glFramebuffer::glFramebuffer(const FramebufferSpecification &specification)
     : m_specification(specification)
-    , m_buffer_id(NULL)
-    , m_color_attachment_id(NULL)
-    , m_depth_stencil_attachment_id(NULL)
+    , m_buffer_id()
+    , m_color_attachment_id()
+    , m_depth_stencil_attachment_id()
 {
 	resize({ specification.width, specification.height });
 }
@@ -59,7 +59,7 @@ void glFramebuffer::resize(const glm::uvec2 &size)
 	    GL_RGBA8,
 	    m_specification.width,
 	    m_specification.height,
-	    NULL,
+	    {},
 	    GL_RGBA,
 	    GL_UNSIGNED_BYTE,
 	    nullptr
@@ -73,17 +73,6 @@ void glFramebuffer::resize(const glm::uvec2 &size)
 	    m_color_attachment_id,
 	    0
 	);
-
-	// glTextureStorage2D(m_color_attachment_id, 0, GL_RGBA8, m_specification.width,
-	// m_specification.height);
-
-	//	glCreateTextures(GL_TEXTURE_2D, 1, &m_depth_stencil_attachment_id);
-	//	glBindTexture(GL_TEXTURE_2D, m_depth_stencil_attachment_id);
-	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_specification.width,
-	// m_specification.height, NULL, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
-	//	// glTextureStorage2D(m_depth_stencil_attachment_id, 0, GL_DEPTH24_STENCIL8,
-	// m_specification.width, m_specification.height); 	glFramebufferTexture2D(GL_FRAMEBUFFER,
-	// GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depth_stencil_attachment_id, 0);
 
 	ensure(
 	    (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE),
