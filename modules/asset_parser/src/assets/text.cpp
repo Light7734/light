@@ -1,6 +1,5 @@
 #include <asset_parser/assets/text.hpp>
 #include <lz4.h>
-#include <nlohmann/json.hpp>
 
 namespace Assets {
 
