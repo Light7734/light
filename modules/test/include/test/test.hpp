@@ -26,6 +26,62 @@ concept test = requires(T test) {
 } // namespace concepts
 
 
+namespace details {
+
+
+class Registry
+{
+public:
+	using Suite = void (*)();
+
+	static void register_suite(Suite suite)
+	{
+		instance().m_suites.emplace_back(suite);
+	}
+
+	static auto run_all() -> int32_t
+	{
+		for (auto &test : instance().m_suites)
+		{
+			test();
+		}
+
+		std::cout << "_________________________[TEST RESULTS]_________________________";
+		std::cout << "Ran " << instance().m_failed_count + instance().m_pasesed_count << " tests:\n"
+		          << "Passed: " << instance().m_pasesed_count << '\n'
+		          << "Failed: " << instance().m_failed_count << '\n';
+
+		return instance().m_failed_count;
+	}
+
+	static void increment_passed_count()
+	{
+		++instance().m_pasesed_count;
+	}
+
+	static void increment_failed_count()
+	{
+		++instance().m_failed_count;
+	}
+
+private:
+	Registry() = default;
+
+	[[nodiscard]] static auto instance() -> Registry &
+	{
+		static auto registry = Registry {};
+		return registry;
+	}
+
+	std::vector<void (*)()> m_suites;
+
+	int32_t m_pasesed_count {};
+	int32_t m_failed_count {};
+};
+
+
+} // namespace details
+
 struct Case
 {
 	auto operator=(std::invocable auto test) -> void // NOLINT
@@ -40,6 +96,7 @@ struct Case
 		{
 			std::cout << " --> FAIL !" << '\n';
 			std::cout << exp.what() << "\n\n";
+			details::Registry::increment_failed_count();
 			return; // TODO(Light): Should we run the remaining tests after a failure?
 		}
 
@@ -48,42 +105,6 @@ struct Case
 
 	std::string_view name;
 };
-
-namespace details {
-
-
-class Registry
-{
-public:
-	using Suite = void (*)();
-
-	static void register_suite(Suite suite)
-	{
-		instance().m_suites.emplace_back(suite);
-	}
-
-	static void run_all()
-	{
-		for (auto &test : instance().m_suites)
-		{
-			test();
-		}
-	}
-
-private:
-	Registry() = default;
-
-	[[nodiscard]] static auto instance() -> Registry &
-	{
-		static auto registry = Registry {};
-		return registry;
-	}
-
-	std::vector<void (*)()> m_suites;
-};
-
-
-} // namespace details
 
 struct TestSuite
 {
