@@ -32,8 +32,43 @@ steps:
       fi
 
       exit ${has_fomatting_issues}
----
 
+---
+kind: pipeline
+type: docker
+name: unit tests
+clone:
+  recursive: true
+  submodule_update_remote: true
+
+trigger:
+  branch:
+  - main
+
+steps:
+- name: unit tests
+  image: unit_tests:latest
+  pull: if-not-exists
+  commands:
+    - |
+      git submodule update --init --recursive
+
+      conan build . \
+        -c tools.system.package_manager:mode=install \
+        -s build_type=Release \
+        -o enable_static_analysis=False \
+        -o enable_tests=True \
+        --build=missing
+
+      find ./build \
+        -type f \
+        -name '*_tests' \
+        -executable \
+        -exec sh -c \
+        '{}' \
+        \;
+
+---
 kind: pipeline
 type: docker
 name: static analysis
@@ -51,5 +86,12 @@ steps:
   pull: if-not-exists
   privileged: true
   commands:
-    - git submodule update --init --recursive
-    - conan build . -s build_type=Release -o enable_static_analysis=True --build=missing
+    - |
+      git submodule update --init --recursive
+
+      conan build . \
+        -c tools.system.package_manager:mode=install \
+        -s build_type=Release \
+        -o enable_static_analysis=True \
+        -o enable_tests=True \
+        --build=missing
