@@ -36,8 +36,21 @@ macro (add_executable_module exename)
 
     message("Adding executable ${exename} with source files: ${source_files}")
     add_executable(${exename} ${source_files})
-    target_include_directories(${exename} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(${exename} PUBLIC base)
+    target_include_directories(${exename} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(${exename} PRIVATE base)
+endmacro ()
+
+macro (add_test_module exename)
+    set(source_files)
+    set(source_directory "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    foreach (source_file ${ARGN})
+        list(APPEND source_files "${source_directory}/${source_file}")
+    endforeach ()
+
+    message("Adding test executable ${exename}_tests with source files: ${source_files}")
+    add_executable(${exename}_tests ${source_files})
+    target_include_directories(${exename} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(${exename}_tests PRIVATE ${exename} base test)
 endmacro ()
 
 macro (add_option option help)
