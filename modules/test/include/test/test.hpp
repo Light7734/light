@@ -46,10 +46,10 @@ public:
 			test();
 		}
 
-		std::cout << "_________________________[TEST RESULTS]_________________________";
+		std::cout << "_________________________[TEST RESULTS]_________________________\n";
 		std::cout << "Ran " << instance().m_failed_count + instance().m_pasesed_count << " tests:\n"
-		          << "Passed: " << instance().m_pasesed_count << '\n'
-		          << "Failed: " << instance().m_failed_count << '\n';
+		          << "\tpassed: " << instance().m_pasesed_count << '\n'
+		          << "\tfailed: " << instance().m_failed_count << '\n';
 
 		return instance().m_failed_count;
 	}
@@ -100,6 +100,7 @@ struct Case
 			return; // TODO(Light): Should we run the remaining tests after a failure?
 		}
 
+		details::Registry::increment_passed_count();
 		std::cout << " --> SUCCESS :D" << "\n";
 	}
 
