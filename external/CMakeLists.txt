@@ -52,7 +52,3 @@ target_link_libraries(
   PUBLIC glm::glm 
   PUBLIC glfw
 )
-
-# Copy imconfig.h over
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/configurations/imgui/imconfig.h
-    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/imgui/)

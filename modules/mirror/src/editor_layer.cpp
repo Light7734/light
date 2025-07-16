@@ -119,7 +119,8 @@ void EditorLayer::on_user_interface_update()
 		Input::receive_game_events(ImGui::IsWindowFocused());
 		auto available_region = ImGui::GetContentRegionAvail();
 
-		if (m_available_content_region_prev != available_region)
+		if (m_available_content_region_prev.x != available_region.x
+		    || m_available_content_region_prev.y != available_region.y)
 		{
 			m_framebuffer->resize({ available_region.x, available_region.y });
 			auto &camera = m_camera_entity.get_component<CameraComponent>().camera;
