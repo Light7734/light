@@ -13,13 +13,15 @@ class LightRecipe(ConanFile):
     options = {
         "enable_tests": [True, False],
         "enable_static_analysis": [True, False],
+        "use_mold": [True, False],
         "export_compile_commands": [True, False],
     }
 
     default_options = {
         "enable_tests": True,
-        "export_compile_commands": True,
         "enable_static_analysis": False,
+        "use_mold": False,
+        "export_compile_commands": True,
     }
 
     def requirements(self):
@@ -36,7 +38,9 @@ class LightRecipe(ConanFile):
         tc = CMakeToolchain(self)
 
         tc.variables["CMAKE_BUILD_TYPE"] = self.settings.build_type
-        tc.cache_variables["CMAKE_LINKER_TYPE"] = "MOLD"
+
+        if self.options.use_mold:
+            tc.cache_variables["CMAKE_LINKER_TYPE"] = "MOLD"
 
         tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = self.options.export_compile_commands
         tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
