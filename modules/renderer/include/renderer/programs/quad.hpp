@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <math/vec4.hpp>
 #include <renderer/programs/renderer_program.hpp>
 
 namespace lt {
@@ -19,9 +19,9 @@ public:
 	~QuadRendererProgram() override = default;
 	struct QuadVertexData
 	{
-		glm::vec4 position;
+		math::vec4 position;
 
-		glm::vec4 tint;
+		math::vec4 tint;
 	};
 
 	QuadRendererProgram(

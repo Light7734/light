@@ -1,8 +1,5 @@
 #include <asset_parser/assets/text.hpp>
 #include <glad/gl.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/matrix.hpp>
 #include <renderer/gl/shader.hpp>
 
 namespace lt {

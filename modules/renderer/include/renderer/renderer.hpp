@@ -1,6 +1,9 @@
 #pragma once
 
 //
+#include <math/mat4.hpp>
+#include <math/vec3.hpp>
+#include <math/vec4.hpp>
 #include <renderer/blender.hpp>
 #include <renderer/buffers.hpp>
 #include <renderer/render_command.hpp>
@@ -48,47 +51,51 @@ public:
 	) -> Scope<Renderer>;
 
 	static void draw_quad(
-	    const glm::vec3 &position,
-	    const glm::vec2 &size,
-	    const glm::vec4 &tint,
+	    const math::vec3 &position,
+	    const math::vec2 &size,
+	    const math::vec4 &tint,
 	    Ref<Texture> texture
 	)
 	{
 		s_context->draw_quad_impl(position, size, tint, std::move(texture));
 	}
 
-	static void draw_quad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint)
+	static void draw_quad(
+	    const math::vec3 &position,
+	    const math::vec2 &size,
+	    const math::vec4 &tint
+	)
 	{
 		s_context->draw_quad_impl(position, size, tint);
 	}
 
-	static void draw_quad(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture)
+	static void draw_quad(const math::vec3 &position, const math::vec2 &size, Ref<Texture> texture)
 	{
 		s_context->draw_quad_impl(position, size, std::move(texture));
 	}
 
 	static void draw_quad(
-	    const glm::mat4 &transform,
-	    const glm::vec4 &tint,
+	    const math::mat4 &transform,
+	    const math::vec4 &tint,
 	    const Ref<Texture> &texture
 	)
 	{
 		s_context->draw_quad_impl(transform, tint, texture);
 	}
 
-	static void draw_quad(const glm::mat4 &transform, const glm::vec4 &tint)
+	static void draw_quad(const math::mat4 &transform, const math::vec4 &tint)
 	{
 		s_context->draw_quad_impl(transform, tint);
 	}
 
-	static void draw_quad(const glm::mat4 &transform, const Ref<Texture> &texture)
+	static void draw_quad(const math::mat4 &transform, const Ref<Texture> &texture)
 	{
 		s_context->draw_quad_impl(transform, texture);
 	}
 
 	static void begin_scene(
 	    Camera *camera,
-	    const glm::mat4 &cameraTransform,
+	    const math::mat4 &cameraTransform,
 	    const Ref<Framebuffer> &targetFrameBuffer = nullptr
 	)
 	{
@@ -134,29 +141,29 @@ private:
 	);
 
 	void draw_quad_impl(
-	    const glm::vec3 &position,
-	    const glm::vec2 &size,
-	    const glm::vec4 &tint,
+	    const math::vec3 &position,
+	    const math::vec2 &size,
+	    const math::vec4 &tint,
 	    Ref<Texture> texture
 	);
 
-	void draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &tint);
+	void draw_quad_impl(const math::vec3 &position, const math::vec2 &size, const math::vec4 &tint);
 
-	void draw_quad_impl(const glm::vec3 &position, const glm::vec2 &size, Ref<Texture> texture);
+	void draw_quad_impl(const math::vec3 &position, const math::vec2 &size, Ref<Texture> texture);
 
 	void draw_quad_impl(
-	    const glm::mat4 &transform,
-	    const glm::vec4 &tint,
+	    const math::mat4 &transform,
+	    const math::vec4 &tint,
 	    const Ref<Texture> &texture
 	);
 
-	void draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint);
+	void draw_quad_impl(const math::mat4 &transform, const math::vec4 &tint);
 
-	void draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &texture);
+	void draw_quad_impl(const math::mat4 &transform, const Ref<Texture> &texture);
 
 	void begin_scene_impl(
 	    Camera *camera,
-	    const glm::mat4 &cameraTransform,
+	    const math::mat4 &cameraTransform,
 	    const Ref<Framebuffer> &targetFrameBuffer = nullptr
 	);
 

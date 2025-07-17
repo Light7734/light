@@ -1,7 +1,6 @@
 #pragma once
 
 #include <camera/scene.hpp>
-#include <glm/glm.hpp>
 
 namespace lt {
 

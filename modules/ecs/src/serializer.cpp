@@ -2,14 +2,16 @@
 #include <camera/component.hpp>
 #include <ecs/components.hpp>
 #include <ecs/serializer.hpp>
+#include <math/vec3.hpp>
+#include <math/vec4.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {
 
 template<>
-struct convert<glm::vec3>
+struct convert<lt::math::vec3>
 {
-	static auto encode(const glm::vec3 &rhs) -> Node
+	static auto encode(const lt::math::vec3 &rhs) -> Node
 	{
 		auto node = Node {};
 		node.push_back(rhs.x);
@@ -18,7 +20,7 @@ struct convert<glm::vec3>
 		return node;
 	}
 
-	static auto decode(const Node &node, glm::vec3 &rhs) -> bool
+	static auto decode(const Node &node, lt::math::vec3 &rhs) -> bool
 	{
 		if (!node.IsSequence() || node.size() != 3)
 		{
@@ -33,9 +35,9 @@ struct convert<glm::vec3>
 };
 
 template<>
-struct convert<glm::vec4>
+struct convert<lt::math::vec4>
 {
-	static auto encode(const glm::vec4 &rhs) -> Node
+	static auto encode(const lt::math::vec4 &rhs) -> Node
 	{
 		auto node = Node {};
 		node.push_back(rhs.x);
@@ -45,7 +47,7 @@ struct convert<glm::vec4>
 		return node;
 	}
 
-	static auto decode(const Node &node, glm::vec4 &rhs) -> bool
+	static auto decode(const Node &node, lt::math::vec4 &rhs) -> bool
 	{
 		if (!node.IsSequence() || node.size() != 4)
 		{
@@ -63,14 +65,14 @@ struct convert<glm::vec4>
 
 namespace lt {
 
-auto operator<<(YAML::Emitter &out, const glm::vec3 &v) -> YAML::Emitter &
+auto operator<<(YAML::Emitter &out, const math::vec3 &v) -> YAML::Emitter &
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
 	return out;
 }
 
-auto operator<<(YAML::Emitter &out, const glm::vec4 &v) -> YAML::Emitter &
+auto operator<<(YAML::Emitter &out, const math::vec4 &v) -> YAML::Emitter &
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
@@ -156,9 +158,10 @@ auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 				                                      .get_component<TransformComponent>();
 
 				entityTransforomComponent.translation = transformComponent["Translation"]
-				                                            .as<glm::vec3>();
-				entityTransforomComponent.rotation = transformComponent["Rotation"].as<glm::vec3>();
-				entityTransforomComponent.scale = transformComponent["Scale"].as<glm::vec3>();
+				                                            .as<math::vec3>();
+				entityTransforomComponent.rotation = transformComponent["Rotation"]
+				                                         .as<math::vec3>();
+				entityTransforomComponent.scale = transformComponent["Scale"].as<math::vec3>();
 			}
 
 			/* #TEMPORARY SOLUTION# */
@@ -168,7 +171,7 @@ auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 				auto &entitySpriteRendererComponent = deserializedEntity
 				                                          .add_component<SpriteRendererComponent>();
 				entitySpriteRendererComponent.tint = spriteRendererComponent["Tint"]
-				                                         .as<glm::vec4>();
+				                                         .as<math::vec4>();
 
 				auto texturePath = spriteRendererComponent["Texture"].as<std::string>();
 
@@ -213,7 +216,7 @@ auto SceneSerializer::deserialize(const std::string &file_path) -> bool
 				);
 
 				entityCameraComponent.camera.set_background_color(
-				    cameraSpecifications["BackgroundColor"].as<glm::vec4>()
+				    cameraSpecifications["BackgroundColor"].as<math::vec4>()
 				);
 
 				entityCameraComponent.isPrimary = cameraComponent["IsPrimary"].as<bool>();

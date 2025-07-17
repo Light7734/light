@@ -1,5 +1,4 @@
 #include <glad/gl.h>
-#include <glm/glm.hpp>
 #include <renderer/gl/framebuffers.hpp>
 
 namespace lt {
@@ -20,7 +19,7 @@ glFramebuffer::~glFramebuffer()
 	// glDeleteTextures(1, &m_depth_stencil_attachment_id);
 }
 
-void glFramebuffer::bind_as_target(const glm::vec4 &clearColor)
+void glFramebuffer::bind_as_target(const math::vec4 &clearColor)
 {
 	// #todo: use viewport instead of default x=0, y=0
 	glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_id);
@@ -35,7 +34,7 @@ void glFramebuffer::bind_as_resource()
 	log_err("NO_IMPLEMENT!");
 }
 
-void glFramebuffer::resize(const glm::uvec2 &size)
+void glFramebuffer::resize(const math::uvec2 &size)
 {
 	if (m_buffer_id)
 	{

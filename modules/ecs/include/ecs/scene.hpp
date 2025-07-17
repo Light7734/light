@@ -3,7 +3,6 @@
 #include <ecs/components/transform.hpp>
 #include <ecs/uuid.hpp>
 #include <entt/entt.hpp>
-#include <glm/glm.hpp>
 
 namespace lt {
 

@@ -3,6 +3,7 @@ add_subdirectory(./base)
 add_subdirectory(./time)
 add_subdirectory(./logger)
 add_subdirectory(./debug)
+add_subdirectory(./math)
 
 add_subdirectory(./asset_baker)
 add_subdirectory(./asset_parser)

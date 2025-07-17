@@ -6,6 +6,7 @@
 #include <ecs/serializer.hpp>
 #include <input/input.hpp>
 #include <input/key_codes.hpp>
+#include <math/vec4.hpp>
 #include <mirror/editor_layer.hpp>
 #include <renderer/framebuffer.hpp>
 #include <renderer/graphics_context.hpp>
@@ -44,7 +45,7 @@ EditorLayer::EditorLayer(const std::string &name)
 		auto entity = Entity { m_scene->create_entity("Awesomeface", {}) };
 		entity.add_component<SpriteRendererComponent>(
 		    AssetManager::get_texture("Awesomeface"),
-		    glm::vec4 { 0.0f, 1.0f, 1.0f, 1.0f }
+		    math::vec4 { 0.0f, 1.0f, 1.0f, 1.0f }
 		);
 	}
 	else
@@ -96,7 +97,8 @@ void EditorLayer::on_update(float delta_time)
 	}
 
 	auto &translation = m_camera_entity.get_component<TransformComponent>().translation;
-	translation += glm::vec3 { m_direction * m_speed * delta_time, 0.0f };
+	auto velocity = m_direction * m_speed * delta_time;
+	translation = translation * math::vec3 { velocity.x, velocity.y, 0.0f };
 
 	if (Input::get_keyboard_key(Key::Escape))
 	{
@@ -122,7 +124,12 @@ void EditorLayer::on_user_interface_update()
 		if (m_available_content_region_prev.x != available_region.x
 		    || m_available_content_region_prev.y != available_region.y)
 		{
-			m_framebuffer->resize({ available_region.x, available_region.y });
+			m_framebuffer->resize(
+			    math::uvec2 {
+			        static_cast<uint32_t>(available_region.x),
+			        static_cast<uint32_t>(available_region.y),
+			    }
+			);
 			auto &camera = m_camera_entity.get_component<CameraComponent>().camera;
 			camera.set_viewport_size(
 			    static_cast<uint32_t>(available_region.x),

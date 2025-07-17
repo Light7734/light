@@ -1,8 +1,8 @@
 #pragma once
 
 #include <app/layer.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <imgui.h>
+#include <math/vec2.hpp>
 #include <mirror/panel/asset_browser.hpp>
 #include <mirror/panel/properties.hpp>
 #include <mirror/panel/scene_hierarchy.hpp>
@@ -36,7 +36,7 @@ public:
 private:
 	std::string m_scene_dir;
 
-	glm::vec2 m_direction;
+	math::vec2 m_direction;
 
 	float m_speed = 1000.0f;
 

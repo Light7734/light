@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <math/vec2.hpp>
 
 namespace lt {
 
@@ -14,7 +14,7 @@ public:
 	{
 		std::string title;
 
-		glm::uvec2 size;
+		math::uvec2 size;
 
 		bool vsync, visible;
 	};
@@ -41,7 +41,7 @@ public:
 
 	virtual void set_title(const std::string &title) = 0;
 
-	virtual void set_size(const glm::uvec2 &size) = 0;
+	virtual void set_size(const math::uvec2 &size) = 0;
 
 	void close()
 	{
@@ -62,7 +62,7 @@ public:
 		return m_properties.title;
 	}
 
-	[[nodiscard]] auto get_size() const -> const glm::uvec2 &
+	[[nodiscard]] auto get_size() const -> const math::uvec2 &
 	{
 		return m_properties.size;
 	}

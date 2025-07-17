@@ -2,7 +2,6 @@
 #include <ecs/components.hpp>
 #include <ecs/entity.hpp>
 #include <ecs/scene.hpp>
-#include <glm/glm.hpp>
 #include <renderer/renderer.hpp>
 
 namespace lt {

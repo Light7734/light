@@ -1,11 +1,12 @@
 #include <camera/scene.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <math/algebra.hpp>
+#include <math/trig.hpp>
 
 namespace lt {
 
 SceneCamera::SceneCamera()
     : m_orthographic_specification { .size = 1000.0f, .near_plane = -1.0f, .far_plane = 10000.0f }
-    , m_perspective_specification { .vertical_fov = glm::radians(45.0f),
+    , m_perspective_specification { .vertical_fov = math::radians(45.0f),
 	                                .near_plane = 0.01f,
 	                                .far_plane = 10000.0f }
     , m_aspect_ratio(16.0f / 9.0f)
@@ -64,26 +65,19 @@ void SceneCamera::set_perspective_near_plane(float near_plane)
 
 void SceneCamera::calculate_projection()
 {
+	// TODO(Light): implement ortho perspective
 	if (m_projection_type == ProjectionType::Orthographic)
 	{
-		m_projection = glm::ortho(
-		    -m_orthographic_specification.size * 0.5f * m_aspect_ratio,
-		    m_orthographic_specification.size * 0.5f * m_aspect_ratio,
-		    -m_orthographic_specification.size * 0.5f,
-		    m_orthographic_specification.size * 0.5f,
-		    m_orthographic_specification.far_plane,
-		    m_orthographic_specification.near_plane
-		);
+		// throw std::runtime_error { "ortho perspective not supported yet" };
 	}
-	else // perspective
-	{
-		m_projection = glm::perspective(
-		    m_perspective_specification.vertical_fov,
-		    m_aspect_ratio,
-		    m_perspective_specification.near_plane,
-		    m_perspective_specification.far_plane
-		);
-	}
+
+	// defaults to perspective for now...
+	m_projection = math::perspective(
+	    m_perspective_specification.vertical_fov,
+	    m_aspect_ratio,
+	    m_perspective_specification.near_plane,
+	    m_perspective_specification.far_plane
+	);
 }
 
 } // namespace lt

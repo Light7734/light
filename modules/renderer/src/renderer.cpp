@@ -1,8 +1,5 @@
 #include <camera/scene.hpp>
 #include <debug/assertions.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/matrix.hpp>
 #include <input/events/window.hpp>
 #include <renderer/blender.hpp>
 #include <renderer/buffers.hpp>
@@ -49,7 +46,7 @@ Renderer::Renderer(
 
 	m_view_projection_buffer = ConstantBuffer::create(
 	    ConstantBufferIndex::ViewProjection,
-	    sizeof(glm::mat4),
+	    sizeof(math::mat4),
 	    shared_context
 	);
 
@@ -77,69 +74,63 @@ void Renderer::on_window_resize(const WindowResizedEvent &event)
 //======================================== DRAW_QUAD ========================================//
 /* tinted textures */
 void Renderer::draw_quad_impl(
-    const glm::vec3 &position,
-    const glm::vec2 &size,
-    const glm::vec4 &tint,
+    const math::vec3 &position,
+    const math::vec2 &size,
+    const math::vec4 &tint,
     Ref<Texture> texture
 )
 {
 	draw_quad(
-	    glm::translate(glm::mat4(1.0f), position)
-	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
+	    math::translate(position) * math::scale(math::vec3 { size.x, size.y, 1.0f }),
 	    tint,
-	    std::move(texture)
+	    texture
 	);
 }
 
 /* tint */
 void Renderer::draw_quad_impl(
-    const glm::vec3 &position,
-    const glm::vec2 &size,
-    const glm::vec4 &tint
+    const math::vec3 &position,
+    const math::vec2 &size,
+    const math::vec4 &tint
 )
 {
-	draw_quad(
-	    glm::translate(glm::mat4(1.0f), position)
-	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
-	    tint
-	);
+	draw_quad(math::translate(position) * math::scale(math::vec3 { size.x, size.y, 1.0f }), tint);
 }
 
 /* texture */
 void Renderer::draw_quad_impl(
-    const glm::vec3 &position,
-    const glm::vec2 &size,
+    const math::vec3 &position,
+    const math::vec2 &size,
     Ref<Texture> texture
 )
 {
 	draw_quad(
-	    glm::translate(glm::mat4(1.0f), position)
-	        * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f }),
-	    std::move(texture)
+	    math::translate(position) * math::scale(math::vec3 { size.x, size.y, 1.0f }),
+	    texture
 	);
 }
 //======================================== DRAW_QUAD ========================================//
 
 //==================== DRAW_QUAD_TINT ====================//
-void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
+void Renderer::draw_quad_impl(const math::mat4 &transform, const math::vec4 &tint)
 {
 	auto map = std::span<QuadRendererProgram::QuadVertexData> { m_quad_renderer.get_map_current(),
 		                                                        4 };
 
 	// top left
-	map[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	map[0].position = transform * math::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
 	map[0].tint = tint;
 
 	// top right
-	map[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
+	map[1].position = transform * math::vec4(0.5f, -0.5f, 0.0f, 1.0f);
 	map[1].tint = tint;
 
 	// bottom right
-	map[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	map[2].position = transform * math::vec4(0.5f, 0.5f, 0.0f, 1.0f);
 	map[2].tint = tint;
 
 	// bottom left
-	map[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+	map[3].position = transform * math::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
 	map[3].tint = tint;
 
 	// advance
@@ -150,7 +141,7 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const glm::vec4 &tint)
 	}
 }
 
-void Renderer::draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &texture)
+void Renderer::draw_quad_impl(const math::mat4 &transform, const Ref<Texture> &texture)
 {
 	ensure(texture, "Texture passed to renderer::draw_quad_impl");
 
@@ -161,19 +152,19 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &te
 	};
 
 	// top left
-	map[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	map[0].position = transform * math::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
 	map[0].texcoord = { 0.0f, 0.0f };
 
 	// top right
-	map[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
+	map[1].position = transform * math::vec4(0.5f, -0.5f, 0.0f, 1.0f);
 	map[1].texcoord = { 1.0f, 0.0f };
 
 	// bottom right
-	map[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	map[2].position = transform * math::vec4(0.5f, 0.5f, 0.0f, 1.0f);
 	map[2].texcoord = { 1.0f, 1.0f };
 
 	// bottom left
-	map[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+	map[3].position = transform * math::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
 	map[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
@@ -185,8 +176,8 @@ void Renderer::draw_quad_impl(const glm::mat4 &transform, const Ref<Texture> &te
 }
 
 void Renderer::draw_quad_impl(
-    const glm::mat4 &transform,
-    const glm::vec4 &tint,
+    const math::mat4 &transform,
+    const math::vec4 &tint,
     const Ref<Texture> &texture
 )
 {
@@ -199,22 +190,22 @@ void Renderer::draw_quad_impl(
 	};
 
 	// top left
-	map[0].position = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	map[0].position = transform * math::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
 	map[0].tint = tint;
 	map[0].texcoord = { 0.0f, 0.0f };
 
 	// top right
-	map[1].position = transform * glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
+	map[1].position = transform * math::vec4(0.5f, -0.5f, 0.0f, 1.0f);
 	map[1].tint = tint;
 	map[1].texcoord = { 1.0f, 0.0f };
 
 	// bottom right
-	map[2].position = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
+	map[2].position = transform * math::vec4(0.5f, 0.5f, 0.0f, 1.0f);
 	map[2].tint = tint;
 	map[2].texcoord = { 1.0f, 1.0f };
 
 	// bottom left
-	map[3].position = transform * glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
+	map[3].position = transform * math::vec4(-0.5f, 0.5f, 0.0f, 1.0f);
 	map[3].tint = tint;
 	map[3].texcoord = { 0.0f, 1.0f };
 
@@ -234,7 +225,7 @@ void Renderer::end_frame()
 	m_render_command->swap_buffers();
 	m_render_command->clear_back_buffer(
 	    m_default_framebuffer_camera ? m_default_framebuffer_camera->get_background_color() :
-	                                   glm::vec4(0.0f)
+	                                   math::vec4(0.0f)
 	);
 
 	m_default_framebuffer_camera = nullptr;
@@ -242,7 +233,7 @@ void Renderer::end_frame()
 
 void Renderer::begin_scene_impl(
     Camera *camera,
-    const glm::mat4 &cameraTransform,
+    const math::mat4 &cameraTransform,
     const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */
 )
 {
@@ -260,8 +251,8 @@ void Renderer::begin_scene_impl(
 	}
 
 	// update view projection buffer
-	auto *map = (glm::mat4 *)m_view_projection_buffer->map();
-	map[0] = camera->get_projection() * glm::inverse(cameraTransform);
+	auto *map = (math::mat4 *)m_view_projection_buffer->map();
+	map[0] = camera->get_projection() * math::inverse(cameraTransform);
 	m_view_projection_buffer->un_map();
 
 	// map renderers

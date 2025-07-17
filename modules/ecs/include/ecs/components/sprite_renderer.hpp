@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <math/vec4.hpp>
 #include <utility>
 
 namespace lt {
@@ -15,7 +15,7 @@ struct SpriteRendererComponent
 
 	SpriteRendererComponent(
 	    Ref<Texture> _texture,
-	    const glm::vec4 &_tint = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+	    const math::vec4 &_tint = math::vec4 { 1.0f, 1.0f, 1.0f, 1.0f }
 	)
 	    : texture(std::move(std::move(_texture)))
 	    , tint(_tint)
@@ -29,7 +29,7 @@ struct SpriteRendererComponent
 
 	Ref<Texture> texture;
 
-	glm::vec4 tint {};
+	math::vec4 tint {};
 };
 
 } // namespace lt

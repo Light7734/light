@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <input/events/event.hpp>
+#include <math/vec2.hpp>
 #include <sstream>
 
 namespace lt {
@@ -32,7 +32,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] auto get_position() const -> const glm::ivec2 &
+	[[nodiscard]] auto get_position() const -> const math::ivec2 &
 	{
 		return m_position;
 	}
@@ -56,7 +56,7 @@ public:
 	}
 
 private:
-	const glm::ivec2 m_position;
+	const math::ivec2 m_position;
 };
 
 class WindowResizedEvent: public Event
@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] auto get_size() const -> const glm::uvec2 &
+	[[nodiscard]] auto get_size() const -> const math::uvec2 &
 	{
 		return m_size;
 	}
@@ -89,7 +89,7 @@ public:
 	}
 
 private:
-	const glm::uvec2 m_size;
+	const math::uvec2 m_size;
 };
 
 class WindowLostFocusEvent: public Event

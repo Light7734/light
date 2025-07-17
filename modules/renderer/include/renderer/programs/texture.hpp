@@ -1,6 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <math/vec2.hpp>
+#include <math/vec4.hpp>
 #include <renderer/programs/renderer_program.hpp>
 
 namespace lt {
@@ -19,9 +20,9 @@ public:
 
 	struct TextureVertexData
 	{
-		glm::vec4 position;
+		math::vec4 position;
 
-		glm::vec2 texcoord;
+		math::vec2 texcoord;
 	};
 
 	TextureRendererProgram(

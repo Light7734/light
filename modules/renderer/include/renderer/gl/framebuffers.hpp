@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <math/vec2.hpp>
+#include <math/vec4.hpp>
 #include <renderer/framebuffer.hpp>
 
 namespace lt {
@@ -12,11 +13,11 @@ public:
 
 	~glFramebuffer() override;
 
-	void bind_as_target(const glm::vec4 &clearColor) override;
+	void bind_as_target(const math::vec4 &clearColor) override;
 
 	void bind_as_resource() override;
 
-	void resize(const glm::uvec2 &size) override;
+	void resize(const math::uvec2 &size) override;
 
 	auto get_color_attachment() -> void * override
 	{

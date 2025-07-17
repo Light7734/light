@@ -15,7 +15,7 @@ void glRenderCommand::swap_buffers()
 	glfwSwapBuffers(m_window_handle);
 }
 
-void glRenderCommand::clear_back_buffer(const glm::vec4 &clearColor)
+void glRenderCommand::clear_back_buffer(const math::vec4 &clearColor)
 {
 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 	glClear(GL_COLOR_BUFFER_BIT);

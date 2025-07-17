@@ -1,10 +1,9 @@
 #include <asset_manager/asset_manager.hpp>
 #include <camera/component.hpp>
 #include <ecs/components.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <math/trig.hpp>
 #include <mirror/panel/properties.hpp>
 
 namespace lt {
@@ -21,7 +20,7 @@ void PropertiesPanel::on_user_interface_update()
 
 			auto buffer = std::array<char, 256> {};
 			memset(buffer.data(), 0, buffer.size());
-			std::strncpy(buffer.data(), tagComponent.tag.c_str(), buffer.size());
+			strncpy(buffer.data(), tagComponent.tag.c_str(), buffer.size());
 
 			if (ImGui::InputText("##Tag", buffer.data(), buffer.size()))
 			{
@@ -147,13 +146,13 @@ void PropertiesPanel::on_user_interface_update()
 				    auto near_plane = float {};
 				    auto far_plane = float {};
 
-				    vertical_fov = glm::degrees(camera.get_perspective_vertical_fov());
+				    vertical_fov = math::degrees(camera.get_perspective_vertical_fov());
 				    near_plane = camera.get_perspective_near_plane();
 				    far_plane = camera.get_perspective_far_plane();
 
 				    if (ImGui::DragFloat("Vertical FOV", &vertical_fov))
 				    {
-					    camera.set_perspective_vertical_fov(glm::radians(vertical_fov));
+					    camera.set_perspective_vertical_fov(math::radians(vertical_fov));
 				    }
 
 				    if (ImGui::DragFloat("Near Plane", &near_plane))
@@ -182,7 +181,7 @@ void PropertiesPanel::set_entity_context(const Entity &entity)
 
 void PropertiesPanel::draw_vec3_control(
     const std::string &label,
-    glm::vec3 &values,
+    math::vec3 &values,
     float reset_value,
     float column_width
 )

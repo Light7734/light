@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <input/events/event.hpp>
+#include <math/vec2.hpp>
 #include <sstream>
 
 namespace lt {
@@ -13,7 +13,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] auto get_position() const -> const glm::vec2 &
+	[[nodiscard]] auto get_position() const -> const math::vec2 &
 	{
 		return m_position;
 	}
@@ -46,7 +46,7 @@ public:
 	}
 
 private:
-	const glm::vec2 m_position;
+	const math::vec2 m_position;
 };
 
 class WheelScrolledEvent: public Event

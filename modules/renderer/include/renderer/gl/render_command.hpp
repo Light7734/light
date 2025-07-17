@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <math/vec4.hpp>
 #include <renderer/render_command.hpp>
 
 struct GLFWwindow;
@@ -14,7 +14,7 @@ public:
 
 	void swap_buffers() override;
 
-	void clear_back_buffer(const glm::vec4 &clearColor) override;
+	void clear_back_buffer(const math::vec4 &clearColor) override;
 
 	void draw(unsigned int count) override;
 

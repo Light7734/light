@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include <glm/glm.hpp>
+#include <math/vec4.hpp>
 
 struct GLFWwindow;
 
@@ -23,7 +22,7 @@ public:
 
 	virtual void swap_buffers() = 0;
 
-	virtual void clear_back_buffer(const glm::vec4 &clearColor) = 0;
+	virtual void clear_back_buffer(const math::vec4 &clearColor) = 0;
 
 	virtual void draw(unsigned int count) = 0;
 

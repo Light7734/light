@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ecs/entity.hpp>
+#include <math/vec3.hpp>
 #include <mirror/panel/panel.hpp>
 
 namespace lt {
@@ -17,7 +18,7 @@ public:
 private:
 	void draw_vec3_control(
 	    const std::string &label,
-	    glm::vec3 &values,
+	    math::vec3 &values,
 	    float reset_value = 0.0f,
 	    float column_width = 100.0f
 	);

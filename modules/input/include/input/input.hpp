@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <glm/glm.hpp>
+#include <math/vec2.hpp>
 
 namespace lt {
 
@@ -36,7 +36,7 @@ public:
 		return instance().m_mouse_buttons[code];
 	}
 
-	static auto get_mouse_position(int /*code*/) -> const glm::vec2 &
+	static auto get_mouse_position(int /*code*/) -> const math::vec2 &
 	{
 		return instance().m_mouse_position;
 	}
@@ -66,9 +66,9 @@ private:
 
 	std::array<bool, 8> m_mouse_buttons {};
 
-	glm::vec2 m_mouse_position;
+	math::vec2 m_mouse_position;
 
-	glm::vec2 m_mouse_delta;
+	math::vec2 m_mouse_delta;
 
 	float m_mouse_wheel_delta {};
 

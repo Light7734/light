@@ -85,7 +85,7 @@ void lWindow::set_title(const std::string &title)
 	glfwSetWindowTitle(m_handle, title.c_str());
 }
 
-void lWindow::set_size(const glm::uvec2 &size)
+void lWindow::set_size(const math::uvec2 &size)
 {
 	m_properties.size = size;
 	glfwSetWindowSize(m_handle, static_cast<int>(size.x), static_cast<int>(size.y));

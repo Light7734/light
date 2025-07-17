@@ -36,8 +36,8 @@ void Input::restart_input_state()
 	m_keyboad_keys.fill(false);
 	m_mouse_buttons.fill(false);
 
-	m_mouse_position = glm::vec2(0.0f);
-	m_mouse_delta = glm::vec2(0.0f);
+	m_mouse_position = math::vec2(0.0f);
+	m_mouse_delta = math::vec2(0.0f);
 	m_mouse_wheel_delta = 0.0f;
 }
 

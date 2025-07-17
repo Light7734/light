@@ -1,6 +1,7 @@
 #include <app/application.hpp>
 #include <app/entrypoint.hpp>
 #include <app/layer_stack.hpp>
+#include <math/vec2.hpp>
 #include <mirror/editor_layer.hpp>
 #include <window/window.hpp>
 
@@ -14,7 +15,7 @@ public:
 		get_window().set_properties(
 		    Window::Properties {
 		        .title = "Mirror",
-		        .size = glm::uvec2(1280u, 720u),
+		        .size = math::uvec2(1280u, 720u),
 		        .vsync = true,
 		    }
 		);

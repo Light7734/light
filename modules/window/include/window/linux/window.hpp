@@ -32,7 +32,7 @@ public:
 
 	void set_title(const std::string &title) override;
 
-	void set_size(const glm::uvec2 &size) override;
+	void set_size(const math::uvec2 &size) override;
 
 	void set_v_sync(bool vsync, bool toggle = false) override;
 
