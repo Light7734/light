@@ -1,38 +1,3 @@
-kind: pipeline
-type: docker
-name: clang format
-clone:
-  recursive: true
-  submodule_update_remote: true
-
-trigger:
-  branch:
-  - main
-
-steps:
-- name: clang format
-  image: clang_format:latest
-  pull: if-not-exists
-  commands:
-    - |
-      set -e
-      clang-format --version
-      has_fomatting_issues=0
-
-      for file in $(find ./modules -name '*.?pp'); do
-        echo "Checking format for $file"
-        if ! clang-format --dry-run --Werror "$file"; then
-          echo "❌ Formatting issue detected in $file"
-          has_fomatting_issues=1
-        fi
-      done
-
-      if [ "$has_fomatting_issues" -eq 0 ]; then
-        echo "✅ All files are properly formatted! Well done! ^~^"
-      fi
-
-      exit ${has_fomatting_issues}
-
 ---
 kind: pipeline
 type: docker
@@ -69,6 +34,36 @@ steps:
 ---
 kind: pipeline
 type: docker
+name: valgrind
+clone:
+  recursive: true
+  submodule_update_remote: true
+
+trigger:
+  branch:
+  - main
+
+steps:
+- name: valgrind
+  image: valgrind:latest
+  pull: if-not-exists
+  commands:
+    - |
+      set -e
+
+      git submodule update --init --recursive
+      conan build . \
+        -c tools.system.package_manager:mode=install \
+        -s build_type=Release \
+        -o enable_static_analysis=False \
+        -o enable_tests=True \
+        --build=missing
+
+      find ./build -type f -name "*_tests" -executable | xargs -I {} bash -c 'valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --error-exitcode=255 {}' || exit 1
+
+---
+kind: pipeline
+type: docker
 name: static analysis
 clone:
   recursive: true
@@ -93,3 +88,39 @@ steps:
         -o enable_static_analysis=True \
         -o enable_tests=True \
         --build=missing
+
+---
+kind: pipeline
+type: docker
+name: clang format
+clone:
+  recursive: true
+  submodule_update_remote: true
+
+trigger:
+  branch:
+  - main
+
+steps:
+- name: clang format
+  image: clang_format:latest
+  pull: if-not-exists
+  commands:
+    - |
+      set -e
+      clang-format --version
+      has_fomatting_issues=0
+
+      for file in $(find ./modules -name '*.?pp'); do
+        echo "Checking format for $file"
+        if ! clang-format --dry-run --Werror "$file"; then
+          echo "❌ Formatting issue detected in $file"
+          has_fomatting_issues=1
+        fi
+      done
+
+      if [ "$has_fomatting_issues" -eq 0 ]; then
+        echo "✅ All files are properly formatted! Well done! ^~^"
+      fi
+
+      exit ${has_fomatting_issues}

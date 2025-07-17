@@ -6,6 +6,12 @@ namespace lt {
 
 using lt::test::expect_le;
 
+// error margin is high since run-time may slow down extremely due to
+// sanitization/debugging or execution through valgrind...
+//
+// <1us error margin is tested manually in release builds and it works fine.
+constexpr auto max_error_margin = std::chrono::milliseconds { 1 };
+
 lt::test::Suite raii = [] {
 	using std::chrono::microseconds;
 
@@ -34,14 +40,14 @@ lt::test::Suite reset_and_elapsed_time = [] {
 	};
 
 	lt::test::Case { "elapsed time is sane" } = [] {
-		expect_le(Timer {}.elapsed_time(), microseconds { 1 });
+		expect_le(Timer {}.elapsed_time(), max_error_margin);
 	};
 
 	lt::test::Case { "elapsed time is sane - constructed with old now" } = [] {
 		const auto timepoint = Timer::Clock::now() - hours { 1 };
 
 		// This fails sometimes in debug if error-range is under 10us
-		expect_le(Timer { timepoint }.elapsed_time(), hours { 1 } + microseconds { 30 });
+		expect_le(Timer { timepoint }.elapsed_time(), hours { 1 } + max_error_margin);
 	};
 
 	lt::test::Case { "reset -> elapsed time is sane - constructed with old now" } = [] {
@@ -49,7 +55,7 @@ lt::test::Suite reset_and_elapsed_time = [] {
 		const auto old_elapsed_time = timer.elapsed_time();
 		timer.reset();
 
-		expect_le(timer.elapsed_time() - old_elapsed_time, microseconds { 101 });
+		expect_le(timer.elapsed_time() - old_elapsed_time, microseconds { 100 } + max_error_margin);
 	};
 
 	lt::test::Case { "reset -> elapsed time is sane - reset with future now" } = [] {
@@ -57,7 +63,7 @@ lt::test::Suite reset_and_elapsed_time = [] {
 		const auto old_elapsed_time = timer.elapsed_time();
 		timer.reset(Timer::Clock::now() + microseconds { 100 });
 
-		expect_le(timer.elapsed_time() - old_elapsed_time, microseconds { 101 });
+		expect_le(timer.elapsed_time() - old_elapsed_time, microseconds { 100 } + max_error_margin);
 	};
 };
 

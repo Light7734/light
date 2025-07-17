@@ -12,8 +12,8 @@ RUN apk add --no-cache \
     py3-pip \
     mesa-dev \
     mesa-gl \
-    pkgconf
-
+    pkgconf \
+    valgrind
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
     && conan profile detect
