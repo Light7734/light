@@ -13,6 +13,7 @@ RUN apk add --no-cache \
     mesa-dev \
     mesa-gl \
     pkgconf \
+    mold \
     valgrind
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
