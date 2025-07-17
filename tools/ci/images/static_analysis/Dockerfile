@@ -15,7 +15,7 @@ RUN apk add --no-cache \
     pkgconf \
     clang-extra-tools \
     mold \
-    ninja-build
+    ninja
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
     && conan profile detect
@@ -27,7 +27,6 @@ RUN clang --version  \
     && g++ --version \
     && clang --version \
     && clang-tidy --version \
-    && which ninja \
     && ninja --version \
     && mold --version
 

@@ -13,7 +13,7 @@ RUN apk add --no-cache \
     mesa-dev \
     mesa-gl \
     pkgconf \
-    ninja-build \
+    ninja \
     mold
 
 
