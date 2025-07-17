@@ -13,6 +13,7 @@ RUN apk add --no-cache \
     mesa-dev \
     mesa-gl \
     pkgconf \
+    ninja-build \
     mold
 
 
@@ -24,7 +25,9 @@ RUN clang --version  \
     && pip --version \
     && cmake --version \
     && g++ --version \
-    && clang --version
+    && clang --version \
+    && ninja --version \
+    && mold --version
 
 RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
     && cd light \
