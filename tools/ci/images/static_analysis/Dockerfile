@@ -13,8 +13,9 @@ RUN apk add --no-cache \
     mesa-dev \
     mesa-gl \
     pkgconf \
-    clang-extra-tools 
-
+    clang-extra-tools \
+    mold \
+    ninja-build
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
     && conan profile detect
@@ -23,13 +24,18 @@ RUN clang --version  \
     && conan --version \
     && pip --version \
     && cmake --version \
+    && g++ --version \
     && clang --version \
-    && clang-tidy --version
+    && clang-tidy --version \
+    && ninja --version \
+    && mold --version
 
 
 RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
     && cd light \
     && conan install . \
         -c tools.system.package_manager:mode=install \
+        -c tools.cmake.cmaketoolchain:generator=Ninja \
+        -s build_type=Debug \
         -o enable_static_analysis=True \
         --build=missing
