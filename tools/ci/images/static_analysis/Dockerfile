@@ -27,6 +27,7 @@ RUN clang --version  \
     && g++ --version \
     && clang --version \
     && clang-tidy --version \
+    && which ninja \
     && ninja --version \
     && mold --version
 
