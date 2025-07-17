@@ -36,6 +36,7 @@ class LightRecipe(ConanFile):
         tc = CMakeToolchain(self)
 
         tc.variables["CMAKE_BUILD_TYPE"] = self.settings.build_type
+        tc.cache_variables["CMAKE_LINKER_TYPE"] = "MOLD"
 
         tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = self.options.export_compile_commands
         tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
