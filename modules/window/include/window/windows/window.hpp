@@ -16,18 +16,23 @@ public:
 
 	~wWindow() override;
 
+	wWindow(wWindow &&) = delete;
+
+	wWindow(const wWindow &) = delete;
+
+	auto operator=(wWindow &&) -> wWindow & = delete;
+
+	auto operator=(const wWindow &) -> wWindow & = delete;
+
 	void poll_events() override;
 
 	void on_event(const Event &event) override;
 
-	void set_properties(
-	    const WindowProperties &properties,
-	    bool overrideVisibility = false
-	) override;
+	void set_properties(const Properties &properties, bool overrideVisibility = false) override;
 
 	void set_title(const std::string &title) override;
 
-	void set_size(const glm::uvec2 &size, bool additive = false) override;
+	void set_size(const math::uvec2 &size) override;
 
 	void set_v_sync(bool vsync, bool toggle = false) override;
 
@@ -39,13 +44,17 @@ public:
 	}
 
 private:
+	void on_window_resize(const WindowResizedEvent &event);
+
+	void bind_glfw_events();
+
 	GLFWwindow *m_handle { nullptr };
 
 	std::function<void(Event &)> m_event_callback;
 
-	void on_window_resize(const WindowResizedEvent &event);
+	Properties m_properties {};
 
-	void bind_glfw_events();
+	bool b_Closed {};
 };
 
 } // namespace lt
