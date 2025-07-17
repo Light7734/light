@@ -40,7 +40,6 @@ endif()
 
 add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLAD)
 include_directories(${DEPENDENCIES_DIR}GLFW/include)
-include_directories(${DEPENDENCIES_DIR}glm/)
 
 add_library(imgui STATIC ${IMGUI_FILES} ${IMGUI_BACKEND_FILES})
 
@@ -49,6 +48,5 @@ target_link_libraries(
   imgui
   PUBLIC glad
   PUBLIC opengl::opengl
-  PUBLIC glm::glm 
   PUBLIC glfw
 )

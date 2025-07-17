@@ -5,8 +5,6 @@ else()
 endif()
 
 target_link_libraries(window PUBLIC 
-    glm::glm
-
     PRIVATE
     glfw
     logger 
