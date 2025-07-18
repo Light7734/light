@@ -66,6 +66,47 @@ steps:
 ---
 kind: pipeline
 type: docker
+name: leak sanitizer
+clone:
+  recursive: true
+  submodule_update_remote: true
+
+trigger:
+  branch:
+  - main
+
+steps:
+- name: leak sanitizer
+  image: leak_sanitizer:latest
+  pull: if-not-exists
+  commands:
+    - |
+      set -e
+
+      git submodule update --init --recursive
+      conan build . \
+        -s build_type=Release \
+        -s compiler=clang \
+        -s compiler.version=20 \
+        -s compiler.libcxx=libc++ \
+        -c tools.system.package_manager:mode=install \
+        -c tools.cmake.cmaketoolchain:generator=Ninja \
+        -c tools.build:cxxflags='["-g", "-fno-omit-frame-pointer", "-nostdinc++", "-isystem", "/libcxx_lsan/include/c++/v1/", "-fsanitize=leak"]' \
+        -c tools.build:sharedlinkflags='["-L/libcxx_lsan/lib", "-Wl,-rpath,/libcxx_lsan/lib", "-lc++", "-lc++abi", "-fsanitize=leak"]' \
+        -c tools.build:exelinkflags='["-L/libcxx_lsan/lib", "-Wl,-rpath,/libcxx_lsan/lib", "-lc++", "-lc++abi", "-fsanitize=leak"]' \
+        -c tools.info.package_id:confs='["tools.build:cxxflags","tools.build:sharedlinkflags","tools.build:exelinkflags"]' \
+        -c tools.build:compiler_executables='{"c": "clang", "cpp": "clang++"}' \
+        -o enable_static_analysis=False \
+        -o enable_tests=True \
+        --build=missing
+      for test in $(find ./build -type f -name '*_tests' -executable); do
+        echo "Running $test"
+        "$test"
+      done
+
+---
+kind: pipeline
+type: docker
 name: static analysis
 clone:
   recursive: true
