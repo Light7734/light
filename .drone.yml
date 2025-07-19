@@ -7,7 +7,13 @@ platform:
   os: windows
   arch: amd64
 
+clone:
+  disable: true
+
 steps:
+- name: clone
+  environment:
+    HOME: C:\Users\username\
 - name: greeting
   commands:
   - echo 'Hello from Windows 10! :D'
