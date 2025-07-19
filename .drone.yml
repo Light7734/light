@@ -1,5 +1,19 @@
 ---
 kind: pipeline
+type: exec
+name: macrohard doors
+
+platform:
+  os: windows
+  arch: amd64
+
+steps:
+- name: greeting
+  commands:
+  - echo 'Hello from Windows 10! :D'
+
+---
+kind: pipeline
 type: docker
 name: unit tests
 clone:
