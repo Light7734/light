@@ -1,27 +1,24 @@
 #!/bin/bash
 
 set -e
+CI_DIR="$(git rev-parse --show-toplevel)/tools/ci/"
 
-IMAGE_DIR="$(git rev-parse --show-toplevel)/tools/ci/images"
+echo "==> Building image: clang_format"
+docker build -t clang_format -f $CI_DIR/static_analysis/clang_format.dockerfile .
 
-echo "==> Building image: clang format"
-cd "$IMAGE_DIR/clang_format"
-docker build -t clang_format .
+echo "==> Building image: static_analysis"
+docker build -t clang_tidy -f $CI_DIR/static_analysis/clang_tidy.dockerfile .
 
-echo "==> Building image: static analysis"
-cd "$IMAGE_DIR/static_analysis"
-docker build -t static_analysis .
+echo "==> Building image: amd64_gcc_unit_tests"
+docker build -t amd64_gcc_unit_tests -f $CI_DIR/amd64/gcc/unit_tests.dockerfile .
 
-echo "==> Building image: unit tests"
-cd "$IMAGE_DIR/unit_tests"
-docker build -t unit_tests .
+echo "==> Building image: amd64_gcc_valgrind"
+docker build -t amd64_gcc_valgrind -f $CI_DIR/amd64/gcc/valgrind.dockerfile .
 
-echo "==> Building image: valgrind"
-cd "$IMAGE_DIR/valgrind"
-docker build -t valgrind .
+echo "==> Building image: amd64_clang_lsan"
+docker build -t amd64_clang_lsan -f $CI_DIR/amd64/clang/lsan.dockerfile .
 
-echo "==> Building image: leak_sanitizer"
-cd "$IMAGE_DIR/leak_sanitizer"
-docker build -t leak_sanitizer .
+echo "==> Building image: amd64_clang_msan"
+docker build -t amd64_clang_msan -f $CI_DIR/amd64/clang/msan.dockerfile .
 
 echo "WOOOOOOOOOOOOOOOOH!!! DONE :D"
