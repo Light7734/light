@@ -49,7 +49,7 @@ RUN git clone --depth=1 https://github.com/llvm/llvm-project.git -b llvmorg-20.1
     && ninja -C . install-cxx install-cxxabi \
     && rm -r /llvm-project/
 
-RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
+RUN git clone 'https://git.light7734.com/light7734/light.git' \
     && cd light \
     && conan install . \
         -c tools.system.package_manager:mode=install \
@@ -63,4 +63,5 @@ RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
         -s compiler=clang \
         -s compiler.version=20 \
         -s compiler.libcxx=libc++ \
+        -o use_mold=True \
         --build=missing

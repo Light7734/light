@@ -2,14 +2,15 @@
 kind: pipeline
 type: exec
 name: macrohard doors
-
+trigger:
+  branch:
+  - main
 platform:
   os: windows
   arch: amd64
 
 clone:
   disable: true
-
 steps:
 - name: clone
   environment:
@@ -22,10 +23,6 @@ steps:
 kind: pipeline
 type: docker
 name: unit tests
-clone:
-  recursive: true
-  submodule_update_remote: true
-
 trigger:
   branch:
   - main
@@ -38,13 +35,13 @@ steps:
     - |
       set -e
 
-      git submodule update --init --recursive
       conan build . \
         -c tools.system.package_manager:mode=install \
         -c tools.cmake.cmaketoolchain:generator=Ninja \
         -s build_type=Release \
         -o enable_static_analysis=False \
         -o enable_tests=True \
+        -o use_mold=True \
         --build=missing
 
       for test in $(find ./build -type f -name '*_tests' -executable); do
@@ -56,10 +53,6 @@ steps:
 kind: pipeline
 type: docker
 name: valgrind
-clone:
-  recursive: true
-  submodule_update_remote: true
-
 trigger:
   branch:
   - main
@@ -72,13 +65,13 @@ steps:
     - |
       set -e
 
-      git submodule update --init --recursive
       conan build . \
         -c tools.system.package_manager:mode=install \
         -c tools.cmake.cmaketoolchain:generator=Ninja \
         -s build_type=Release \
         -o enable_static_analysis=False \
         -o enable_tests=True \
+        -o use_mold=True \
         --build=missing
 
       find ./build -type f -name "*_tests" -executable | xargs -I {} bash -c 'valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --error-exitcode=255 {}' || exit 1
@@ -87,10 +80,6 @@ steps:
 kind: pipeline
 type: docker
 name: leak sanitizer
-clone:
-  recursive: true
-  submodule_update_remote: true
-
 trigger:
   branch:
   - main
@@ -103,12 +92,7 @@ steps:
     - |
       set -e
 
-      git submodule update --init --recursive
       conan build . \
-        -s build_type=Release \
-        -s compiler=clang \
-        -s compiler.version=20 \
-        -s compiler.libcxx=libc++ \
         -c tools.system.package_manager:mode=install \
         -c tools.cmake.cmaketoolchain:generator=Ninja \
         -c tools.build:cxxflags='["-g", "-fno-omit-frame-pointer", "-nostdinc++", "-isystem", "/libcxx_lsan/include/c++/v1/", "-fsanitize=leak"]' \
@@ -116,8 +100,11 @@ steps:
         -c tools.build:exelinkflags='["-L/libcxx_lsan/lib", "-Wl,-rpath,/libcxx_lsan/lib", "-lc++", "-lc++abi", "-fsanitize=leak"]' \
         -c tools.info.package_id:confs='["tools.build:cxxflags","tools.build:sharedlinkflags","tools.build:exelinkflags"]' \
         -c tools.build:compiler_executables='{"c": "clang", "cpp": "clang++"}' \
-        -o enable_static_analysis=False \
-        -o enable_tests=True \
+        -s build_type=Release \
+        -s compiler=clang \
+        -s compiler.version=20 \
+        -s compiler.libcxx=libc++ \
+        -o use_mold=True \
         --build=missing
       for test in $(find ./build -type f -name '*_tests' -executable); do
         echo "Running $test"
@@ -128,10 +115,6 @@ steps:
 kind: pipeline
 type: docker
 name: static analysis
-clone:
-  recursive: true
-  submodule_update_remote: true
-
 trigger:
   branch:
   - main
@@ -143,24 +126,19 @@ steps:
   privileged: true
   commands:
     - |
-      git submodule update --init --recursive
-
       conan build . \
         -c tools.system.package_manager:mode=install \
         -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -s build_type=Debug \
+        -s build_type=Release \
         -o enable_static_analysis=True \
         -o enable_tests=True \
+        -o use_mold=True \
         --build=missing
 
 ---
 kind: pipeline
 type: docker
 name: clang format
-clone:
-  recursive: true
-  submodule_update_remote: true
-
 trigger:
   branch:
   - main

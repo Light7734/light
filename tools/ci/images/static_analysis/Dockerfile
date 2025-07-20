@@ -31,11 +31,12 @@ RUN clang --version  \
     && mold --version
 
 
-RUN git clone 'https://git.light7734.com/light7734/light.git' --recursive \
+RUN git clone 'https://git.light7734.com/light7734/light.git' \
     && cd light \
     && conan install . \
         -c tools.system.package_manager:mode=install \
         -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -s build_type=Debug \
+        -s build_type=Release \
         -o enable_static_analysis=True \
+        -o use_mold=True \
         --build=missing
