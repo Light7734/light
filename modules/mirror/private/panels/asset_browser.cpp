@@ -82,14 +82,15 @@ void AssetBrowserPanel::on_user_interface_update()
 			}
 
 			// Button
+			const auto path_str = path.string();
 			ImGui::TableNextColumn();
-			ImGui::PushID(path.c_str());
+			ImGui::PushID(path_str.c_str());
 			switch (asset_type)
 			{
 			// Directory
 			case AssetType::directory:
 				if (ImGui::ImageButton(
-				        path.c_str(),
+				        path_str.c_str(),
 				        m_directory_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size)
 				    ))
@@ -101,7 +102,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Scene
 			case AssetType::scene:
 				if (ImGui::ImageButton(
-				        path.c_str(),
+				        path_str.c_str(),
 				        m_scene_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size)
 				    ))
@@ -115,7 +116,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Image
 			case AssetType::image:
 				if (ImGui::ImageButton(
-				        path.c_str(),
+				        path_str.c_str(),
 				        m_image_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size)
 				    ))
@@ -126,7 +127,7 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Text
 			case AssetType::text:
 				if (ImGui::ImageButton(
-				        path.c_str(),
+				        path_str.c_str(),
 				        m_text_texture->get_texture(),
 				        ImVec2(m_file_size, m_file_size)
 				    ))

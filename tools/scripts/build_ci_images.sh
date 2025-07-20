@@ -20,4 +20,8 @@ echo "==> Building image: valgrind"
 cd "$IMAGE_DIR/valgrind"
 docker build -t valgrind .
 
+echo "==> Building image: leak_sanitizer"
+cd "$IMAGE_DIR/leak_sanitizer"
+docker build -t leak_sanitizer .
+
 echo "WOOOOOOOOOOOOOOOOH!!! DONE :D"

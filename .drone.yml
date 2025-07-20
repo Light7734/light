@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: exec
-name: macrohard doors
+name: amd64 — msvc
 trigger:
   branch:
   - main
@@ -9,20 +9,16 @@ platform:
   os: windows
   arch: amd64
 
-clone:
-  disable: true
 steps:
-- name: clone
-  environment:
-    HOME: C:\Users\username\
-- name: greeting
-  commands:
-  - echo 'Hello from Windows 10! :D'
+- name: unit tests
+  shell: powershell
+  commands: 
+    - ./tools/ci/steps/amd64/msvc/unit-tests.ps1
 
 ---
 kind: pipeline
 type: docker
-name: unit tests
+name: amd64 — gcc
 trigger:
   branch:
   - main
@@ -32,54 +28,18 @@ steps:
   image: unit_tests:latest
   pull: if-not-exists
   commands:
-    - |
-      set -e
+    - ./tools/ci/steps/amd64/gcc/unit-tests.sh
 
-      conan build . \
-        -c tools.system.package_manager:mode=install \
-        -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -s build_type=Release \
-        -o enable_static_analysis=False \
-        -o enable_tests=True \
-        -o use_mold=True \
-        --build=missing
-
-      for test in $(find ./build -type f -name '*_tests' -executable); do
-        echo "Running $test"
-        "$test"
-      done
-
----
-kind: pipeline
-type: docker
-name: valgrind
-trigger:
-  branch:
-  - main
-
-steps:
 - name: valgrind
   image: valgrind:latest
   pull: if-not-exists
   commands:
-    - |
-      set -e
-
-      conan build . \
-        -c tools.system.package_manager:mode=install \
-        -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -s build_type=Release \
-        -o enable_static_analysis=False \
-        -o enable_tests=True \
-        -o use_mold=True \
-        --build=missing
-
-      find ./build -type f -name "*_tests" -executable | xargs -I {} bash -c 'valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --error-exitcode=255 {}' || exit 1
+    - ./tools/ci/steps/amd64/gcc/valgrind.sh
 
 ---
 kind: pipeline
 type: docker
-name: leak sanitizer
+name: amd64 — clang
 trigger:
   branch:
   - main
@@ -89,27 +49,7 @@ steps:
   image: leak_sanitizer:latest
   pull: if-not-exists
   commands:
-    - |
-      set -e
-
-      conan build . \
-        -c tools.system.package_manager:mode=install \
-        -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -c tools.build:cxxflags='["-g", "-fno-omit-frame-pointer", "-nostdinc++", "-isystem", "/libcxx_lsan/include/c++/v1/", "-fsanitize=leak"]' \
-        -c tools.build:sharedlinkflags='["-L/libcxx_lsan/lib", "-Wl,-rpath,/libcxx_lsan/lib", "-lc++", "-lc++abi", "-fsanitize=leak"]' \
-        -c tools.build:exelinkflags='["-L/libcxx_lsan/lib", "-Wl,-rpath,/libcxx_lsan/lib", "-lc++", "-lc++abi", "-fsanitize=leak"]' \
-        -c tools.info.package_id:confs='["tools.build:cxxflags","tools.build:sharedlinkflags","tools.build:exelinkflags"]' \
-        -c tools.build:compiler_executables='{"c": "clang", "cpp": "clang++"}' \
-        -s build_type=Release \
-        -s compiler=clang \
-        -s compiler.version=20 \
-        -s compiler.libcxx=libc++ \
-        -o use_mold=True \
-        --build=missing
-      for test in $(find ./build -type f -name '*_tests' -executable); do
-        echo "Running $test"
-        "$test"
-      done
+    - ./tools/ci/steps/amd64/clang/lsan.sh
 
 ---
 kind: pipeline
@@ -125,20 +65,12 @@ steps:
   pull: if-not-exists
   privileged: true
   commands:
-    - |
-      conan build . \
-        -c tools.system.package_manager:mode=install \
-        -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -s build_type=Release \
-        -o enable_static_analysis=True \
-        -o enable_tests=True \
-        -o use_mold=True \
-        --build=missing
+    - ./tools/ci/steps/static_analysis.sh
 
 ---
 kind: pipeline
 type: docker
-name: clang format
+name: style
 trigger:
   branch:
   - main
@@ -148,21 +80,4 @@ steps:
   image: clang_format:latest
   pull: if-not-exists
   commands:
-    - |
-      set -e
-      clang-format --version
-      has_fomatting_issues=0
-
-      for file in $(find ./modules -name '*.?pp'); do
-        echo "Checking format for $file"
-        if ! clang-format --dry-run --Werror "$file"; then
-          echo "❌ Formatting issue detected in $file"
-          has_fomatting_issues=1
-        fi
-      done
-
-      if [ "$has_fomatting_issues" -eq 0 ]; then
-        echo "✅ All files are properly formatted! Well done! ^~^"
-      fi
-
-      exit ${has_fomatting_issues}
+    - ./tools/ci/steps/style.sh
