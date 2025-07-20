@@ -139,7 +139,7 @@ void UserInterface::dockspace_end()
 void UserInterface::set_dark_theme_colors()
 {
 	ImGuiStyle &style = ImGui::GetStyle();
-	ImVec4(&colors)[55] = style.Colors;
+	ImVec4(&colors)[60] = style.Colors;
 
 	style.WindowPadding = ImVec2(0.0f, 0.0f);
 

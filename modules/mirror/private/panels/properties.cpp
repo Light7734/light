@@ -198,7 +198,7 @@ void PropertiesPanel::draw_vec3_control(
 	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2 { 0, 0 });
 
-	auto line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	auto line_height = GImGui->Font->LegacySize + GImGui->Style.FramePadding.y * 2.0f;
 	auto button_size = ImVec2 { line_height + 3.0f, line_height };
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
@@ -276,7 +276,7 @@ void PropertiesPanel::draw_component(
 	             | ImGuiTreeNodeFlags_FramePadding;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4, 4 });
-	auto lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	auto lineHeight = GImGui->Font->LegacySize + GImGui->Style.FramePadding.y * 2.0f;
 	ImGui::Separator();
 
 	// NOLINTNEXTLINE

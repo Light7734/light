@@ -1,9 +1,9 @@
 #include <GLFW/glfw3.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
 #include <input/key_codes.hpp>
+#include <ui/gl/backend.hpp>
 #include <ui/gl/ui.hpp>
+#include <ui/glfw/glfw.h>
 
 namespace lt {
 

@@ -4,3 +4,12 @@ find_package(yaml-cpp REQUIRED)
 find_package(EnTT REQUIRED)
 find_package(opengl_system REQUIRED)
 find_package(lz4 REQUIRED)
+
+find_package(imgui REQUIRED)
+add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+target_link_libraries(
+  imgui::imgui
+  INTERFACE glad
+  INTERFACE opengl::opengl
+  INTERFACE glfw
+)

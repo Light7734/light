@@ -12,5 +12,5 @@ if (ENABLE_STATIC_ANALYSIS)
 endif ()
 
 add_option(ENABLE_TESTS "Enables the building of the test modules")
-add_subdirectory(./modules)
-add_subdirectory(./external)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glad)

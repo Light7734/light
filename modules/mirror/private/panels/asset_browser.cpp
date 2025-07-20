@@ -89,13 +89,9 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Directory
 			case AssetType::directory:
 				if (ImGui::ImageButton(
+				        path.c_str(),
 				        m_directory_texture->get_texture(),
-				        ImVec2(m_file_size, m_file_size),
-				        ImVec2 { 0.0f, 0.0f },
-				        ImVec2 { 1.0f, 1.0f },
-				        0,
-				        ImVec4 { 0.0f, 0.0f, 0.0f, 0.0f },
-				        ImVec4 { 1.0f, 1.0f, 1.0f, 1.0f }
+				        ImVec2(m_file_size, m_file_size)
 				    ))
 				{
 					m_current_directory /= path.filename();
@@ -105,13 +101,9 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Scene
 			case AssetType::scene:
 				if (ImGui::ImageButton(
+				        path.c_str(),
 				        m_scene_texture->get_texture(),
-				        ImVec2(m_file_size, m_file_size),
-				        ImVec2 { 0.0f, 0.0f },
-				        ImVec2 { 1.0f, 1.0f },
-				        0,
-				        ImVec4 { 0.0f, 0.0f, 0.0f, 0.0f },
-				        ImVec4 { 1.0f, 1.0f, 1.0f, 1.0f }
+				        ImVec2(m_file_size, m_file_size)
 				    ))
 				{
 					auto serializer = SceneSerializer { m_active_scene };
@@ -123,13 +115,9 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Image
 			case AssetType::image:
 				if (ImGui::ImageButton(
+				        path.c_str(),
 				        m_image_texture->get_texture(),
-				        ImVec2(m_file_size, m_file_size),
-				        ImVec2 { 0.0f, 0.0f },
-				        ImVec2 { 1.0f, 1.0f },
-				        0,
-				        ImVec4 { 0.0f, 0.0f, 0.0f, 0.0f },
-				        ImVec4 { 1.0f, 1.0f, 1.0f, 1.0f }
+				        ImVec2(m_file_size, m_file_size)
 				    ))
 				{
 				}
@@ -138,13 +126,9 @@ void AssetBrowserPanel::on_user_interface_update()
 			// Text
 			case AssetType::text:
 				if (ImGui::ImageButton(
+				        path.c_str(),
 				        m_text_texture->get_texture(),
-				        ImVec2(m_file_size, m_file_size),
-				        ImVec2 { 0.0f, 0.0f },
-				        ImVec2 { 1.0f, 1.0f },
-				        0,
-				        ImVec4 { 0.0f, 0.0f, 0.0f, 0.0f },
-				        ImVec4 { 1.0f, 1.0f, 1.0f, 1.0f }
+				        ImVec2(m_file_size, m_file_size)
 				    ))
 				{
 				}
