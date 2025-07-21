@@ -25,12 +25,20 @@ done
 
 llvm-profdata merge --input-files './build/coverage/list' -o "./build/coverage/merged.profdata" 
 find ./modules -type f -name "*.profraw" -exec rm -fv {} +
+
+# fix for imgui code is temporary
+# we will remove imgui as dependency in future versions
 LLVM_COV_SHOW=$(llvm-cov show \
         -instr-profile='./build/coverage/merged.profdata' \
         $(find ./build -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) \
         $(find ./build -type f -name '*\.a' -exec printf -- '-object %s ' {} \;) \
         -ignore-filename-regex='\.test\.cpp$' \
-        -ignore-filename-regex='./external/'
+        -ignore-filename-regex='./external/' \
+        -ignore-filename-regex='gl\/backend.cpp$' \
+        -ignore-filename-regex='gl\/backend.hpp$' \
+        -ignore-filename-regex='gl\/loader.hpp$' \
+        -ignore-filename-regex='glfw\/glfw.h$' \
+        -ignore-filename-regex='glfw\/glfw.cpp$'
 )
 
 echo "${LLVM_COV_SHOW}" > './build/coverage/coverage.txt'
