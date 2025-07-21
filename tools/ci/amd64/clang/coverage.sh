@@ -25,7 +25,12 @@ done
 
 llvm-profdata merge --input-files './build/coverage/list' -o "./build/coverage/merged.profdata" 
 find ./modules -type f -name "*.profraw" -exec rm -fv {} +
-LLVM_COV_SHOW=$(llvm-cov show -instr-profile='./build/coverage/merged.profdata' $(find ./build -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) $(find ./build -type f -name '*\.a' -exec printf -- '-object %s ' {} \;))
+LLVM_COV_SHOW=$(llvm-cov show \
+        -instr-profile='./build/coverage/merged.profdata' \
+        $(find ./build -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) \
+        $(find ./build -type f -name '*\.a' -exec printf -- '-object %s ' {} \;) \
+        -ignore-filename-regex="*.test.cpp|./external*"
+)
 
 echo "${LLVM_COV_SHOW}" > './build/coverage/coverage.txt'
 wget -qO- "https://codecov.io/bash" | bash
