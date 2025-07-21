@@ -7,16 +7,13 @@ rm -rf ./build
 conan build . \
     -c tools.system.package_manager:mode=install \
     -c tools.cmake.cmaketoolchain:generator=Ninja \
-    -c tools.build:cxxflags='["-fprofile-instr-generate", "-fcoverage-mapping"]' \
-    -c tools.build:sharedlinkflags='["-fprofile-instr-generate", "-fcoverage-mapping"]' \
-    -c tools.build:exelinkflags='["-fprofile-instr-generate", "-fcoverage-mapping"]' \
-    -c tools.info.package_id:confs='["tools.build:cxxflags","tools.build:sharedlinkflags","tools.build:exelinkflags"]' \
     -c tools.build:compiler_executables='{"c": "clang", "cpp": "clang++"}' \
     -s build_type=Release \
     -s compiler=clang \
     -s compiler.version=20 \
     -s compiler.libcxx=libc++ \
     -o use_mold=True \
+    -o enable_llvm_coverage=True \
     --build=missing
 
 for test in $(find ./build -type f -name '*_tests' -executable); do
@@ -24,3 +21,15 @@ for test in $(find ./build -type f -name '*_tests' -executable); do
   "$test"
 done
 
+mkdir -p ./build/coverage/ 
+for test in $(find ./build -type f -name '*_tests' -executable); do
+    export LLVM_PROFILE_FILE="./build/coverage/$(basename "$(dirname "{}")").profraw";
+    echo ${LLVM_PROFILE_FILE} >> ./build/coverage/list;
+    "$test"
+done
+
+llvm-profdata merge --input-files './build/coverage/list' -o "./build/coverage/merged.profdata" 
+find ./modules -type f -name "*.profraw" -exec rm -fv {} +
+LLVM_COV_SHOW=$(llvm-cov show -instr-profile='./build/coverage/merged.profdata' $(find ./build -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) -ignore-filename-regex='./modules/[^/]+/*_tests')
+echo "${LLVM_COV_SHOW}" > './build/coverage/coverage.txt'
+wget -qO- "https://codecov.io/bash" | bash

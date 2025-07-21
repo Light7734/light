@@ -15,6 +15,9 @@ docker build -t amd64_gcc_unit_tests -f $CI_DIR/amd64/gcc/unit_tests.dockerfile 
 echo "==> Building image: amd64_gcc_valgrind"
 docker build -t amd64_gcc_valgrind -f $CI_DIR/amd64/gcc/valgrind.dockerfile .
 
+echo "==> Building image: amd64_clang_coverage"
+docker build -t amd64_clang_coverage -f $CI_DIR/amd64/clang/coverage.dockerfile .
+
 echo "==> Building image: amd64_clang_lsan"
 docker build -t amd64_clang_lsan -f $CI_DIR/amd64/clang/lsan.dockerfile .
 

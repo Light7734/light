@@ -25,13 +25,13 @@ trigger:
 
 steps:
 - name: unit tests
-  image: unit_tests:latest
+  image: amd64_gcc_unit_tests:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/gcc/unit_tests.sh
 
 - name: valgrind
-  image: valgrind:latest
+  image: amd64_gcc_valgrind:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/gcc/valgrind.sh
@@ -45,14 +45,23 @@ trigger:
   - main
 
 steps:
+- name: code coverage
+  image: amd64_clang_coverage:latest
+  pull: if-not-exists
+  environment:
+    CODECOV_TOKEN:
+      from_secret: CODECOV_TOKEN 
+  commands:
+    - ./tools/ci/amd64/clang/coverage.sh
+
 - name: leak sanitizer
-  image: leak_sanitizer:latest
+  image: amd64_clang_lsan:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/clang/lsan.sh
 
 - name: memory sanitizer
-  image: memory_sanitizer:latest
+  image: amd64_clang_msan:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/clang/msan.sh

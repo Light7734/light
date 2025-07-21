@@ -12,6 +12,7 @@ class LightRecipe(ConanFile):
 
     options = {
         "enable_tests": [True, False],
+        "enable_llvm_coverage": [True, False],
         "enable_static_analysis": [True, False],
         "use_mold": [True, False],
         "export_compile_commands": [True, False],
@@ -19,6 +20,7 @@ class LightRecipe(ConanFile):
 
     default_options = {
         "enable_tests": True,
+        "enable_llvm_coverage": False,
         "enable_static_analysis": False,
         "use_mold": False,
         "export_compile_commands": True,
@@ -44,8 +46,9 @@ class LightRecipe(ConanFile):
             tc.cache_variables["CMAKE_LINKER_TYPE"] = "MOLD"
 
         tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = self.options.export_compile_commands
-        tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
         tc.cache_variables["ENABLE_TESTS"] = self.options.enable_tests
+        tc.cache_variables["ENABLE_LLVM_COVERAGE"] = self.options.enable_llvm_coverage
+        tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
 
         repo = git.Repo(search_parent_directories=True)
         tc.cache_variables["GIT_HASH"] = repo.head.object.hexsha
