@@ -29,7 +29,8 @@ LLVM_COV_SHOW=$(llvm-cov show \
         -instr-profile='./build/coverage/merged.profdata' \
         $(find ./build -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) \
         $(find ./build -type f -name '*\.a' -exec printf -- '-object %s ' {} \;) \
-        -ignore-filename-regex="*.test.cpp|./external*"
+        -ignore-filename-regex='\.test\.cpp$' \
+        -ignore-filename-regex='./external/'
 )
 
 echo "${LLVM_COV_SHOW}" > './build/coverage/coverage.txt'
