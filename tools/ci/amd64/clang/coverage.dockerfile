@@ -1,12 +1,16 @@
 FROM archlinux:latest
 
-RUN pacman -Syu --noconfirm && \
-    pacman -S --noconfirm \
+RUN pacman -Syu --noconfirm --disable-download-timeout \
+    && pacman -S  --noconfirm --disable-download-timeout reflector \
+    && reflector --verbose --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist \
+    && sed -i 's/^#ParallelDownloads = .*/ParallelDownloads = 8/' /etc/pacman.conf \
+    && grep "ParallelDownloads" /etc/pacman.conf
+
+RUN pacman -S --noconfirm --disable-download-timeout \
     bash \
     base-devel \
     git \
     cmake \
-    ninja \
     python \
     python-pip \
     clang \
@@ -16,13 +20,13 @@ RUN pacman -Syu --noconfirm && \
     ninja \
     curl \
     wget \
-    zlib
+    zlib \
+    libc++
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
     && conan profile detect
 
-RUN clang --version  \
-    && pip --version \
+RUN pip --version \
     && conan --version \
     && cmake --version \
     && g++ --version \
@@ -43,6 +47,6 @@ RUN git clone 'https://git.light7734.com/light7734/light.git' \
         -s compiler.version=20 \
         -s compiler.libcxx=libc++ \
         -o use_mold=True \
-        -o enable_lcov=True \
+        -o enable_llvm_coverage=True \
         --build=missing \
     && rm -r ../light/
