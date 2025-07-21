@@ -16,14 +16,9 @@ conan build . \
     -o enable_llvm_coverage=True \
     --build=missing
 
-for test in $(find ./build -type f -name '*_tests' -executable); do
-  echo "Running $test"
-  "$test"
-done
-
 mkdir -p ./build/coverage/ 
 for test in $(find ./build -type f -name '*_tests' -executable); do
-    export LLVM_PROFILE_FILE="./build/coverage/$(basename "$(dirname "{}")").profraw";
+    export LLVM_PROFILE_FILE="./build/coverage/$(basename "$(dirname "$test")").profraw";
     echo ${LLVM_PROFILE_FILE} >> ./build/coverage/list;
     "$test"
 done
