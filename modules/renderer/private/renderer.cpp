@@ -4,12 +4,13 @@
 #include <renderer/blender.hpp>
 #include <renderer/buffers.hpp>
 #include <renderer/framebuffer.hpp>
+#include <renderer/programs/quad.hpp>
+#include <renderer/programs/texture.hpp>
+#include <renderer/programs/tinted_texture.hpp>
 #include <renderer/render_command.hpp>
 #include <renderer/renderer.hpp>
 #include <renderer/shader.hpp>
 #include <renderer/texture.hpp>
-#include <span>
-#include <utility>
 
 namespace lt {
 
@@ -21,19 +22,25 @@ Renderer::Renderer(
     CreateInfo create_info
 )
     : m_quad_renderer(
-          LT_MAX_QUAD_RENDERER_VERTICES,
-          shared_context,
-          std::move(create_info.quad_renderer_shader)
+          create_scope<QuadRendererProgram>(
+              LT_MAX_QUAD_RENDERER_VERTICES,
+              shared_context,
+              std::move(create_info.quad_renderer_shader)
+          )
       )
     , m_texture_renderer(
-          LT_MAX_TEXTURE_RENDERER_VERTICES,
-          shared_context,
-          std::move(create_info.texture_renderer_shader)
+          create_scope<TextureRendererProgram>(
+              LT_MAX_TEXTURE_RENDERER_VERTICES,
+              shared_context,
+              std::move(create_info.texture_renderer_shader)
+          )
       )
     , m_tinted_texture_renderer(
-          LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES,
-          shared_context,
-          std::move(create_info.tinted_texture_renderer_shader)
+          create_scope<TintedTextureRendererProgram>(
+              LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES,
+              shared_context,
+              std::move(create_info.tinted_texture_renderer_shader)
+          )
       )
     , m_view_projection_buffer(nullptr)
     , m_render_command(nullptr)
@@ -53,6 +60,10 @@ Renderer::Renderer(
 	m_render_command = RenderCommand::create(window_handle, shared_context);
 	m_blender = Blender::create(shared_context);
 	m_blender->enable(BlendFactor::SRC_ALPHA, BlendFactor::INVERSE_SRC_ALPHA);
+}
+
+Renderer::~Renderer() // NOLINT
+{
 }
 
 auto Renderer::create(
@@ -114,7 +125,7 @@ void Renderer::draw_quad_impl(
 //==================== DRAW_QUAD_TINT ====================//
 void Renderer::draw_quad_impl(const math::mat4 &transform, const math::vec4 &tint)
 {
-	auto map = std::span<QuadRendererProgram::QuadVertexData> { m_quad_renderer.get_map_current(),
+	auto map = std::span<QuadRendererProgram::QuadVertexData> { m_quad_renderer->get_map_current(),
 		                                                        4 };
 
 	// top left
@@ -134,7 +145,7 @@ void Renderer::draw_quad_impl(const math::mat4 &transform, const math::vec4 &tin
 	map[3].tint = tint;
 
 	// advance
-	if (!m_quad_renderer.advance())
+	if (!m_quad_renderer->advance())
 	{
 		log_wrn("Exceeded LT_MAX_QUAD_RENDERER_VERTICES: {}", LT_MAX_QUAD_RENDERER_VERTICES);
 		flush_scene();
@@ -147,7 +158,7 @@ void Renderer::draw_quad_impl(const math::mat4 &transform, const Ref<Texture> &t
 
 	texture->bind();
 	auto map = std::span<TextureRendererProgram::TextureVertexData> {
-		m_texture_renderer.get_map_current(),
+		m_texture_renderer->get_map_current(),
 		4
 	};
 
@@ -168,7 +179,7 @@ void Renderer::draw_quad_impl(const math::mat4 &transform, const Ref<Texture> &t
 	map[3].texcoord = { 0.0f, 1.0f };
 
 	// advance
-	if (!m_texture_renderer.advance())
+	if (!m_texture_renderer->advance())
 	{
 		log_wrn("Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES);
 		flush_scene();
@@ -185,7 +196,7 @@ void Renderer::draw_quad_impl(
 
 	texture->bind();
 	auto map = std::span<TintedTextureRendererProgram::TintedTextureVertexData> {
-		m_tinted_texture_renderer.get_map_current(),
+		m_tinted_texture_renderer->get_map_current(),
 		4
 	};
 
@@ -209,7 +220,7 @@ void Renderer::draw_quad_impl(
 	map[3].tint = tint;
 	map[3].texcoord = { 0.0f, 1.0f };
 
-	if (!m_tinted_texture_renderer.advance())
+	if (!m_tinted_texture_renderer->advance())
 	{
 		log_wrn("Exceeded LT_MAX_TEXTURE_RENDERER_VERTICES: {}", LT_MAX_TEXTURE_RENDERER_VERTICES);
 		flush_scene();
@@ -256,66 +267,66 @@ void Renderer::begin_scene_impl(
 	m_view_projection_buffer->un_map();
 
 	// map renderers
-	m_quad_renderer.map();
-	m_texture_renderer.map();
-	m_tinted_texture_renderer.map();
+	m_quad_renderer->map();
+	m_texture_renderer->map();
+	m_tinted_texture_renderer->map();
 }
 
 void Renderer::flush_scene()
 {
 	/* tinted texture renderer */
-	m_tinted_texture_renderer.un_map();
-	if (m_tinted_texture_renderer.get_quad_count())
+	m_tinted_texture_renderer->un_map();
+	if (m_tinted_texture_renderer->get_quad_count())
 	{
-		m_tinted_texture_renderer.bind();
-		m_render_command->draw_indexed(m_tinted_texture_renderer.get_quad_count() * 6u);
+		m_tinted_texture_renderer->bind();
+		m_render_command->draw_indexed(m_tinted_texture_renderer->get_quad_count() * 6u);
 	}
 
 	/* quad renderer */
-	m_quad_renderer.un_map();
-	if (m_quad_renderer.get_quad_count())
+	m_quad_renderer->un_map();
+	if (m_quad_renderer->get_quad_count())
 	{
-		m_quad_renderer.bind();
-		m_render_command->draw_indexed(m_quad_renderer.get_quad_count() * 6u);
+		m_quad_renderer->bind();
+		m_render_command->draw_indexed(m_quad_renderer->get_quad_count() * 6u);
 	}
 
 	/* texture renderer */
-	m_texture_renderer.un_map();
-	if (m_texture_renderer.get_quad_count())
+	m_texture_renderer->un_map();
+	if (m_texture_renderer->get_quad_count())
 	{
-		m_texture_renderer.bind();
-		m_render_command->draw_indexed(m_texture_renderer.get_quad_count() * 6u);
+		m_texture_renderer->bind();
+		m_render_command->draw_indexed(m_texture_renderer->get_quad_count() * 6u);
 	}
 
-	m_quad_renderer.map();
-	m_texture_renderer.map();
-	m_tinted_texture_renderer.map();
+	m_quad_renderer->map();
+	m_texture_renderer->map();
+	m_tinted_texture_renderer->map();
 }
 
 void Renderer::end_scene_impl()
 {
 	/* tinted texture renderer */
-	m_tinted_texture_renderer.un_map();
-	if (m_tinted_texture_renderer.get_quad_count())
+	m_tinted_texture_renderer->un_map();
+	if (m_tinted_texture_renderer->get_quad_count())
 	{
-		m_tinted_texture_renderer.bind();
-		m_render_command->draw_indexed(m_tinted_texture_renderer.get_quad_count() * 6u);
+		m_tinted_texture_renderer->bind();
+		m_render_command->draw_indexed(m_tinted_texture_renderer->get_quad_count() * 6u);
 	}
 
 	/* quad renderer */
-	m_quad_renderer.un_map();
-	if (m_quad_renderer.get_quad_count())
+	m_quad_renderer->un_map();
+	if (m_quad_renderer->get_quad_count())
 	{
-		m_quad_renderer.bind();
-		m_render_command->draw_indexed(m_quad_renderer.get_quad_count() * 6u);
+		m_quad_renderer->bind();
+		m_render_command->draw_indexed(m_quad_renderer->get_quad_count() * 6u);
 	}
 
 	/* texture renderer */
-	m_texture_renderer.un_map();
-	if (m_texture_renderer.get_quad_count())
+	m_texture_renderer->un_map();
+	if (m_texture_renderer->get_quad_count())
 	{
-		m_texture_renderer.bind();
-		m_render_command->draw_indexed(m_texture_renderer.get_quad_count() * 6u);
+		m_texture_renderer->bind();
+		m_render_command->draw_indexed(m_texture_renderer->get_quad_count() * 6u);
 	}
 
 	// reset frame buffer

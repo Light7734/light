@@ -1,6 +1,5 @@
 #pragma once
 
-//
 #include <math/mat4.hpp>
 #include <math/vec3.hpp>
 #include <math/vec4.hpp>
@@ -8,11 +7,6 @@
 #include <renderer/buffers.hpp>
 #include <renderer/render_command.hpp>
 #include <renderer/renderer.hpp>
-///
-
-#include <renderer/programs/quad.hpp>
-#include <renderer/programs/texture.hpp>
-#include <renderer/programs/tinted_texture.hpp>
 #include <utility>
 
 #define LT_MAX_QUAD_RENDERER_VERTICES           (1028u * 4u)
@@ -31,6 +25,10 @@ class SharedContext;
 class Camera;
 class WindowResizedEvent;
 class Shader;
+
+class TintedTextureRendererProgram;
+class QuadRendererProgram;
+class TextureRendererProgram;
 
 class Renderer
 {
@@ -107,6 +105,8 @@ public:
 		s_context->end_scene_impl();
 	}
 
+	~Renderer();
+
 	void on_window_resize(const WindowResizedEvent &event);
 
 	void begin_frame();
@@ -116,11 +116,11 @@ public:
 private:
 	static Renderer *s_context;
 
-	QuadRendererProgram m_quad_renderer;
+	Scope<QuadRendererProgram> m_quad_renderer;
 
-	TextureRendererProgram m_texture_renderer;
+	Scope<TextureRendererProgram> m_texture_renderer;
 
-	TintedTextureRendererProgram m_tinted_texture_renderer;
+	Scope<TintedTextureRendererProgram> m_tinted_texture_renderer;
 
 	Scope<ConstantBuffer> m_view_projection_buffer;
 
