@@ -101,13 +101,16 @@ function (add_test_module target_lib_name)
     file(MAKE_DIRECTORY "${PRIVATE_INCLUDE_DIR}")
     file(CREATE_LINK
         "${CMAKE_CURRENT_SOURCE_DIR}/private/"
-        "${PRIVATE_INCLUDE_DIR}${target_lib_name}"
+        "${PRIVATE_INCLUDE_DIR}/${target_lib_name}"
         SYMBOLIC
     )
 
     add_executable(${target_lib_name}_tests ${source_files})
     target_link_libraries(${target_lib_name}_tests PRIVATE ${target_lib_name} base test)
-
+    target_include_directories(${target_lib_name}_tests
+        PRIVATE ${PUBLIC_INCLUDE_DIR}
+        PRIVATE ${PRIVATE_INCLUDE_DIR}
+    )
 endfunction ()
 
 function (add_option option help)
