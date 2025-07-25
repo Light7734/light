@@ -6,7 +6,6 @@ namespace lt {
 
 class Event;
 
-
 class Window
 {
 public:

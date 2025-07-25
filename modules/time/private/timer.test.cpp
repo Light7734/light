@@ -23,7 +23,7 @@ lt::test::Suite raii = [] {
 	};
 
 	lt::test::Case { "plenty" } = [] {
-		for (auto i : std::views::iota(0, 100'001))
+		for (auto idx : std::views::iota(0, 100'001))
 		{
 			Timer {};
 		}

@@ -12,7 +12,6 @@ struct FailedAssertion: std::exception
 	}
 };
 
-
 template<typename Expression_T, typename... Args>
 constexpr void ensure(Expression_T &&expression, std::format_string<Args...> fmt, Args &&...args)
 {
