@@ -14,6 +14,44 @@ concept Printable = requires(std::ostream &os, T t) {
 template<typename T>
 concept Testable = Printable<T> && std::equality_comparable<T>;
 
+constexpr void expect_unreachable(
+    std::source_location source_location = std::source_location::current()
+)
+{
+	throw std::runtime_error {
+		std::format(
+		    "Failed unreachable expectation:\n"
+		    "\tlocation: {}:{}",
+		    source_location.file_name(),
+		    source_location.line()
+		),
+	};
+};
+
+constexpr void expect_throw(
+    std::invocable auto invocable,
+    std::source_location source_location = std::source_location::current()
+)
+{
+	try
+	{
+		invocable();
+	}
+	catch (const std::exception &exp)
+	{
+		return;
+	}
+
+	throw std::runtime_error {
+		std::format(
+		    "Failed throwing expectation:\n"
+		    "\tlocation: {}:{}",
+		    source_location.file_name(),
+		    source_location.line()
+		),
+	};
+}
+
 constexpr void expect_eq(
     Testable auto lhs,
     Testable auto rhs,
