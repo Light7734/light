@@ -2,21 +2,21 @@
 
 #include <app/application.hpp>
 
-int main(int argc, char *argv[]) // NOLINT
+auto main(int argc, char *argv[]) -> int32_t
 try
 {
 	std::ignore = argc;
 	std::ignore = argv;
 
-	auto application = lt::Scope<lt::Application> {};
+	auto application = lt::Scope<lt::app::Application> {};
 
-	application = lt::create_application();
-
-	lt::ensure(application, "Failed to create application");
-	lt::ensure(application->sanity_check(), "Failed to verify the sanity of the application");
+	application = lt::app::create_application();
+	if (!application)
+	{
+		throw std::runtime_error { "Failed to create application\n" };
+	}
 
 	application->game_loop();
-
 	return EXIT_SUCCESS;
 }
 catch (const std::exception &exp)

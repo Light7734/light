@@ -5,5 +5,5 @@ add_library_module(asset_manager
 target_link_libraries(
   asset_manager
   PUBLIC asset_parser
-  PRIVATE renderer
+  PRIVATE logger
 )

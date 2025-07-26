@@ -1,18 +1,15 @@
 #pragma once
 
-#include <time/timer.hpp>
+namespace lt::app {
 
-namespace lt {
-
-class Renderer;
-class Window;
-class Event;
-class GraphicsContext;
-class UserInterface;
-class LayerStack;
+class ISystem;
 
 extern Scope<class Application> create_application();
 
+/** The main application class.
+ * Think of this like an aggregate of systems, you register systems through this interface.
+ * Then they'll tick every "application frame".
+ */
 class Application
 {
 public:
@@ -24,54 +21,22 @@ public:
 
 	auto operator=(Application &&) -> Application & = delete;
 
-	virtual ~Application();
-
-	[[nodiscard]] auto sanity_check() const -> bool;
+	virtual ~Application() = default;
 
 	void game_loop();
 
-	[[nodiscard]] auto get_window() -> Window &
-	{
-		return *m_window;
-	}
+	void register_system(Ref<app::ISystem> system);
 
-	[[nodiscard]] auto get_layer_stack() -> LayerStack &
-	{
-		return *m_layer_stack;
-	}
-
-	static void quit();
+	void unregister_system(Ref<app::ISystem> system);
 
 protected:
-	Application();
+	Application() = default;
 
 private:
-	void update_layers();
+	std::vector<Ref<app::ISystem>> m_systems;
 
-	void render_layers();
-
-	void render_user_interface();
-
-	void poll_events();
-
-	void on_event(const Event &event);
-
-	void log_debug_data() const;
-
-	Timer m_timer;
-
-	Scope<Window> m_window;
-
-	Scope<UserInterface> m_user_interface;
-
-	Scope<GraphicsContext> m_graphics_context;
-
-	Scope<Renderer> m_renderer;
-
-	Scope<LayerStack> m_layer_stack;
-
-	static Application *s_instance;
+	std::vector<Ref<app::ISystem>> m_systems_to_be_removed;
 };
 
 
-} // namespace lt
+} // namespace lt::app

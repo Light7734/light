@@ -1,4 +1,5 @@
 add_library_module(renderer
+    system.cpp
     blender.cpp
     buffers.cpp
     framebuffer.cpp
@@ -19,6 +20,7 @@ add_library_module(renderer
     gl/shader.cpp
     gl/texture.cpp
     gl/vertex_layout.cpp
+    vk/instance.cpp
 )
 
 target_link_libraries(
@@ -34,4 +36,15 @@ target_link_libraries(
   PUBLIC yaml-cpp::yaml-cpp
   PUBLIC EnTT::EnTT
   PRIVATE lt_debug 
+  PRIVATE window
+  PUBLIC vulkan
+)
+
+add_test_module(renderer 
+    system.test.cpp
+) 
+target_link_libraries(
+  renderer_tests
+  PRIVATE lt_debug 
+  PRIVATE window
 )

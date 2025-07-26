@@ -1,10 +1,5 @@
 #include <imgui.h>
-#include <input/events/char.hpp>
-#include <input/events/event.hpp>
-#include <input/events/keyboard.hpp>
-#include <input/events/mouse.hpp>
 #include <input/input.hpp>
-#include <input/key_codes.hpp>
 #include <logger/logger.hpp>
 
 namespace lt {

@@ -3,6 +3,7 @@
 #include <ecs/components/transform.hpp>
 #include <ecs/uuid.hpp>
 #include <entt/entt.hpp>
+#include <functional>
 
 namespace lt {
 
@@ -12,11 +13,11 @@ class Framebuffer;
 class Scene
 {
 public:
-	void on_create();
-
-	void on_update(float deltaTime);
-
-	void on_render(const Ref<Framebuffer> &targetFrameBuffer = nullptr);
+	template<typename... T>
+	auto group()
+	{
+		return m_registry.group(entt::get<T...>);
+	}
 
 	auto create_entity(
 	    const std::string &name,
@@ -24,6 +25,11 @@ public:
 	) -> Entity;
 
 	auto get_entity_by_tag(const std::string &tag) -> Entity;
+
+	auto get_entt_registry() -> entt::registry &
+	{
+		return m_registry;
+	}
 
 private:
 	friend class Entity;
@@ -40,5 +46,13 @@ private:
 	    const TransformComponent &transform = TransformComponent()
 	) -> Entity;
 };
+
+namespace ecs {
+
+using Registry = Scene;
+
+using Entity = ::lt::Entity;
+
+} // namespace ecs
 
 } // namespace lt

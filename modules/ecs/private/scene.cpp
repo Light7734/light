@@ -1,72 +1,8 @@
-#include <camera/component.hpp>
 #include <ecs/components.hpp>
 #include <ecs/entity.hpp>
 #include <ecs/scene.hpp>
-#include <renderer/renderer.hpp>
 
 namespace lt {
-
-void Scene::on_create()
-{
-	/* native scripts */
-	{
-		m_registry.view<NativeScriptComponent>().each([](NativeScriptComponent &nsc) {
-			if (nsc.instance == nullptr)
-			{
-				nsc.instance = nsc.CreateInstance();
-				nsc.instance->on_create();
-			}
-		});
-	}
-}
-
-void Scene::on_update(float deltaTime)
-{
-	/* native scripts */
-	{
-		m_registry.view<NativeScriptComponent>().each([=](NativeScriptComponent &nsc) {
-			nsc.instance->on_update(deltaTime);
-		});
-	}
-}
-
-void Scene::on_render(const Ref<Framebuffer> &targetFrameBuffer /* = nullptr */)
-{
-	auto *sceneCamera = (Camera *)nullptr;
-	auto *sceneCameraTransform = (TransformComponent *)nullptr;
-
-	/* scene camera */
-	{
-		m_registry.group(entt::get<TransformComponent, CameraComponent>)
-		    .each([&](TransformComponent &transformComp, CameraComponent &cameraComp) {
-			    if (cameraComp.isPrimary)
-			    {
-				    sceneCamera = &cameraComp.camera;
-				    sceneCameraTransform = &transformComp;
-			    }
-		    });
-	}
-
-	/* draw quads */
-	{
-		if (sceneCamera)
-		{
-			Renderer::begin_scene(sceneCamera, *sceneCameraTransform, targetFrameBuffer);
-
-			m_registry.group(entt::get<TransformComponent, SpriteRendererComponent>)
-			    .each([](TransformComponent &transformComp,
-			             SpriteRendererComponent &spriteRendererComp) {
-				    Renderer::draw_quad(
-				        transformComp,
-				        spriteRendererComp.tint,
-				        spriteRendererComp.texture
-				    );
-			    });
-
-			Renderer::end_scene();
-		}
-	}
-}
 
 auto Scene::create_entity(const std::string &name, const TransformComponent &transform) -> Entity
 {
