@@ -41,10 +41,10 @@ public:
 			test();
 		}
 
-		std::cout << "_________________________[TEST RESULTS]_________________________\n";
 		std::cout << "Ran " << instance().m_failed_count + instance().m_pasesed_count << " tests:\n"
 		          << "\tpassed: " << instance().m_pasesed_count << '\n'
 		          << "\tfailed: " << instance().m_failed_count << '\n';
+		std::cout << "________________________________________________________________\n\n\n";
 
 		return instance().m_failed_count;
 	}
@@ -60,7 +60,10 @@ public:
 	}
 
 private:
-	Registry() = default;
+	Registry()
+	{
+		std::cout << "________________________________________________________________\n";
+	}
 
 	[[nodiscard]] static auto instance() -> Registry &
 	{
