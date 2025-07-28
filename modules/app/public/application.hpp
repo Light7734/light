@@ -35,7 +35,9 @@ protected:
 private:
 	std::vector<Ref<app::ISystem>> m_systems;
 
-	std::vector<Ref<app::ISystem>> m_systems_to_be_removed;
+	std::vector<Ref<app::ISystem>> m_systems_to_be_unregistered;
+
+	std::vector<Ref<app::ISystem>> m_systems_to_be_registered;
 };
 
 

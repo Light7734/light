@@ -1,5 +1,5 @@
 if (NOT WIN32)
-    add_library_module(surface system.cpp linux/system.cpp)
+    add_library_module(surface linux/system.cpp)
 else()
 endif()
 
@@ -11,3 +11,6 @@ target_link_libraries(surface PUBLIC
     logger 
     lt_debug
 )
+
+add_test_module(surface system.test.cpp)
+target_link_libraries(surface_tests PRIVATE glfw)

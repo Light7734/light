@@ -19,6 +19,12 @@ public:
 		return m_registry.group(entt::get<T...>);
 	}
 
+	template<typename T>
+	auto view()
+	{
+		return m_registry.view<T>();
+	}
+
 	auto create_entity(
 	    const std::string &name,
 	    const TransformComponent &transform = TransformComponent()
@@ -30,6 +36,7 @@ public:
 	{
 		return m_registry;
 	}
+
 
 private:
 	friend class Entity;

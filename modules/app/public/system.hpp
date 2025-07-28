@@ -17,7 +17,9 @@ public:
 
 	auto operator=(const ISystem &) -> ISystem & = delete;
 
-	virtual void init() = 0;
+	virtual void on_register() = 0;
+
+	virtual void on_unregister() = 0;
 
 	virtual auto tick() -> bool = 0;
 };

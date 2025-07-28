@@ -84,7 +84,8 @@ struct Case
 {
 	auto operator=(std::invocable auto test) -> void // NOLINT
 	{
-		std::cout << "Running... " << name;
+		std::cout << "[Running-----------] --> ";
+        std::cout << name << '\n';
 
 		try
 		{
@@ -92,14 +93,14 @@ struct Case
 		}
 		catch (const std::exception &exp)
 		{
-			std::cout << " --> FAIL !" << '\n';
-			std::cout << exp.what() << "\n\n";
+			std::cout << exp.what() << "\n";
+			std::cout << "[-----------FAIL !!]" << "\n\n";
 			details::Registry::increment_failed_count();
 			return; // TODO(Light): Should we run the remaining tests after a failure?
 		}
 
 		details::Registry::increment_passed_count();
-		std::cout << " --> SUCCESS :D" << "\n";
+		std::cout << "[--------SUCCESS :D]" << "\n\n";
 	}
 
 	std::string_view name;

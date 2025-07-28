@@ -22,23 +22,26 @@ public:
 		setup_window_system();
 		register_systems();
 
-		m_window_system->add_event_listener([&](const surface::System::Event &event) {
-			const auto visitor = overloads {
-				[&](const lt::surface::KeyPressedEvent &event) {
-				    std::cout << "key pressed: " << event.to_string() << std::endl;
+		m_window_system->add_event_listener(
+		    m_window,
+		    [&](const surface::SurfaceComponent::Event &event) {
+			    const auto visitor = overloads {
+				    [&](const lt::surface::KeyPressedEvent &event) {
+				        std::cout << "key pressed: " << event.to_string() << std::endl;
 
-				    if (event.get_key() == 81)
-				    {
-					    unregister_system(m_window_system);
-					    log_inf("Quitting...");
-				    }
-				    return true;
-				},
-				[](const auto &) { return false; },
-			};
+				        if (event.get_key() == 81)
+				        {
+					        unregister_system(m_window_system);
+					        log_inf("Quitting...");
+				        }
+				        return true;
+				    },
+				    [](const auto &) { return false; },
+			    };
 
-			return std::visit(visitor, event);
-		});
+			    return std::visit(visitor, event);
+		    }
+		);
 	}
 
 	void setup_window_system()

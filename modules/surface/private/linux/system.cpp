@@ -1,11 +1,13 @@
+#define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <surface/system.hpp>
 
 namespace lt::surface {
 
-void handle_event(GLFWwindow *window, const System::Event &event)
+void handle_event(GLFWwindow *window, const SurfaceComponent::Event &event)
 {
-	auto &callbacks = *static_cast<std::vector<System::EventCallback> *>(
+	auto &callbacks = *static_cast<std::vector<SurfaceComponent::EventCallback> *>(
 	    glfwGetWindowUserPointer(window)
 	);
 
@@ -90,6 +92,50 @@ void bind_glfw_events(GLFWwindow *handle)
 	});
 }
 
+System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
+{
+	ensure(m_registry, "Failed to initialize surface system: null registry");
+	ensure(
+	    m_registry->view<SurfaceComponent>().size() == 0,
+	    "Failed to initialize surface system: registry has surface component(s)"
+	);
+
+	m_registry->get_entt_registry()
+	    .on_construct<SurfaceComponent>()
+	    .connect<&System::on_surface_construct>(this);
+
+	m_registry->get_entt_registry()
+	    .on_update<SurfaceComponent>()
+	    .connect<&System::on_surface_update>(this);
+
+	m_registry->get_entt_registry()
+	    .on_destroy<SurfaceComponent>()
+	    .connect<&System::on_surface_destroy>(this);
+}
+
+System::~System()
+{
+	m_registry->get_entt_registry()
+	    .on_construct<SurfaceComponent>()
+	    .disconnect<&System::on_surface_construct>(this);
+
+	m_registry->get_entt_registry()
+	    .on_update<SurfaceComponent>()
+	    .connect<&System::on_surface_update>(this);
+
+	m_registry->get_entt_registry()
+	    .on_destroy<SurfaceComponent>()
+	    .disconnect<&System::on_surface_destroy>(this);
+
+
+	m_registry->view<SurfaceComponent>().each([&](const entt::entity entity, SurfaceComponent &) {
+		std::cout << "REMOVED SURFACE COMPONENT ON DESTRUCTION" << std::endl;
+		m_registry->get_entt_registry().remove<SurfaceComponent>(entity);
+	});
+
+	glfwTerminate();
+}
+
 void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 {
 	ensure(glfwInit(), "Failed to initialize 'glfw'");
@@ -111,8 +157,15 @@ void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 	);
 	ensure(surface.m_glfw_handle, "Failed to create 'GLFWwindow'");
 
-	glfwSetWindowUserPointer(surface.m_glfw_handle, &m_event_callbacks);
+	glfwSetWindowUserPointer(surface.m_glfw_handle, &surface.m_event_callbacks);
+	surface.m_native_handle = glfwGetX11Window(surface.m_glfw_handle);
 	bind_glfw_events(surface.m_glfw_handle);
+}
+
+void System::on_surface_update(entt::registry &registry, entt::entity entity)
+{
+	auto &surface = registry.get<SurfaceComponent>(entity);
+	glfwSetWindowUserPointer(surface.m_glfw_handle, &surface.m_event_callbacks);
 }
 
 void System::on_surface_destroy(entt::registry &registry, entt::entity entity)
@@ -170,29 +223,17 @@ void System::set_visibility(ecs::Entity surface_entity, bool visible)
 	}
 }
 
+void System::add_event_listener(
+    ecs::Entity surface_entity,
+    SurfaceComponent::EventCallback callback
+)
+{
+	auto &surface = surface_entity.get_component<SurfaceComponent>();
+	surface.m_event_callbacks.emplace_back(std::move(callback));
+}
+
 } // namespace lt::surface
 
 namespace lt {
-
-// void System::on_event(const Event &event)
-// {
-// 	switch (event.get_event_type())
-// 	{
-// 	/* closed */
-// 	case EventType::WindowClosed: b_Closed = true; break;
-//
-// 	/* resized */
-// 	case EventType::WindowResized:
-// 		on_surface_resize(dynamic_cast<const WindowResizedEvent &>(event));
-// 		break;
-//
-// 	default: break;
-// 	}
-// }
-//
-// void System::on_surface_resize(const WindowResizedEvent &event)
-// {
-// 	m_properties.size = event.get_size();
-// }
 
 } // namespace lt

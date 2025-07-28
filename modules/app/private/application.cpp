@@ -5,11 +5,6 @@ namespace lt::app {
 
 void Application::game_loop()
 {
-	for (auto &system : m_systems)
-	{
-		system->init();
-	}
-
 	while (true)
 	{
 		for (auto &system : m_systems)
@@ -20,7 +15,12 @@ void Application::game_loop()
 			}
 		}
 
-		for (auto &system : m_systems_to_be_removed)
+		for (auto &system : m_systems_to_be_registered)
+		{
+			m_systems.emplace_back(system)->on_register();
+		}
+
+		for (auto &system : m_systems_to_be_unregistered)
 		{
 			m_systems.erase(
 			    std::remove(m_systems.begin(), m_systems.end(), system),
@@ -42,7 +42,7 @@ void Application::register_system(Ref<app::ISystem> system)
 
 void Application::unregister_system(Ref<app::ISystem> system)
 {
-	m_systems_to_be_removed.emplace_back(std::move(system));
+	m_systems_to_be_unregistered.emplace_back(std::move(system));
 }
 
 } // namespace lt::app

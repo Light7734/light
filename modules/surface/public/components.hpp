@@ -1,15 +1,51 @@
 #pragma once
 
 #include <math/vec2.hpp>
+#include <surface/events/keyboard.hpp>
+#include <surface/events/mouse.hpp>
+#include <surface/events/surface.hpp>
+#include <variant>
 
 struct GLFWwindow;
 
 namespace lt::surface {
 
+/** Represents a platform's surface (eg. a Window).
+ *
+ * @note Read-only component, should only be modified through a system.
+ */
 class SurfaceComponent
 {
 public:
 	friend class System;
+
+	using Event = std::variant<
+	    // surface events
+	    ClosedEvent,
+	    MovedEvent,
+	    ResizedEvent,
+	    LostFocusEvent,
+	    GainFocusEvent,
+
+	    // keyboard events
+	    KeyPressedEvent,
+	    KeyRepeatEvent,
+	    KeyReleasedEvent,
+	    KeySetCharEvent,
+
+	    // mouse events
+	    MouseMovedEvent,
+	    WheelScrolledEvent,
+	    ButtonPressedEvent,
+	    ButtonReleasedEvent>;
+
+	using EventCallback = std::function<bool(const Event &)>;
+
+	using WindowsNativeHandle = void *;
+
+	using X11NativeHandle = unsigned long;
+
+	using NativeHandle = std::variant<WindowsNativeHandle, X11NativeHandle>;
 
 	struct CreateInfo
 	{
@@ -50,17 +86,17 @@ public:
 		return m_visible;
 	}
 
-	[[nodiscard]] auto get_native_handle() const -> void *
+	[[nodiscard]] auto get_native_handle() const -> NativeHandle
 	{
 		return m_native_handle;
 	}
 
+private:
 	[[nodiscard]] auto get_glfw_handle() const -> GLFWwindow *
 	{
 		return m_glfw_handle;
 	}
 
-private:
 	std::string_view m_title;
 
 	math::uvec2 m_size;
@@ -69,9 +105,11 @@ private:
 
 	bool m_visible;
 
-	void *m_native_handle {};
+	NativeHandle m_native_handle;
 
 	GLFWwindow *m_glfw_handle {};
+
+	std::vector<EventCallback> m_event_callbacks;
 };
 
 } // namespace lt::surface

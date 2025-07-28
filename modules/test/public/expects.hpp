@@ -140,6 +140,27 @@ constexpr void expect_false(
 	}
 }
 
+constexpr void expect_not_nullptr(
+    auto *pointer,
+    std::source_location source_location = std::source_location::current()
+)
+{
+	if (pointer == nullptr)
+	{
+		throw std::runtime_error {
+			std::format(
+			    "Failed true expectation:\n"
+			    "\tactual: nullptr\n"
+			    "\texpected: not nullptr\n"
+			    "\tlocation: {}:{}",
+			    source_location.file_name(),
+			    source_location.line()
+			),
+		};
+	}
+}
+
+
 constexpr void expect_le(
     Testable auto lhs,
     Testable auto rhs,

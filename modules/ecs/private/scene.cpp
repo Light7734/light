@@ -11,21 +11,6 @@ auto Scene::create_entity(const std::string &name, const TransformComponent &tra
 
 auto Scene::get_entity_by_tag(const std::string &tag) -> Entity
 {
-	// TagComponent tagComp(tag);
-	// entt::entity entity = entt::to_entity(m_registry, tagComp);
-	auto entity = Entity {};
-
-	m_registry.view<TagComponent>().each([&](TagComponent &tagComp) {
-		// if (tagComp.tag == tag)
-		// 	entity = entity(entt::to_entity(m_registry, tagComp), this);
-	});
-
-	if (entity.is_valid())
-	{
-		return entity;
-	}
-
-	ensure(false, "Scene::get_entity_by_tag: failed to find entity by tag: {}", tag);
 	return {};
 }
 

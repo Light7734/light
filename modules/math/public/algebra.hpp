@@ -4,7 +4,6 @@
 
 namespace lt::math {
 
-
 /**
  * let...
  * a = h / w ==> for aspect ratio adjustment
