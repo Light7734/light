@@ -27,11 +27,24 @@ namespace details {
 class Registry
 {
 public:
-	using Suite = void (*)();
+	using FuzzFunction = int32_t (*)(const uint8_t *, size_t);
+	using SuiteFunction = void (*)();
 
-	static void register_suite(Suite suite)
+	static void register_suite(SuiteFunction suite)
 	{
 		instance().m_suites.emplace_back(suite);
+	}
+
+	static void register_fuzz_harness(FuzzFunction suite)
+	{
+		if (instance().m_fuzz_harness)
+		{
+			throw std::logic_error {
+				"Attempting to register fuzz harness while one is already registered",
+			};
+		}
+
+		instance().m_fuzz_harness = suite;
 	}
 
 	static auto run_all() -> int32_t
@@ -47,6 +60,18 @@ public:
 		std::cout << "________________________________________________________________\n\n\n";
 
 		return instance().m_failed_count;
+	}
+
+	static auto process_fuzz_input(const uint8_t *data, size_t size) -> int32_t
+	{
+		if (!instance().m_fuzz_harness)
+		{
+			throw std::logic_error {
+				"Attempting to process fuzz input with no active harness",
+			};
+		}
+
+		return instance().m_fuzz_harness(data, size);
 	}
 
 	static void increment_passed_count()
@@ -71,7 +96,9 @@ private:
 		return registry;
 	}
 
-	std::vector<void (*)()> m_suites;
+	std::vector<SuiteFunction> m_suites;
+
+	FuzzFunction m_fuzz_harness {};
 
 	int32_t m_pasesed_count {};
 	int32_t m_failed_count {};
@@ -85,7 +112,7 @@ struct Case
 	auto operator=(std::invocable auto test) -> void // NOLINT
 	{
 		std::cout << "[Running-----------] --> ";
-        std::cout << name << '\n';
+		std::cout << name << '\n';
 
 		try
 		{
@@ -117,6 +144,18 @@ struct TestSuite
 	}
 };
 
+struct TestFuzzHarness
+{
+	template<class TestFuzzHarness>
+	constexpr TestFuzzHarness(TestFuzzHarness suite)
+	{
+#ifndef LIGHT_SKIP_FUZZ_TESTS
+		details::Registry::register_fuzz_harness(+suite);
+#endif
+	}
+};
+
 using Suite = const TestSuite;
+using FuzzHarness = const TestFuzzHarness;
 
 } // namespace lt::test

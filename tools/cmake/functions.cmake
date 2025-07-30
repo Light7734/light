@@ -113,6 +113,44 @@ function (add_test_module target_lib_name)
     )
 endfunction ()
 
+function (add_fuzz_module target_lib_name)
+    if (NOT ${ENABLE_TESTS})
+        return()
+    endif ()
+
+    set(source_files)
+    set(source_directory "${CMAKE_CURRENT_SOURCE_DIR}/private")
+    foreach (source_file ${ARGN})
+        list(APPEND source_files "${source_directory}/${source_file}")
+    endforeach ()
+
+    message("Adding fuzz executable ${target_lib_name}_fuzz with source files: ${source_files}")
+
+    set(PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/public_includes")
+    file(MAKE_DIRECTORY "${PUBLIC_INCLUDE_DIR}")
+    file(CREATE_LINK
+        "${CMAKE_CURRENT_SOURCE_DIR}/public/"
+        "${PUBLIC_INCLUDE_DIR}/${target_lib_name}"
+        SYMBOLIC
+    )
+    set(PRIVATE_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/private_includes")
+    file(MAKE_DIRECTORY "${PRIVATE_INCLUDE_DIR}")
+    file(CREATE_LINK
+        "${CMAKE_CURRENT_SOURCE_DIR}/private/"
+        "${PRIVATE_INCLUDE_DIR}/${target_lib_name}"
+        SYMBOLIC
+    )
+
+    add_executable(${target_lib_name}_fuzz ${source_files})
+    target_link_libraries(${target_lib_name}_fuzz PRIVATE ${target_lib_name} base fuzz_test)
+    target_link_options(${target_lib_name}_fuzz PRIVATE -fsanitize=fuzzer)
+    target_compile_options(${target_lib_name}_fuzz PRIVATE -fsanitize=fuzzer)
+    target_include_directories(${target_lib_name}_fuzz
+        PRIVATE ${PUBLIC_INCLUDE_DIR}
+        PRIVATE ${PRIVATE_INCLUDE_DIR}
+    )
+endfunction ()
+
 function (add_option option help)
     option(${option} ${help})
 
