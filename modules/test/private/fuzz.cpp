@@ -1,11 +1,11 @@
 #include <test/test.hpp>
 
 namespace lt::test {
+
 auto process_fuzz_input(const uint8_t *data, size_t size) -> int32_t
 try
 {
-	details::Registry::process_fuzz_input(data, size);
-	return EXIT_SUCCESS;
+	return details::Registry::process_fuzz_input(data, size);
 }
 catch (const std::exception &exp)
 {
