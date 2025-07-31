@@ -32,7 +32,7 @@ public:
 
 	auto tick() -> bool override;
 
-	void set_title(ecs::Entity surface_entity, std::string_view new_title);
+	static void set_title(ecs::Entity surface_entity, std::string_view new_title);
 
 	void set_size(ecs::Entity surface_entity, const math::uvec2 &new_size);
 
@@ -48,6 +48,8 @@ private:
 	void on_surface_update(entt::registry &registry, entt::entity entity);
 
 	void on_surface_destroy(entt::registry &registry, entt::entity entity);
+
+	void ensure_component_sanity(const SurfaceComponent &component);
 
 	Ref<ecs::Registry> m_registry;
 };

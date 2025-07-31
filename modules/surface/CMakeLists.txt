@@ -13,4 +13,4 @@ target_link_libraries(surface PUBLIC
 )
 
 add_test_module(surface system.test.cpp)
-target_link_libraries(surface_tests PRIVATE glfw)
+add_fuzz_module(surface system.fuzz.cpp)

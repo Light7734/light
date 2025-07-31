@@ -5,6 +5,11 @@
 
 namespace lt::surface {
 
+void glfw_error_callbac(int32_t code, const char *description)
+{
+	log_err("GLFW ERROR: {} -> {}", code, description);
+}
+
 void handle_event(GLFWwindow *window, const SurfaceComponent::Event &event)
 {
 	auto &callbacks = *static_cast<std::vector<SurfaceComponent::EventCallback> *>(
@@ -92,9 +97,15 @@ void bind_glfw_events(GLFWwindow *handle)
 	});
 }
 
+void init_glfw() {};
+
 System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
+	glfwSetErrorCallback(&glfw_error_callbac);
+	ensure(glfwInit(), "Failed to initialize 'glfw'");
+
 	ensure(m_registry, "Failed to initialize surface system: null registry");
+
 	ensure(
 	    m_registry->view<SurfaceComponent>().size() == 0,
 	    "Failed to initialize surface system: registry has surface component(s)"
@@ -129,7 +140,6 @@ System::~System()
 
 
 	m_registry->view<SurfaceComponent>().each([&](const entt::entity entity, SurfaceComponent &) {
-		std::cout << "REMOVED SURFACE COMPONENT ON DESTRUCTION" << std::endl;
 		m_registry->get_entt_registry().remove<SurfaceComponent>(entity);
 	});
 
@@ -138,28 +148,33 @@ System::~System()
 
 void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 {
-	ensure(glfwInit(), "Failed to initialize 'glfw'");
+	try
+	{
+		auto &surface = registry.get<SurfaceComponent>(entity);
+		ensure_component_sanity(surface);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	// glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	auto &surface = registry.get<SurfaceComponent>(entity);
-	auto [width, height] = surface.get_size();
+		surface.m_glfw_handle = glfwCreateWindow(
+		    static_cast<int>(surface.get_resolution().x),
+		    static_cast<int>(surface.get_resolution().y),
+		    surface.get_title().begin(),
+		    nullptr,
+		    nullptr
+		);
+		ensure(surface.m_glfw_handle, "Failed to create 'GLFWwindow'");
 
-	surface.m_glfw_handle = glfwCreateWindow(
-	    static_cast<int32_t>(width),
-	    static_cast<int32_t>(height),
-	    surface.get_title().begin(),
-	    nullptr,
-	    nullptr
-	);
-	ensure(surface.m_glfw_handle, "Failed to create 'GLFWwindow'");
-
-	glfwSetWindowUserPointer(surface.m_glfw_handle, &surface.m_event_callbacks);
-	surface.m_native_handle = glfwGetX11Window(surface.m_glfw_handle);
-	bind_glfw_events(surface.m_glfw_handle);
+		glfwSetWindowUserPointer(surface.m_glfw_handle, &surface.m_event_callbacks);
+		surface.m_native_handle = glfwGetX11Window(surface.m_glfw_handle);
+		bind_glfw_events(surface.m_glfw_handle);
+	}
+	catch (...)
+	{
+		registry.remove<SurfaceComponent>(entity);
+		throw;
+	}
 }
 
 void System::on_surface_update(entt::registry &registry, entt::entity entity)
@@ -171,7 +186,11 @@ void System::on_surface_update(entt::registry &registry, entt::entity entity)
 void System::on_surface_destroy(entt::registry &registry, entt::entity entity)
 {
 	auto &surface = registry.get<SurfaceComponent>(entity);
-	glfwDestroyWindow(surface.m_glfw_handle);
+
+	if (surface.m_glfw_handle)
+	{
+		glfwDestroyWindow(surface.m_glfw_handle);
+	}
 }
 
 void System::set_title(ecs::Entity entity, std::string_view new_title)
@@ -179,11 +198,15 @@ void System::set_title(ecs::Entity entity, std::string_view new_title)
 	auto &surface = entity.get_component<SurfaceComponent>();
 
 	surface.m_title = new_title;
-	glfwSetWindowTitle(surface.m_glfw_handle, surface.m_title.begin());
+	glfwSetWindowTitle(surface.m_glfw_handle, surface.m_title.c_str());
 }
 
 auto System::tick() -> bool
 {
+	m_registry->view<SurfaceComponent>().each([](SurfaceComponent &surface) {
+		glfwSwapBuffers(surface.m_glfw_handle);
+	});
+
 	glfwPollEvents();
 	return false;
 }
@@ -191,7 +214,7 @@ auto System::tick() -> bool
 void System::set_size(ecs::Entity surface_entity, const math::uvec2 &new_size)
 {
 	auto &surface = surface_entity.get_component<SurfaceComponent>();
-	surface.m_size = new_size;
+	surface.m_resolution = new_size;
 
 	glfwSetWindowSize(
 	    surface.m_glfw_handle,
@@ -230,6 +253,36 @@ void System::add_event_listener(
 {
 	auto &surface = surface_entity.get_component<SurfaceComponent>();
 	surface.m_event_callbacks.emplace_back(std::move(callback));
+}
+
+void System::ensure_component_sanity(const SurfaceComponent &component)
+{
+	auto [width, height] = component.get_resolution();
+
+	ensure(width != 0u, "Received bad values for surface component: width({}) == 0", width);
+
+	ensure(height != 0u, "Received bad values for surface component: height({}) == 0", height);
+
+	ensure(
+	    width < SurfaceComponent::max_dimension,
+	    "Received bad values for surface component: width({}) > max_dimension({})",
+	    width,
+	    SurfaceComponent::max_dimension
+	);
+
+	ensure(
+	    height < SurfaceComponent::max_dimension,
+	    "Received bad values for surface component: height({}) > max_dimension({})",
+	    height,
+	    SurfaceComponent::max_dimension
+	);
+
+	ensure(
+	    component.get_title().size() < SurfaceComponent::max_title_length,
+	    "Received bad values for surface component: title.size({}) > max_title_length({})",
+	    component.get_title().size(),
+	    SurfaceComponent::max_title_length
+	);
 }
 
 } // namespace lt::surface

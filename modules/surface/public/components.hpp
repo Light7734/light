@@ -47,11 +47,15 @@ public:
 
 	using NativeHandle = std::variant<WindowsNativeHandle, X11NativeHandle>;
 
+	static constexpr auto max_dimension = 4096;
+
+	static constexpr auto max_title_length = 256;
+
 	struct CreateInfo
 	{
 		std::string_view title;
 
-		math::uvec2 size;
+		math::uvec2 resolution;
 
 		bool vsync;
 
@@ -60,20 +64,20 @@ public:
 
 	SurfaceComponent(const CreateInfo &info)
 	    : m_title(info.title)
-	    , m_size(info.size)
+	    , m_resolution(info.resolution)
 	    , m_vsync(info.vsync)
 	    , m_visible(info.visible)
 	{
 	}
 
-	[[nodiscard]] auto get_title() const -> const std::string_view &
+	[[nodiscard]] auto get_title() const -> std::string_view
 	{
 		return m_title;
 	}
 
-	[[nodiscard]] auto get_size() const -> const math::uvec2 &
+	[[nodiscard]] auto get_resolution() const -> const math::uvec2 &
 	{
-		return m_size;
+		return m_resolution;
 	}
 
 	[[nodiscard]] auto is_vsync() const -> bool
@@ -97,9 +101,9 @@ private:
 		return m_glfw_handle;
 	}
 
-	std::string_view m_title;
+	std::string m_title;
 
-	math::uvec2 m_size;
+	math::uvec2 m_resolution;
 
 	bool m_vsync;
 
