@@ -52,7 +52,7 @@ public:
 		m_window = m_editor_registry->create_entity("Editor Window");
 		m_window.add_component<SurfaceComponent>(SurfaceComponent::CreateInfo {
 		    .title = "Editor Window",
-		    .size = { 800u, 600u },
+		    .resolution = { 800u, 600u },
 		    .vsync = true,
 		    .visible = true,
 		});
