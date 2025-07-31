@@ -6,23 +6,31 @@
 
 namespace lt {
 
-struct FailedAssertion: std::exception
+template<typename Expression_T, typename... Args_T>
+struct ensure
 {
-	FailedAssertion(const char *file, int line)
+	ensure(
+	    Expression_T expression,
+	    std::format_string<Args_T...> fmt,
+	    Args_T &&...args,
+	    const std::source_location &location = std::source_location::current()
+	)
 	{
-		log_crt("Assertion failed in: {} (line {})", file, line);
+		if (!static_cast<bool>(expression))
+		{
+			throw std::runtime_error { std::format(
+				"exception: {}\nlocation: {}:{}",
+				std::format(fmt, std::forward<Args_T>(args)...),
+				location.file_name(),
+				location.line()
+			) };
+		}
 	}
 };
 
 
-template<typename Expression_T>
-constexpr void ensure(Expression_T &&expression, const char *message)
-{
-	if (!static_cast<bool>(expression))
-	{
-		Logger::log(LogLvl::critical, message);
-		throw ::lt::FailedAssertion(__FILE__, __LINE__);
-	}
-}
+template<typename Expression_T, typename... Args_T>
+ensure(Expression_T, std::format_string<Args_T...>, Args_T &&...)
+    -> ensure<Expression_T, Args_T...>;
 
 } // namespace lt
