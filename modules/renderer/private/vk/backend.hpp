@@ -1,0 +1,135 @@
+#pragma once
+
+#define VK_NO_PROTOTYPES
+#include <renderer/backend.hpp>
+#include <vulkan/vulkan.h>
+
+namespace lt::renderer::vk {
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+// global functions
+extern PFN_vkGetInstanceProcAddr vk_get_instance_proc_address;
+extern PFN_vkCreateInstance vk_create_instance;
+extern PFN_vkEnumerateInstanceExtensionProperties vk_enumerate_instance_extension_properties;
+extern PFN_vkEnumerateInstanceLayerProperties vk_enumerate_instance_layer_properties;
+
+// instance functions
+extern PFN_vkDestroyInstance vk_destroy_instance;
+extern PFN_vkEnumeratePhysicalDevices vk_enumerate_physical_devices;
+extern PFN_vkGetPhysicalDeviceProperties vk_get_physical_device_properties;
+extern PFN_vkGetPhysicalDeviceQueueFamilyProperties vk_get_physical_device_queue_family_properties;
+extern PFN_vkCreateDevice vk_create_device;
+extern PFN_vkGetDeviceProcAddr vk_get_device_proc_address;
+extern PFN_vkDestroyDevice vk_destroy_device;
+extern PFN_vkGetPhysicalDeviceFeatures vk_get_physical_device_features;
+extern PFN_vkEnumerateDeviceExtensionProperties vk_enumerate_device_extension_properties;
+
+// extension instance functions
+extern PFN_vkCmdBeginDebugUtilsLabelEXT vk_cmd_begin_debug_label;
+extern PFN_vkCmdEndDebugUtilsLabelEXT vk_cmd_end_debug_label;
+extern PFN_vkCmdInsertDebugUtilsLabelEXT vk_cmd_insert_debug_label;
+extern PFN_vkCreateDebugUtilsMessengerEXT vk_create_debug_messenger;
+extern PFN_vkDestroyDebugUtilsMessengerEXT vk_destroy_debug_messenger;
+extern PFN_vkQueueBeginDebugUtilsLabelEXT vk_queue_begin_debug_label;
+extern PFN_vkQueueEndDebugUtilsLabelEXT vk_queue_end_debug_label;
+extern PFN_vkQueueInsertDebugUtilsLabelEXT vk_queue_insert_debug_label;
+extern PFN_vkSetDebugUtilsObjectNameEXT vk_set_debug_object_name;
+extern PFN_vkSetDebugUtilsObjectTagEXT vk_set_debug_object_tag;
+extern PFN_vkSubmitDebugUtilsMessageEXT vk_submit_debug_message;
+
+// device functions
+extern PFN_vkGetDeviceQueue vk_get_device_queue;
+extern PFN_vkCreateCommandPool vk_create_command_pool;
+extern PFN_vkDestroyCommandPool vk_destroy_command_pool;
+extern PFN_vkAllocateCommandBuffers vk_allocate_command_buffers;
+extern PFN_vkFreeCommandBuffers vk_free_command_buffers;
+extern PFN_vkBeginCommandBuffer vk_begin_command_buffer;
+extern PFN_vkEndCommandBuffer vk_end_command_buffer;
+extern PFN_vkCmdPipelineBarrier vk_cmd_pipeline_barrier;
+extern PFN_vkQueueSubmit vk_queue_submit;
+extern PFN_vkQueueWaitIdle vk_queue_wait_idle;
+extern PFN_vkDeviceWaitIdle vk_device_wait_idle;
+extern PFN_vkCreateFence vk_create_fence;
+extern PFN_vkDestroyFence vk_destroy_fence;
+extern PFN_vkWaitForFences vk_wait_for_fences;
+extern PFN_vkResetFences vk_reset_fences;
+extern PFN_vkCreateSemaphore vk_create_semaphore;
+extern PFN_vkDestroySemaphore vk_destroy_semaphore;
+extern PFN_vkCreateSwapchainKHR vk_create_swapchain_khr;
+extern PFN_vkDestroySwapchainKHR vk_destroy_swapchain_khr;
+extern PFN_vkGetSwapchainImagesKHR vk_get_swapchain_images_khr;
+extern PFN_vkAcquireNextImageKHR vk_acquire_next_image_khr;
+extern PFN_vkQueuePresentKHR vk_queue_present_khr;
+extern PFN_vkCreateImageView vk_create_image_view;
+extern PFN_vkDestroyImageView vk_destroy_image_view;
+extern PFN_vkCreateRenderPass vk_create_render_pass;
+extern PFN_vkDestroyRenderPass vk_destroy_render_pass;
+extern PFN_vkCreateFramebuffer vk_create_frame_buffer;
+extern PFN_vkDestroyFramebuffer vk_destroy_frame_buffer;
+extern PFN_vkCreateShaderModule vk_create_shader_module;
+extern PFN_vkDestroyShaderModule vk_destroy_shader_module;
+extern PFN_vkCreatePipelineLayout vk_create_pipeline_layout;
+extern PFN_vkDestroyPipelineLayout vk_destroy_pipeline_layout;
+extern PFN_vkCreateGraphicsPipelines vk_create_graphics_pipelines;
+extern PFN_vkDestroyPipeline vk_destroy_pipeline;
+extern PFN_vkCmdBeginRenderPass vk_cmd_begin_render_pass;
+extern PFN_vkCmdEndRenderPass vk_cmd_end_render_pass;
+extern PFN_vkCmdBindPipeline vk_cmd_bind_pipeline;
+extern PFN_vkCmdDraw vk_cmd_draw;
+extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
+extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+
+class Backend: public ::lt::renderer::Backend
+{
+public:
+	Backend();
+
+	Backend(Backend &&) = default;
+
+	auto operator=(Backend &&) -> Backend & = default;
+
+	Backend(const Backend &) = delete;
+
+	auto operator=(const Backend &) -> Backend & = delete;
+
+	~Backend() override;
+
+	[[nodiscard]] constexpr auto get_api() const -> API override
+	{
+		return API::vulkan;
+	}
+
+private:
+	void initialize_instance();
+
+	void initialize_debug_messenger();
+
+	void initialize_physical_device();
+
+	void initialize_logical_device();
+
+	void initialize_queue();
+
+	void load_library();
+
+	void load_global_functions();
+
+	void load_instance_functions();
+
+	void load_device_functions();
+
+	[[nodiscard]] auto find_suitable_queue_family() const -> uint32_t;
+
+	VkInstance m_instance {};
+
+	VkPhysicalDevice m_physical_device {};
+
+	VkDevice m_device {};
+
+	VkQueue m_queue {};
+
+	VkDebugUtilsMessengerEXT m_debug_messenger {};
+};
+
+} // namespace lt::renderer::vk
