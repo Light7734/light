@@ -1,6 +1,20 @@
-A bleeding-edge, cross-platform, cross-graphics-api, minimal-dependencies modern game-engine.
+.. light documentation master file, created by
+   sphinx-quickstart on Tue Aug  5 12:20:54 2025.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-Supported Platforms: Windows, Mac, Linux, FreeBSD
-Supported GraphicsAPIs: DirectX12-Ultimate, Vulkan 1.4, Metal, OpenGL 4.6
+light documentation
+===================
 
-Dependencies: stdlib, meshoptimizer
+Add your content using ``reStructuredText`` syntax. See the
+`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
+documentation for details.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   guidelines/development.rst
+   guidelines/conventions.rst
+
+
