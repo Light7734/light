@@ -2,8 +2,8 @@
 
 Development
 ===================================================================================================
-As a solo-project, I am not only the **developer**, but also the **manager** of this project. Therefore
-there is a need, if this project is to succeed, to have a development plan. 
+As a solo-project, I am not only the **developer**, but also the **manager**. 
+Therefore there is a need, if this project is to succeed, to have a development plan. 
 
 Such a plan should:
 
@@ -16,7 +16,7 @@ These are the **management** aspects of the project, which help the development 
 ---by pulling my mind out of its **engineering dreamland**, and make it focus on the **broader picture**.
 
 Cycle
---------------------
+---------------------------------------------------------------------------------------------------
 A cycle is one **step** in development, one cycle = one ticket, and it consists of 4 stages:
 
 1 - Make it known
@@ -53,46 +53,69 @@ A cycle is one **step** in development, one cycle = one ticket, and it consists 
 4 - Make it fast
     - This is an engine, at the end of the day, **performance** is king.
     - Get a performance and/or memory profile and try to alleviate the bottlenecks.
+    - Avoid premature optimizations, be certain what you change has performance benefits.
 
 
 Sprint
---------------------
+---------------------------------------------------------------------------------------------------
 A sprint is the collection of all the finished cycles in one week.
 It's meant to provide insight on development speed and help projecting the future.
 
 
 Commit Message Specification
---------------------
+---------------------------------------------------------------------------------------------------
 The project follows the `Conventional Commits Specification <https://www.conventionalcommits.org/en/v1.0.0-beta.4>`_.
+
+.. code-block:: md
+
+    <type>[optional scope]: <description>
+
+    [optional body]
+
+    [optional footer]
 
 With the following commit types:
 
 - feat
-    - For adding new features.
-    - Coressponds to a **minor** semantic bump in version.
-
-- refactor
-    - For refactoring existing code.
-    - Coressponds to a **patch** semantic bump in version.
+    - For adding a new feature.
+    - Causes a **minor** bump in version.
 
 - fix
-    - For fixing an issue.
-    - Coressponds to a **patch** semantic bump in version.
+    - For changes that fix one or more bug.
+    - Causes a **patch** bump in version.
+
+- refactor
+    - For non feat/fix changes that improve the implementation and/or the interface.
+    - Causes a **patch** bump in version.
+
+- perf
+    - For changes that (hopefully) improve the performance.
+    - Causes a **patch** bump in version.
 
 - build
-    - For changes to the build pipeline.
-    - Coressponds to a **patch** semantic bump in version.
+    - For changes that affect the build system or external dependencies.
+    - Causes a **patch** bump in version.
+
+- asset
+    - For changes to the files under the ``/data`` directory.
+    - Causes a **patch** bump in version.
+
+- test
+    - For adding missing tests or correcting the existing tests.
+    - Does not affect the version.
 
 - chore
     - For releases, .gitignore changes, deleting unused files, etc.
     - Does not affect the version.
 
 - ci
-    - For anything related to the ci/cd pipelines like .drone.yml changes.
+    - For changes to our CI configuration files and scripts, including files under ``/tools/ci``.
     - Does not affect the version.
 
-- asset
-- test
+- docs
+    - For changes to the documentations.
+    - Does not affect the version.
+
 Semantic Versioning
 ---------------------------------------------------------------------------------------------------
 Coupled with conventional commit style messages, we can automajically version the project following
