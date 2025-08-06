@@ -59,7 +59,6 @@ for message in reversed(messages):
 
 with open(file_path, "w") as f:
     f.write(".. changelogs\n\n\n")
-    f.write(".. include:: ../.special.rst\n\n\n")
     f.write("Changelogs\n")
     f.write("==================================================\n\n")
 
