@@ -1,20 +1,32 @@
-.. light documentation master file, created by
-   sphinx-quickstart on Tue Aug  5 12:20:54 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-light documentation
-===================
-
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+.. light documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Light Engine
 
+   light/showcase.rst
+   light/features.rst
+   
+.. toctree::
+   :maxdepth: 2
+   :caption: Software Architecture
+
+   architecture/assets.rst
+   architecture/resource.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Development Guidelines
+
+   guidelines/philosophy.rst
    guidelines/development.rst
    guidelines/conventions.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Generated Docs
+
+   generated/api.rst
+   generated/changelog.rst
 
 
