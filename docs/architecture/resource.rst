@@ -1,4 +1,5 @@
-Resource Management
+.. architecture/resources
 
+Resource Management
 ===================================================================================================
 
