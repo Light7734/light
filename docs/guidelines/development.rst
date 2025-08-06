@@ -93,3 +93,32 @@ With the following commit types:
 
 - asset
 - test
+Semantic Versioning
+---------------------------------------------------------------------------------------------------
+Coupled with conventional commit style messages, we can automajically version the project following
+the **Semantic Versioning 2.0.0** specifications.
+
+The full version identifier consits of a version core (major.minor.patch) + label + hexsha of the commit.
+Using the following format:
+
+
+.. code-block:: md
+
+    <major>.<minor>.<patch>-<label>+<short_hexsha>
+
+    eg.
+    0.8.1-kitten+ea898 
+    0.5.0-kitten+01d85
+    1.5.0-akasha+7de53
+
+    kitten refers to all pre-release (1.0.0) versions
+
+
+The shortened hexsha of a commit is obtained by:
+``git rev-parse --short=5 <commit_hexsha>``
+
+
+
+
+
+
