@@ -7,8 +7,10 @@
 namespace lt::test {
 
 template<typename T>
-concept Printable = requires(std::ostream &os, T t) {
-	{ os << t } -> std::same_as<std::ostream &>;
+concept Printable = requires(std::ostream &stream, T value) {
+	{ stream << value } -> std::same_as<std::ostream &>;
+} || requires(std::ostream &stream, T value) {
+	{ stream << std::to_underlying<T>(value) } -> std::same_as<std::ostream &>;
 };
 
 template<typename T>
@@ -58,7 +60,25 @@ constexpr void expect_eq(
     std::source_location source_location = std::source_location::current()
 )
 {
-	if (lhs != rhs)
+	if constexpr (std::is_enum_v<decltype(lhs)>)
+	{
+		if (lhs != rhs)
+		{
+			throw std::runtime_error {
+				std::format(
+				    "Failed equality expectation:\n"
+				    "\tactual: {}\n"
+				    "\texpected: {}\n"
+				    "\tlocation: {}:{}",
+				    std::to_underlying<decltype(lhs)>(lhs),
+				    std::to_underlying<decltype(rhs)>(rhs),
+				    source_location.file_name(),
+				    source_location.line()
+				),
+			};
+		}
+	}
+	else if (lhs != rhs)
 	{
 		throw std::runtime_error {
 			std::format(

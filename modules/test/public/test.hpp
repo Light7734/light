@@ -5,23 +5,6 @@
 
 namespace lt::test {
 
-namespace concepts {
-
-template<typename T>
-concept printable = requires(std::ostream &os, T t) {
-	{ os << t } -> std::same_as<std::ostream &>;
-};
-
-// clang-format off
-template<class T, auto expr = []{}>
-concept test = requires(T test) {
-	{ test.name } -> printable;
-	{ test = expr } -> std::same_as<void>;
-};
-// clang-format on
-
-} // namespace concepts
-
 namespace details {
 
 class Registry
