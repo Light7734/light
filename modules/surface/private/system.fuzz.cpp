@@ -22,8 +22,8 @@ void create_surface_component(test::FuzzDataProvider &provider, ecs::Registry &r
 	const auto title = provider.consume_string(length).value_or("");
 
 	const auto resolution = math::uvec2 {
-		provider.consume<uint32_t>().value_or({ 32 }),
-		provider.consume<uint32_t>().value_or({ 64 }),
+		provider.consume<uint32_t>().value_or(32u),
+		provider.consume<uint32_t>().value_or(64u),
 	};
 	const auto visible = provider.consume<bool>().value_or(false);
 	const auto vsync = provider.consume<bool>().value_or(false);
