@@ -1,94 +1,94 @@
-# ---
-# kind: pipeline
-# type: exec
-# name: amd64 — msvc
-# trigger:
-#   branch:
-#   - main
-# platform:
-#   os: windows
-#   arch: amd64
-# 
-# steps:
-# - name: unit tests
-#   shell: powershell
-#   commands: 
-#     - ./tools/ci/amd64/msvc/unit_tests.ps1
-# 
-# ---
-# kind: pipeline
-# type: docker
-# name: amd64 — gcc
-# trigger:
-#   branch:
-#   - main
-# 
-# steps:
-# - name: unit tests
-#   image: amd64_gcc_unit_tests:latest
-#   pull: if-not-exists
-#   commands:
-#     - ./tools/ci/amd64/gcc/unit_tests.sh
-# 
-# - name: valgrind
-#   image: amd64_gcc_valgrind:latest
-#   pull: if-not-exists
-#   commands:
-#     - ./tools/ci/amd64/gcc/valgrind.sh
-# 
-# ---
-# kind: pipeline
-# type: docker
-# name: amd64 — clang
-# trigger:
-#   branch:
-#   - main
-# 
-# steps:
-# - name: code coverage
-#   image: amd64_clang_coverage:latest
-#   pull: if-not-exists
-#   environment:
-#     CODECOV_TOKEN:
-#       from_secret: CODECOV_TOKEN 
-#   commands:
-#     - ./tools/ci/amd64/clang/coverage.sh
-# 
-# - name: leak sanitizer
-#   image: amd64_clang_lsan:latest
-#   pull: if-not-exists
-#   commands:
-#     - ./tools/ci/amd64/clang/lsan.sh
-# 
-# - name: memory sanitizer
-#   image: amd64_clang_msan:latest
-#   pull: if-not-exists
-#   commands:
-#     - ./tools/ci/amd64/clang/msan.sh
-# 
-# ---
-# kind: pipeline
-# type: docker
-# name: static analysis
-# trigger:
-#   branch:
-#   - main
-# 
-# steps:
-# - name: clang tidy
-#   image: clang_tidy:latest
-#   pull: if-not-exists
-#   privileged: true
-#   commands:
-#     - ./tools/ci/static_analysis/clang_tidy.sh
-# 
-# - name: clang format
-#   image: clang_format:latest
-#   pull: if-not-exists
-#   commands:
-#     - ./tools/ci/static_analysis/clang_format.sh
+---
+kind: pipeline
+type: exec
+name: amd64 — msvc
+trigger:
+  branch:
+  - main
+platform:
+  os: windows
+  arch: amd64
 
-# ---
+steps:
+- name: unit tests
+  shell: powershell
+  commands: 
+    - ./tools/ci/amd64/msvc/unit_tests.ps1
+
+---
+kind: pipeline
+type: docker
+name: amd64 — gcc
+trigger:
+  branch:
+  - main
+
+steps:
+- name: unit tests
+  image: amd64_gcc_unit_tests:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/amd64/gcc/unit_tests.sh
+
+- name: valgrind
+  image: amd64_gcc_valgrind:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/amd64/gcc/valgrind.sh
+
+---
+kind: pipeline
+type: docker
+name: amd64 — clang
+trigger:
+  branch:
+  - main
+
+steps:
+- name: code coverage
+  image: amd64_clang_coverage:latest
+  pull: if-not-exists
+  environment:
+    CODECOV_TOKEN:
+      from_secret: CODECOV_TOKEN 
+  commands:
+    - ./tools/ci/amd64/clang/coverage.sh
+
+- name: leak sanitizer
+  image: amd64_clang_lsan:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/amd64/clang/lsan.sh
+
+- name: memory sanitizer
+  image: amd64_clang_msan:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/amd64/clang/msan.sh
+
+---
+kind: pipeline
+type: docker
+name: static analysis
+trigger:
+  branch:
+  - main
+
+steps:
+- name: clang tidy
+  image: clang_tidy:latest
+  pull: if-not-exists
+  privileged: true
+  commands:
+    - ./tools/ci/static_analysis/clang_tidy.sh
+
+- name: clang format
+  image: clang_format:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/static_analysis/clang_format.sh
+
+---
 kind: pipeline
 type: docker 
 name: documentation — development
