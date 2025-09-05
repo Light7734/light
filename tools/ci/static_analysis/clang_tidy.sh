@@ -14,6 +14,7 @@ conan build . \
 -c tools.cmake.cmaketoolchain:generator=Ninja \
 -s build_type=Release \
 -o enable_static_analysis=True \
--o enable_tests=True \
+-o enable_unit_tests=True \
+-o enable_fuzz_tests=True \
 -o use_mold=True \
 --build=missing

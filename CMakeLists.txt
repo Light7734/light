@@ -8,7 +8,8 @@ include(${CMAKE_DIR}/functions.cmake)
 include(${CMAKE_DIR}/definitions.cmake)
 include(${CMAKE_DIR}/dependencies.cmake)
 
-add_option(ENABLE_TESTS "Enables the building of the test modules")
+add_option(ENABLE_UNIT_TESTS "Enables the building of the unit test modules")
+add_option(ENABLE_FUZZ_TESTS "Enables the building of the fuzz test modules")
 
 add_option(ENABLE_STATIC_ANALYSIS "Makes clang-tidy checks mandatory for compilation")
 if (ENABLE_STATIC_ANALYSIS)

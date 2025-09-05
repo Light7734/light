@@ -78,7 +78,7 @@ function (add_executable_module exename)
 endfunction ()
 
 function (add_test_module target_lib_name)
-    if (NOT ${ENABLE_TESTS})
+    if (NOT ${ENABLE_UNIT_TESTS})
         return()
     endif ()
 
@@ -114,7 +114,7 @@ function (add_test_module target_lib_name)
 endfunction ()
 
 function (add_fuzz_module target_lib_name)
-    if (NOT ${ENABLE_TESTS})
+    if (NOT ${ENABLE_FUZZ_TESTS})
         return()
     endif ()
 

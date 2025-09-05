@@ -21,7 +21,8 @@ RUN pacman -S --noconfirm --disable-download-timeout \
     curl \
     wget \
     zlib \
-    libc++
+    libc++ \
+    libinput
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
     && conan profile detect
@@ -37,7 +38,7 @@ RUN pip --version \
     && llvm-cov --version
 
 RUN git clone 'https://git.light7734.com/light7734/light.git' \
-    && cd light; git checkout 'ci/code_cov' \
+    && cd light \
     && conan build . \
         -c tools.system.package_manager:mode=install \
         -c tools.cmake.cmaketoolchain:generator=Ninja \

@@ -11,7 +11,8 @@ class LightRecipe(ConanFile):
     generators = "CMakeDeps"
 
     options = {
-        "enable_tests": [True, False],
+        "enable_unit_tests": [True, False],
+        "enable_fuzz_tests": [True, False],
         "enable_llvm_coverage": [True, False],
         "enable_static_analysis": [True, False],
         "use_mold": [True, False],
@@ -19,7 +20,8 @@ class LightRecipe(ConanFile):
     }
 
     default_options = {
-        "enable_tests": True,
+        "enable_unit_tests": True,
+        "enable_fuzz_tests": False,
         "enable_llvm_coverage": False,
         "enable_static_analysis": False,
         "use_mold": False,
@@ -46,7 +48,8 @@ class LightRecipe(ConanFile):
             tc.cache_variables["CMAKE_LINKER_TYPE"] = "MOLD"
 
         tc.cache_variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = self.options.export_compile_commands
-        tc.cache_variables["ENABLE_TESTS"] = self.options.enable_tests
+        tc.cache_variables["ENABLE_UNIT_TESTS"] = self.options.enable_unit_tests
+        tc.cache_variables["ENABLE_FUZZ_TESTS"] = self.options.enable_fuzz_tests
         tc.cache_variables["ENABLE_LLVM_COVERAGE"] = self.options.enable_llvm_coverage
         tc.cache_variables["ENABLE_STATIC_ANALYSIS"] = self.options.enable_static_analysis
 

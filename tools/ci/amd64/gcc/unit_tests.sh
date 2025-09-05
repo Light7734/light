@@ -8,7 +8,7 @@ conan build . \
   -c tools.system.package_manager:mode=install \
   -c tools.cmake.cmaketoolchain:generator=Ninja \
   -s build_type=Release \
-  -o enable_tests=True \
+  -o enable_unit_tests=True \
   -o use_mold=True \
   --build=missing
 
