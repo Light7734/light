@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export DISPLAY=':0'
-
 set -e
 cd $(git rev-parse --show-toplevel)/
 rm -rf ./build
