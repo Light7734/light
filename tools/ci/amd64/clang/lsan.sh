@@ -4,6 +4,9 @@ set -e
 cd $(git rev-parse --show-toplevel)/
 rm -rf ./build
 
+Xvfb :99 -screen 0 1024x768x16 &
+export DISPLAY=:99
+
 conan build . \
   -c tools.system.package_manager:mode=install \
   -c tools.cmake.cmaketoolchain:generator=Ninja \
