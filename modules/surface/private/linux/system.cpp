@@ -5,6 +5,41 @@
 
 namespace lt::surface {
 
+// This class is to ensure glfwInit/glfwTerminate is called only once and exactly when needed during
+// entire application runtime
+class GlfwSingleton
+{
+public:
+	[[nodiscard]] static auto get() -> GlfwSingleton &
+	{
+		static auto instance = GlfwSingleton {};
+		return instance;
+	}
+
+	GlfwSingleton(GlfwSingleton &&) = delete;
+
+	GlfwSingleton(const GlfwSingleton &) = delete;
+
+	auto operator=(GlfwSingleton &&) -> GlfwSingleton & = delete;
+
+	auto operator=(const GlfwSingleton &) -> GlfwSingleton & = delete;
+
+private:
+	GlfwSingleton()
+	{
+		log_inf("Initializing glfw...");
+		ensure(glfwInit(), "Failed to initialize 'glfw'");
+		log_inf("...Finished");
+	}
+
+	~GlfwSingleton()
+	{
+		log_inf("Terminating glfw...");
+		glfwTerminate();
+		log_inf("...Finished");
+	}
+};
+
 void glfw_error_callbac(int32_t code, const char *description)
 {
 	log_err("GLFW ERROR: {} -> {}", code, description);
@@ -97,13 +132,12 @@ void bind_glfw_events(GLFWwindow *handle)
 	});
 }
 
-void init_glfw() {};
-
 System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
 	glfwSetErrorCallback(&glfw_error_callbac);
-	ensure(glfwInit(), "Failed to initialize 'glfw'");
 
+	// will call `glfwInit()` only the first time
+	auto &glfw_instance = GlfwSingleton::get();
 	ensure(m_registry, "Failed to initialize surface system: null registry");
 
 	ensure(
@@ -142,8 +176,6 @@ System::~System()
 	m_registry->view<SurfaceComponent>().each([&](const entt::entity entity, SurfaceComponent &) {
 		m_registry->get_entt_registry().remove<SurfaceComponent>(entity);
 	});
-
-	glfwTerminate();
 }
 
 void System::on_surface_construct(entt::registry &registry, entt::entity entity)
