@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
+
 set -e
 cd $(git rev-parse --show-toplevel)/
 rm -rf ./build
