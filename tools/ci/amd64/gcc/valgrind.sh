@@ -14,4 +14,15 @@ conan build . \
   -o use_mold=True \
   --build=missing
 
-find ./build -type f -name "*_tests" -executable | xargs -I {} bash -c 'valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --error-exitcode=255 {}' || exit 1
+
+for test in $(find ./build -type f -name '*_tests' -executable); do
+  echo "Running $test"
+
+  valgrind \
+      --leak-check=full \
+      --show-leak-kinds=all \
+      --track-origins=yes \
+      --verbose \
+      --error-exitcode=255  \
+      ${test} || exit 1
+done
