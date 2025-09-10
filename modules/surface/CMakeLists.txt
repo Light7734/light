@@ -1,6 +1,7 @@
 if (NOT WIN32)
     add_library_module(surface linux/system.cpp)
-else()
+else(WIN32)
+    add_library_module(surface windows/system.cpp)
 endif()
 
 target_link_libraries(surface PUBLIC 
