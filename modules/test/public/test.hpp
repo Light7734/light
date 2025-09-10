@@ -119,21 +119,21 @@ struct Case
 struct TestSuite
 {
 	template<class TSuite>
-	constexpr TestSuite(TSuite suite)
+	constexpr TestSuite(TSuite body)
 	{
 #ifndef LIGHT_SKIP_TESTS
-		details::Registry::register_suite(+suite);
+		details::Registry::register_suite(+body);
 #endif
 	}
 };
 
 struct TestFuzzHarness
 {
-	template<class TestFuzzHarness>
-	constexpr TestFuzzHarness(TestFuzzHarness suite)
+	template<class TestFuzzHarnessBody>
+	constexpr TestFuzzHarness(TestFuzzHarnessBody body)
 	{
 #ifndef LIGHT_SKIP_FUZZ_TESTS
-		details::Registry::register_fuzz_harness(+suite);
+		details::Registry::register_fuzz_harness(+body);
 #endif
 	}
 };
