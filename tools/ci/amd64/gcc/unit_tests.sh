@@ -9,7 +9,7 @@ export DISPLAY=:99
 export CXX=$(which g++)
 export CC=$(which gcc)
 
-conan conan build . \
+conan build . \
     -c tools.system.package_manager:mode=install \
     -c tools.cmake.cmaketoolchain:generator=Ninja \
     -c tools.build:compiler_executables='{"c": "gcc", "cpp": "g++"}' \
