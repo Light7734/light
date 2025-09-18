@@ -6,6 +6,8 @@ rm -rf ./build
 
 Xvfb :99 -screen 0 1024x768x16 &
 export DISPLAY=:99
+export CXX=$(which clang++)
+export CC=$(which clang)
 
 conan build . \
     -c tools.system.package_manager:mode=install \
@@ -37,11 +39,6 @@ LLVM_COV_SHOW=$(llvm-cov show \
         $(find ./build -type f -name '*\.a' -exec printf -- '-object %s ' {} \;) \
         -ignore-filename-regex='\.test\.cpp$' \
         -ignore-filename-regex='./external/' \
-        -ignore-filename-regex='gl\/backend.cpp$' \
-        -ignore-filename-regex='gl\/backend.hpp$' \
-        -ignore-filename-regex='gl\/loader.hpp$' \
-        -ignore-filename-regex='glfw\/glfw.h$' \
-        -ignore-filename-regex='glfw\/glfw.cpp$'
 )
 
 echo "${LLVM_COV_SHOW}" > './build/coverage/coverage.txt'
