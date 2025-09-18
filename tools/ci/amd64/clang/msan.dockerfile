@@ -14,7 +14,17 @@ RUN pacman -Syu --noconfirm && \
     mold \
     ninja \
     zlib \
-    libunwind
+    libc++ \
+    libinput \
+    libunwind \
+    xorg-server-xvfb \
+    libx11 \
+    libxrandr \
+    libxinerama \
+    libxcursor \
+    libxi \
+    xcb-util-cursor
+
 
 RUN pip install --no-cache-dir --break-system-packages conan gitpython \
     && conan profile detect
