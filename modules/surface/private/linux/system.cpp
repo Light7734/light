@@ -59,6 +59,10 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 
 System::~System()
 {
+	m_registry->view<SurfaceComponent>().each([&](const entt::entity entity, SurfaceComponent &) {
+		m_registry->get_entt_registry().remove<SurfaceComponent>(entity);
+	});
+
 	m_registry->get_entt_registry()
 	    .on_construct<SurfaceComponent>()
 	    .disconnect<&System::on_surface_construct>(this);
@@ -70,11 +74,6 @@ System::~System()
 	m_registry->get_entt_registry()
 	    .on_destroy<SurfaceComponent>()
 	    .disconnect<&System::on_surface_destroy>(this);
-
-
-	m_registry->view<SurfaceComponent>().each([&](const entt::entity entity, SurfaceComponent &) {
-		m_registry->get_entt_registry().remove<SurfaceComponent>(entity);
-	});
 }
 
 void System::on_register()
