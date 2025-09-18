@@ -7,11 +7,11 @@ namespace lt::surface {
 class KeyPressedEvent
 {
 public:
-	KeyPressedEvent(int32_t key): m_key(key)
+	KeyPressedEvent(uint32_t key): m_key(key)
 	{
 	}
 
-	[[nodiscard]] auto get_key() const -> int32_t
+	[[nodiscard]] auto get_key() const -> uint32_t
 	{
 		return m_key;
 	}
@@ -22,7 +22,7 @@ public:
 	}
 
 private:
-	int32_t m_key;
+	uint32_t m_key;
 };
 
 class KeyRepeatEvent
@@ -32,7 +32,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] auto get_key() const -> int32_t
+	[[nodiscard]] auto get_key() const -> uint32_t
 	{
 		return m_key;
 	}
@@ -43,17 +43,17 @@ public:
 	}
 
 private:
-	int32_t m_key;
+	uint32_t m_key;
 };
 
 class KeyReleasedEvent
 {
 public:
-	KeyReleasedEvent(int key): m_key(key)
+	KeyReleasedEvent(uint32_t key): m_key(key)
 	{
 	}
 
-	[[nodiscard]] auto get_key() const -> int32_t
+	[[nodiscard]] auto get_key() const -> uint32_t
 	{
 		return m_key;
 	}
@@ -64,7 +64,7 @@ public:
 	}
 
 private:
-	int32_t m_key;
+	uint32_t m_key;
 };
 
 class KeySetCharEvent

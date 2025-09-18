@@ -4,16 +4,14 @@
 #include <surface/events/keyboard.hpp>
 #include <surface/events/mouse.hpp>
 #include <surface/events/surface.hpp>
+#include <surface/requests/surface.hpp>
 #include <variant>
 
-struct GLFWwindow;
+typedef struct _XDisplay Display;
 
 namespace lt::surface {
 
-/** Represents a platform's surface (eg. a Window).
- *
- * @note Read-only component, should only be modified through a system.
- */
+/** Represents a platform's surface (eg. a Window). */
 class SurfaceComponent
 {
 public:
@@ -29,23 +27,27 @@ public:
 
 	    // keyboard events
 	    KeyPressedEvent,
-	    KeyRepeatEvent,
 	    KeyReleasedEvent,
-	    KeySetCharEvent,
 
 	    // mouse events
 	    MouseMovedEvent,
-	    WheelScrolledEvent,
 	    ButtonPressedEvent,
 	    ButtonReleasedEvent>;
 
-	using EventCallback = std::function<bool(const Event &)>;
+	using Request = std::variant<
+	    ModifyTitleRequest,
+	    ModifyResolutionRequest,
+	    ModifyPositionRequest,
+	    ModifyVisibilityRequest>;
 
-	using WindowsNativeHandle = void *;
-
-	using X11NativeHandle = unsigned long;
-
-	using NativeHandle = std::variant<WindowsNativeHandle, X11NativeHandle>;
+#ifdef LIGHT_PLATFORM_LINUX
+	struct NativeData
+	{
+		Display *display;
+		uint32_t window;
+		unsigned long wm_delete_message;
+	};
+#endif
 
 	static constexpr auto max_dimension = 4096;
 
@@ -67,6 +69,7 @@ public:
 	    , m_resolution(info.resolution)
 	    , m_vsync(info.vsync)
 	    , m_visible(info.visible)
+	    , m_native_data({})
 	{
 	}
 
@@ -80,6 +83,11 @@ public:
 		return m_resolution;
 	}
 
+	[[nodiscard]] auto get_position() const -> const math::ivec2 &
+	{
+		return m_position;
+	}
+
 	[[nodiscard]] auto is_vsync() const -> bool
 	{
 		return m_vsync;
@@ -90,30 +98,48 @@ public:
 		return m_visible;
 	}
 
-	[[nodiscard]] auto get_native_handle() const -> NativeHandle
+	[[nodiscard]] auto get_native_data() const -> const NativeData &
 	{
-		return m_native_handle;
+		return m_native_data;
+	}
+
+	[[nodiscard]] auto peek_events() const -> const std::vector<Event> &
+	{
+		return m_event_queue;
+	}
+
+	[[nodiscard]] auto peek_requests() const -> const std::vector<Request> &
+	{
+		return m_requests;
+	};
+
+	void push_request(const Request &request)
+	{
+		m_requests.emplace_back(request);
+	}
+
+	/** @note: Only the surface system and tests should push events */
+	void push_event(const Event &event)
+	{
+		m_event_queue.emplace_back(event);
 	}
 
 private:
-	[[nodiscard]] auto get_glfw_handle() const -> GLFWwindow *
-	{
-		return m_glfw_handle;
-	}
-
 	std::string m_title;
 
 	math::uvec2 m_resolution;
+
+	math::ivec2 m_position;
 
 	bool m_vsync;
 
 	bool m_visible;
 
-	NativeHandle m_native_handle;
+	NativeData m_native_data;
 
-	GLFWwindow *m_glfw_handle {};
+	std::vector<Event> m_event_queue;
 
-	std::vector<EventCallback> m_event_callbacks;
+	std::vector<Request> m_requests;
 };
 
 } // namespace lt::surface

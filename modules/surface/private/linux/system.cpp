@@ -1,143 +1,42 @@
-#define GLFW_EXPOSE_NATIVE_X11
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
+#include <ecs/components.hpp>
+#include <surface/components.hpp>
+#include <surface/events/mouse.hpp>
+#include <surface/requests/surface.hpp>
 #include <surface/system.hpp>
+
+//
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/keysym.h>
+#include <X11/keysymdef.h>
 
 namespace lt::surface {
 
-// This class is to ensure glfwInit/glfwTerminate is called only once and exactly when needed during
-// entire application runtime
-class GlfwSingleton
+template<class... Ts>
+struct overloads: Ts...
 {
-public:
-	[[nodiscard]] static auto get() -> GlfwSingleton &
-	{
-		static auto instance = GlfwSingleton {};
-		return instance;
-	}
-
-	GlfwSingleton(GlfwSingleton &&) = delete;
-
-	GlfwSingleton(const GlfwSingleton &) = delete;
-
-	auto operator=(GlfwSingleton &&) -> GlfwSingleton & = delete;
-
-	auto operator=(const GlfwSingleton &) -> GlfwSingleton & = delete;
-
-private:
-	GlfwSingleton()
-	{
-		log_inf("Initializing glfw...");
-		ensure(glfwInit(), "Failed to initialize 'glfw'");
-		log_inf("...Finished");
-	}
-
-	~GlfwSingleton()
-	{
-		log_inf("Terminating glfw...");
-		glfwTerminate();
-		log_inf("...Finished");
-	}
+	using Ts::operator()...;
 };
 
-void glfw_error_callbac(int32_t code, const char *description)
-{
-	log_err("GLFW ERROR: {} -> {}", code, description);
-}
+void ensure_component_sanity(const SurfaceComponent &component);
 
-void handle_event(GLFWwindow *window, const SurfaceComponent::Event &event)
-{
-	auto &callbacks = *static_cast<std::vector<SurfaceComponent::EventCallback> *>(
-	    glfwGetWindowUserPointer(window)
-	);
-
-	for (auto &callback : callbacks)
-	{
-		if (callback(event))
-		{
-			return;
-		}
-	}
-}
-
-void bind_glfw_events(GLFWwindow *handle)
-{
-	glfwSetWindowPosCallback(handle, [](GLFWwindow *window, int xpos, int ypos) {
-		handle_event(window, MovedEvent { xpos, ypos });
-	});
-
-	glfwSetWindowSizeCallback(handle, [](GLFWwindow *window, int width, int height) {
-		handle_event(
-		    window,
-		    ResizedEvent { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }
-		);
-	});
-
-	glfwSetWindowCloseCallback(handle, [](GLFWwindow *window) {
-		handle_event(window, ClosedEvent {});
-	});
-
-	glfwSetWindowFocusCallback(handle, [](GLFWwindow *window, int focus) {
-		if (focus == GLFW_TRUE)
-		{
-			handle_event(window, GainFocusEvent {});
-		}
-		else
-		{
-			handle_event(window, LostFocusEvent {});
-		}
-	});
-
-	glfwSetCursorPosCallback(handle, [](GLFWwindow *window, double xpos, double ypos) {
-		handle_event(
-		    window,
-		    MouseMovedEvent { static_cast<float>(xpos), static_cast<float>(ypos) }
-		);
-	});
-
-	glfwSetMouseButtonCallback(
-	    handle,
-	    [](GLFWwindow *window, int button, int action, int /*mods*/) {
-		    if (action == GLFW_PRESS)
-		    {
-			    handle_event(window, ButtonPressedEvent { button });
-		    }
-		    else if (action == GLFW_RELEASE)
-		    {
-			    handle_event(window, ButtonReleasedEvent { button });
-		    }
-	    }
-	);
-
-	glfwSetScrollCallback(handle, [](GLFWwindow *window, double /*xoffset*/, double yoffset) {
-		handle_event(window, WheelScrolledEvent { static_cast<float>(yoffset) });
-	});
-
-	glfwSetKeyCallback(
-	    handle,
-	    [](GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods*/) {
-		    if (action == GLFW_PRESS)
-		    {
-			    handle_event(window, KeyPressedEvent { key });
-		    }
-		    else if (action == GLFW_RELEASE)
-		    {
-			    handle_event(window, KeyReleasedEvent { key });
-		    }
-	    }
-	);
-
-	glfwSetCharCallback(handle, [](GLFWwindow *window, unsigned int character) {
-		handle_event(window, KeySetCharEvent { character });
-	});
-}
+constexpr auto all_events_mask = KeyPressMask |         //
+                                 KeyReleaseMask |       //
+                                 ButtonPressMask |      //
+                                 ButtonReleaseMask |    //
+                                 EnterWindowMask |      //
+                                 LeaveWindowMask |      //
+                                 PointerMotionMask |    //
+                                 KeymapStateMask |      //
+                                 ExposureMask |         //
+                                 VisibilityChangeMask | //
+                                 StructureNotifyMask |  //
+                                 FocusChangeMask |      //
+                                 ColormapChangeMask |   //
+                                 OwnerGrabButtonMask;
 
 System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
-	glfwSetErrorCallback(&glfw_error_callbac);
-
-	// will call `glfwInit()` only the first time
-	auto &glfw_instance = GlfwSingleton::get();
 	ensure(m_registry, "Failed to initialize surface system: null registry");
 
 	ensure(
@@ -178,29 +77,94 @@ System::~System()
 	});
 }
 
+void System::on_register()
+{
+}
+
+void System::on_unregister()
+{
+}
+
 void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 {
 	try
 	{
 		auto &surface = registry.get<SurfaceComponent>(entity);
+		const auto &resolution = surface.get_resolution();
+		const auto &position = surface.get_position();
 		ensure_component_sanity(surface);
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		// TODO(Light): refactor "environment" into standalone module
+		// NOLINTNEXTLINE(concurrency-mt-unsafe)
+		auto *display_env = std::getenv("DISPLAY");
+		ensure(display_env != nullptr, "DISPLAY env var not found!");
 
-		surface.m_glfw_handle = glfwCreateWindow(
-		    static_cast<int>(surface.get_resolution().x),
-		    static_cast<int>(surface.get_resolution().y),
-		    surface.get_title().begin(),
-		    nullptr,
-		    nullptr
+		auto *display = XOpenDisplay(display_env);
+		auto root_window = XDefaultRootWindow(display);
+
+		auto border_width = 0;
+		auto depth = int32_t { CopyFromParent };
+		auto window_class = CopyFromParent;
+		auto *visual = (Visual *)CopyFromParent;
+
+		auto attribute_value_mask = CWBackPixel | CWEventMask;
+		auto attributes = XSetWindowAttributes {
+			.background_pixel = 0xffafe9af,
+			.event_mask = all_events_mask,
+		};
+
+		typedef struct Hints
+		{
+			unsigned long flags;
+			unsigned long functions;
+			unsigned long decorations;
+			long inputMode;
+			unsigned long status;
+		} Hints;
+
+		auto main_window = XCreateWindow(
+		    display,
+		    root_window,
+		    position.x,
+		    position.y,
+		    resolution.x,
+		    resolution.y,
+		    border_width,
+		    depth,
+		    window_class,
+		    visual,
+		    attribute_value_mask,
+		    &attributes
 		);
-		ensure(surface.m_glfw_handle, "Failed to create 'GLFWwindow'");
+		surface.m_native_data.display = display;
+		surface.m_native_data.window = main_window;
 
-		glfwSetWindowUserPointer(surface.m_glfw_handle, &surface.m_event_callbacks);
-		surface.m_native_handle = glfwGetX11Window(surface.m_glfw_handle);
-		bind_glfw_events(surface.m_glfw_handle);
+		surface.m_native_data.wm_delete_message = XInternAtom(display, "WM_DELETE_WINDOW", False);
+		XSetWMProtocols(display, main_window, &surface.m_native_data.wm_delete_message, 1);
+
+		// code to remove decoration
+		long hints[5] = { 2, 0, 0, 0, 0 };
+		Atom motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
+
+		XChangeProperty(
+		    display,
+		    surface.m_native_data.window,
+		    motif_hints,
+		    motif_hints,
+		    32,
+		    PropModeReplace,
+		    (unsigned char *)&hints,
+		    5
+		);
+
+		XMapWindow(display, main_window);
+		XStoreName(display, main_window, surface.m_title.c_str());
+		XFlush(display);
+
+		if (!surface.is_visible())
+		{
+			XUnmapWindow(display, main_window);
+		}
 	}
 	catch (...)
 	{
@@ -212,82 +176,213 @@ void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 void System::on_surface_update(entt::registry &registry, entt::entity entity)
 {
 	auto &surface = registry.get<SurfaceComponent>(entity);
-	glfwSetWindowUserPointer(surface.m_glfw_handle, &surface.m_event_callbacks);
 }
 
 void System::on_surface_destroy(entt::registry &registry, entt::entity entity)
 {
-	auto &surface = registry.get<SurfaceComponent>(entity);
-
-	if (surface.m_glfw_handle)
+	const auto &[display, window, _] = registry.get<SurfaceComponent>(entity).get_native_data();
+	if (!display)
 	{
-		glfwDestroyWindow(surface.m_glfw_handle);
+		log_wrn("Surface component destroyed with null display");
+		return;
+	}
+
+	XDestroyWindow(display, window);
+}
+
+void System::handle_events(SurfaceComponent &surface)
+{
+	auto &queue = surface.m_event_queue;
+	queue.clear();
+
+	auto event = XEvent {};
+	auto &[display, window, wm_delete_message] = surface.m_native_data;
+
+	XFlush(display);
+	while (XEventsQueued(display, QueuedAlready) != 0)
+	{
+		XNextEvent(surface.m_native_data.display, &event);
+
+		switch (event.type)
+		{
+		case KeyPress:
+		{
+			queue.emplace_back<KeyPressedEvent>(
+			    static_cast<uint32_t>(XLookupKeysym(&event.xkey, 0))
+			);
+			break;
+		}
+		case KeyRelease:
+		{
+			queue.emplace_back<KeyReleasedEvent>(
+			    static_cast<uint32_t>(XLookupKeysym(&event.xkey, 0))
+			);
+			break;
+		}
+		case ButtonPress:
+		{
+			queue.emplace_back<ButtonPressedEvent>(static_cast<int>(event.xbutton.button));
+			break;
+		}
+		case ButtonRelease:
+		{
+			queue.emplace_back<ButtonReleasedEvent>(static_cast<int>(event.xbutton.button));
+			break;
+		}
+		case FocusIn:
+		{
+			queue.emplace_back<GainFocusEvent>({});
+			break;
+		}
+		case FocusOut:
+		{
+			queue.emplace_back<LostFocusEvent>({});
+			break;
+		}
+		case ClientMessage:
+		{
+			if (event.xclient.data.l[0] == wm_delete_message)
+			{
+				queue.emplace_back<ClosedEvent>({});
+			}
+
+			break;
+		}
+		case MotionNotify:
+		{
+			queue.emplace_back<MouseMovedEvent>(MouseMovedEvent {
+			    static_cast<float>(event.xmotion.x),
+			    static_cast<float>(event.xmotion.y),
+			});
+			break;
+		}
+		case ConfigureNotify:
+		{
+			const auto [prev_width, prev_height] = surface.get_resolution();
+			const auto new_width = event.xconfigure.width;
+			const auto new_height = event.xconfigure.height;
+			if (prev_width != new_width || prev_height != new_height)
+			{
+				surface.m_resolution.x = new_width;
+				surface.m_resolution.y = new_height;
+				queue.emplace_back<ResizedEvent>(ResizedEvent {
+				    static_cast<uint32_t>(new_width),
+				    static_cast<uint32_t>(new_height),
+				});
+			}
+
+			const auto [prev_x, prev_y] = surface.get_position();
+			const auto new_x = event.xconfigure.x;
+			const auto new_y = event.xconfigure.y;
+			if (prev_x != new_x || prev_y != new_y)
+			{
+				surface.m_position.x = new_x;
+				surface.m_position.y = new_y;
+				queue.emplace_back<MovedEvent>(MovedEvent {
+				    new_x,
+				    new_y,
+				});
+			}
+			break;
+		}
+
+		case Expose: break;
+		case GraphicsExpose: break;
+		case NoExpose: break;
+		case CirculateRequest: break;
+		case ConfigureRequest: break;
+		case MapRequest: break;
+		case ResizeRequest: break;
+		case CirculateNotify: break;
+		case CreateNotify: break;
+		case DestroyNotify: break;
+		case GravityNotify: break;
+		case MapNotify: break;
+		case MappingNotify: break;
+		case ReparentNotify: break;
+		case UnmapNotify: break;
+		case VisibilityNotify: break;
+		case ColormapNotify: break;
+		case PropertyNotify: break;
+		case SelectionClear: break;
+		case SelectionNotify: break;
+		case SelectionRequest: break;
+		default: log_inf("Unknown X Event");
+		}
 	}
 }
 
-void System::set_title(ecs::Entity entity, std::string_view new_title)
+void System::handle_requests(SurfaceComponent &surface)
 {
-	auto &surface = entity.get_component<SurfaceComponent>();
+	const auto visitor = overloads {
+		[&](const ModifyTitleRequest &request) { modify_title(surface, request); },
+		[&](const ModifyResolutionRequest &request) { modify_resolution(surface, request); },
+		[&](const ModifyPositionRequest &request) { modify_position(surface, request); },
+		[&](const ModifyVisibilityRequest &request) { modify_visiblity(surface, request); },
+		[&](const auto &) { log_err("Unknown surface request"); },
+	};
 
-	surface.m_title = new_title;
-	glfwSetWindowTitle(surface.m_glfw_handle, surface.m_title.c_str());
+	for (const auto &request : surface.peek_requests())
+	{
+		std::visit(visitor, request);
+	}
+
+	surface.m_requests.clear();
+}
+
+void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
+{
+	surface.m_title = request.title;
+
+	const auto &[display, window, _] = surface.get_native_data();
+	XStoreName(display, window, request.title.c_str());
+}
+
+void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
+{
+	surface.m_resolution = request.resolution;
+
+	const auto &[display, window, _] = surface.get_native_data();
+	const auto &[width, height] = request.resolution;
+	XResizeWindow(display, window, width, height);
+}
+
+void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
+{
+	surface.m_position = request.position;
+
+	const auto &[display, window, _] = surface.get_native_data();
+	const auto &[x, y] = request.position;
+	XMoveWindow(display, window, static_cast<int>(x), static_cast<int>(y));
+}
+
+void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
+{
+	const auto &[display, window, _] = surface.get_native_data();
+	surface.m_visible = request.visible;
+
+	if (request.visible)
+	{
+		XMapWindow(display, window);
+	}
+	else
+	{
+		XUnmapWindow(display, window);
+	}
 }
 
 auto System::tick() -> bool
 {
-	m_registry->view<SurfaceComponent>().each([](SurfaceComponent &surface) {
-		glfwSwapBuffers(surface.m_glfw_handle);
+	m_registry->view<SurfaceComponent>().each([this](SurfaceComponent &surface) {
+		handle_requests(surface);
+
+		handle_events(surface);
 	});
 
-	glfwPollEvents();
 	return false;
 }
 
-void System::set_size(ecs::Entity surface_entity, const math::uvec2 &new_size)
-{
-	auto &surface = surface_entity.get_component<SurfaceComponent>();
-	surface.m_resolution = new_size;
-
-	glfwSetWindowSize(
-	    surface.m_glfw_handle,
-	    static_cast<int>(new_size.x),
-	    static_cast<int>(new_size.y)
-	);
-}
-
-void System::set_v_sync(ecs::Entity surface_entity, bool vsync)
-{
-	auto &surface = surface_entity.get_component<SurfaceComponent>();
-	surface.m_vsync = vsync;
-
-	glfwSwapInterval(vsync);
-}
-
-void System::set_visibility(ecs::Entity surface_entity, bool visible)
-{
-	auto &surface = surface_entity.get_component<SurfaceComponent>();
-	surface.m_visible = visible;
-
-	if (visible)
-	{
-		glfwShowWindow(surface.m_glfw_handle);
-	}
-	else
-	{
-		glfwHideWindow(surface.m_glfw_handle);
-	}
-}
-
-void System::add_event_listener(
-    ecs::Entity surface_entity,
-    SurfaceComponent::EventCallback callback
-)
-{
-	auto &surface = surface_entity.get_component<SurfaceComponent>();
-	surface.m_event_callbacks.emplace_back(std::move(callback));
-}
-
-void System::ensure_component_sanity(const SurfaceComponent &component)
+void ensure_component_sanity(const SurfaceComponent &component)
 {
 	auto [width, height] = component.get_resolution();
 

@@ -1,11 +1,13 @@
+#include <ecs/entity.hpp>
 #include <ecs/scene.hpp>
+#include <surface/components.hpp>
 #include <surface/system.hpp>
 #include <test/fuzz.hpp>
 #include <test/test.hpp>
 
 namespace lt::surface {
 
-enum class Action : uint8_t
+enum class FuzzAction : uint8_t
 {
 	create_entity,
 
@@ -13,7 +15,22 @@ enum class Action : uint8_t
 
 	destroy_surface_component,
 
-	tick,
+	push_request,
+
+	push_event,
+
+	tick_system,
+
+	count,
+};
+
+enum class EventType : uint8_t
+{
+	Closed,
+	Moved,
+	Resized,
+	LostFocus,
+	GainFocus,
 };
 
 void create_surface_component(test::FuzzDataProvider &provider, ecs::Registry &registry)
@@ -55,6 +72,14 @@ void remove_surface_component(ecs::Registry &registry)
 	}
 }
 
+void push_request(ecs::Registry &registry)
+{
+}
+
+void push_event(ecs::Registry &registry)
+{
+}
+
 void check_invariants()
 {
 }
@@ -67,9 +92,14 @@ test::FuzzHarness harness = [](const uint8_t *data, size_t size) {
 
 	while (auto action = provider.consume<uint8_t>())
 	{
-		switch (static_cast<Action>(action.value()))
+		if (*action > std::to_underlying(FuzzAction::count))
 		{
-		case Action::create_entity:
+			*action = *action % std::to_underlying(FuzzAction::count);
+		}
+
+		switch (static_cast<FuzzAction>(action.value()))
+		{
+		case FuzzAction::create_entity:
 		{
 			const auto length = std::min(provider.consume<uint32_t>().value_or(16), 255u);
 			const auto tag = provider.consume_string(length).value_or("");
@@ -77,17 +107,36 @@ test::FuzzHarness harness = [](const uint8_t *data, size_t size) {
 
 			break;
 		}
-		case Action::create_surface_component:
+		case FuzzAction::create_surface_component:
 		{
 			create_surface_component(provider, *registry);
 			break;
 		}
-		case Action::destroy_surface_component:
+		case FuzzAction::destroy_surface_component:
 		{
 			remove_surface_component(*registry);
 			break;
 		}
-		case Action::tick:
+		case FuzzAction::push_event:
+		{
+			const auto view = registry->get_entt_registry().view<SurfaceComponent>();
+
+			if (!view->empty())
+			{
+				view.each([&](auto entity, SurfaceComponent &surface) {
+					provider.consume<uint8_t>().value_or(0);
+				});
+
+				registry->get_entt_registry().remove<SurfaceComponent>(*view.begin());
+			}
+
+			break;
+		}
+		case FuzzAction::push_request:
+		{
+			break;
+		}
+		case FuzzAction::tick_system:
 		{
 			system.tick();
 			break;

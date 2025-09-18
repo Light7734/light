@@ -1,3 +1,6 @@
+#include <ecs/entity.hpp>
+#include <surface/components.hpp>
+#include <surface/requests/surface.hpp>
 #include <surface/system.hpp>
 #include <test/test.hpp>
 
@@ -17,6 +20,13 @@ constexpr auto width = 800u;
 constexpr auto height = 600u;
 constexpr auto vsync = true;
 constexpr auto visible = false;
+
+template<class... Ts>
+struct overloads: Ts...
+{
+	using Ts::operator()...;
+};
+
 
 class Fixture
 {
@@ -41,7 +51,11 @@ public:
 
 	void check_values(const SurfaceComponent &component)
 	{
-		expect_ne(std::get<SurfaceComponent::X11NativeHandle>(component.get_native_handle()), 0);
+#ifdef LIGHT_PLATFORM_LINUX
+		expect_not_nullptr(component.get_native_data().display);
+		expect_ne(component.get_native_data().window, 0);
+#endif
+
 		expect_eq(component.get_resolution().x, width);
 		expect_eq(component.get_resolution().y, height);
 		expect_eq(component.get_title(), title);
@@ -61,9 +75,7 @@ Suite raii = [] {
 
 	Case { "many won't freeze/throw" } = [] {
 		auto fixture = Fixture {};
-
-		/* range is small since glfw init/terminate is slow. */
-		for (auto idx : std::views::iota(0, 100))
+		for (auto idx : std::views::iota(0, 250))
 		{
 			ignore = System { fixture.registry() };
 		}
@@ -74,7 +86,7 @@ Suite raii = [] {
 
 		auto fixture = Fixture {};
 		fixture.add_surface_component();
-		expect_throw([&] { ignore = System { { fixture.registry() } }; });
+		expect_throw([&] { ignore = System { fixture.registry() }; });
 	};
 
 	Case { "post construct has correct state" } = [] {
@@ -107,8 +119,8 @@ Suite system_events = [] {
 	Case { "on_unregister won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
-		system.on_register();
 
+		system.on_register();
 		system.on_unregister();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 0);
 	};
@@ -185,14 +197,73 @@ Suite tick = [] {
 		fixture.add_surface_component();
 		system.tick();
 	};
+};
 
-	Case { "ticking on chaotic registry won't throw" } = [] {
+Suite tick_handles_events = [] {
+	Case { "ticking clears previous tick's events" } = [] {
+		auto fixture = Fixture {};
+		auto system = System { fixture.registry() };
+		auto &surface = fixture.add_surface_component();
+
+		// flush window-creation events
+		system.tick();
+		expect_eq(surface.peek_events().size(), 0);
+
+		surface.push_event(surface::MovedEvent({}, {}));
+		expect_eq(surface.peek_events().size(), 1);
+
+		surface.push_event(surface::ButtonPressedEvent({}));
+		expect_eq(surface.peek_events().size(), 2);
+
+		system.tick();
+		expect_eq(surface.peek_events().size(), 0);
 	};
 };
 
-Suite property_setters = [] {
+Suite tick_handles_requests = [] {
+	Case { "ticking clears requests" } = [] {
+		auto fixture = Fixture {};
+		auto system = System { fixture.registry() };
+		auto &surface = fixture.add_surface_component();
 
-};
+		constexpr auto title = "ABC";
+		constexpr auto position = math::ivec2 { 50, 50 };
+		constexpr auto resolution = math::uvec2 { 50, 50 };
 
-Suite listeners = [] {
+		expect_eq(surface.peek_requests().size(), 0);
+
+		surface.push_request(surface::ModifyVisibilityRequest(true));
+		expect_eq(surface.peek_requests().size(), 1);
+		system.tick();
+		expect_eq(surface.peek_requests().size(), 0);
+
+		surface.push_request(surface::ModifyTitleRequest(title));
+		expect_eq(surface.peek_requests().size(), 1);
+
+		surface.push_request(surface::ModifyResolutionRequest(resolution));
+		surface.push_request(surface::ModifyPositionRequest(position));
+		expect_eq(surface.peek_requests().size(), 1 + 2);
+
+		surface.push_request(surface::ModifyVisibilityRequest(false));
+		surface.push_request(surface::ModifyVisibilityRequest(true));
+		surface.push_request(surface::ModifyVisibilityRequest(false));
+		expect_eq(surface.peek_requests().size(), 1 + 2 + 3);
+
+		system.tick();
+		expect_eq(surface.peek_requests().size(), 0);
+
+		expect_eq(surface.get_title(), title);
+		expect_eq(surface.get_position(), position);
+		expect_eq(surface.get_resolution(), resolution);
+
+		log_dbg("EVENT COUNT: {}", surface.peek_events().size());
+		for (const auto &event : surface.peek_events())
+		{
+			const auto visitor = overloads {
+				[&](auto event) { log_dbg("event: {}", event.to_string()); },
+			};
+
+			std::visit(visitor, event);
+		}
+	};
 };
