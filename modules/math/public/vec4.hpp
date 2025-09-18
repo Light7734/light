@@ -39,6 +39,12 @@ struct vec4_impl
 		return values[idx];
 	}
 
+	friend auto operator<<(std::ostream &stream, vec4_impl<T> value) -> std::ostream &
+	{
+		stream << value.x << ", " << value.y << ", " << value.z << ", " << value.w;
+		return stream;
+	}
+
 	// NOLINTNEXTLINE
 	union
 	{
