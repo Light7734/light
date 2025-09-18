@@ -1,4 +1,3 @@
-#include <glad/gl.h>
 #include <renderer/gl/framebuffers.hpp>
 
 namespace lt {

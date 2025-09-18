@@ -7,15 +7,9 @@
 #include <renderer/renderer.hpp>       // required for forward declaratio>
 #include <ui/ui.hpp>                   // required for forward declaratio>
 
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <glfw/glfw3.h>
-#include <glfw/glfw3native.h>
-
 namespace lt {
 
-dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
-    : m_window_handle(windowHandle)
-    , m_debug_interface(nullptr)
+dxGraphicsContext::dxGraphicsContext(): m_window_handle(windowHandle), m_debug_interface(nullptr)
 {
 	// set 'GraphicsAPI';
 	m_graphics_api = GraphicsAPI::DirectX;
@@ -28,7 +22,7 @@ dxGraphicsContext::dxGraphicsContext(GLFWwindow *windowHandle)
 	setup_debug_interface();
 }
 
-void dxGraphicsContext::setup_device_and_swap_chain(GLFWwindow *windowHandle)
+void dxGraphicsContext::setup_device_and_swap_chain()
 {
 	auto context = std::static_pointer_cast<dxSharedContext>(m_shared_context);
 
@@ -52,8 +46,7 @@ void dxGraphicsContext::setup_device_and_swap_chain(GLFWwindow *windowHandle)
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = 1u;
 
-	// #todo: don't handle Windows's window with glfw, create it yourself
-	sd.OutputWindow = static_cast<HWND>(glfwGetWin32Window(windowHandle));
+	sd.OutputWindow = {}; // ...
 	sd.Windowed = true;
 
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;

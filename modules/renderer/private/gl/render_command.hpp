@@ -3,14 +3,12 @@
 #include <math/vec4.hpp>
 #include <renderer/render_command.hpp>
 
-struct GLFWwindow;
-
 namespace lt {
 
 class glRenderCommand: public RenderCommand
 {
 public:
-	glRenderCommand(GLFWwindow *windowHandle);
+	glRenderCommand();
 
 	void swap_buffers() override;
 
@@ -28,9 +26,6 @@ public:
 	    unsigned int width,
 	    unsigned int height
 	) override;
-
-private:
-	GLFWwindow *m_window_handle;
 };
 
 } // namespace lt

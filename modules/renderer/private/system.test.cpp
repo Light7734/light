@@ -13,11 +13,8 @@ Suite raii = [] {
 	using lt::test::expect_throw;
 	using renderer::System;
 
-	auto *window = static_cast<GLFWwindow *>(lt::Window::create([](auto &&PH1) {})->get_handle());
-
 	Case { "happy" } = [=] {
 		std::ignore = System { {
-			.glfw_window_handle = window,
 			.registry = create_ref<ecs::Registry>(),
 		} };
 	};
@@ -25,14 +22,12 @@ Suite raii = [] {
 	Case { "unhappy" } = [=] {
 		expect_throw([=] {
 			std::ignore = System { {
-				.glfw_window_handle = window,
 				.registry = {},
 			} };
 		});
 
 		expect_throw([=] {
 			std::ignore = System { {
-				.glfw_window_handle = {},
 				.registry = create_ref<ecs::Registry>(),
 			} };
 		});
@@ -42,7 +37,6 @@ Suite raii = [] {
 		for (auto idx : std::views::iota(0, 100'001))
 		{
 			std::ignore = System { {
-				.glfw_window_handle = window,
 				.registry = create_ref<ecs::Registry>(),
 			} };
 		}

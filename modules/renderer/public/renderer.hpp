@@ -13,8 +13,6 @@
 #define LT_MAX_TEXTURE_RENDERER_VERTICES        (1028u * 4u)
 #define LT_MAX_TINTED_TEXTURE_RENDERER_VERTICES (1028u * 4u)
 
-struct GLFWwindow;
-
 namespace lt {
 
 class ConstantBuffer;
@@ -42,11 +40,7 @@ public:
 		Ref<Shader> tinted_texture_renderer_shader;
 	};
 
-	static auto create(
-	    GLFWwindow *windowHandle,
-	    Ref<SharedContext> sharedContext,
-	    CreateInfo create_info
-	) -> Scope<Renderer>;
+	static auto create(Ref<SharedContext> sharedContext, CreateInfo create_info) -> Scope<Renderer>;
 
 	static void draw_quad(
 	    const math::vec3 &position,
@@ -134,11 +128,7 @@ private:
 
 	bool m_should_clear_backbuffer { false };
 
-	Renderer(
-	    GLFWwindow *window_handle,
-	    const Ref<SharedContext> &shared_context,
-	    CreateInfo create_info
-	);
+	Renderer(const Ref<SharedContext> &shared_context, CreateInfo create_info);
 
 	void draw_quad_impl(
 	    const math::vec3 &position,

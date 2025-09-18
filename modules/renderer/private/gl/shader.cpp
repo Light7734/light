@@ -1,6 +1,4 @@
 #include <asset_parser/assets/text.hpp>
-#include <glad/gl.h>
-#include <renderer/gl/shader.hpp>
 
 namespace lt {
 

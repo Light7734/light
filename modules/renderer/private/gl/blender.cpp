@@ -1,4 +1,3 @@
-#include <glad/gl.h>
 #include <renderer/gl/blender.hpp>
 
 namespace lt {

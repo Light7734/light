@@ -6,7 +6,6 @@ namespace lt::renderer {
 System::System(InitRequirements requirements): m_registry(std::move(requirements.registry))
 {
 	ensure(m_registry, "null registry");
-	ensure(requirements.glfw_window_handle, "null glfw handle");
 }
 
 System::~System() = default;

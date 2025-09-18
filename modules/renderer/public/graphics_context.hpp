@@ -1,7 +1,5 @@
 #pragma once
 
-struct GLFWwindow;
-
 namespace lt {
 
 class SharedContext;
@@ -19,12 +17,7 @@ enum class GraphicsAPI
 class GraphicsContext
 {
 public:
-	static auto create(
-	    GraphicsAPI api,
-	    GLFWwindow *window_handle
-
-	) -> Scope<GraphicsContext>;
-
+	static auto create(GraphicsAPI api) -> Scope<GraphicsContext>;
 	GraphicsContext(const GraphicsContext &) = delete;
 
 	GraphicsContext &operator=(const GraphicsContext &) = delete;

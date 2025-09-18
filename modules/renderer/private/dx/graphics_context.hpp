@@ -4,23 +4,19 @@
 #include <renderer/graphics_context.hpp>
 #include <wrl.h>
 
-struct GLFWwindow;
-
 namespace lt {
 
 class dxGraphicsContext: public GraphicsContext
 {
 public:
-	dxGraphicsContext(GLFWwindow *windowHandle);
+	dxGraphicsContext();
 
 	virtual void log_debug_data() override;
 
 private:
-	GLFWwindow *m_window_handle;
-
 	Microsoft::WRL::ComPtr<ID3D11Debug> m_debug_interface;
 
-	void setup_device_and_swap_chain(GLFWwindow *windowHandle);
+	void setup_device_and_swap_chain();
 
 	void setup_render_targets();
 

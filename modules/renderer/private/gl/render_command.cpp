@@ -1,18 +1,13 @@
-#include <glad/gl.h>
 #include <renderer/gl/render_command.hpp>
-#ifndef DONT_FUCKING_ORDER_THESSE_PLEASE_FOR_THE_LOVE_OF_GOD_CLANG_FORMAT
-	#include <GLFW/glfw3.h>
-#endif
 
 namespace lt {
 
-glRenderCommand::glRenderCommand(GLFWwindow *windowHandle): m_window_handle(windowHandle)
+glRenderCommand::glRenderCommand(): m_window_handle(windowHandle)
 {
 }
 
 void glRenderCommand::swap_buffers()
 {
-	glfwSwapBuffers(m_window_handle);
 }
 
 void glRenderCommand::clear_back_buffer(const math::vec4 &clearColor)

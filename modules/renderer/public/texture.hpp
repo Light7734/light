@@ -3,7 +3,6 @@
 namespace Assets {
 
 class TextureAsset;
-
 }
 
 namespace lt {

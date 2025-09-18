@@ -1,5 +1,4 @@
 #include <cstddef>
-#include <glad/gl.h>
 #include <logger/logger.hpp>
 #include <renderer/gl/buffers.hpp>
 

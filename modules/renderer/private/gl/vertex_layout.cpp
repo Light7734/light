@@ -1,4 +1,3 @@
-#include <glad/gl.h>
 #include <lt_debug/assertions.hpp>
 #include <renderer/gl/buffers.hpp>
 #include <renderer/gl/vertex_layout.hpp>

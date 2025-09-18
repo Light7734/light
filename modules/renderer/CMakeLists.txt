@@ -27,10 +27,7 @@ target_link_libraries(
   renderer
   PUBLIC camera
   PUBLIC input
-  PUBLIC glad
   PUBLIC logger
-  PUBLIC opengl::opengl
-  PUBLIC glfw
   PUBLIC imgui
   PUBLIC asset_parser
   PUBLIC yaml-cpp::yaml-cpp

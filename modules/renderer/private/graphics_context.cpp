@@ -12,7 +12,7 @@ GraphicsContext *GraphicsContext::s_context = nullptr;
 
 GraphicsContext::~GraphicsContext() = default;
 
-auto GraphicsContext::create(GraphicsAPI api, GLFWwindow *window_handle) -> Scope<GraphicsContext>
+auto GraphicsContext::create(GraphicsAPI api) -> Scope<GraphicsContext>
 {
 	delete s_context;
 

@@ -2,8 +2,6 @@
 
 #include <math/vec4.hpp>
 
-struct GLFWwindow;
-
 namespace lt {
 
 class SharedContext;
@@ -11,8 +9,7 @@ class SharedContext;
 class RenderCommand
 {
 public:
-	static auto create(GLFWwindow *windowHandle, const Ref<SharedContext> &sharedContext)
-	    -> Scope<RenderCommand>;
+	static auto create(const Ref<SharedContext> &sharedContext) -> Scope<RenderCommand>;
 
 	RenderCommand(const RenderCommand &) = delete;
 

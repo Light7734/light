@@ -3,8 +3,6 @@
 #include <base/base.hpp>
 #include <ecs/scene.hpp>
 
-struct GLFWwindow;
-
 namespace lt::renderer {
 
 /** The system for putting gore on your display
@@ -28,8 +26,6 @@ public:
 	/** The requirements for this system to initialize. */
 	struct InitRequirements
 	{
-		GLFWwindow *glfw_window_handle;
-
 		Ref<ecs::Registry> registry;
 	};
 

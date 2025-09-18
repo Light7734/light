@@ -11,12 +11,11 @@
 
 namespace lt {
 
-auto RenderCommand::create(GLFWwindow *windowHandle, const Ref<SharedContext> & /*sharedContext*/)
-    -> Scope<RenderCommand>
+auto RenderCommand::create(const Ref<SharedContext> & /*sharedContext*/) -> Scope<RenderCommand>
 {
 	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: return create_scope<glRenderCommand>(windowHandle);
+	case GraphicsAPI::OpenGL: return create_scope<glRenderCommand>();
 
 	case GraphicsAPI::DirectX:
 		lt_win(

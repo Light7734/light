@@ -1,5 +1,4 @@
 #include <asset_parser/assets/texture.hpp>
-#include <glad/gl.h>
 #include <lt_debug/assertions.hpp>
 #include <renderer/gl/texture.hpp>
 

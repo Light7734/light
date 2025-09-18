@@ -1,4 +1,3 @@
-#include <glad/gl.h>
 #include <input/events/window.hpp>
 #include <renderer/blender.hpp> // required for forward declaratio>
 #include <renderer/buffers.hpp> // required for forward declaratio>
@@ -6,18 +5,11 @@
 #include <renderer/render_command.hpp> // required for forward declaratio>
 #include <renderer/renderer.hpp>       // required for forward declaratio>
 
-#ifndef STOP_FUCKING_ORDERING_THESE_THE_WRONG_WAY_CLANG_FORMAT____
-	#include <GLFW/glfw3.h>
-#endif
-
 namespace lt {
 
-glGraphicsContext::glGraphicsContext(GLFWwindow *windowHandle): m_window_handle(windowHandle)
+glGraphicsContext::glGraphicsContext()
 {
 	m_graphics_api = GraphicsAPI::OpenGL;
-	glfwMakeContextCurrent(windowHandle);
-	ensure(gladLoadGL(glfwGetProcAddress), "Failed to initialize opengl (glad)");
-
 	set_debug_message_callback();
 }
 

@@ -4,8 +4,6 @@
 #include <ui/ui.hpp>
 #include <wrl.h>
 
-struct GLFWwindow;
-
 namespace lt {
 
 class dxSharedContext;
@@ -17,10 +15,7 @@ public:
 
 	~dxUserInterface();
 
-	void platform_implementation(
-	    GLFWwindow *windowHandle,
-	    Ref<SharedContext> sharedContext
-	) override;
+	void platform_implementation(Ref<SharedContext> sharedContext) override;
 
 	void begin() override;
 

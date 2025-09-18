@@ -16,11 +16,7 @@ namespace lt {
 
 Renderer *Renderer::s_context = nullptr;
 
-Renderer::Renderer(
-    GLFWwindow *window_handle,
-    const Ref<SharedContext> &shared_context,
-    CreateInfo create_info
-)
+Renderer::Renderer(const Ref<SharedContext> &shared_context, CreateInfo create_info)
     : m_quad_renderer(
           create_scope<QuadRendererProgram>(
               LT_MAX_QUAD_RENDERER_VERTICES,
@@ -66,15 +62,9 @@ Renderer::~Renderer() // NOLINT
 {
 }
 
-auto Renderer::create(
-    GLFWwindow *windowHandle,
-    Ref<SharedContext> sharedContext,
-    CreateInfo create_info
-) -> Scope<Renderer>
+auto Renderer::create(Ref<SharedContext> sharedContext, CreateInfo create_info) -> Scope<Renderer>
 {
-	return make_scope<Renderer>(
-	    new Renderer(windowHandle, std::move(sharedContext), std::move(create_info))
-	);
+	return make_scope<Renderer>(new Renderer(std::move(sharedContext), std::move(create_info)));
 }
 
 void Renderer::on_window_resize(const WindowResizedEvent &event)
