@@ -1,63 +1,46 @@
 #pragma once
 
-#include <surface/system.hpp>
+#include <app/system.hpp>
+#include <ecs/scene.hpp>
+#include <surface/components.hpp>
+#include <surface/events/keyboard.hpp>
+#include <surface/events/mouse.hpp>
 
 namespace lt::input {
 
-template<class... Ts>
-struct overloads: Ts...
-{
-	using Ts::operator()...;
-};
-
-/**
- *
- * @note If this system is attached, it will always consume the input events f rom surface.
- * Therefore if you want any input detection mechanism, callbacks should be setup with this
- * system and not directly with surface.
- */
-class System
+class System: public app::ISystem
 {
 public:
-	System(lt::surface::System &surface_system)
-	{
-		surface_system.add_event_listener([this](auto &&event) {
-			return handle_event(std::forward<decltype(event)>(event));
-		});
-	};
+	System(Ref<ecs::Registry> registry);
+
+	auto tick() -> bool override;
+
+	void on_register() override;
+
+	void on_unregister() override;
 
 private:
-	auto handle_event(const lt::surface::System::Event &event) -> bool
-	{
-		const auto visitor = overloads {
-			[this](const lt::surface::KeyPressedEvent &event) {
-			    m_keys[event.get_key()] = true;
-			    return true;
-			},
+	void handle_event(const surface::SurfaceComponent::Event &event);
 
-			[](const lt::surface::KeyRepeatEvent &) { return false; },
+	void on_surface_lost_focus();
 
-			[](const lt::surface::KeyReleasedEvent &) { return false; },
+	void on_key_press(const lt::surface::KeyPressedEvent &event);
 
-			[](const lt::surface::KeySetCharEvent &) { return false; },
+	void on_key_release(const lt::surface::KeyReleasedEvent &event);
 
-			[](const lt::surface::MouseMovedEvent &) { return false; },
+	void on_pointer_move(const lt::surface::MouseMovedEvent &event);
 
-			[](const lt::surface::WheelScrolledEvent &) { return false; },
+	void on_button_press(const lt::surface::ButtonPressedEvent &event);
 
-			[](const lt::surface::ButtonPressedEvent &) { return false; },
+	void on_button_release(const lt::surface::ButtonReleasedEvent &event);
 
-			[](const lt::surface::ButtonReleasedEvent &) { return false; },
-
-			[](const auto &) { return false; },
-		};
-
-		return std::visit(visitor, event);
-	}
-
-	void setup_callbacks(GLFWwindow *handle);
+	Ref<ecs::Registry> m_registry;
 
 	std::array<bool, 512> m_keys {};
+
+	std::array<bool, 512> m_buttons {};
+
+	math::vec2 m_pointer_position;
 };
 
 
