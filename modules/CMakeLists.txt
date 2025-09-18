@@ -10,7 +10,7 @@ add_subdirectory(./asset_parser)
 # add_subdirectory(./asset_manager)
 # 
 add_subdirectory(./camera)
-# add_subdirectory(./input)
+add_subdirectory(./input)
 # add_subdirectory(./ui)
 # 
 add_subdirectory(./surface)
