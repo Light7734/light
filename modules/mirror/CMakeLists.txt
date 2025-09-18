@@ -4,7 +4,8 @@ target_link_libraries(
   libmirror
   INTERFACE
   app
-  opengl::opengl
+  time
+  input 
   surface
 )
 
@@ -16,4 +17,4 @@ add_test_module(libmirror
 )
 
 add_executable_module(mirror entrypoint/mirror.cpp)
-target_link_libraries(mirror PRIVATE libmirror)
+target_link_libraries(mirror PRIVATE libmirror input)
