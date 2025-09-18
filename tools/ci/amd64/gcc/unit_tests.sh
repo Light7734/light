@@ -17,7 +17,6 @@ conan build . \
     -s compiler=gcc \
     -s compiler.version=15 \
     -s compiler.libcxx=libstdc++ \
-    -o use_mold=True \
     -o enable_unit_tests=True \
     -o enable_fuzz_tests=False \
     -o enable_llvm_coverage=False \
