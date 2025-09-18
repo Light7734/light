@@ -7,9 +7,12 @@
 namespace lt::test {
 
 template<typename T>
-concept Printable = requires(std::ostream &stream, T value) {
-	{ stream << value } -> std::same_as<std::ostream &>;
-} || requires(std::ostream &stream, T value) {
+concept Formattable = requires(T &v, std::format_context ctx) {
+	std::formatter<std::remove_cvref_t<T>>().format(v, ctx);
+};
+
+template<typename T>
+concept Printable = Formattable<T> || requires(std::ostream &stream, T value) {
 	{ stream << std::to_underlying<T>(value) } -> std::same_as<std::ostream &>;
 };
 
