@@ -1,23 +1,41 @@
-FROM alpine:latest
+FROM archlinux:base-devel
 
-RUN apk add --no-cache \
+RUN pacman -Syu --noconfirm --disable-download-timeout \
+    && pacman -S --noconfirm --needed --disable-download-timeout reflector \
+    && reflector --verbose --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist \
+    && sed -i 's/^#ParallelDownloads = .*/ParallelDownloads = 9/' /etc/pacman.conf
+
+RUN pacman -S --noconfirm --needed --disable-download-timeout \
     bash \
-    clang \
-    llvm \
-    cmake \
+    base-devel \
     git \
-    make \
-    g++ \
-    python3 \
-    py3-pip \
-    mesa-dev \
-    mesa-gl \
-    pkgconf \
+    cmake \
+    python \
+    python-pip \
+    clang \
+    gcc \
+    llvm \
+    mesa \
     ninja \
     mold \
-    valgrind
+    valgrind \
+    curl \
+    wget \
+    zlib \
+    libc++ \
+    libinput \
+    xorg-server-xvfb \
+    libx11 \
+    libxrandr \
+    libxinerama \
+    libxcursor \
+    libxi \
+    xcb-util-cursor
 
-RUN pip install --no-cache-dir --break-system-packages conan gitpython \
+
+RUN pip install --no-cache-dir --break-system-packages \
+    conan \
+    gitpython \
     && conan profile detect
 
 RUN clang --version  \
@@ -27,13 +45,25 @@ RUN clang --version  \
     && g++ --version \
     && clang --version \
     && ninja --version \
-    && mold --version
+    && mold --version \
+    && valgrind --version
 
-RUN git clone 'https://git.light7734.com/light7734/light.git' \
+# We `build` instead of `install` to make sure the project can be built with the current image state.
+RUN git clone 'https://git.light7734.com/light7734/light.git' --depth=1 \
     && cd light \
-    && conan install . \
-        -s build_type=Release \
-        -c tools.system.package_manager:mode=install \
-        -c tools.cmake.cmaketoolchain:generator=Ninja \
-        -o use_mold=True \
-        --build=missing
+    && conan build . \
+    -c tools.system.package_manager:mode=install \
+    -c tools.cmake.cmaketoolchain:generator=Ninja \
+    -c tools.build:compiler_executables='{"c": "gcc", "cpp": "g++"}' \
+    -s build_type=Release \
+    -s compiler=gcc \
+    -s compiler.version=15 \
+    -s compiler.libcxx=libstdc++ \
+    -o enable_unit_tests=True \
+    -o enable_fuzz_tests=False \
+    -o enable_llvm_coverage=False \
+    -o enable_static_analysis=False \
+    -o use_mold=True \
+    -o export_compile_commands=False \
+    --build=missing \
+    && rm -rf ../light
