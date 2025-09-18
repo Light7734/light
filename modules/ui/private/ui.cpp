@@ -25,8 +25,7 @@ namespace lt {
 
 UserInterface *UserInterface::s_context = nullptr;
 
-auto UserInterface::create(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
-    -> Scope<UserInterface>
+auto UserInterface::create(Ref<SharedContext> sharedContext) -> Scope<UserInterface>
 {
 	auto scopeUserInterface = Scope<UserInterface> { nullptr };
 
@@ -66,7 +65,7 @@ UserInterface::UserInterface()
 	s_context = this;
 }
 
-void UserInterface::init(GLFWwindow *windowHandle, Ref<SharedContext> sharedContext)
+void UserInterface::init(Ref<SharedContext> sharedContext)
 {
 	// create context
 	IMGUI_CHECKVERSION();
