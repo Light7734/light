@@ -165,5 +165,5 @@ Suite tick = [] {
 		        .trigger = { .mapped_keycode = 69 },
 		    }
 		);
-    };
+	};
 };
