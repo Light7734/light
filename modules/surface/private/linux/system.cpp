@@ -100,6 +100,7 @@ void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 		ensure(display_env != nullptr, "DISPLAY env var not found!");
 
 		auto *display = XOpenDisplay(display_env);
+
 		auto root_window = XDefaultRootWindow(display);
 
 		auto border_width = 0;
@@ -188,6 +189,7 @@ void System::on_surface_destroy(entt::registry &registry, entt::entity entity)
 	}
 
 	XDestroyWindow(display, window);
+	XCloseDisplay(display);
 }
 
 void System::handle_events(SurfaceComponent &surface)

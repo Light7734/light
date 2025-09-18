@@ -60,7 +60,6 @@ private:
 
 	void set_visibility(ecs::Entity surface_entity, bool visible);
 
-
 	Ref<ecs::Registry> m_registry;
 };
 
