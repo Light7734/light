@@ -141,15 +141,16 @@ Suite tick = [] {
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::triggered);
 
 		system.tick();
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
+		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
 
 		system.tick();
 		system.tick();
 		system.tick();
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
+		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
 
-		surface.push_event(surface::KeyPressedEvent(69));
+		surface.push_event(surface::KeyReleasedEvent(69));
 		system.tick();
+		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
 	};
 
 	Case { "Tick triggers" } = [] {
