@@ -40,4 +40,3 @@ if(ENABLE_LLVM_COVERAGE)
 endif ()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glad)
