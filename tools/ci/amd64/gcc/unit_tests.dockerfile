@@ -1,4 +1,4 @@
-FROM archlinux:base-devel 
+FROM archlinux:base-devel
 
 RUN pacman -Syu --noconfirm --disable-download-timeout \
     && pacman -S --noconfirm --needed --disable-download-timeout reflector \
