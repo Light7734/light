@@ -51,7 +51,6 @@ struct vec2_impl
 		};
 	}
 
-
 	T x; // NOLINT
 
 	T y; // NOLINT
@@ -65,3 +64,17 @@ using ivec2 = vec2_impl<int32_t>;
 using uvec2 = vec2_impl<uint32_t>;
 
 } // namespace lt::math
+
+template<typename T>
+struct std::formatter<lt::math::vec2_impl<T>>
+{
+	constexpr auto parse(std::format_parse_context &context)
+	{
+		return context.begin();
+	}
+
+	auto format(const lt::math::vec2_impl<T> &val, std::format_context &context) const
+	{
+		return std::format_to(context.out(), "{}, {}", val.x, val.y);
+	}
+};

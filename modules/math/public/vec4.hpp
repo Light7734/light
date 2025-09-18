@@ -7,19 +7,29 @@ namespace lt::math {
 template<typename T = float>
 struct vec4_impl
 {
-	vec4_impl(): x(), y(), z(), w()
+	constexpr vec4_impl(): x(), y(), z(), w()
 	{
 	}
 
-	explicit vec4_impl(T scalar): x(scalar), y(scalar), z(scalar), w(scalar)
+	constexpr explicit vec4_impl(T scalar): x(scalar), y(scalar), z(scalar), w(scalar)
 	{
 	}
 
-	vec4_impl(T x, T y, T z, T w): x(x), y(y), z(z), w(w)
+	constexpr vec4_impl(T x, T y, T z, T w): x(x), y(y), z(z), w(w)
 	{
 	}
 
-	[[nodiscard]] auto operator-(const vec4_impl<T> &other) const -> vec4_impl
+	[[nodiscard]] auto operator==(const vec4_impl<T> &other) const -> bool
+	{
+		return x == other.x && y == other.y && z == other.z && w == other.w;
+	}
+
+	[[nodiscard]] auto operator!=(const vec4_impl<T> &other) const -> bool
+	{
+		return !(*this == other);
+	}
+
+	[[nodiscard]] constexpr auto operator-(const vec4_impl<T> &other) const -> vec4_impl
 	{
 		return {
 			x - other.x,
@@ -29,12 +39,12 @@ struct vec4_impl
 		};
 	}
 
-	[[nodiscard]] auto operator[](size_t idx) -> T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) -> T &
 	{
 		return values[idx];
 	}
 
-	[[nodiscard]] auto operator[](size_t idx) const -> const T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) const -> const T &
 	{
 		return values[idx];
 	}
@@ -82,3 +92,17 @@ using ivec4 = vec4_impl<int32_t>;
 using uvec4 = vec4_impl<uint32_t>;
 
 } // namespace lt::math
+
+template<typename T>
+struct std::formatter<lt::math::vec4_impl<T>>
+{
+	constexpr auto parse(std::format_parse_context &context)
+	{
+		return context.begin();
+	}
+
+	auto format(const lt::math::vec4_impl<T> &val, std::format_context &context) const
+	{
+		return std::format_to(context.out(), "{}, {}, {}, {}", val.x, val.y, val.z, val.w);
+	}
+};

@@ -9,7 +9,7 @@ template<typename T = float>
 struct mat4_impl
 {
 	using Column_T = vec4_impl<T>;
-	explicit mat4_impl(T scalar = 0)
+	constexpr explicit mat4_impl(T scalar = 0)
 	    : values(
 	          {
 	              Column_T { scalar },
@@ -22,7 +22,7 @@ struct mat4_impl
 	}
 
 	// clang-format off
-    mat4_impl(
+    constexpr mat4_impl(
         const T&  x0, const T&  y0, const T&  z0, const T&  w0,
         const T&  x1, const T&  y1, const T&  z1, const T&  w1,
         const T&  x2, const T&  y2, const T&  z2, const T&  w2,
@@ -33,7 +33,7 @@ struct mat4_impl
 	{
 	}
 
-	mat4_impl(
+	constexpr mat4_impl(
 	    const Column_T &column_x,
 	    const Column_T &column_y,
 	    const Column_T &column_z,
@@ -53,22 +53,22 @@ struct mat4_impl
 		};
 	}
 
-	[[nodiscard]] auto operator[](size_t idx) -> Column_T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) -> Column_T &
 	{
 		return values[idx];
 	}
 
-	[[nodiscard]] auto operator[](size_t idx) const -> const Column_T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) const -> const Column_T &
 	{
 		return values[idx];
 	}
 
-	[[nodiscard]] auto operator*(const mat4_impl<T> &other) const -> mat4_impl<T>
+	[[nodiscard]] constexpr auto operator*(const mat4_impl<T> &other) const -> mat4_impl<T>
 	{
 		return mat4_impl<T> {};
 	}
 
-	[[nodiscard]] auto operator*(const vec4_impl<T> &other) const -> vec4_impl<T>
+	[[nodiscard]] constexpr auto operator*(const vec4_impl<T> &other) const -> vec4_impl<T>
 	{
 		return vec4_impl<T> {};
 	}
