@@ -30,7 +30,6 @@ target_link_libraries(
   PUBLIC logger
   PUBLIC imgui
   PUBLIC asset_parser
-  PUBLIC yaml-cpp::yaml-cpp
   PUBLIC EnTT::EnTT
   PRIVATE lt_debug 
   PRIVATE window

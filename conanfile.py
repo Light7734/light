@@ -31,7 +31,6 @@ class LightRecipe(ConanFile):
     def requirements(self):
         self.requires("entt/3.15.0")
         self.requires("stb/cci.20240531")
-        self.requires("yaml-cpp/0.8.0")
         self.requires("lz4/1.10.0")
 
     def layout(self):
