@@ -30,7 +30,6 @@ class LightRecipe(ConanFile):
 
     def requirements(self):
         self.requires("entt/3.15.0")
-        self.requires("lz4/1.10.0")
 
     def layout(self):
         cmake_layout(self)

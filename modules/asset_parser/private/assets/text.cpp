@@ -1,5 +1,4 @@
 #include <asset_parser/assets/text.hpp>
-#include <lz4.h>
 
 namespace Assets {
 

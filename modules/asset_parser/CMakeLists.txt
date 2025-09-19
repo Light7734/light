@@ -6,6 +6,5 @@ add_library_module(asset_parser
 
 target_link_libraries(
     asset_parser
-    PRIVATE LZ4::lz4_static 
     PRIVATE logger
 )
