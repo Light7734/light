@@ -16,15 +16,16 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 
 auto System::tick() -> bool
 {
-	m_registry->view<surface::SurfaceComponent>().each([&](const entt::entity,
-	                                                       surface::SurfaceComponent &surface) {
+	for (auto &[entity, surface] : m_registry->view<surface::SurfaceComponent>())
+	{
 		for (const auto &event : surface.peek_events())
 		{
 			handle_event(event);
 		}
-	});
+	}
 
-	m_registry->view<InputComponent>().each([&](const entt::entity, InputComponent &input) {
+	for (auto &[entity, input] : m_registry->view<InputComponent>())
+	{
 		// TODO(Light): instead of iterating over all actions each frame,
 		// make a list of "dirty" actions to reset
 		// and a surface_input->input_action mapping to get to action through input
@@ -48,7 +49,7 @@ auto System::tick() -> bool
 				action.state = InputAction::State::inactive;
 			}
 		}
-	});
+	}
 
 	return false;
 }

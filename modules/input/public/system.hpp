@@ -1,7 +1,7 @@
 #pragma once
 
 #include <app/system.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
 #include <surface/components.hpp>
 #include <surface/events/keyboard.hpp>
 #include <surface/events/mouse.hpp>
