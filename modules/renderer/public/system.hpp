@@ -1,7 +1,7 @@
 #pragma once
 
 #include <base/base.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
 
 namespace lt::renderer {
 

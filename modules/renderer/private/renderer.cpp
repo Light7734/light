@@ -1,4 +1,4 @@
-#include <camera/scene.hpp>
+#include <ecs/registry.hpp>
 #include <input/events/window.hpp>
 #include <lt_debug/assertions.hpp>
 #include <renderer/blender.hpp>
