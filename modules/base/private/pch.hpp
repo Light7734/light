@@ -15,6 +15,7 @@
 #include <atomic>
 #include <bitset>
 #include <filesystem>
+#include <flat_map>
 #include <fstream>
 #include <functional>
 #include <iostream>
