@@ -1,5 +1,4 @@
 #include <ecs/components.hpp>
-#include <entt/entt.hpp>
 #include <imgui.h>
 #include <mirror/panels/properties.hpp>
 #include <mirror/panels/scene_hierarchy.hpp>

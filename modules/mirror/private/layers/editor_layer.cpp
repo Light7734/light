@@ -2,7 +2,7 @@
 #include <asset_manager/asset_manager.hpp>
 #include <camera/component.hpp>
 #include <ecs/components.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
 #include <ecs/serializer.hpp>
 #include <input/input.hpp>
 #include <input/key_codes.hpp>

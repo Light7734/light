@@ -28,9 +28,9 @@ public:
 		using Surface = lt::surface::SurfaceComponent;
 		using Input = lt::input::InputComponent;
 
-		auto view = m_registry->get_entt_registry().view<Surface, Input>();
-
-		view.each([&](Surface &surface, Input &input) {});
+		for (auto &[entity, surface, input] : m_registry->view<Surface, Input>())
+		{
+		}
 	}
 
 	auto tick() -> bool override
@@ -42,8 +42,8 @@ public:
 
 		std::this_thread::sleep_for(std::chrono::milliseconds { 10 });
 		auto should_quit = false;
-		auto view = m_registry->get_entt_registry().view<Surface, Input>();
-		view.each([&](Surface &surface, Input &input) {
+		for (auto &[entity, surface, input] : m_registry->view<Surface, Input>())
+		{
 			using State = lt::input::InputAction::State;
 			const auto &[x, y] = surface.get_position();
 			const auto &[width, height] = surface.get_resolution();
@@ -76,7 +76,7 @@ public:
 				log_dbg("Deubg action 4");
 				surface.push_request(surface::ModifyResolutionRequest({ width - 5, height - 5 }));
 			}
-		});
+		}
 
 		timer.reset();
 		return should_quit;
@@ -125,15 +125,18 @@ public:
 		using lt::surface::SurfaceComponent;
 		m_surface_system = create_ref<lt::surface::System>(m_editor_registry);
 
-		m_window = m_editor_registry->create_entity("Editor Window");
-		m_window.add_component<SurfaceComponent>(SurfaceComponent::CreateInfo {
-		    .title = "Editor Window",
-		    .resolution = { 400u, 400u },
-		    .vsync = true,
-		    .visible = true,
-		});
+		m_window = m_editor_registry->create_entity();
+		m_editor_registry->add<SurfaceComponent>(
+		    m_window,
+		    SurfaceComponent::CreateInfo {
+		        .title = "Editor Window",
+		        .resolution = { 400u, 400u },
+		        .vsync = true,
+		        .visible = true,
+		    }
+		);
 
-		auto &input = m_window.add_component<InputComponent>();
+		auto &input = m_editor_registry->add<InputComponent>(m_window, {});
 		auto quit_action_key = input.add_action(
 		    input::InputAction {
 		        .name = "quit",
@@ -142,7 +145,6 @@ public:
 		);
 
 		auto debug_action_keys = std::array<lt::input::InputAction::Key, 4> {};
-
 		debug_action_keys[0] = input.add_action(
 		    input::InputAction {
 		        .name = "debug_1",

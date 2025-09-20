@@ -1,5 +1,5 @@
 #include <asset_manager/asset_manager.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
 #include <ecs/serializer.hpp>
 #include <imgui.h>
 #include <mirror/panels/asset_browser.hpp>

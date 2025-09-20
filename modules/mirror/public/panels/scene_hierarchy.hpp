@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ecs/entity.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
 #include <mirror/panels/panel.hpp>
 
 namespace lt {
