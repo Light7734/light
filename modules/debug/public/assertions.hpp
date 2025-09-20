@@ -10,7 +10,7 @@ template<typename Expression_T, typename... Args_T>
 struct ensure
 {
 	ensure(
-	    Expression_T expression,
+	    const Expression_T &expression,
 	    std::format_string<Args_T...> fmt,
 	    Args_T &&...args,
 	    const std::source_location &location = std::source_location::current()
