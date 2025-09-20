@@ -1,4 +1,5 @@
-#include <camera/scene.hpp>
+#include <camera/camera.hpp>
+#include <camera/component.hpp>
 #include <math/algebra.hpp>
 #include <math/trig.hpp>
 
