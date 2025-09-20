@@ -1,4 +1,3 @@
-#include <ecs/components.hpp>
 #include <surface/components.hpp>
 #include <surface/events/mouse.hpp>
 #include <surface/requests/surface.hpp>
