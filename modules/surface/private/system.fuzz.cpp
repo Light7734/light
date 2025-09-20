@@ -1,5 +1,5 @@
 #include <ecs/entity.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
 #include <surface/components.hpp>
 #include <surface/system.hpp>
 #include <test/fuzz.hpp>

@@ -40,40 +40,32 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 	ensure(m_registry, "Failed to initialize surface system: null registry");
 
 	ensure(
-	    m_registry->view<SurfaceComponent>().size() == 0,
+	    m_registry->view<SurfaceComponent>().get_size() == 0,
 	    "Failed to initialize surface system: registry has surface component(s)"
 	);
 
-	m_registry->get_entt_registry()
-	    .on_construct<SurfaceComponent>()
-	    .connect<&System::on_surface_construct>(this);
+	m_registry->connect_on_construct<SurfaceComponent>(
+	    [this](ecs::Registry &registry, ecs::Entity entity) {
+		    on_surface_construct(registry, entity);
+	    }
+	);
 
-	m_registry->get_entt_registry()
-	    .on_update<SurfaceComponent>()
-	    .connect<&System::on_surface_update>(this);
-
-	m_registry->get_entt_registry()
-	    .on_destroy<SurfaceComponent>()
-	    .connect<&System::on_surface_destroy>(this);
+	m_registry->connect_on_destruct<SurfaceComponent>(
+	    [this](ecs::Registry &registry, ecs::Entity entity) {
+		    on_surface_destruct(registry, entity);
+	    }
+	);
 }
 
 System::~System()
 {
-	m_registry->view<SurfaceComponent>().each([&](const entt::entity entity, SurfaceComponent &) {
-		m_registry->get_entt_registry().remove<SurfaceComponent>(entity);
-	});
+	for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
+	{
+		m_registry->remove<SurfaceComponent>(entity);
+	}
 
-	m_registry->get_entt_registry()
-	    .on_construct<SurfaceComponent>()
-	    .disconnect<&System::on_surface_construct>(this);
-
-	m_registry->get_entt_registry()
-	    .on_update<SurfaceComponent>()
-	    .connect<&System::on_surface_update>(this);
-
-	m_registry->get_entt_registry()
-	    .on_destroy<SurfaceComponent>()
-	    .disconnect<&System::on_surface_destroy>(this);
+	m_registry->disconnect_on_construct<SurfaceComponent>();
+	m_registry->disconnect_on_destruct<SurfaceComponent>();
 }
 
 void System::on_register()
@@ -84,7 +76,7 @@ void System::on_unregister()
 {
 }
 
-void System::on_surface_construct(entt::registry &registry, entt::entity entity)
+void System::on_surface_construct(ecs::Registry &registry, ecs::Entity entity)
 {
 	try
 	{
@@ -173,12 +165,7 @@ void System::on_surface_construct(entt::registry &registry, entt::entity entity)
 	}
 }
 
-void System::on_surface_update(entt::registry &registry, entt::entity entity)
-{
-	auto &surface = registry.get<SurfaceComponent>(entity);
-}
-
-void System::on_surface_destroy(entt::registry &registry, entt::entity entity)
+void System::on_surface_destruct(ecs::Registry &registry, ecs::Entity entity)
 {
 	const auto &[display, window, _] = registry.get<SurfaceComponent>(entity).get_native_data();
 	if (!display)
@@ -374,11 +361,12 @@ void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityR
 
 auto System::tick() -> bool
 {
-	m_registry->view<SurfaceComponent>().each([this](SurfaceComponent &surface) {
+	for (auto &dense : m_registry->view<SurfaceComponent>())
+	{
+		auto &surface = dense.second;
 		handle_requests(surface);
-
 		handle_events(surface);
-	});
+	}
 
 	return false;
 }

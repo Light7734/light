@@ -1,7 +1,8 @@
 #pragma once
 
 #include <app/system.hpp>
-#include <ecs/scene.hpp>
+#include <ecs/registry.hpp>
+#include <math/vec2.hpp>
 
 namespace lt::surface {
 
@@ -27,11 +28,9 @@ public:
 	auto tick() -> bool override;
 
 private:
-	void on_surface_construct(entt::registry &registry, entt::entity entity);
+	void on_surface_construct(ecs::Registry &registry, ecs::Entity entity);
 
-	void on_surface_update(entt::registry &registry, entt::entity entity);
-
-	void on_surface_destroy(entt::registry &registry, entt::entity entity);
+	void on_surface_destruct(ecs::Registry &registry, ecs::Entity entity);
 
 	void handle_requests(struct SurfaceComponent &surface);
 

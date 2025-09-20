@@ -1,4 +1,5 @@
 #include <ecs/entity.hpp>
+#include <ranges>
 #include <surface/components.hpp>
 #include <surface/requests/surface.hpp>
 #include <surface/system.hpp>
@@ -45,8 +46,8 @@ public:
 	    }
 	) -> SurfaceComponent &
 	{
-		auto entity = m_registry->create_entity("");
-		return entity.add_component<SurfaceComponent>(info);
+		auto entity = m_registry->create_entity();
+		return m_registry->add<SurfaceComponent>(entity, info);
 	}
 
 	void check_values(const SurfaceComponent &component)
@@ -92,7 +93,7 @@ Suite raii = [] {
 	Case { "post construct has correct state" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
-		expect_eq(fixture.registry()->view<SurfaceComponent>()->size(), 0);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
 	Case { "post destruct has correct state" } = [] {
@@ -100,10 +101,10 @@ Suite raii = [] {
 		auto system = create_scope<System>(fixture.registry());
 
 		fixture.add_surface_component();
-		expect_eq(fixture.registry()->view<SurfaceComponent>()->size(), 1);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
 
 		system.reset();
-		expect_eq(fixture.registry()->view<SurfaceComponent>()->size(), 0);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 };
 
@@ -113,7 +114,7 @@ Suite system_events = [] {
 		auto system = System { fixture.registry() };
 
 		system.on_register();
-		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 0);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
 	Case { "on_unregister won't throw" } = [] {
@@ -122,7 +123,7 @@ Suite system_events = [] {
 
 		system.on_register();
 		system.on_unregister();
-		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 0);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 };
 
@@ -132,7 +133,7 @@ Suite registry_events = [] {
 		auto system = System { fixture.registry() };
 
 		const auto &component = fixture.add_surface_component();
-		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 1);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
 		fixture.check_values(component);
 	};
 
@@ -168,7 +169,7 @@ Suite registry_events = [] {
 		auto system = System { fixture.registry() };
 
 		expect_throw([&] { fixture.add_surface_component({ .resolution = { width, 0 } }); });
-		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 0);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
 	Case { "on_destrroy<SurfaceComponent> cleans up component" } = [] {
@@ -176,11 +177,11 @@ Suite registry_events = [] {
 		auto system = create_scope<System>(fixture.registry());
 
 		const auto &component = fixture.add_surface_component();
-		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 1);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
 		fixture.check_values(component);
 
 		system.reset();
-		expect_eq(fixture.registry()->view<SurfaceComponent>().size(), 0);
+		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 };
 
