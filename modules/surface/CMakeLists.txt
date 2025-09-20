@@ -10,6 +10,7 @@ endif()
 target_link_libraries(surface PUBLIC 
     ecs
     app
+    math
     PRIVATE
     logger 
     lt_debug

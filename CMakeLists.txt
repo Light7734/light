@@ -6,7 +6,6 @@ set(CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake)
 include(CheckCXXSourceCompiles)
 include(${CMAKE_DIR}/functions.cmake)
 include(${CMAKE_DIR}/definitions.cmake)
-include(${CMAKE_DIR}/dependencies.cmake)
 
 add_option(ENABLE_UNIT_TESTS "Enables the building of the unit test modules")
 add_option(ENABLE_FUZZ_TESTS "Enables the building of the fuzz test modules")

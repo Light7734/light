@@ -1,7 +1,5 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout
-import shutil
-import os
 import git
 
 class LightRecipe(ConanFile):
@@ -27,9 +25,6 @@ class LightRecipe(ConanFile):
         "use_mold": False,
         "export_compile_commands": True,
     }
-
-    def requirements(self):
-        self.requires("entt/3.15.0")
 
     def layout(self):
         cmake_layout(self)
