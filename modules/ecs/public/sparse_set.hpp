@@ -1,0 +1,141 @@
+#pragma once
+
+namespace lt::ecs {
+
+/**
+ *
+ * @ref https://programmingpraxis.com/2012/03/09/sparse-sets/
+ */
+template<typename Identifier_T = uint32_t>
+class TypeErasedSparseSet
+{
+public:
+	TypeErasedSparseSet() = default;
+
+	TypeErasedSparseSet(TypeErasedSparseSet &&) = default;
+
+	TypeErasedSparseSet(const TypeErasedSparseSet &) = default;
+
+	auto operator=(TypeErasedSparseSet &&) -> TypeErasedSparseSet & = default;
+
+	auto operator=(const TypeErasedSparseSet &) -> TypeErasedSparseSet & = default;
+
+	virtual ~TypeErasedSparseSet() = default;
+
+	virtual void remove(Identifier_T identifier) = 0;
+};
+
+/**
+ *
+ * @todo(Light): implement identifier recycling.
+ */
+template<typename Value_T, typename Identifier_T = uint32_t>
+class SparseSet: public TypeErasedSparseSet<Identifier_T>
+{
+public:
+	using Dense_T = std::pair<Identifier_T, Value_T>;
+
+	static constexpr auto max_capacity = size_t { 1'000'000 };
+
+	static constexpr auto null_identifier = std::numeric_limits<Identifier_T>().max();
+
+	explicit SparseSet(size_t initial_capacity = 1)
+	{
+		ensure(
+		    initial_capacity <= max_capacity,
+		    "Failed to create SparseSet: capacity too large ({} > {})",
+		    initial_capacity,
+		    max_capacity
+		);
+
+		m_dense.reserve(initial_capacity);
+		m_sparse.resize(initial_capacity, null_identifier);
+	}
+
+	auto insert(Identifier_T identifier, Value_T value) -> Dense_T &
+	{
+		if (m_sparse.size() < identifier + 1)
+		{
+			auto new_capacity = std::max(static_cast<size_t>(identifier + 1), m_sparse.size() * 2);
+			new_capacity = std::min(new_capacity, max_capacity);
+
+			// log_dbg("Increasing sparse vector size:", m_dead_count);
+			// log_dbg("\tdead_count: {}", m_dead_count);
+			// log_dbg("\talive_count: {}", m_alive_count);
+			// log_dbg("\tsparse.size: {} -> {}", m_sparse.size(), new_capacity);
+
+			m_sparse.resize(new_capacity, null_identifier);
+		}
+
+		++m_alive_count;
+		m_sparse[identifier] = m_dense.size();
+		return m_dense.emplace_back(identifier, std::move(value));
+	}
+
+	void remove(Identifier_T identifier) override
+	{
+		auto &idx = m_sparse[identifier];
+		auto &[entity, component] = m_dense[idx];
+
+		idx = null_identifier;
+		++m_dead_count;
+		--m_alive_count;
+	}
+
+	void clear()
+	{
+		m_dense.clear();
+		m_sparse.clear();
+		m_alive_count = 0;
+	}
+
+	[[nodiscard]] auto contains(Identifier_T identifier) const -> bool
+	{
+		return m_sparse.size() > identifier               //
+		       && m_sparse[identifier] != null_identifier //
+		       && m_dense[m_sparse[identifier]].first == identifier;
+	}
+
+	auto begin() -> std::vector<Dense_T>::iterator
+	{
+		return m_dense.begin();
+	}
+
+	auto end() -> std::vector<Dense_T>::iterator
+	{
+		return m_dense.end();
+	}
+
+	[[nodiscard]] auto at(Identifier_T identifier) -> Dense_T &
+	{
+		return m_dense.at(m_sparse.at(identifier));
+	}
+
+	/** @warn unsafe, for bound-checked access: use `.at` */
+	[[nodiscard]] auto &&operator[](this auto &&self, Identifier_T identifier)
+	{
+		using Self_T = decltype(self);
+		return std::forward<Self_T>(self).m_dense[std::forward<Self_T>(self).m_sparse[identifier]];
+	}
+
+	[[nodiscard]] auto get_size() const noexcept -> size_t
+	{
+		return m_alive_count;
+	}
+
+	[[nodiscard]] auto get_capacity() const noexcept -> size_t
+	{
+		return m_sparse.capacity();
+	}
+
+private:
+	std::vector<Dense_T> m_dense;
+
+	std::vector<Identifier_T> m_sparse;
+
+	size_t m_alive_count {};
+
+	size_t m_dead_count {};
+};
+
+} // namespace lt::ecs
