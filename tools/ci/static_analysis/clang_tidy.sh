@@ -9,12 +9,12 @@ echo 'Runng this would be a waste of CPU cycles and electricty'
 echo 'Fix the checks before removing these lines'
 exit 0
 
-conan build . \
--c tools.system.package_manager:mode=install \
--c tools.cmake.cmaketoolchain:generator=Ninja \
--s build_type=Release \
--o enable_static_analysis=True \
--o enable_unit_tests=True \
--o enable_fuzz_tests=True \
--o use_mold=True \
---build=missing
+cmake .. \
+-G Ninja \
+-DCMAKE_LINKER_TYPE=MOLD \
+-DENABLE_UNIT_TESTS=ON \
+-DENABLE_FUZZ_TESTS=ON \
+-CMAKE_CXX_CLANG_TIDY=ON \
+-DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_CXX_FLAGS="-std=c++23 -stdlib=libc++ -g -fno-omit-frame-pointer" \
+&& cmake --build . -j `nproc`
