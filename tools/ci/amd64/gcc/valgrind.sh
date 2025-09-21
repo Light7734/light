@@ -12,16 +12,17 @@ export CXX=$(which g++)
 export CC=$(which gcc)
 export DISPLAY=:99
 
+# gcc uses libstdc++ by default
 cmake .. \
 -G Ninja \
 -DCMAKE_LINKER_TYPE=MOLD \
 -DENABLE_UNIT_TESTS=ON \
 -DENABLE_LLVM_COVERAGE=ON \
 -DCMAKE_BUILD_TYPE=Release \
--DCMAKE_CXX_FLAGS="-std=c++23 -stdlib=libstdc++ -g -fno-omit-frame-pointer" \
+-DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" \
 && cmake --build . -j `nproc`
 
-for test in $(find ./build -type f -name '*_tests' -executable); do
+for test in $(find ./ -type f -name '*_tests' -executable); do
   echo "Running $test"
 
   valgrind \
