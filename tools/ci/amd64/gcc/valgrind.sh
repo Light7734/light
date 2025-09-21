@@ -17,7 +17,6 @@ cmake .. \
 -G Ninja \
 -DCMAKE_LINKER_TYPE=MOLD \
 -DENABLE_UNIT_TESTS=ON \
--DENABLE_LLVM_COVERAGE=ON \
 -DCMAKE_BUILD_TYPE=Release \
 -DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" \
 && cmake --build . -j `nproc`
