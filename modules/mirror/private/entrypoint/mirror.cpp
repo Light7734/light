@@ -201,7 +201,7 @@ private:
 
 	Ref<MirrorSystem> m_mirror_system;
 
-	lt::ecs::Entity m_window;
+	lt::ecs::Entity m_window = lt::ecs::null_entity;
 };
 
 auto app::create_application() -> Scope<app::Application>

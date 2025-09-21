@@ -47,7 +47,9 @@ void create_surface_component(test::FuzzDataProvider &provider, ecs::Registry &r
 
 	try
 	{
-		registry.create_entity("").add_component<surface::SurfaceComponent>(
+		auto entity = registry.create_entity();
+		registry.add<surface::SurfaceComponent>(
+		    entity,
 		    surface::SurfaceComponent::CreateInfo {
 		        .title = std::move(title),
 		        .resolution = resolution,
@@ -64,11 +66,11 @@ void create_surface_component(test::FuzzDataProvider &provider, ecs::Registry &r
 
 void remove_surface_component(ecs::Registry &registry)
 {
-	const auto view = registry.get_entt_registry().view<SurfaceComponent>();
+	const auto view = registry.view<SurfaceComponent>();
 
-	if (!view->empty())
+	if (!view.is_empty())
 	{
-		registry.get_entt_registry().remove<SurfaceComponent>(*view.begin());
+		registry.remove<SurfaceComponent>(view[0].first);
 	}
 }
 
@@ -102,8 +104,7 @@ test::FuzzHarness harness = [](const uint8_t *data, size_t size) {
 		case FuzzAction::create_entity:
 		{
 			const auto length = std::min(provider.consume<uint32_t>().value_or(16), 255u);
-			const auto tag = provider.consume_string(length).value_or("");
-			registry->create_entity(tag);
+			registry->create_entity();
 
 			break;
 		}
@@ -119,15 +120,15 @@ test::FuzzHarness harness = [](const uint8_t *data, size_t size) {
 		}
 		case FuzzAction::push_event:
 		{
-			const auto view = registry->get_entt_registry().view<SurfaceComponent>();
+			auto view = registry->view<SurfaceComponent>();
 
-			if (!view->empty())
+			if (!view.is_empty())
 			{
-				view.each([&](auto entity, SurfaceComponent &surface) {
+				for (auto &[entity, component] : view)
+				{
 					provider.consume<uint8_t>().value_or(0);
-				});
-
-				registry->get_entt_registry().remove<SurfaceComponent>(*view.begin());
+					// @TODO(Light): push some event
+				}
 			}
 
 			break;
@@ -136,6 +137,7 @@ test::FuzzHarness harness = [](const uint8_t *data, size_t size) {
 		{
 			break;
 		}
+		case FuzzAction::count:
 		case FuzzAction::tick_system:
 		{
 			system.tick();

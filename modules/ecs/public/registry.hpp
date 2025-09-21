@@ -6,6 +6,8 @@ namespace lt::ecs {
 
 using Entity = uint32_t;
 
+constexpr auto null_entity = std::numeric_limits<Entity>::max();
+
 /** A registry of components, the heart of an ECS architecture.
  *
  * @todo(Light): Implement grouping

@@ -58,20 +58,28 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 
 System::~System()
 {
-	// TODO(Light): make registry.remove not validate iterators
-	auto entities_to_remove = std::vector<ecs::Entity> {};
-	for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
+	try
 	{
-		entities_to_remove.emplace_back(entity);
-	}
+		// TODO(Light): make registry.remove not validate iterators
+		auto entities_to_remove = std::vector<ecs::Entity> {};
+		for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
+		{
+			entities_to_remove.emplace_back(entity);
+		}
 
-	for (auto entity : entities_to_remove)
+		for (auto entity : entities_to_remove)
+		{
+			m_registry->remove<SurfaceComponent>(entity);
+		}
+
+		m_registry->disconnect_on_construct<SurfaceComponent>();
+		m_registry->disconnect_on_destruct<SurfaceComponent>();
+	}
+	catch (const std::exception &exp)
 	{
-		m_registry->remove<SurfaceComponent>(entity);
+		log_err("Uncaught exception in surface::~System:");
+		log_err("\twhat: {}", exp.what());
 	}
-
-	m_registry->disconnect_on_construct<SurfaceComponent>();
-	m_registry->disconnect_on_destruct<SurfaceComponent>();
 }
 
 void System::on_register()
@@ -141,8 +149,8 @@ void System::on_surface_construct(ecs::Registry &registry, ecs::Entity entity)
 		XSetWMProtocols(display, main_window, &surface.m_native_data.wm_delete_message, 1);
 
 		// code to remove decoration
-		long hints[5] = { 2, 0, 0, 0, 0 };
-		Atom motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
+		auto hints = std::array<unsigned char, 5> { 2, 0, 0, 0, 0 };
+		const auto motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
 
 		XChangeProperty(
 		    display,
@@ -151,7 +159,7 @@ void System::on_surface_construct(ecs::Registry &registry, ecs::Entity entity)
 		    motif_hints,
 		    32,
 		    PropModeReplace,
-		    (unsigned char *)&hints,
+		    hints.data(),
 		    5
 		);
 
@@ -283,28 +291,7 @@ void System::handle_events(SurfaceComponent &surface)
 			break;
 		}
 
-		case Expose: break;
-		case GraphicsExpose: break;
-		case NoExpose: break;
-		case CirculateRequest: break;
-		case ConfigureRequest: break;
-		case MapRequest: break;
-		case ResizeRequest: break;
-		case CirculateNotify: break;
-		case CreateNotify: break;
-		case DestroyNotify: break;
-		case GravityNotify: break;
-		case MapNotify: break;
-		case MappingNotify: break;
-		case ReparentNotify: break;
-		case UnmapNotify: break;
-		case VisibilityNotify: break;
-		case ColormapNotify: break;
-		case PropertyNotify: break;
-		case SelectionClear: break;
-		case SelectionNotify: break;
-		case SelectionRequest: break;
-		default: log_inf("Unknown X Event");
+		default: break; /* pass */
 		}
 	}
 }

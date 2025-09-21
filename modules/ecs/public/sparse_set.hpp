@@ -150,6 +150,11 @@ public:
 		return m_sparse.capacity();
 	}
 
+	[[nodiscard]] auto is_empty() const noexcept -> bool
+	{
+		return m_dense.empty();
+	}
+
 private:
 	std::vector<Dense_T> m_dense;
 

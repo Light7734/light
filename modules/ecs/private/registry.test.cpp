@@ -8,8 +8,6 @@ using lt::test::expect_unreachable;
 using lt::test::Suite;
 
 using lt::test::expect_eq;
-using lt::test::expect_ne;
-using lt::test::expect_throw;
 
 using lt::test::expect_false;
 using lt::test::expect_true;
@@ -19,7 +17,7 @@ using lt::ecs::Registry;
 
 struct Component
 {
-	int m_int;
+	int m_int {};
 	std::string m_string;
 
 	[[nodiscard]] friend auto operator==(const Component &lhs, const Component &rhs) -> bool
@@ -43,7 +41,7 @@ struct std::formatter<Component>
 
 struct Component_B
 {
-	float m_float;
+	float m_float {};
 
 	[[nodiscard]] friend auto operator==(const Component_B lhs, const Component_B &rhs) -> bool
 	{
