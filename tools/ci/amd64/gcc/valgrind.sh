@@ -5,6 +5,7 @@ export DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
 set -e
 cd $(git rev-parse --show-toplevel)/
 rm -rf ./build
+mkdir build/ && cd build
 
 Xvfb :99 -screen 0 1024x768x16 &
 export CXX=$(which g++)

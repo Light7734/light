@@ -6,9 +6,9 @@ rm -rf ./build
 mkdir build/ && cd build
 
 Xvfb :99 -screen 0 1024x768x16 &
-export DISPLAY=:99
 export CXX=$(which clang++)
 export CC=$(which clang)
+export DISPLAY=:99
 
 cmake .. \
 -G Ninja \
