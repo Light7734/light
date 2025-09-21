@@ -58,7 +58,14 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 
 System::~System()
 {
+	// TODO(Light): make registry.remove not validate iterators
+	auto entities_to_remove = std::vector<ecs::Entity> {};
 	for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
+	{
+		entities_to_remove.emplace_back(entity);
+	}
+
+	for (auto entity : entities_to_remove)
 	{
 		m_registry->remove<SurfaceComponent>(entity);
 	}
@@ -157,8 +164,11 @@ void System::on_surface_construct(ecs::Registry &registry, ecs::Entity entity)
 			XUnmapWindow(display, main_window);
 		}
 	}
-	catch (...)
+	catch (const std::exception &exp)
 	{
+		log_err("Exception thrown when on_constructing surface component");
+		log_err("\tentity: {}", entity);
+		log_err("\twhat: {}", exp.what());
 		registry.remove<SurfaceComponent>(entity);
 		throw;
 	}
