@@ -7,25 +7,26 @@ cd $(git rev-parse --show-toplevel)/
 rm -rf ./build
 
 Xvfb :99 -screen 0 1024x768x16 &
+export CXX=$(which g++)
+export CC=$(which gcc)
 export DISPLAY=:99
 
-conan build . \
-  -c tools.system.package_manager:mode=install \
-  -c tools.cmake.cmaketoolchain:generator=Ninja \
-  -s build_type=Release \
-  -o enable_unit_tests=True \
-  -o use_mold=True \
-  --build=missing
-
+cmake .. \
+-G Ninja \
+-DCMAKE_LINKER_TYPE=MOLD \
+-DENABLE_UNIT_TESTS=ON \
+-DENABLE_LLVM_COVERAGE=ON \
+-DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_CXX_FLAGS="-std=c++23 -stdlib=libstdc++ -g -fno-omit-frame-pointer" \
+&& cmake --build . -j `nproc`
 
 for test in $(find ./build -type f -name '*_tests' -executable); do
   echo "Running $test"
 
   valgrind \
-      --leak-check=full \
-      --show-leak-kinds=all \
-      --track-origins=yes \
-      --verbose \
-      --error-exitcode=255  \
-      ${test} || exit 1
+  --leak-check=full \
+  --show-leak-kinds=all \
+  --track-origins=yes \
+  --verbose \
+  --error-exitcode=255 ${test} || exit 1
 done
