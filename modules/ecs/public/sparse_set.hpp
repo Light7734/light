@@ -68,6 +68,10 @@ public:
 		return m_dense.emplace_back(identifier, std::move(value));
 	}
 
+	/** @warn invalidates begin/end iterators
+	 *
+	 * @todo(Light): make it not invalidate the iterators >:c
+	 */
 	void remove(Identifier_T identifier) override
 	{
 		auto &idx = m_sparse[identifier];
