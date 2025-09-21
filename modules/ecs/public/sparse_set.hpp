@@ -88,7 +88,7 @@ public:
 			std::swap(component, last_component);
 			entity = last_entity;
 
-			// make sparse to point to new idx
+			// make sparse point to new idx
 			last_idx = idx;
 
 			// pop dense and invalidate sparse[identifier]
