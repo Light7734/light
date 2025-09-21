@@ -3,25 +3,21 @@
 set -e
 cd $(git rev-parse --show-toplevel)/
 rm -rf ./build
+mkdir -p ./build/coverage/ && cd build
 
 Xvfb :99 -screen 0 1024x768x16 &
 export DISPLAY=:99
 export CXX=$(which clang++)
 export CC=$(which clang)
 
-conan build . \
-    -c tools.system.package_manager:mode=install \
-    -c tools.cmake.cmaketoolchain:generator=Ninja \
-    -c tools.build:compiler_executables='{"c": "clang", "cpp": "clang++"}' \
-    -s build_type=Release \
-    -s compiler=clang \
-    -s compiler.version=20 \
-    -s compiler.libcxx=libc++ \
-    -o use_mold=True \
-    -o enable_llvm_coverage=True \
-    --build=missing
+cmake .. \
+-G Ninja \
+-DCMAKE_LINKER_TYPE=MOLD \
+-DENABLE_UNIT_TESTS=ON \
+-DENABLE_LLVM_COVERAGE=ON \
+-DCMAKE_BUILD_TYPE=Release
+&& cmake --build . -j`nproc`
 
-mkdir -p ./build/coverage/ 
 for test in $(find ./build -type f -name '*_tests' -executable); do
     export LLVM_PROFILE_FILE="./build/coverage/$(basename "$(dirname "$test")").profraw";
     echo ${LLVM_PROFILE_FILE} >> ./build/coverage/list;
