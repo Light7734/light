@@ -25,10 +25,6 @@ public:
 	virtual void remove(Identifier_T identifier) = 0;
 };
 
-/**
- *
- * @todo(Light): implement identifier recycling.
- */
 template<typename Value_T, typename Identifier_T = uint32_t>
 class SparseSet: public TypeErasedSparseSet<Identifier_T>
 {
@@ -77,7 +73,29 @@ public:
 		auto &idx = m_sparse[identifier];
 		auto &[entity, component] = m_dense[idx];
 
-		idx = null_identifier;
+		auto &[last_entity, last_component] = m_dense.back();
+		auto &last_idx = m_sparse[last_entity];
+
+		// removed entity is in dense's back, just pop and invalidate sparse[identifier]
+		if (entity == last_entity)
+		{
+			idx = null_identifier;
+			m_dense.pop_back();
+		}
+		else
+		{
+			// swap dense's 'back' to 'removed'
+			std::swap(component, last_component);
+			entity = last_entity;
+
+			// make sparse to point to new idx
+			last_idx = idx;
+
+			// pop dense and invalidate sparse[identifier]
+			idx = null_identifier;
+			m_dense.pop_back();
+		}
+
 		++m_dead_count;
 		--m_alive_count;
 	}

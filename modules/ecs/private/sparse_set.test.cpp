@@ -76,8 +76,33 @@ Suite element_raii = [] {
 			set.remove(idx);
 
 			expect_eq(set.get_size(), 10'000 - (idx + 1));
-			expect_throw([&] { std::ignore = set.at(idx); });
 			expect_false(set.contains(idx));
+			expect_throw([&] { std::ignore = set.at(idx); });
+		}
+	};
+
+	Case { "removed elements won't be iterated again" } = [] {
+		auto set = Set {};
+
+		for (auto idx : std::views::iota(0, 10'000))
+		{
+			set.insert(idx, idx);
+		}
+
+		set.remove(0);
+		set.remove(32);
+		set.remove(69);
+		set.remove(420);
+		set.remove(9'999);
+
+		for (auto &[identifier, value] : set)
+		{
+			expect_eq(identifier, value);
+			expect_ne(value, 0);
+			expect_ne(value, 32);
+			expect_ne(value, 69);
+			expect_ne(value, 420);
+			expect_ne(value, 9'999);
 		}
 	};
 };

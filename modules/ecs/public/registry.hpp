@@ -8,9 +8,16 @@ using Entity = uint32_t;
 
 /** A registry of components, the heart of an ECS architecture.
  *
- * @todo(Light): optimize multi-component views
- * @todo(Light): support more than 2-component views
- * @todo(Light): handle edge cases or specify the undefined behaviors
+ * @todo(Light): Implement grouping
+ * @todo(Light): Implement identifier recycling
+ * @todo(Light): Optimize views/each
+ * @todo(Light): Support >2 component views
+ * @todo(Light): Handle more edge cases or specify the undefined behaviors
+ *
+ * @ref https://skypjack.github.io/
+ * @ref https://github.com/alecthomas/entityx
+ * @ref https://github.com/skypjack/entt
+ * @ref https://github.com/SanderMertens/flecs
  */
 class Registry
 {
@@ -93,7 +100,7 @@ public:
 	}
 
 	template<typename Component_T>
-	auto view() -> SparseSet<Component_T, Entity>&
+	auto view() -> SparseSet<Component_T, Entity> &
 	{
 		return get_derived_set<Component_T>();
 	};
