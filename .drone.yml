@@ -25,13 +25,13 @@ trigger:
 
 steps:
 - name: unit tests
-  image: amd64_gcc_unit_tests:latest
+  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/gcc/unit_tests.sh
 
 - name: valgrind
-  image: amd64_gcc_valgrind:latest
+  image: ci:latest 
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/gcc/valgrind.sh
@@ -46,7 +46,7 @@ trigger:
 
 steps:
 - name: code coverage
-  image: amd64_clang_coverage:latest
+  image: ci:latest
   pull: if-not-exists
   environment:
     CODECOV_TOKEN:
@@ -55,13 +55,13 @@ steps:
     - ./tools/ci/amd64/clang/coverage.sh
 
 - name: leak sanitizer
-  image: amd64_clang_lsan:latest
+  image: ci:latest 
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/clang/lsan.sh
 
 - name: memory sanitizer
-  image: amd64_clang_msan:latest
+  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/clang/msan.sh
@@ -76,14 +76,14 @@ trigger:
 
 steps:
 - name: clang tidy
-  image: clang_tidy:latest
+  image: ci:latest 
   pull: if-not-exists
   privileged: true
   commands:
     - ./tools/ci/static_analysis/clang_tidy.sh
 
 - name: clang format
-  image: clang_format:latest
+  image: ci:latest 
   pull: if-not-exists
   commands:
     - ./tools/ci/static_analysis/clang_format.sh
