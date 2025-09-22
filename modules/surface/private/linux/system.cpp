@@ -44,13 +44,13 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 	);
 
 	m_registry->connect_on_construct<SurfaceComponent>(
-	    [this](ecs::Registry &registry, ecs::Entity entity) {
+	    [this](ecs::Registry &registry, ecs::EntityId entity) {
 		    on_surface_construct(registry, entity);
 	    }
 	);
 
 	m_registry->connect_on_destruct<SurfaceComponent>(
-	    [this](ecs::Registry &registry, ecs::Entity entity) {
+	    [this](ecs::Registry &registry, ecs::EntityId entity) {
 		    on_surface_destruct(registry, entity);
 	    }
 	);
@@ -58,10 +58,15 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 
 System::~System()
 {
+	if (!m_registry)
+	{
+		return;
+	}
+
 	try
 	{
 		// TODO(Light): make registry.remove not validate iterators
-		auto entities_to_remove = std::vector<ecs::Entity> {};
+		auto entities_to_remove = std::vector<ecs::EntityId> {};
 		for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
 		{
 			entities_to_remove.emplace_back(entity);
@@ -90,7 +95,7 @@ void System::on_unregister()
 {
 }
 
-void System::on_surface_construct(ecs::Registry &registry, ecs::Entity entity)
+void System::on_surface_construct(ecs::Registry &registry, ecs::EntityId entity)
 {
 	try
 	{
@@ -182,7 +187,7 @@ void System::on_surface_construct(ecs::Registry &registry, ecs::Entity entity)
 	}
 }
 
-void System::on_surface_destruct(ecs::Registry &registry, ecs::Entity entity)
+void System::on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity)
 {
 	const auto &[display, window, _] = registry.get<SurfaceComponent>(entity).get_native_data();
 	if (!display)
@@ -355,7 +360,7 @@ void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityR
 	}
 }
 
-auto System::tick() -> bool
+void System::tick(app::TickInfo tick)
 {
 	for (auto &dense : m_registry->view<SurfaceComponent>())
 	{
@@ -364,7 +369,12 @@ auto System::tick() -> bool
 		handle_events(surface);
 	}
 
-	return false;
+	const auto now = std::chrono::steady_clock::now();
+	m_last_tick_result = app::TickResult {
+		.info = tick,
+		.duration = now - tick.start_time,
+		.end_time = now,
+	};
 }
 
 void ensure_component_sanity(const SurfaceComponent &component)

@@ -16,6 +16,15 @@ using test::expect_not_nullptr;
 using test::expect_throw;
 using test::Suite;
 
+[[nodiscard]] auto tick_info() -> app::TickInfo
+{
+	return {
+		.delta_time = std::chrono::milliseconds { 16 },
+		.budget = std::chrono::milliseconds { 10 },
+		.start_time = std::chrono::steady_clock::now(),
+	};
+}
+
 constexpr auto title = "TestWindow";
 constexpr auto width = 800u;
 constexpr auto height = 600u;
@@ -188,7 +197,7 @@ Suite registry_events = [] {
 Suite tick = [] {
 	Case { "ticking on empty registry won't throw" } = [] {
 		auto fixture = Fixture {};
-		System { fixture.registry() }.tick();
+		System { fixture.registry() }.tick(tick_info());
 	};
 
 	Case { "ticking on non-empty registry won't throw" } = [] {
@@ -196,7 +205,7 @@ Suite tick = [] {
 		auto system = System { fixture.registry() };
 
 		fixture.add_surface_component();
-		system.tick();
+		system.tick(tick_info());
 	};
 };
 
@@ -207,7 +216,7 @@ Suite tick_handles_events = [] {
 		auto &surface = fixture.add_surface_component();
 
 		// flush window-creation events
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(surface.peek_events().size(), 0);
 
 		surface.push_event(surface::MovedEvent({}, {}));
@@ -216,7 +225,7 @@ Suite tick_handles_events = [] {
 		surface.push_event(surface::ButtonPressedEvent({}));
 		expect_eq(surface.peek_events().size(), 2);
 
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(surface.peek_events().size(), 0);
 	};
 };
@@ -235,7 +244,7 @@ Suite tick_handles_requests = [] {
 
 		surface.push_request(surface::ModifyVisibilityRequest(true));
 		expect_eq(surface.peek_requests().size(), 1);
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(surface.peek_requests().size(), 0);
 
 		surface.push_request(surface::ModifyTitleRequest(title));
@@ -250,7 +259,7 @@ Suite tick_handles_requests = [] {
 		surface.push_request(surface::ModifyVisibilityRequest(false));
 		expect_eq(surface.peek_requests().size(), 1 + 2 + 3);
 
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(surface.peek_requests().size(), 0);
 
 		expect_eq(surface.get_title(), title);

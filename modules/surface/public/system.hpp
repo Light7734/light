@@ -25,12 +25,17 @@ public:
 
 	void on_unregister() override;
 
-	auto tick() -> bool override;
+	void tick(app::TickInfo tick) override;
+
+	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
+	{
+		return m_last_tick_result;
+	}
 
 private:
-	void on_surface_construct(ecs::Registry &registry, ecs::Entity entity);
+	void on_surface_construct(ecs::Registry &registry, ecs::EntityId entity);
 
-	void on_surface_destruct(ecs::Registry &registry, ecs::Entity entity);
+	void on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity);
 
 	void handle_requests(struct SurfaceComponent &surface);
 
@@ -53,13 +58,15 @@ private:
 	    const struct ModifyVisibilityRequest &request
 	);
 
-	void modify_position(ecs::Entity surface_entity, const math::ivec2 &new_size);
+	void modify_position(ecs::EntityId surface_entity, const math::ivec2 &new_size);
 
-	void modify_position(ecs::Entity surface_entity, const math::uvec2 &new_size);
+	void modify_position(ecs::EntityId surface_entity, const math::uvec2 &new_size);
 
-	void set_visibility(ecs::Entity surface_entity, bool visible);
+	void set_visibility(ecs::EntityId surface_entity, bool visible);
 
 	Ref<ecs::Registry> m_registry;
+
+	app::TickResult m_last_tick_result;
 };
 
 } // namespace lt::surface
