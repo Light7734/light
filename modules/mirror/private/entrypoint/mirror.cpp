@@ -33,12 +33,10 @@ public:
 		}
 	}
 
-	auto tick() -> bool override
+	void tick(app::TickInfo tick) override
 	{
 		using Surface = lt::surface::SurfaceComponent;
 		using Input = lt::input::InputComponent;
-
-		static lt::Timer timer;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds { 10 });
 		auto should_quit = false;
@@ -78,8 +76,12 @@ public:
 			}
 		}
 
-		timer.reset();
-		return should_quit;
+		const auto now = std::chrono::steady_clock::now();
+		m_last_tick_result = app::TickResult {
+			.info = tick,
+			.duration = now - tick.start_time,
+			.end_time = now,
+		};
 	}
 
 	void on_register() override
@@ -90,11 +92,19 @@ public:
 	{
 	}
 
+	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
+	{
+		return m_last_tick_result;
+	}
+
 private:
 	Ref<ecs::Registry> m_registry;
 
 	lt::input::InputAction::Key m_quit_action_key;
+
 	std::array<lt::input::InputAction::Key, 4> m_debug_action_keys {};
+
+	app::TickResult m_last_tick_result {};
 };
 
 class Mirror: public app::Application
@@ -201,7 +211,7 @@ private:
 
 	Ref<MirrorSystem> m_mirror_system;
 
-	lt::ecs::Entity m_window = lt::ecs::null_entity;
+	lt::ecs::EntityId m_window = lt::ecs::null_entity;
 };
 
 auto app::create_application() -> Scope<app::Application>
