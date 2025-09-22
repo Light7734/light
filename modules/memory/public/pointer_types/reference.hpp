@@ -1,0 +1,28 @@
+#pragma once
+
+#include <memory>
+
+namespace lt::memory {
+
+/** Wrapper around std::shared_ptr. */
+template<typename t>
+using Ref = std::shared_ptr<t>;
+
+/** Allocates memory for an `Underlying_T` and directly constructs it there.
+ *
+ * @return A Ref<Underlying_T> to the constructed object.
+ */
+template<typename Underlying_T, typename... Args>
+constexpr Ref<Underlying_T> create_ref(Args &&...args)
+{
+	return std::make_shared<Underlying_T>(std::forward<Args>(args)...);
+}
+
+/** Converts c-style pointer of type `Underlying_T` to a `Ref<Underlying_T>`. */
+template<typename Underlying_T>
+constexpr Ref<Underlying_T> make_ref(Underlying_T *raw_pointer)
+{
+	return Ref<Underlying_T>(raw_pointer);
+}
+
+} // namespace lt::memory
