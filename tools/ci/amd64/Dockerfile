@@ -10,10 +10,10 @@ afl-utils \
 base-devel \
 bash \
 clang \
-clang-extra-tools \
 cmake \
 curl \
 gcc \
+gdb \
 git \
 libc++ \
 libinput \
