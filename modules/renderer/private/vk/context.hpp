@@ -1,10 +1,19 @@
 #pragma once
 
 #define VK_NO_PROTOTYPES
-#include <renderer/backend.hpp>
+#define VK_USE_PLATFORM_XLIB_KHR
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_xlib.h>
+
+//
+#include <app/system.hpp>
+#include <ecs/entity.hpp>
+#include <memory/pointer_types/null_on_move.hpp>
+#include <surface/components.hpp>
 
 namespace lt::renderer::vk {
+
+using memory::NullOnMove;
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
 // global functions
@@ -78,26 +87,54 @@ extern PFN_vkCmdBindPipeline vk_cmd_bind_pipeline;
 extern PFN_vkCmdDraw vk_cmd_draw;
 extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
 extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
+
+extern PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
+extern PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
-class Backend: public ::lt::renderer::Backend
+class Context
 {
 public:
-	Backend();
+	Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system_stats);
 
-	Backend(Backend &&) = default;
+	~Context();
 
-	auto operator=(Backend &&) -> Backend & = default;
+	Context(Context &&other) noexcept = default;
 
-	Backend(const Backend &) = delete;
+	auto operator=(Context &&other) noexcept -> Context & = default;
 
-	auto operator=(const Backend &) -> Backend & = delete;
+	Context(const Context &) = delete;
 
-	~Backend() override;
+	auto operator=(const Context &) -> Context & = delete;
 
-	[[nodiscard]] constexpr auto get_api() const -> API override
+	[[nodiscard]] auto instance() -> VkInstance
 	{
-		return API::vulkan;
+		return m_instance;
+	}
+
+	[[nodiscard]] auto physical_device() -> VkPhysicalDevice
+	{
+		return m_physical_device;
+	}
+
+	[[nodiscard]] auto device() -> VkDevice
+	{
+		return m_device;
+	}
+
+	auto queue() -> VkQueue
+	{
+		return m_queue;
+	};
+
+	auto debug_messenger() -> VkDebugUtilsMessengerEXT
+	{
+		return m_debug_messenger;
+	};
+
+	[[nodiscard]] auto get_stats() const -> const app::SystemStats &
+	{
+		return *m_stats;
 	}
 
 private:
@@ -121,15 +158,23 @@ private:
 
 	[[nodiscard]] auto find_suitable_queue_family() const -> uint32_t;
 
-	VkInstance m_instance {};
+	Ref<ecs::Registry> m_registry;
 
-	VkPhysicalDevice m_physical_device {};
+	NullOnMove<VkInstance> m_instance = VK_NULL_HANDLE;
 
-	VkDevice m_device {};
+	NullOnMove<VkPhysicalDevice> m_physical_device = VK_NULL_HANDLE;
 
-	VkQueue m_queue {};
+	NullOnMove<VkDevice> m_device = VK_NULL_HANDLE;
 
-	VkDebugUtilsMessengerEXT m_debug_messenger {};
+	NullOnMove<VkQueue> m_queue = VK_NULL_HANDLE;
+
+	NullOnMove<VkSwapchainKHR> m_swapcha = VK_NULL_HANDLE;
+
+	NullOnMove<VkDebugUtilsMessengerEXT> m_debug_messenger = VK_NULL_HANDLE;
+
+	NullOnMove<VkSurfaceKHR> m_surface = VK_NULL_HANDLE;
+
+	Ref<app::SystemStats> m_stats;
 };
 
 } // namespace lt::renderer::vk

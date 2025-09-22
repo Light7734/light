@@ -1,4 +1,4 @@
-#include <renderer/vk/backend.hpp>
+#include <renderer/vk/context.hpp>
 
 #if defined(_WIN32)
 
@@ -83,10 +83,16 @@ PFN_vkCmdBindPipeline vk_cmd_bind_pipeline;
 PFN_vkCmdDraw vk_cmd_draw;
 PFN_vkCmdSetViewport vk_cmd_set_viewport;
 PFN_vkCmdSetScissor vk_cmd_set_scissors;
+
+PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
+PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
-Backend::Backend()
+Context::Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system_stats)
+    : m_stats(std::move(system_stats))
 {
+	ensure(m_stats, "Failed to create Vulkan Context: null stats");
+
 	load_library();
 	load_global_functions();
 
@@ -100,15 +106,30 @@ Backend::Backend()
 	load_device_functions();
 
 	initialize_queue();
+
+	const auto &component = surface_entity.get<surface::SurfaceComponent>();
+
+	auto xlib_surface_create_info = VkXlibSurfaceCreateInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
+		.dpy = component.get_native_data().display,
+		.window = component.get_native_data().window,
+	};
+
+	vk_create_xlib_surface_khr(m_instance, &xlib_surface_create_info, nullptr, &m_surface);
 }
 
-Backend::~Backend()
+Context::~Context()
 {
 	vk_destroy_device(m_device, nullptr);
-	vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
+
+	if (m_instance)
+	{
+		vk_destroy_surface_khr(m_instance, m_surface, nullptr);
+		vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
+	}
+
 	vk_destroy_instance(m_instance, nullptr);
 }
-
 
 auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const char *
 {
@@ -132,14 +153,17 @@ auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const 
 	return "PERFORMANCE";
 }
 
-auto parse_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity) -> LogLvl
+auto parse_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity)
+    -> app::SystemDiagnosis::Severity
 {
+	using enum app::SystemDiagnosis::Severity;
+
 	switch (message_severity)
 	{
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: return LogLvl::trace;
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: return LogLvl::info;
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return LogLvl::warn;
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return LogLvl::error;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: return verbose;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: return info;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return warning;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return error;
 	default: ensure(false, "Invalid message severity: {}", static_cast<int>(message_severity));
 	}
 
@@ -153,16 +177,34 @@ auto validation_layers_callback(
     void *const vulkan_user_data
 ) -> VkBool32
 {
-	std::ignore = vulkan_user_data;
+	auto stats = *(Ref<app::SystemStats> *)vulkan_user_data; // NOLINT
 
 	const auto &type = parse_message_type(message_types);
-	const auto level = parse_message_severity(message_severity);
 
-	Logger::log(level, ":: <{}> :: {}", type, callback_data->pMessage);
+	auto message = std::format(
+	    "Vulkan Validation Message:\ntype: {}\nseverity: {}\nmessage: {}",
+	    type,
+	    std::to_underlying(parse_message_severity(message_severity)),
+	    callback_data->pMessage
+	);
+
+	auto severity = parse_message_severity(message_severity);
+	if (std::to_underlying(severity) < 2)
+	{
+		return static_cast<VkBool32>(VK_FALSE);
+	}
+
+	stats->push_diagnosis(
+	    app::SystemDiagnosis {
+	        .message = message,
+	        .code = {}, // TODO(Light): extract vulkan validation-layers code from the message
+	        .severity = severity,
+	    }
+	);
 	return static_cast<VkBool32>(VK_FALSE);
 }
 
-void Backend::initialize_instance()
+void Context::initialize_instance()
 {
 	auto app_info = VkApplicationInfo {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -198,10 +240,10 @@ void Backend::initialize_instance()
 		auto extensions = std::vector<VkExtensionProperties>(count);
 		vk_enumerate_instance_extension_properties(nullptr, &count, extensions.data());
 
-		log_inf("Available vulkan instance extensions:");
+		// log_inf("Available vulkan instance extensions:");
 		for (auto &ext : extensions)
 		{
-			log_inf("\t{} @ {}", ext.extensionName, ext.specVersion);
+			// log_inf("\t{} @ {}", ext.extensionName, ext.specVersion);
 		}
 	}
 
@@ -210,7 +252,7 @@ void Backend::initialize_instance()
 	ensure(m_instance, "Failed to create vulkan instance");
 }
 
-void Backend::initialize_debug_messenger()
+void Context::initialize_debug_messenger()
 {
 	const auto info = VkDebugUtilsMessengerCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -226,6 +268,8 @@ void Backend::initialize_debug_messenger()
 
 
 		.pfnUserCallback = &validation_layers_callback,
+
+		.pUserData = &m_stats,
 	};
 
 	ensure(
@@ -234,7 +278,7 @@ void Backend::initialize_debug_messenger()
 	);
 }
 
-void Backend::initialize_physical_device()
+void Context::initialize_physical_device()
 {
 	auto count = 0u;
 	vk_enumerate_physical_devices(m_instance, &count, nullptr);
@@ -260,7 +304,7 @@ void Backend::initialize_physical_device()
 	ensure(m_physical_device, "Failed to find any suitable Vulkan physical device");
 }
 
-void Backend::initialize_logical_device()
+void Context::initialize_logical_device()
 {
 	const float priorities = .0f;
 
@@ -292,12 +336,12 @@ void Backend::initialize_logical_device()
 	);
 }
 
-void Backend::initialize_queue()
+void Context::initialize_queue()
 {
 	vk_get_device_queue(m_device, find_suitable_queue_family(), 0, &m_queue);
 }
 
-void Backend::load_library()
+void Context::load_library()
 {
 	library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
 	ensure(library, "Failed to dlopen libvulkan.so");
@@ -309,13 +353,13 @@ void Backend::load_library()
 	ensure(vk_get_instance_proc_address, "Failed to load vulkan function: vkGetInstanceProcAddr");
 }
 
-void Backend::load_global_functions()
+void Context::load_global_functions()
 {
 	constexpr auto load_fn = []<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		pfn = reinterpret_cast<T>(vk_get_instance_proc_address(nullptr, fn_name));
 		ensure(pfn, "Failed to load vulkan global function: {}", fn_name);
-		log_trc("Loaded global function: {}", fn_name);
+		// log_trc("Loaded global function: {}", fn_name);
 	};
 
 	load_fn(vk_create_instance, "vkCreateInstance");
@@ -323,13 +367,13 @@ void Backend::load_global_functions()
 	load_fn(vk_enumerate_instance_layer_properties, "vkEnumerateInstanceLayerProperties");
 }
 
-void Backend::load_instance_functions()
+void Context::load_instance_functions()
 {
 	const auto load_fn = [&]<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		pfn = reinterpret_cast<T>(vk_get_instance_proc_address(m_instance, fn_name));
 		ensure(pfn, "Failed to load vulkan instance function: {}", fn_name);
-		log_trc("Loaded instance function: {}", fn_name);
+		// log_trc("Loaded instance function: {}", fn_name);
 	};
 
 	load_fn(vk_destroy_instance, "vkDestroyInstance");
@@ -356,15 +400,18 @@ void Backend::load_instance_functions()
 	load_fn(vk_set_debug_object_name, "vkSetDebugUtilsObjectNameEXT");
 	load_fn(vk_set_debug_object_tag, "vkSetDebugUtilsObjectTagEXT");
 	load_fn(vk_submit_debug_message, "vkSubmitDebugUtilsMessageEXT");
+
+	load_fn(vk_create_xlib_surface_khr, "vkCreateXlibSurfaceKHR");
+	load_fn(vk_destroy_surface_khr, "vkDestroySurfaceKHR");
 }
 
-void Backend::load_device_functions()
+void Context::load_device_functions()
 {
 	const auto load_fn = [&]<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		pfn = reinterpret_cast<T>(vk_get_device_proc_address(m_device, fn_name));
 		ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
-		log_trc("Loaded device function: {}", fn_name);
+		// log_trc("Loaded device function: {}", fn_name);
 	};
 
 	load_fn(vk_get_device_queue, "vkGetDeviceQueue");
@@ -409,7 +456,7 @@ void Backend::load_device_functions()
 	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
 }
 
-[[nodiscard]] auto Backend::find_suitable_queue_family() const -> uint32_t
+[[nodiscard]] auto Context::find_suitable_queue_family() const -> uint32_t
 {
 	auto count = 0u;
 	vk_get_physical_device_queue_family_properties(m_physical_device, &count, nullptr);

@@ -1,41 +1,30 @@
 #pragma once
 
-#include <base/base.hpp>
-#include <ecs/registry.hpp>
+#include <app/system.hpp>
+#include <ecs/entity.hpp>
+#include <renderer/validation.hpp>
+#include <renderer/vk/context.hpp>
 
 namespace lt::renderer {
 
-/** The system for putting gore on your display
- *
- * Exclusively operates on components:
- * - RendererComponent
- * - PostEffectsComponent
- * - UserInterfaceComponent
- *
- * Requires read acces on components:
- * - TransformComponent
- */
-class System
+class System: app::ISystem
 {
 public:
-	/** The configurations of this system. */
-	struct Properties
-	{
-	};
-
-	/** The requirements for this system to initialize. */
-	struct InitRequirements
+	struct CreateInfo
 	{
 		Ref<ecs::Registry> registry;
+		ecs::Entity surface_entity;
+		Ref<app::SystemStats> system_stats;
 	};
 
-	/** The requirements for this system to tick. */
-	struct TickRequirements
+	[[nodiscard]] System(CreateInfo info)
+	    : m_registry(std::move(info.registry))
+	    , m_context(info.surface_entity, std::move(info.system_stats))
 	{
-		double delta_time;
-	};
+		ensure(m_registry, "Failed to initialize renderer system: null registry");
+	}
 
-	[[nodiscard]] System(InitRequirements requirements);
+	~System() override = default;
 
 	System(System &&) = default;
 
@@ -45,12 +34,38 @@ public:
 
 	auto operator=(const System &) -> System & = delete;
 
-	~System();
+	void on_register() override
+	{
+	}
 
-	void tick(TickRequirements requirements);
+	void on_unregister() override
+	{
+	}
+
+	void get_validation_state();
+
+	void tick(app::TickInfo tick) override
+	{
+	}
+
+	[[nodiscard]] auto get_stats() const -> const app::SystemStats &
+	{
+		return m_context.get_stats();
+	}
+
+	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
+	{
+		return m_last_tick_result;
+	}
 
 private:
 	Ref<ecs::Registry> m_registry;
+
+	renderer::Validation m_validation;
+
+	vk::Context m_context;
+
+	app::TickResult m_last_tick_result {};
 };
 
 } // namespace lt::renderer
