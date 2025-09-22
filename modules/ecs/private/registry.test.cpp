@@ -12,7 +12,7 @@ using lt::test::expect_eq;
 using lt::test::expect_false;
 using lt::test::expect_true;
 
-using lt::ecs::Entity;
+using lt::ecs::EntityId;
 using lt::ecs::Registry;
 
 struct Component
@@ -86,7 +86,7 @@ Suite raii = [] {
 Suite entity_raii = [] {
 	Case { "create_entity returns unique values" } = [] {
 		auto registry = Registry {};
-		auto set = std::unordered_set<Entity> {};
+		auto set = std::unordered_set<EntityId> {};
 
 		for (auto idx : std::views::iota(0, 10'000))
 		{
@@ -101,7 +101,7 @@ Suite entity_raii = [] {
 	Case { "post create/destroy_entity has correct state" } = [] {
 		auto registry = Registry {};
 
-		auto entities = std::vector<Entity> {};
+		auto entities = std::vector<EntityId> {};
 		for (auto idx : std::views::iota(0, 10'000))
 		{
 			entities.emplace_back(registry.create_entity());
@@ -154,14 +154,18 @@ Suite component_raii = [] {
 Suite callbacks = [] {
 	Case { "connecting on_construct/on_destruct won't throw" } = [] {
 		auto registry = Registry {};
-		registry.connect_on_construct<Component>([&](Registry &, Entity) {});
-		registry.connect_on_destruct<Component>([&](Registry &, Entity) {});
+		registry.connect_on_construct<Component>([&](Registry &, EntityId) {});
+		registry.connect_on_destruct<Component>([&](Registry &, EntityId) {});
 	};
 
 	Case { "on_construct/on_destruct won't get called on unrelated component" } = [] {
 		auto registry = Registry {};
-		registry.connect_on_construct<Component>([&](Registry &, Entity) { expect_unreachable(); });
-		registry.connect_on_destruct<Component>([&](Registry &, Entity) { expect_unreachable(); });
+		registry.connect_on_construct<Component>([&](Registry &, EntityId) {
+			expect_unreachable();
+		});
+		registry.connect_on_destruct<Component>([&](Registry &, EntityId) {
+			expect_unreachable();
+		});
 
 		for (auto idx : std::views::iota(0, 100'000))
 		{
@@ -171,14 +175,14 @@ Suite callbacks = [] {
 
 	Case { "on_construct/on_destruct gets called" } = [] {
 		auto registry = Registry {};
-		auto all_entities = std::vector<Entity> {};
-		auto on_construct_called = std::vector<Entity> {};
-		auto on_destruct_called = std::vector<Entity> {};
+		auto all_entities = std::vector<EntityId> {};
+		auto on_construct_called = std::vector<EntityId> {};
+		auto on_destruct_called = std::vector<EntityId> {};
 
-		registry.connect_on_construct<Component>([&](Registry &, Entity entity) {
+		registry.connect_on_construct<Component>([&](Registry &, EntityId entity) {
 			on_construct_called.emplace_back(entity);
 		});
-		registry.connect_on_destruct<Component>([&](Registry &, Entity entity) {
+		registry.connect_on_destruct<Component>([&](Registry &, EntityId entity) {
 			on_destruct_called.emplace_back(entity);
 		});
 
@@ -206,8 +210,8 @@ Suite each = [] {
 
 	auto shared_entity_counter = 0u;
 
-	auto component_map_a = std::unordered_map<Entity, Component> {};
-	auto entities_a = std::vector<Entity> {};
+	auto component_map_a = std::unordered_map<EntityId, Component> {};
+	auto entities_a = std::vector<EntityId> {};
 
 	for (auto idx : std::views::iota(0, 10'000))
 	{
@@ -220,10 +224,10 @@ Suite each = [] {
 		component_map_a[entity] = component;
 	}
 
-	auto component_map_b = std::unordered_map<lt::ecs::Entity, Component_B> {};
+	auto component_map_b = std::unordered_map<lt::ecs::EntityId, Component_B> {};
 	for (auto idx : std::views::iota(0, 10'000))
 	{
-		auto entity = Entity {};
+		auto entity = EntityId {};
 		if (idx % 3 == 0)
 		{
 			entity = entities_a[idx];
@@ -243,7 +247,7 @@ Suite each = [] {
 
 	Case { "each one element" } = [&] {
 		auto counter = 0u;
-		registry.each<Component>([&](Entity entity, Component &component) {
+		registry.each<Component>([&](EntityId entity, Component &component) {
 			++counter;
 			expect_eq(component_map_a[entity], component);
 		});
@@ -251,7 +255,7 @@ Suite each = [] {
 		expect_eq(component_map_a.size(), counter);
 
 		counter = 0u;
-		registry.each<Component_B>([&](Entity entity, Component_B &component) {
+		registry.each<Component_B>([&](EntityId entity, Component_B &component) {
 			++counter;
 			expect_eq(component_map_b[entity], component);
 		});
@@ -261,7 +265,7 @@ Suite each = [] {
 	Case { "each two element" } = [&] {
 		auto counter = 0u;
 		registry.each<Component, Component_B>(
-		    [&](Entity entity, Component &component_a, Component_B &component_b) {
+		    [&](EntityId entity, Component &component_a, Component_B &component_b) {
 			    expect_eq(component_map_a[entity], component_a);
 			    expect_eq(component_map_b[entity], component_b);
 			    ++counter;
@@ -277,8 +281,8 @@ Suite views = [] {
 
 	auto shared_entity_counter = 0u;
 
-	auto component_map_a = std::unordered_map<Entity, Component> {};
-	auto entities_a = std::vector<Entity> {};
+	auto component_map_a = std::unordered_map<EntityId, Component> {};
+	auto entities_a = std::vector<EntityId> {};
 
 	for (auto idx : std::views::iota(0, 10'000))
 	{
@@ -291,10 +295,10 @@ Suite views = [] {
 		component_map_a[entity] = component;
 	}
 
-	auto component_map_b = std::unordered_map<Entity, Component_B> {};
+	auto component_map_b = std::unordered_map<EntityId, Component_B> {};
 	for (auto idx : std::views::iota(0, 10'000))
 	{
-		auto entity = Entity {};
+		auto entity = EntityId {};
 		if (idx % 3 == 0)
 		{
 			entity = entities_a[idx];

@@ -128,6 +128,11 @@ public:
 		return m_dense.end();
 	}
 
+	[[nodiscard]] auto at(Identifier_T identifier) const -> const Dense_T &
+	{
+		return m_dense.at(m_sparse.at(identifier));
+	}
+
 	[[nodiscard]] auto at(Identifier_T identifier) -> Dense_T &
 	{
 		return m_dense.at(m_sparse.at(identifier));

@@ -4,9 +4,9 @@
 
 namespace lt::ecs {
 
-using Entity = uint32_t;
+using EntityId = uint32_t;
 
-constexpr auto null_entity = std::numeric_limits<Entity>::max();
+constexpr auto null_entity = std::numeric_limits<EntityId>::max();
 
 /** A registry of components, the heart of an ECS architecture.
  *
@@ -24,9 +24,9 @@ constexpr auto null_entity = std::numeric_limits<Entity>::max();
 class Registry
 {
 public:
-	using UnderlyingSparseSet_T = TypeErasedSparseSet<Entity>;
+	using UnderlyingSparseSet_T = TypeErasedSparseSet<EntityId>;
 
-	using Callback_T = std::function<void(Registry &, Entity)>;
+	using Callback_T = std::function<void(Registry &, EntityId)>;
 
 	template<typename Component_T>
 	void connect_on_construct(Callback_T callback)
@@ -52,13 +52,13 @@ public:
 		m_on_destruct_hooks.erase(get_type_id<Component_T>());
 	}
 
-	auto create_entity() -> Entity
+	auto create_entity() -> EntityId
 	{
 		++m_entity_count;
 		return m_current++;
 	}
 
-	void destroy_entity(Entity entity)
+	void destroy_entity(EntityId entity)
 	{
 		for (const auto &[key, set] : m_sparsed_sets)
 		{
@@ -69,14 +69,21 @@ public:
 	}
 
 	template<typename Component_T>
-	auto get(Entity entity) -> Component_T &
+	auto get(EntityId entity) const -> const Component_T &
 	{
 		auto &derived_set = get_derived_set<Component_T>();
 		return derived_set.at(entity).second;
 	}
 
 	template<typename Component_T>
-	auto add(Entity entity, Component_T component) -> Component_T &
+	auto get(EntityId entity) -> Component_T &
+	{
+		auto &derived_set = get_derived_set<Component_T>();
+		return derived_set.at(entity).second;
+	}
+
+	template<typename Component_T>
+	auto add(EntityId entity, Component_T component) -> Component_T &
 	{
 		auto &derived_set = get_derived_set<Component_T>();
 		auto &added_component = derived_set.insert(entity, std::move(component)).second;
@@ -90,7 +97,7 @@ public:
 	};
 
 	template<typename Component_T>
-	void remove(Entity entity)
+	void remove(EntityId entity)
 	{
 		if (m_on_destruct_hooks.contains(get_type_id<Component_T>()))
 		{
@@ -102,18 +109,18 @@ public:
 	}
 
 	template<typename Component_T>
-	auto view() -> SparseSet<Component_T, Entity> &
+	auto view() -> SparseSet<Component_T, EntityId> &
 	{
 		return get_derived_set<Component_T>();
 	};
 
 	template<typename ComponentA_T, typename ComponentB_T>
 	    requires(!std::is_same_v<ComponentA_T, ComponentB_T>)
-	auto view() -> std::vector<std::tuple<Entity, ComponentA_T &, ComponentB_T &>>
+	auto view() -> std::vector<std::tuple<EntityId, ComponentA_T &, ComponentB_T &>>
 	{
 		auto &set_a = get_derived_set<ComponentA_T>();
 		auto &set_b = get_derived_set<ComponentB_T>();
-		auto view = std::vector<std::tuple<Entity, ComponentA_T &, ComponentB_T &>> {};
+		auto view = std::vector<std::tuple<EntityId, ComponentA_T &, ComponentB_T &>> {};
 
 		/* iterate over the "smaller" component-set, and check if its entities have the other
 		 * component */
@@ -142,7 +149,7 @@ public:
 	};
 
 	template<typename Component_T>
-	void each(std::function<void(Entity, Component_T &)> functor)
+	void each(std::function<void(EntityId, Component_T &)> functor)
 	{
 		for (auto &[entity, component] : get_derived_set<Component_T>())
 		{
@@ -152,7 +159,7 @@ public:
 
 	template<typename ComponentA_T, typename ComponentB_T>
 	    requires(!std::is_same_v<ComponentA_T, ComponentB_T>)
-	void each(std::function<void(Entity, ComponentA_T &, ComponentB_T &)> functor)
+	void each(std::function<void(EntityId, ComponentA_T &, ComponentB_T &)> functor)
 	{
 		auto &set_a = get_derived_set<ComponentA_T>();
 		auto &set_b = get_derived_set<ComponentB_T>();
@@ -223,22 +230,22 @@ private:
 	}
 
 	template<typename T>
-	auto get_derived_set() -> SparseSet<T, Entity> &
+	auto get_derived_set() -> SparseSet<T, EntityId> &
 	{
 		constexpr auto type_id = get_type_id<T>();
 		if (!m_sparsed_sets.contains(type_id))
 		{
-			m_sparsed_sets[type_id] = create_scope<SparseSet<T, Entity>>();
+			m_sparsed_sets[type_id] = create_scope<SparseSet<T, EntityId>>();
 		}
 
 		auto *base_set = m_sparsed_sets[type_id].get();
-		auto *derived_set = dynamic_cast<SparseSet<T, Entity> *>(base_set);
+		auto *derived_set = dynamic_cast<SparseSet<T, EntityId> *>(base_set);
 		ensure(derived_set, "Failed to downcast to derived set");
 
 		return *derived_set;
 	}
 
-	Entity m_current;
+	EntityId m_current;
 
 	TypeId m_entity_count;
 
