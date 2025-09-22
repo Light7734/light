@@ -20,5 +20,6 @@ cmake .. \
 
 for test in $(find ./ -type f -name '*_tests' -executable); do
   echo "Running $test"
-  "$test"
+  gdb -ex='set confirm off' -ex='run' -ex='bt' -ex='quit' "$test"
+
 done
