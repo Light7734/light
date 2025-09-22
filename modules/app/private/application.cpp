@@ -9,10 +9,16 @@ void Application::game_loop()
 	{
 		for (auto &system : m_systems)
 		{
-			if (system->tick())
-			{
-				return;
-			}
+			const auto &last_tick = system->get_last_tick_result();
+			const auto now = std::chrono::steady_clock::now();
+
+			system->tick(
+			    TickInfo {
+			        .delta_time = now - last_tick.end_time,
+			        .budget = std::chrono::milliseconds { 10 },
+			        .start_time = now,
+			    }
+			);
 		}
 
 		for (auto &system : m_systems_to_be_registered)
