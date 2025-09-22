@@ -18,6 +18,15 @@ using test::expect_throw;
 using test::Suite;
 // NOLINTEND
 
+[[nodiscard]] auto tick_info() -> app::TickInfo
+{
+	return {
+		.delta_time = std::chrono::milliseconds { 16 },
+		.budget = std::chrono::milliseconds { 10 },
+		.start_time = std::chrono::steady_clock::now(),
+	};
+}
+
 class Fixture
 {
 public:
@@ -26,7 +35,7 @@ public:
 		return m_registry;
 	}
 
-	auto add_input_component() -> ecs::Entity
+	auto add_input_component() -> ecs::EntityId
 	{
 		auto entity = m_registry->create_entity();
 		m_registry->add<InputComponent>(entity, {});
@@ -34,7 +43,7 @@ public:
 		return entity;
 	}
 
-	auto add_surface_component() -> ecs::Entity
+	auto add_surface_component() -> ecs::EntityId
 	{
 		auto entity = m_registry->create_entity();
 		m_registry->add<surface::SurfaceComponent>(
@@ -124,7 +133,7 @@ Suite tick = [] {
 		auto registry = fixture.registry();
 		auto system = System { fixture.registry() };
 
-		expect_false(system.tick());
+		system.tick(tick_info());
 	};
 
 	Case { "Tick triggers input action" } = [] {
@@ -146,23 +155,23 @@ Suite tick = [] {
 		);
 
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
 
 		surface.push_event(surface::KeyPressedEvent(69));
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::triggered);
 
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
 
-		system.tick();
-		system.tick();
-		system.tick();
+		system.tick(tick_info());
+		system.tick(tick_info());
+		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
 
 		surface.push_event(surface::KeyReleasedEvent(69));
-		system.tick();
+		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
 	};
 

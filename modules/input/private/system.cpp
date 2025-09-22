@@ -14,7 +14,7 @@ System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
 	ensure(m_registry, "Failed to initialize input system: null registry");
 }
 
-auto System::tick() -> bool
+void System::tick(app::TickInfo tick)
 {
 	for (auto &[entity, surface] : m_registry->view<surface::SurfaceComponent>())
 	{
@@ -51,7 +51,12 @@ auto System::tick() -> bool
 		}
 	}
 
-	return false;
+	const auto now = std::chrono::steady_clock::now();
+	m_last_tick_result = app::TickResult {
+		.info = tick,
+		.duration = now - tick.start_time,
+		.end_time = now,
+	};
 }
 
 void System::on_register()

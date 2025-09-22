@@ -13,11 +13,16 @@ class System: public app::ISystem
 public:
 	System(Ref<ecs::Registry> registry);
 
-	auto tick() -> bool override;
+	void tick(app::TickInfo tick) override;
 
 	void on_register() override;
 
 	void on_unregister() override;
+
+	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
+	{
+		return m_last_tick_result;
+	}
 
 private:
 	void handle_event(const surface::SurfaceComponent::Event &event);
@@ -41,6 +46,8 @@ private:
 	std::array<bool, 512> m_buttons {};
 
 	math::vec2 m_pointer_position;
+
+	app::TickResult m_last_tick_result {};
 };
 
 
