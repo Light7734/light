@@ -4,7 +4,7 @@ FROM archlinux:latest
 RUN \
 sed -i 's/^#ParallelDownloads = .*/ParallelDownloads = 8/' /etc/pacman.conf \
 && echo 'NoExtract = usr/share/{man,doc,info}/*' >> /etc/pacman.conf \
-&& pacman -Syyu --noconfirm --disable-download-timeout \
+&& pacman -Syyu --noconfirm --needed --disable-download-timeout \
 afl++ \
 afl-utils \
 base-devel \
@@ -12,27 +12,49 @@ bash \
 clang \
 cmake \
 curl \
+expat \
 gcc \
 gdb \
 git \
+glm \
 libc++ \
 libinput \
+libpciaccess \
+libpng \
 libunwind \
 libx11 \
+libxcb \
 libxcursor \
 libxi \
 libxinerama \
+libxpresent \
 libxrandr \
+lz4 \
 mesa \
 mold \
 ninja \
+python \
+python-distlib \
+python-distutils-extra \
+python-jsonschema \
+qt5-base \
+qt6-base \
 valgrind \
+vulkan-headers \
+vulkan-icd-loader \
+vulkan-validation-layers \
+wayland \
+wayland-protocols \
 wget \
+xcb-util \
 xcb-util-cursor \
+xcb-util-keysyms \
+xcb-util-wm \
 xorg-server-xvfb \
 xorg-util-macros \
 xtrans \
 zlib \
+zstd \
 && pacman -Scc --noconfirm
 
 ## Sanitizers ##
