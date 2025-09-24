@@ -9,10 +9,6 @@ export CXX=$(which g++)
 export CC=$(which gcc)
 export DISPLAY=:99
 
-lshw -C display
-nvidia-smi
-vulkaninfo --summary
-
 # gcc uses libstdc++ by default
 cmake .. \
 -G Ninja \
@@ -25,5 +21,4 @@ cmake .. \
 for test in $(find ./ -type f -name '*_tests' -executable); do
   echo "Running $test"
   gdb -ex='set confirm off' -ex='run' -ex='bt' -ex='quit' "$test"
-
 done
