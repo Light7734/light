@@ -30,7 +30,7 @@ public:
 
 	auto operator=(NullOnMove &&other) noexcept -> NullOnMove &
 	{
-		if (this == &other)
+		if (this == std::addressof(other))
 		{
 			return *this;
 		}
