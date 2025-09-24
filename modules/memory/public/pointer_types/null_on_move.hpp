@@ -30,7 +30,7 @@ public:
 
 	auto operator=(NullOnMove &&other) noexcept -> NullOnMove &
 	{
-		if (this->m_value == other.m_value)
+		if (this == &other)
 		{
 			return *this;
 		}
