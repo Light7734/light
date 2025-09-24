@@ -119,7 +119,7 @@ Context::Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system
 	load_device_functions();
 
 	initialize_queue();
-    initialize_surface();
+    initialize_surface(surface_entity);
 }
 
 Context::~Context()
@@ -273,7 +273,7 @@ void Context::initialize_queue()
 	vk_get_device_queue(m_device, find_suitable_queue_family(), 0, &m_queue);
 }
 
-void Context::initialize_surface()
+void Context::initialize_surface(const ecs::Entity &surface_entity)
 {
 	const auto &component = surface_entity.get<surface::SurfaceComponent>();
 

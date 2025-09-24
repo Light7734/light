@@ -148,7 +148,7 @@ private:
 
 	void initialize_queue();
 
-	void initialize_surface();
+	void initialize_surface(const ecs::Entity &surface_entity);
 
 	void load_library();
 
@@ -170,11 +170,11 @@ private:
 
 	NullOnMove<VkQueue> m_queue = VK_NULL_HANDLE;
 
-	NullOnMove<VkSwapchainKHR> m_swapcha = VK_NULL_HANDLE;
-
 	NullOnMove<VkDebugUtilsMessengerEXT> m_debug_messenger = VK_NULL_HANDLE;
 
 	NullOnMove<VkSurfaceKHR> m_surface = VK_NULL_HANDLE;
+
+	NullOnMove<VkSwapchainKHR> m_swapchain = VK_NULL_HANDLE;
 
 	Ref<app::SystemStats> m_stats;
 };
