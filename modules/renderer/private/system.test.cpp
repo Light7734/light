@@ -6,9 +6,6 @@
 using namespace lt;
 using std::ignore;
 using test::Case;
-using test::expect_eq;
-using test::expect_ne;
-using test::expect_not_nullptr;
 using test::expect_throw;
 using test::expect_true;
 using test::Suite;
@@ -75,7 +72,7 @@ struct RendererContext
 
 Suite raii = [] {
 	Case { "happy path won't throw" } = [&] {
-		std::ignore = create_system();
+		ignore = create_system();
 	};
 
 	Case { "happy path has no validation errors" } = [&] {
@@ -91,7 +88,7 @@ Suite raii = [] {
 		auto stats = create_ref<app::SystemStats>();
 
 		expect_throw([&] {
-			std::ignore = System(
+			ignore = System(
 			    {
 			        .registry = {},
 			        .surface_entity = surface_entity,
@@ -101,7 +98,7 @@ Suite raii = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = System(
+			ignore = System(
 			    System::CreateInfo {
 			        .registry = surface_entity.get_registry(),
 			        .surface_entity = empty_entity,
@@ -111,7 +108,7 @@ Suite raii = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = System(
+			ignore = System(
 			    System::CreateInfo {
 			        .registry = surface_entity.get_registry(),
 			        .surface_entity = surface_entity,
