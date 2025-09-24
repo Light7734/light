@@ -42,6 +42,7 @@ qt6-base \
 valgrind \
 vulkan-headers \
 vulkan-icd-loader \
+vulkan-tools \
 vulkan-validation-layers \
 wayland \
 wayland-protocols \
@@ -96,3 +97,13 @@ git clone --depth=1 https://github.com/llvm/llvm-project.git -b llvmorg-20.1.8 \
 \
 && cd ../.. \
 && rm -rf llvm-project
+
+RUN \
+sudo pacman -S --needed --noconfirm --disable-download-timeout \
+lshw \
+linux-firmware-nvidia \
+nvidia-dkms \
+nvidia-utils \
+vulkan-tools \
+vulkan-headers \
+vulkan-validation-layers

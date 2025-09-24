@@ -1,13 +1,13 @@
-kind: pipeline
-type: docker
-name: gpu-test
-
-steps:
-  - name: gpu-check
-    image: nvidia/cuda:12.1.0-base-ubuntu22.04
-    pull: if-not-exists
-    commands:
-      - nvidia-smi
+# kind: pipeline
+# type: docker
+# name: gpu-test
+# 
+# steps:
+#   - name: gpu-check
+#     image: nvidia/cuda:12.1.0-base-ubuntu22.04
+#     pull: if-not-exists
+#     commands:
+#       - nvidia-smi
 
 # ---
 # kind: pipeline
@@ -27,28 +27,19 @@ steps:
 #     - ./tools/ci/amd64/msvc/unit_tests.ps1
 # 
 # ---
-#kind: pipeline
-#type: docker
-#name: amd64 — gcc
-#trigger:
-#  branch:
-#  - main
-#
-#steps:
-#- name: unit tests
-#  image: ci:latest
-#  pull: if-not-exists
-#  commands:
-#    - env
-#    - echo ${PATH}
-#    - echo $${PATH}
-#    - echo $DISPLAY
-#    - echo ${DISPLAY}
-#    - echo $${DISPLAY}
-#    - echo ${NVIDIA_VISIBLE_DEVICES}
-#    - echo $${NVIDIA_VISIBLE_DEVICES}
-#
-#    - ./tools/ci/amd64/gcc/unit_tests.sh
+kind: pipeline
+type: docker
+name: amd64 — gcc
+trigger:
+  branch:
+  - main
+
+steps:
+- name: unit tests
+  image: ci:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/amd64/gcc/unit_tests.sh
 
 # - name: valgrind
 #   image: ci:latest 
