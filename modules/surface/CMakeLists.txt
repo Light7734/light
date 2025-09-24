@@ -11,6 +11,7 @@ target_link_libraries(surface PUBLIC
     ecs
     app
     math
+    memory
     PRIVATE
     logger 
     lt_debug

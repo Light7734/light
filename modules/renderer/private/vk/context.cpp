@@ -131,9 +131,6 @@ Context::~Context()
 {
 	try
 	{
-		log_trc("Fucking destructing shit at address: {}", (size_t)this);
-
-
 		if (m_device)
 		{
 			vkc(vk_device_wait_idle(m_device));
@@ -146,13 +143,7 @@ Context::~Context()
 		{
 			vk_destroy_surface_khr(m_instance, m_surface, nullptr);
 			vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
-			vk_destroy_instance(m_instance, nullptr);
-		}
-
-		if (library)
-		{
-			dlclose(library);
-			library = nullptr;
+			// vk_destroy_instance(m_instance, nullptr);
 		}
 	}
 	catch (const std::exception &exp)
@@ -307,7 +298,6 @@ void Context::initialize_surface(const ecs::Entity &surface_entity)
 	vkc(vk_create_xlib_surface_khr(m_instance, &create_info, nullptr, &m_surface));
 
 	const auto &[width, height] = component.get_resolution();
-	log_dbg("{} x {}", width, height);
 	m_framebuffer_size = {
 		.width = width,
 		.height = height,
@@ -636,7 +626,7 @@ auto validation_layers_callback(
 ) -> VkBool32
 {
 	log_dbg("VALIDATION: {}", callback_data->pMessage);
-	return VK_FALSE;
+	return VK_FALSE; // TODO(Light): fix this mess!
 
 	auto stats = *(Ref<app::SystemStats> *)vulkan_user_data; // NOLINT
 
