@@ -23,6 +23,15 @@ mkdir -p ./coverage/
 for test in $(find ./ -type f -name '*_tests' -executable); do
     export LLVM_PROFILE_FILE="./coverage/$(basename "$(dirname "$test")").profraw";
     echo ${LLVM_PROFILE_FILE} >> ./coverage/list;
+
+    gdb \
+    --return-child-result \
+    -ex='set confirm off' \
+    -ex='set pagination off' \
+    -ex='run' \
+    -ex='bt full' \
+    -ex='quit' \
+    -q \
     "$test"
 done
 

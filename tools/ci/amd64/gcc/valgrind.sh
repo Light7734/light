@@ -22,12 +22,11 @@ cmake .. \
 && cmake --build . -j `nproc`
 
 for test in $(find ./ -type f -name '*_tests' -executable); do
-  echo "Running $test"
-
-  valgrind \
-  --leak-check=full \
-  --show-leak-kinds=all \
-  --track-origins=yes \
-  --verbose \
-  --error-exitcode=255 ${test} || exit 1
+    echo "Running $test"
+    valgrind \
+    --leak-check=full \
+    --show-leak-kinds=all \
+    --track-origins=yes \
+    --verbose \
+    --error-exitcode=255 ${test} || exit 1
 done

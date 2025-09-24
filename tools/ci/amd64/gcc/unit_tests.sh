@@ -19,6 +19,14 @@ cmake .. \
 && cmake --build . -j `nproc`
 
 for test in $(find ./ -type f -name '*_tests' -executable); do
-  echo "Running $test"
-  gdb --return-child-result -q -ex='set confirm off' -ex='set pagination off' -ex='run' -ex='bt full' -ex='quit' "$test"
+    echo "Running $test"
+    gdb \
+    --return-child-result \
+    -ex='set confirm off' \
+    -ex='set pagination off' \
+    -ex='run' \
+    -ex='bt full' \
+    -ex='quit' \
+    -q \
+    "$test"
 done
