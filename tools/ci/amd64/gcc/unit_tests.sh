@@ -9,6 +9,7 @@ export CXX=$(which g++)
 export CC=$(which gcc)
 export DISPLAY=:99
 
+nvidia-smi
 lshw -C display
 vulkaninfo --summary
 
