@@ -110,6 +110,7 @@ void System::on_surface_construct(ecs::Registry &registry, ecs::EntityId entity)
 		ensure(display_env != nullptr, "DISPLAY env var not found!");
 
 		auto *display = XOpenDisplay(display_env);
+		ensure(display, "Failed to open XDisplay with DISPLAY: {}", display_env);
 
 		auto root_window = XDefaultRootWindow(display);
 
