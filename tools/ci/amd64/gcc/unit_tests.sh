@@ -9,6 +9,7 @@ export CXX=$(which g++)
 export CC=$(which gcc)
 export DISPLAY=:99
 
+lshw -C display
 vulkaninfo --summary
 
 # gcc uses libstdc++ by default
