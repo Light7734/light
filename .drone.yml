@@ -27,6 +27,7 @@ steps:
 - name: unit tests
   image: ci:latest
   pull: if-not-exists
+  environment: DISPLAY
   commands:
     - env
     - echo ${PATH}
