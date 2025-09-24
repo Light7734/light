@@ -88,9 +88,24 @@ extern PFN_vkCmdDraw vk_cmd_draw;
 extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
 extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
 
+// Surface
+extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR vk_get_physical_device_surface_support;
+extern PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vk_get_physical_device_surface_capabilities;
+extern PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vk_get_physical_device_surface_formats;
+
 extern PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
 extern PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+
+inline void vkc(VkResult result)
+{
+	if (result)
+	{
+		throw std::runtime_error {
+			std::format("Vulkan call failed with result: {}", std::to_underlying(result))
+		};
+	}
+}
 
 class Context
 {
@@ -150,6 +165,8 @@ private:
 
 	void initialize_surface(const ecs::Entity &surface_entity);
 
+	void initialize_swapchain();
+
 	void load_library();
 
 	void load_global_functions();
@@ -157,6 +174,11 @@ private:
 	void load_instance_functions();
 
 	void load_device_functions();
+
+	auto get_optimal_swapchain_image_count(
+	    VkSurfaceCapabilitiesKHR capabilities,
+	    uint32_t desired_image_count = 3
+	) -> uint32_t;
 
 	[[nodiscard]] auto find_suitable_queue_family() const -> uint32_t;
 
@@ -174,7 +196,15 @@ private:
 
 	NullOnMove<VkSurfaceKHR> m_surface = VK_NULL_HANDLE;
 
+	VkExtent2D m_framebuffer_size {};
+
+	uint32_t m_graphics_queue_family_index = VK_QUEUE_FAMILY_IGNORED;
+
+	uint32_t m_present_queue_family_index = VK_QUEUE_FAMILY_IGNORED;
+
 	NullOnMove<VkSwapchainKHR> m_swapchain = VK_NULL_HANDLE;
+
+	std::vector<VkImage> m_swapchain_images;
 
 	Ref<app::SystemStats> m_stats;
 };

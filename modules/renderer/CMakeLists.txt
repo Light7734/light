@@ -7,8 +7,6 @@ target_link_libraries(renderer
 PUBLIC 
     app 
     ecs
-    vulkan
-    memory
     surface
 )
 

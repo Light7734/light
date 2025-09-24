@@ -47,7 +47,7 @@ struct RendererContext
 	};
 }
 
-[[nodiscard]] auto create_system() -> std::pair<RendererContext, SurfaceContext>
+[[nodiscard]] auto create_system() -> std::pair<SurfaceContext, RendererContext>
 {
 	auto surface_context = create_surface();
 	auto &[surface_system, surface_entity] = surface_context;
@@ -55,6 +55,7 @@ struct RendererContext
 	auto stats = create_ref<app::SystemStats>();
 
 	return {
+		std::move(surface_context),
 		RendererContext {
 		    .registry = registry,
 		    .system = System(
@@ -65,8 +66,6 @@ struct RendererContext
 		        }
 		    ),
 		},
-
-		std::move(surface_context),
 	};
 }
 
@@ -76,7 +75,7 @@ Suite raii = [] {
 	};
 
 	Case { "happy path has no validation errors" } = [&] {
-		auto [renderer, surface] = create_system();
+		auto [surface, renderer] = create_system();
 		expect_true(renderer.system.get_stats().empty_diagnosis());
 	};
 
