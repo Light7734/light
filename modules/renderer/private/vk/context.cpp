@@ -88,6 +88,19 @@ PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
 PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
+auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const char *;
+
+auto parse_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity)
+    -> app::SystemDiagnosis::Severity;
+
+auto validation_layers_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT const message_severity,
+    VkDebugUtilsMessageTypeFlagsEXT const message_types,
+    VkDebugUtilsMessengerCallbackDataEXT const *const callback_data,
+    void *const vulkan_user_data
+) -> VkBool32;
+
+
 Context::Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system_stats)
     : m_stats(std::move(system_stats))
 {
@@ -106,16 +119,7 @@ Context::Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system
 	load_device_functions();
 
 	initialize_queue();
-
-	const auto &component = surface_entity.get<surface::SurfaceComponent>();
-
-	auto xlib_surface_create_info = VkXlibSurfaceCreateInfoKHR {
-		.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
-		.dpy = component.get_native_data().display,
-		.window = component.get_native_data().window,
-	};
-
-	vk_create_xlib_surface_khr(m_instance, &xlib_surface_create_info, nullptr, &m_surface);
+    initialize_surface();
 }
 
 Context::~Context()
@@ -131,78 +135,6 @@ Context::~Context()
 	vk_destroy_instance(m_instance, nullptr);
 }
 
-auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const char *
-{
-	if (message_types == VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
-	{
-		return "GENERAL";
-	}
-
-	if (message_types
-	    == (VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-	        | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT))
-	{
-		return "VALIDATION | PERFORMANCE";
-	}
-
-	if (message_types == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
-	{
-		return "VALIDATION";
-	}
-
-	return "PERFORMANCE";
-}
-
-auto parse_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity)
-    -> app::SystemDiagnosis::Severity
-{
-	using enum app::SystemDiagnosis::Severity;
-
-	switch (message_severity)
-	{
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: return verbose;
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: return info;
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return warning;
-	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return error;
-	default: ensure(false, "Invalid message severity: {}", static_cast<int>(message_severity));
-	}
-
-	return {};
-}
-
-auto validation_layers_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT const message_severity,
-    VkDebugUtilsMessageTypeFlagsEXT const message_types,
-    VkDebugUtilsMessengerCallbackDataEXT const *const callback_data,
-    void *const vulkan_user_data
-) -> VkBool32
-{
-	auto stats = *(Ref<app::SystemStats> *)vulkan_user_data; // NOLINT
-
-	const auto &type = parse_message_type(message_types);
-
-	auto message = std::format(
-	    "Vulkan Validation Message:\ntype: {}\nseverity: {}\nmessage: {}",
-	    type,
-	    std::to_underlying(parse_message_severity(message_severity)),
-	    callback_data->pMessage
-	);
-
-	auto severity = parse_message_severity(message_severity);
-	if (std::to_underlying(severity) < 2)
-	{
-		return static_cast<VkBool32>(VK_FALSE);
-	}
-
-	stats->push_diagnosis(
-	    app::SystemDiagnosis {
-	        .message = message,
-	        .code = {}, // TODO(Light): extract vulkan validation-layers code from the message
-	        .severity = severity,
-	    }
-	);
-	return static_cast<VkBool32>(VK_FALSE);
-}
 
 void Context::initialize_instance()
 {
@@ -341,6 +273,19 @@ void Context::initialize_queue()
 	vk_get_device_queue(m_device, find_suitable_queue_family(), 0, &m_queue);
 }
 
+void Context::initialize_surface()
+{
+	const auto &component = surface_entity.get<surface::SurfaceComponent>();
+
+	auto xlib_surface_create_info = VkXlibSurfaceCreateInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
+		.dpy = component.get_native_data().display,
+		.window = component.get_native_data().window,
+	};
+
+	vk_create_xlib_surface_khr(m_instance, &xlib_surface_create_info, nullptr, &m_surface);
+}
+
 void Context::load_library()
 {
 	library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
@@ -477,5 +422,79 @@ void Context::load_device_functions()
 	ensure(false, "Failed to find a suitable Vulkan queue family");
 	return 0;
 }
+
+auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const char *
+{
+	if (message_types == VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
+	{
+		return "GENERAL";
+	}
+
+	if (message_types
+	    == (VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+	        | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT))
+	{
+		return "VALIDATION | PERFORMANCE";
+	}
+
+	if (message_types == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+	{
+		return "VALIDATION";
+	}
+
+	return "PERFORMANCE";
+}
+
+auto parse_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity)
+    -> app::SystemDiagnosis::Severity
+{
+	using enum app::SystemDiagnosis::Severity;
+
+	switch (message_severity)
+	{
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: return verbose;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: return info;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return warning;
+	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return error;
+	default: ensure(false, "Invalid message severity: {}", static_cast<int>(message_severity));
+	}
+
+	return {};
+}
+
+auto validation_layers_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT const message_severity,
+    VkDebugUtilsMessageTypeFlagsEXT const message_types,
+    VkDebugUtilsMessengerCallbackDataEXT const *const callback_data,
+    void *const vulkan_user_data
+) -> VkBool32
+{
+	auto stats = *(Ref<app::SystemStats> *)vulkan_user_data; // NOLINT
+
+	const auto &type = parse_message_type(message_types);
+
+	auto message = std::format(
+	    "Vulkan Validation Message:\ntype: {}\nseverity: {}\nmessage: {}",
+	    type,
+	    std::to_underlying(parse_message_severity(message_severity)),
+	    callback_data->pMessage
+	);
+
+	auto severity = parse_message_severity(message_severity);
+	if (std::to_underlying(severity) < 2)
+	{
+		return static_cast<VkBool32>(VK_FALSE);
+	}
+
+	stats->push_diagnosis(
+	    app::SystemDiagnosis {
+	        .message = message,
+	        .code = {}, // TODO(Light): extract vulkan validation-layers code from the message
+	        .severity = severity,
+	    }
+	);
+	return static_cast<VkBool32>(VK_FALSE);
+}
+
 
 } // namespace lt::renderer::vk

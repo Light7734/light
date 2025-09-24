@@ -148,6 +148,8 @@ private:
 
 	void initialize_queue();
 
+	void initialize_surface();
+
 	void load_library();
 
 	void load_global_functions();
