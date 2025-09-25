@@ -1,3 +1,4 @@
+#include <ranges>
 #include <renderer/vk/context.hpp>
 
 #if defined(_WIN32)
@@ -134,15 +135,23 @@ Context::~Context()
 		if (m_device)
 		{
 			vkc(vk_device_wait_idle(m_device));
+
+			for (auto &view : m_swapchain_image_views)
+			{
+				vk_destroy_image_view(m_device, view, nullptr);
+			}
+
 			vk_destroy_swapchain_khr(m_device, m_swapchain, nullptr);
 			vk_destroy_device(m_device, nullptr);
 		}
-
 
 		if (m_instance)
 		{
 			vk_destroy_surface_khr(m_instance, m_surface, nullptr);
 			vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
+			// TODO(Light): fix this issue
+			// @ref:
+			// https://git.light7734.com/light7734/light/commit/f268724034a2ceb63b90dc13aedf86a1eecac62e
 			// vk_destroy_instance(m_instance, nullptr);
 		}
 	}
@@ -279,7 +288,7 @@ void Context::initialize_logical_device()
 		.pEnabledFeatures = &physical_device_features,
 	};
 
-	ensure(
+	ensuree
 	    !vk_create_device(m_physical_device, &device_info, nullptr, &m_device),
 	    "Failed to create logical vulkan device"
 	);
@@ -402,11 +411,37 @@ void Context::initialize_swapchain()
 	vkc(vk_create_swapchain_khr(m_device, &create_info, nullptr, &m_swapchain));
 	vkc(vk_device_wait_idle(m_device));
 
-	// auto image_count = uint32_t { 0u };
-	// vk_get_swapchain_images_khr(m_device, m_swapchain, &image_count, nullptr);
+	auto image_count = uint32_t { 0u };
+	vk_get_swapchain_images_khr(m_device, m_swapchain, &image_count, nullptr);
 
-	// m_swapchain_images.resize(image_count);
-	// vk_get_swapchain_images_khr(m_device, m_swapchain, &image_count, m_swapchain_images.data());
+	m_swapchain_images.resize(image_count);
+	m_swapchain_image_views.resize(image_count);
+	vk_get_swapchain_images_khr(m_device, m_swapchain, &image_count, m_swapchain_images.data());
+
+	for (auto [image, view] : std::views::zip(m_swapchain_images, m_swapchain_image_views))
+	{
+		auto create_info = VkImageViewCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.image = image,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = surface_format.format,
+            .components = VkComponentMapping {
+                .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+            },
+            .subresourceRange = VkImageSubresourceRange {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0u,
+                .levelCount = 1u,
+                .baseArrayLayer = 0u,
+                .layerCount = 1u,
+            }
+		};
+
+		vkc(vk_create_image_view(m_device, &create_info, nullptr, &view));
+	}
 }
 
 auto Context::get_optimal_swapchain_image_count(
@@ -626,7 +661,7 @@ auto validation_layers_callback(
 ) -> VkBool32
 {
 	log_dbg("VALIDATION: {}", callback_data->pMessage);
-	return VK_FALSE; // TODO(Light): fix this mess!
+	ensure(vulkan_user_data, "Validation layers's user data is not set!");
 
 	auto stats = *(Ref<app::SystemStats> *)vulkan_user_data; // NOLINT
 
