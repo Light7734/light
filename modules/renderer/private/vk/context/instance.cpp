@@ -1,8 +1,8 @@
-#include <ranges>
-#include <renderer/vk/context.hpp>
+#include <app/system.hpp>
+#include <renderer/vk/context/instance.hpp>
 
 #if defined(_WIN32)
-
+	#error "Unsupported platform (currently)"
 #elif defined(__unix__)
 	#include <dlfcn.h>
 namespace {
@@ -99,70 +99,35 @@ auto parse_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT message_sever
     -> app::SystemDiagnosis::Severity;
 
 auto validation_layers_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT const message_severity,
-    VkDebugUtilsMessageTypeFlagsEXT const message_types,
-    VkDebugUtilsMessengerCallbackDataEXT const *const callback_data,
-    void *const vulkan_user_data
+    VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+    VkDebugUtilsMessageTypeFlagsEXT message_types,
+    VkDebugUtilsMessengerCallbackDataEXT const *callback_data,
+    void *vulkan_user_data
 ) -> VkBool32;
 
 
-Context::Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system_stats)
-    : m_stats(std::move(system_stats))
+Instance::Instance()
 {
-	ensure(m_stats, "Failed to create Vulkan Context: null stats");
-
 	load_library();
 	load_global_functions();
 
 	initialize_instance();
 	load_instance_functions();
-
 	initialize_debug_messenger();
-
-	initialize_physical_device();
-	initialize_logical_device();
-	load_device_functions();
-
-	initialize_surface(surface_entity);
-	initialize_queue();
-	initialize_swapchain();
 }
 
-Context::~Context()
+Instance::~Instance()
 {
-	try
+	if (m_instance)
 	{
-		if (m_device)
-		{
-			vkc(vk_device_wait_idle(m_device));
-
-			for (auto &view : m_swapchain_image_views)
-			{
-				vk_destroy_image_view(m_device, view, nullptr);
-			}
-
-			vk_destroy_swapchain_khr(m_device, m_swapchain, nullptr);
-			vk_destroy_device(m_device, nullptr);
-		}
-
-		if (m_instance)
-		{
-			vk_destroy_surface_khr(m_instance, m_surface, nullptr);
-			vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
-			// TODO(Light): fix this issue
-			// @ref:
-			// https://git.light7734.com/light7734/light/commit/f268724034a2ceb63b90dc13aedf86a1eecac62e
-			// vk_destroy_instance(m_instance, nullptr);
-		}
+		vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
+		vk_destroy_instance(m_instance, nullptr);
 	}
-	catch (const std::exception &exp)
-	{
-		log_err("Exception: {}", exp.what());
-	}
+
+	unload_library();
 }
 
-
-void Context::initialize_instance()
+void Instance::initialize_instance()
 {
 	auto app_info = VkApplicationInfo {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -206,11 +171,10 @@ void Context::initialize_instance()
 	}
 
 	vkc(vk_create_instance(&instance_info, nullptr, &m_instance));
-
 	ensure(m_instance, "Failed to create vulkan instance");
 }
 
-void Context::initialize_debug_messenger()
+void Instance::initialize_debug_messenger()
 {
 	const auto info = VkDebugUtilsMessengerCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -227,7 +191,7 @@ void Context::initialize_debug_messenger()
 
 		.pfnUserCallback = &validation_layers_callback,
 
-		.pUserData = &m_stats,
+		.pUserData = {},
 	};
 
 	ensure(
@@ -236,242 +200,7 @@ void Context::initialize_debug_messenger()
 	);
 }
 
-void Context::initialize_physical_device()
-{
-	auto count = 0u;
-	vkc(vk_enumerate_physical_devices(m_instance, &count, nullptr));
-	ensure(count != 0u, "Failed to find any physical devices with Vulkan support");
-
-	auto devices = std::vector<VkPhysicalDevice>(count);
-	vkc(vk_enumerate_physical_devices(m_instance, &count, devices.data()));
-
-	for (auto &device : devices)
-	{
-		auto properties = VkPhysicalDeviceProperties {};
-		auto features = VkPhysicalDeviceFeatures {};
-
-		vk_get_physical_device_properties(device, &properties);
-		vk_get_physical_device_features(device, &features);
-
-		if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-		    && features.geometryShader)
-		{
-			m_physical_device = device;
-		}
-	}
-	ensure(m_physical_device, "Failed to find any suitable Vulkan physical device");
-}
-
-void Context::initialize_logical_device()
-{
-	const float priorities = .0f;
-
-	auto queue_info = VkDeviceQueueCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-		.queueFamilyIndex = find_suitable_queue_family(),
-		.queueCount = 1u,
-		.pQueuePriorities = &priorities,
-	};
-
-	auto physical_device_features = VkPhysicalDeviceFeatures {};
-
-	auto extensions = std::vector<const char *> {
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	};
-
-	auto device_info = VkDeviceCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.queueCreateInfoCount = 1,
-		.pQueueCreateInfos = &queue_info,
-		.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-		.ppEnabledExtensionNames = extensions.data(),
-		.pEnabledFeatures = &physical_device_features,
-	};
-
-	ensuree
-	    !vk_create_device(m_physical_device, &device_info, nullptr, &m_device),
-	    "Failed to create logical vulkan device"
-	);
-}
-
-void Context::initialize_surface(const ecs::Entity &surface_entity)
-{
-	const auto &component = surface_entity.get<surface::SurfaceComponent>();
-
-	auto create_info = VkXlibSurfaceCreateInfoKHR {
-		.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
-		.dpy = component.get_native_data().display,
-		.window = component.get_native_data().window,
-	};
-
-	vkc(vk_create_xlib_surface_khr(m_instance, &create_info, nullptr, &m_surface));
-
-	const auto &[width, height] = component.get_resolution();
-	m_framebuffer_size = {
-		.width = width,
-		.height = height,
-	};
-}
-
-void Context::initialize_queue()
-{
-	vk_get_device_queue(m_device, find_suitable_queue_family(), 0, &m_queue);
-
-	auto count = uint32_t { 0u };
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, nullptr);
-
-	auto properties = std::vector<VkQueueFamilyProperties>(count);
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, properties.data());
-
-	for (auto idx = uint32_t { 0u }; const auto &property : properties)
-	{
-		if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-		{
-			m_graphics_queue_family_index = idx;
-		}
-
-		auto has_presentation_support = VkBool32 { false };
-		vkc(vk_get_physical_device_surface_support(
-		    m_physical_device,
-		    idx,
-		    m_surface,
-		    &has_presentation_support
-		));
-		if (has_presentation_support)
-		{
-			m_present_queue_family_index = idx;
-		}
-
-		++idx;
-
-		if (m_graphics_queue_family_index != VK_QUEUE_FAMILY_IGNORED
-		    && m_present_queue_family_index != VK_QUEUE_FAMILY_IGNORED)
-		{
-			break;
-		}
-	}
-
-	ensure(
-	    m_graphics_queue_family_index != VK_QUEUE_FAMILY_IGNORED,
-	    "Failed to find graphics queue family"
-	);
-
-	ensure(
-	    m_present_queue_family_index != VK_QUEUE_FAMILY_IGNORED,
-	    "Failed to find presentation queue family"
-	);
-}
-
-
-void Context::initialize_swapchain()
-{
-	auto capabilities = VkSurfaceCapabilitiesKHR {};
-	vkc(vk_get_physical_device_surface_capabilities(m_physical_device, m_surface, &capabilities));
-
-	auto count = uint32_t { 0 };
-	vkc(vk_get_physical_device_surface_formats(m_physical_device, m_surface, &count, nullptr));
-
-	auto formats = std::vector<VkSurfaceFormatKHR>(count);
-	vkc(
-	    vk_get_physical_device_surface_formats(m_physical_device, m_surface, &count, formats.data())
-	);
-	ensure(!formats.empty(), "Surface has no formats!");
-
-	// TODO(Light): parameterize
-	constexpr auto desired_swapchain_image_count = uint32_t { 3 };
-	const auto surface_format = formats.front();
-
-	const auto queue_indices = std::array<uint32_t, 2> {
-		m_graphics_queue_family_index,
-		m_present_queue_family_index,
-	};
-
-	auto create_info = VkSwapchainCreateInfoKHR {
-		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-		.surface = m_surface,
-		.minImageCount = get_optimal_swapchain_image_count(
-		    capabilities,
-		    desired_swapchain_image_count
-		),
-		.imageFormat = surface_format.format,
-		.imageColorSpace = surface_format.colorSpace,
-		.imageExtent = m_framebuffer_size,
-		.imageArrayLayers = 1u,
-		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		.queueFamilyIndexCount = queue_indices.size(),
-		.pQueueFamilyIndices = queue_indices.data(),
-		.preTransform = capabilities.currentTransform,
-		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-		.presentMode = VK_PRESENT_MODE_FIFO_RELAXED_KHR, // TODO(Light): parameterize
-		.clipped = VK_TRUE,
-		.oldSwapchain = nullptr,
-	};
-
-	vkc(vk_create_swapchain_khr(m_device, &create_info, nullptr, &m_swapchain));
-	vkc(vk_device_wait_idle(m_device));
-
-	auto image_count = uint32_t { 0u };
-	vk_get_swapchain_images_khr(m_device, m_swapchain, &image_count, nullptr);
-
-	m_swapchain_images.resize(image_count);
-	m_swapchain_image_views.resize(image_count);
-	vk_get_swapchain_images_khr(m_device, m_swapchain, &image_count, m_swapchain_images.data());
-
-	for (auto [image, view] : std::views::zip(m_swapchain_images, m_swapchain_image_views))
-	{
-		auto create_info = VkImageViewCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			.image = image,
-			.viewType = VK_IMAGE_VIEW_TYPE_2D,
-			.format = surface_format.format,
-            .components = VkComponentMapping {
-                .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-                .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-                .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-                .a = VK_COMPONENT_SWIZZLE_IDENTITY,
-            },
-            .subresourceRange = VkImageSubresourceRange {
-                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                .baseMipLevel = 0u,
-                .levelCount = 1u,
-                .baseArrayLayer = 0u,
-                .layerCount = 1u,
-            }
-		};
-
-		vkc(vk_create_image_view(m_device, &create_info, nullptr, &view));
-	}
-}
-
-auto Context::get_optimal_swapchain_image_count(
-    VkSurfaceCapabilitiesKHR capabilities,
-    uint32_t desired_image_count
-) -> uint32_t
-{
-	const auto min_image_count = capabilities.minImageCount;
-	const auto max_image_count = capabilities.maxImageCount;
-
-	const auto has_max_limit = max_image_count != 0;
-
-	// Desired image count is in range
-	if ((!has_max_limit || max_image_count >= desired_image_count)
-	    && min_image_count <= desired_image_count)
-	{
-		return desired_image_count;
-	}
-
-	// Fall-back to 2 if in ange
-	if (min_image_count <= 2 && max_image_count >= 2)
-	{
-		return 2;
-	}
-
-	// Fall-back to min_image_count
-	return min_image_count;
-}
-
-void Context::load_library()
+void Instance::load_library()
 {
 	library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
 	ensure(library, "Failed to dlopen libvulkan.so");
@@ -483,7 +212,18 @@ void Context::load_library()
 	ensure(vk_get_instance_proc_address, "Failed to load vulkan function: vkGetInstanceProcAddr");
 }
 
-void Context::load_global_functions()
+void Instance::unload_library()
+{
+	if (!library)
+	{
+		return;
+	}
+
+	// dlclose(library);
+	//  library = nullptr;
+}
+
+void Instance::load_global_functions()
 {
 	constexpr auto load_fn = []<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -497,7 +237,7 @@ void Context::load_global_functions()
 	load_fn(vk_enumerate_instance_layer_properties, "vkEnumerateInstanceLayerProperties");
 }
 
-void Context::load_instance_functions()
+void Instance::load_instance_functions()
 {
 	const auto load_fn = [&]<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -541,11 +281,11 @@ void Context::load_instance_functions()
 	load_fn(vk_destroy_surface_khr, "vkDestroySurfaceKHR");
 }
 
-void Context::load_device_functions()
+void Instance::load_device_functions_impl(VkDevice device)
 {
 	const auto load_fn = [&]<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		pfn = reinterpret_cast<T>(vk_get_device_proc_address(m_device, fn_name));
+		pfn = reinterpret_cast<T>(vk_get_device_proc_address(device, fn_name));
 		ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
 		// log_trc("Loaded device function: {}", fn_name);
 	};
@@ -590,28 +330,6 @@ void Context::load_device_functions()
 	load_fn(vk_cmd_draw, "vkCmdDraw");
 	load_fn(vk_cmd_set_viewport, "vkCmdSetViewport");
 	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
-}
-
-[[nodiscard]] auto Context::find_suitable_queue_family() const -> uint32_t
-{
-	auto count = 0u;
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, nullptr);
-	ensure(count != 0u, "Failed to find any physical devices with Vulkan support");
-
-	auto families = std::vector<VkQueueFamilyProperties>(count);
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, families.data());
-
-	const auto required_flags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
-	for (auto idx = 0u; auto &family : families)
-	{
-		if ((family.queueFlags & required_flags) == required_flags)
-		{
-			return idx;
-		}
-	}
-
-	ensure(false, "Failed to find a suitable Vulkan queue family");
-	return 0;
 }
 
 auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const char *
@@ -660,7 +378,11 @@ auto validation_layers_callback(
     void *const vulkan_user_data
 ) -> VkBool32
 {
+	std::cout << callback_data->pMessage << std::endl;
+	return VK_FALSE;
+
 	log_dbg("VALIDATION: {}", callback_data->pMessage);
+
 	ensure(vulkan_user_data, "Validation layers's user data is not set!");
 
 	auto stats = *(Ref<app::SystemStats> *)vulkan_user_data; // NOLINT
@@ -689,6 +411,5 @@ auto validation_layers_callback(
 	);
 	return static_cast<VkBool32>(VK_FALSE);
 }
-
 
 } // namespace lt::renderer::vk

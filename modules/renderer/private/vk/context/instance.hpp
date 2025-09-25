@@ -5,16 +5,17 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_xlib.h>
 
-//
-#include <app/system.hpp>
-#include <ecs/entity.hpp>
-#include <memory/pointer_types/null_on_move.hpp>
-#include <surface/components.hpp>
-
 namespace lt::renderer::vk {
 
-using memory::NullOnMove;
-
+inline void vkc(VkResult result)
+{
+	if (result)
+	{
+		throw std::runtime_error {
+			std::format("Vulkan call failed with result: {}", std::to_underlying(result))
+		};
+	}
+}
 // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
 // global functions
 extern PFN_vkGetInstanceProcAddr vk_get_instance_proc_address;
@@ -97,118 +98,64 @@ extern PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
 extern PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
-inline void vkc(VkResult result)
-{
-	if (result)
-	{
-		throw std::runtime_error {
-			std::format("Vulkan call failed with result: {}", std::to_underlying(result))
-		};
-	}
-}
-
-class Context
+/**
+ * Responsible for dynamically loading Vulkan library/functions.
+ *
+ * @note: The delayed vkInstance destruction is due to a work-around for libx11:
+ * @ref:
+ * https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/commit/0017308648b6bf8eef10ef0ffb9470576c0c2e9e
+ * https://www.xfree86.org/4.7.0/DRI11.html
+ * https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues/1894
+ */
+class Instance
 {
 public:
-	Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system_stats);
-
-	~Context();
-
-	Context(Context &&other) noexcept = default;
-
-	auto operator=(Context &&other) noexcept -> Context & = default;
-
-	Context(const Context &) = delete;
-
-	auto operator=(const Context &) -> Context & = delete;
-
-	[[nodiscard]] auto instance() -> VkInstance
+	static auto get() -> VkInstance
 	{
-		return m_instance;
+		return Instance::instance().m_instance;
 	}
 
-	[[nodiscard]] auto physical_device() -> VkPhysicalDevice
+	static auto load_device_functions(VkDevice device)
 	{
-		return m_physical_device;
+		instance().load_device_functions_impl(device);
 	}
 
-	[[nodiscard]] auto device() -> VkDevice
-	{
-		return m_device;
-	}
+	Instance(Instance &&) = delete;
 
-	auto queue() -> VkQueue
-	{
-		return m_queue;
-	};
+	Instance(const Instance &) = delete;
 
-	auto debug_messenger() -> VkDebugUtilsMessengerEXT
-	{
-		return m_debug_messenger;
-	};
+	auto operator=(const Instance &) -> Instance & = delete;
 
-	[[nodiscard]] auto get_stats() const -> const app::SystemStats &
-	{
-		return *m_stats;
-	}
+	auto operator=(Instance &&) -> Instance & = delete;
 
 private:
+	static auto instance() -> Instance &
+	{
+		static auto instance = Instance {};
+		return instance;
+	}
+
+	Instance();
+
+	~Instance();
+
 	void initialize_instance();
 
 	void initialize_debug_messenger();
 
-	void initialize_physical_device();
-
-	void initialize_logical_device();
-
-	void initialize_queue();
-
-	void initialize_surface(const ecs::Entity &surface_entity);
-
-	void initialize_swapchain();
-
 	void load_library();
+
+	void unload_library();
 
 	void load_global_functions();
 
 	void load_instance_functions();
 
-	void load_device_functions();
+	void load_device_functions_impl(VkDevice device);
 
-	auto get_optimal_swapchain_image_count(
-	    VkSurfaceCapabilitiesKHR capabilities,
-	    uint32_t desired_image_count = 3
-	) -> uint32_t;
+	VkInstance m_instance = VK_NULL_HANDLE;
 
-	[[nodiscard]] auto find_suitable_queue_family() const -> uint32_t;
-
-	Ref<ecs::Registry> m_registry;
-
-	NullOnMove<VkInstance> m_instance = VK_NULL_HANDLE;
-
-	NullOnMove<VkPhysicalDevice> m_physical_device = VK_NULL_HANDLE;
-
-	NullOnMove<VkDevice> m_device = VK_NULL_HANDLE;
-
-	NullOnMove<VkQueue> m_queue = VK_NULL_HANDLE;
-
-	NullOnMove<VkDebugUtilsMessengerEXT> m_debug_messenger = VK_NULL_HANDLE;
-
-	NullOnMove<VkSurfaceKHR> m_surface = VK_NULL_HANDLE;
-
-	VkExtent2D m_framebuffer_size {};
-
-	uint32_t m_graphics_queue_family_index = VK_QUEUE_FAMILY_IGNORED;
-
-	uint32_t m_present_queue_family_index = VK_QUEUE_FAMILY_IGNORED;
-
-	NullOnMove<VkSwapchainKHR> m_swapchain = VK_NULL_HANDLE;
-
-	std::vector<VkImage> m_swapchain_images;
-
-	std::vector<VkImageView> m_swapchain_image_views;
-
-	Ref<app::SystemStats> m_stats;
+	VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
 };
 
 } // namespace lt::renderer::vk

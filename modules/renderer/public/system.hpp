@@ -2,8 +2,7 @@
 
 #include <app/system.hpp>
 #include <ecs/entity.hpp>
-#include <renderer/validation.hpp>
-#include <renderer/vk/context.hpp>
+#include <renderer/vk/context/context.hpp>
 
 namespace lt::renderer {
 
@@ -19,8 +18,10 @@ public:
 
 	[[nodiscard]] System(CreateInfo info)
 	    : m_registry(std::move(info.registry))
-	    , m_context(info.surface_entity, std::move(info.system_stats))
+	    , m_stats(info.system_stats)
+	    , m_context(info.surface_entity, info.system_stats)
 	{
+		ensure(m_stats, "Failed to initialize system: null stats");
 		ensure(m_registry, "Failed to initialize renderer system: null registry");
 	}
 
@@ -50,7 +51,7 @@ public:
 
 	[[nodiscard]] auto get_stats() const -> const app::SystemStats &
 	{
-		return m_context.get_stats();
+		return *m_stats;
 	}
 
 	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
@@ -61,7 +62,7 @@ public:
 private:
 	Ref<ecs::Registry> m_registry;
 
-	renderer::Validation m_validation;
+	Ref<app::SystemStats> m_stats;
 
 	vk::Context m_context;
 
