@@ -16,6 +16,12 @@ public:
 	}
 
 	template<typename Component_T>
+	auto add(Component_T component) -> Component_T &
+	{
+		return m_registry->add(m_identifier, component);
+	}
+
+	template<typename Component_T>
 	auto get() -> Component_T &
 	{
 		return m_registry->get<Component_T>(m_identifier);
