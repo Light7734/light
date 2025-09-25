@@ -7,7 +7,9 @@
 #include <surface/requests/surface.hpp>
 #include <variant>
 
+#ifdef LIGHT_PLATFORM_LINUX
 typedef struct _XDisplay Display;
+#endif
 
 namespace lt::surface {
 
