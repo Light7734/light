@@ -47,6 +47,13 @@ extern PFN_vkSetDebugUtilsObjectNameEXT vk_set_debug_object_name;
 extern PFN_vkSetDebugUtilsObjectTagEXT vk_set_debug_object_tag;
 extern PFN_vkSubmitDebugUtilsMessageEXT vk_submit_debug_message;
 
+// surface instance functions
+extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR vk_get_physical_device_surface_support;
+extern PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vk_get_physical_device_surface_capabilities;
+extern PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vk_get_physical_device_surface_formats;
+extern PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
+extern PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
+
 // device functions
 extern PFN_vkGetDeviceQueue vk_get_device_queue;
 extern PFN_vkCreateCommandPool vk_create_command_pool;
@@ -89,13 +96,6 @@ extern PFN_vkCmdDraw vk_cmd_draw;
 extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
 extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
 
-// Surface
-extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR vk_get_physical_device_surface_support;
-extern PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vk_get_physical_device_surface_capabilities;
-extern PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vk_get_physical_device_surface_formats;
-
-extern PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr;
-extern PFN_vkDestroySurfaceKHR vk_destroy_surface_khr;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 /**
