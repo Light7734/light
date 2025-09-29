@@ -10,6 +10,11 @@ namespace details {
 class Registry
 {
 public:
+	struct Options
+	{
+		bool stop_on_fail = false;
+	};
+
 	using FuzzFunction = int32_t (*)(const uint8_t *, size_t);
 	using SuiteFunction = void (*)();
 
@@ -30,11 +35,29 @@ public:
 		instance().m_fuzz_harness = suite;
 	}
 
-	static auto run_all() -> int32_t
+	static auto run_all(Options options) -> int32_t
 	{
+		instance().m_options = options;
+		instance().print_options();
+
 		for (auto &test : instance().m_suites)
 		{
-			test();
+			try
+			{
+				test();
+			}
+			catch (const std::exception &exp)
+			{
+				if (options.stop_on_fail)
+				{
+					std::println("Quitting due to options.stop_on_fail == true");
+					break;
+				}
+
+				std::println("Uncaught exception when running suite:");
+				std::println("\twhat: {}", exp.what());
+				break;
+			}
 		}
 
 		std::cout << "Ran " << instance().m_failed_count + instance().m_pasesed_count << " tests:\n"
@@ -67,7 +90,17 @@ public:
 		++instance().m_failed_count;
 	}
 
+	static auto should_return_on_failure() -> bool
+	{
+		return instance().m_options.stop_on_fail;
+	}
+
 private:
+	void print_options()
+	{
+        std::println("stop-on-failure: {}", m_options.stop_on_fail);
+	}
+
 	Registry()
 	{
 		std::cout << "________________________________________________________________\n";
@@ -78,6 +111,8 @@ private:
 		static auto registry = Registry {};
 		return registry;
 	}
+
+	Options m_options {};
 
 	std::vector<SuiteFunction> m_suites;
 
@@ -92,7 +127,8 @@ private:
 
 struct Case
 {
-	auto operator=(std::invocable auto test) -> void // NOLINT
+	// NOLINTNEXTLINE(misc-unconventional-assign-operator)
+	auto operator=(std::invocable auto test) -> void
 	{
 		std::cout << "[Running-----------] --> ";
 		std::cout << name << '\n';
@@ -106,7 +142,11 @@ struct Case
 			std::cout << exp.what() << "\n";
 			std::cout << "[-----------FAIL !!]" << "\n\n";
 			details::Registry::increment_failed_count();
-			return; // TODO(Light): Should we run the remaining tests after a failure?
+
+			if (details::Registry::should_return_on_failure())
+			{
+				throw;
+			}
 		}
 
 		details::Registry::increment_passed_count();
