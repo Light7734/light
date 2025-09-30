@@ -68,7 +68,7 @@ Suite raii = "raii"_suite = [] {
 		std::ignore = Registry {};
 	};
 
-	Case { "many won't throw" } = [] {
+	Case { "many won't freeze/throw" } = [] {
 		for (auto idx : std::views::iota(0, 100'000))
 		{
 			std::ignore = Registry {};

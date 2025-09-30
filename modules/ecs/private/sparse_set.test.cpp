@@ -33,7 +33,7 @@ Suite raii = "raii"_suite = [] {
 };
 
 Suite element_raii = "element_raii"_suite = [] {
-	Case { "many inserts/removes won't throw" } = [] {
+	Case { "many inserts/removes won't freeze/throw" } = [] {
 		auto set = Set {};
 		for (auto idx : std::views::iota(0, 10'000))
 		{
