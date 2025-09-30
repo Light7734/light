@@ -102,6 +102,16 @@ public:
 		++instance().m_total_case_count;
 	}
 
+	static void increment_matched_case_count()
+	{
+		++instance().m_matched_case_count;
+	}
+
+	static void increment_skipped_case_count()
+	{
+		++instance().m_skipped_case_count;
+	}
+
 	static void increment_passed_case_count()
 	{
 		++instance().m_passed_case_count;
@@ -269,12 +279,15 @@ private:
 	void run_normal(std::invocable auto test)
 	{
 		using details::Registry;
+		Registry::increment_total_case_count();
 
 		// NOLINTNEXTLINE
 		if (!std::regex_search(m_name.data(), Registry::get_case_regex()))
 		{
+			Registry::increment_skipped_case_count();
 			return;
 		}
+		Registry::increment_matched_case_count();
 
 		std::cout << "[Running-----------] --> ";
 		std::cout << m_name << '\n';
@@ -292,10 +305,11 @@ private:
 			{
 				throw;
 			}
+
+			return;
 		}
 
 		Registry::increment_passed_case_count();
-		Registry::increment_total_case_count();
 		std::cout << "[--------SUCCESS :D]" << "\n\n";
 	}
 
