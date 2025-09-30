@@ -1,5 +1,6 @@
 add_library_module(renderer
     system.cpp
+    vk/debug/messenger.cpp
     vk/context/instance.cpp
     vk/context/surface.cpp
     vk/context/device.cpp
@@ -12,6 +13,7 @@ target_link_libraries(renderer
 PUBLIC 
     app 
     ecs
+    memory
 PRIVATE
     surface
     pthread
@@ -19,6 +21,8 @@ PRIVATE
 
 add_test_module(renderer 
     system.test.cpp
+    vk/test_utils.cpp
+    vk/debug/messenger.test.cpp
     vk/context/instance.test.cpp
     vk/context/surface.test.cpp
     vk/context/device.test.cpp
@@ -26,3 +30,8 @@ add_test_module(renderer
     vk/context/context.test.cpp
     vk/pipeline.test.cpp
 ) 
+target_link_libraries(renderer_tests
+PRIVATE
+    surface
+    pthread
+)

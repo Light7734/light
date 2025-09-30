@@ -108,7 +108,7 @@ private:
 	);
 };
 
-Suite raii = [] {
+Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [&] {
 		ignore = create_system();
 	};

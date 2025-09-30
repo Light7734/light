@@ -1,15 +1,14 @@
 #pragma once
 
 #include <memory/pointer_types/null_on_move.hpp>
-#include <renderer/vk/context/device.hpp>
-#include <renderer/vk/context/instance.hpp>
+#include <renderer/vk/vulkan.hpp>
 
 namespace lt::renderer::vk {
 
 class Swapchain
 {
 public:
-	Swapchain(const Device &device, const Surface &surface);
+	Swapchain(const class Device &device, const class Surface &surface);
 
 	~Swapchain();
 

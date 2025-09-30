@@ -1,21 +1,13 @@
-#include <ranges>
 #include <renderer/vk/context/context.hpp>
 #include <renderer/vk/pipeline.hpp>
+#include <renderer/vk/test_utils.hpp>
 #include <surface/system.hpp>
 #include <test/test.hpp>
 
 using namespace lt;
 
-using std::ignore;
-using test::Case;
-using test::expect_throw;
-using test::expect_true;
-using test::Suite;
-
 using renderer::vk::Context;
 using renderer::vk::Pipeline;
-
-constexpr auto resolution = math::uvec2 { 800, 600 };
 
 class VkPipelineTest
 {
@@ -29,7 +21,7 @@ public:
 		m_surface_entity = create_scope<ecs::Entity>(m_registry, m_registry->create_entity());
 		m_surface_entity->add<surface::SurfaceComponent>(surface::SurfaceComponent::CreateInfo {
 		    .title = "",
-		    .resolution = resolution,
+		    .resolution = constants::resolution,
 		});
 
 		m_context = create_ref<Context>(*m_surface_entity, m_stats);
@@ -57,7 +49,7 @@ private:
 	Ref<Context> m_context;
 };
 
-Suite raii = [] {
+Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = VkPipelineTest {};
 		std::ignore = Pipeline { { .context = fixture.context() } };

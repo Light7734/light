@@ -1,4 +1,3 @@
-#include <ranges>
 #include <renderer/vk/context/context.hpp>
 #include <renderer/vk/context/instance.hpp>
 

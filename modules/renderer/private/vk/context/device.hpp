@@ -1,15 +1,14 @@
 #pragma once
 
 #include <memory/pointer_types/null_on_move.hpp>
-#include <renderer/vk/context/instance.hpp>
-#include <renderer/vk/context/surface.hpp>
+#include <renderer/vk/vulkan.hpp>
 
 namespace lt::renderer::vk {
 
 class Device
 {
 public:
-	Device(const Surface &surface);
+	Device(const class Surface &surface);
 
 	~Device();
 
@@ -41,7 +40,7 @@ private:
 
 	void initialize_logical_device();
 
-	void initialize_queue(const Surface &surface);
+	void initialize_queue(const class Surface &surface);
 
 	[[nodiscard]] auto find_suitable_queue_family() const -> uint32_t;
 

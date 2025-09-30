@@ -1,9 +1,14 @@
 #include <renderer/vk/context/device.hpp>
+#include <renderer/vk/context/instance.hpp>
+#include <renderer/vk/context/surface.hpp>
+#include <renderer/vk/debug/validation.hpp>
 
 namespace lt::renderer::vk {
 
 Device::Device(const Surface &surface)
 {
+	ensure(surface.vk(), "Failed to initialize vk::Device: null vulkan surface");
+
 	initialize_physical_device();
 	initialize_logical_device();
 	Instance::load_device_functions(m_device);

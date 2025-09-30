@@ -1,5 +1,6 @@
 #include <app/system.hpp>
 #include <renderer/vk/context/instance.hpp>
+#include <renderer/vk/debug/validation.hpp>
 
 #if defined(_WIN32)
 	#error "Unsupported platform (currently)"
@@ -113,17 +114,11 @@ Instance::Instance()
 
 	initialize_instance();
 	load_instance_functions();
-	initialize_debug_messenger();
 }
 
 Instance::~Instance()
 {
-	if (m_instance)
-	{
-		vk_destroy_debug_messenger(m_instance, m_debug_messenger, nullptr);
-		vk_destroy_instance(m_instance, nullptr);
-	}
-
+	vk_destroy_instance(m_instance, nullptr);
 	unload_library();
 }
 
@@ -143,12 +138,83 @@ void Instance::initialize_instance()
 		VK_KHR_SURFACE_EXTENSION_NAME,
 		VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
 	};
+
+	const char *layer_name = "VK_LAYER_KHRONOS_validation";
+	const auto setting_validate_core = VkBool32 { VK_TRUE };
+	const auto setting_validate_sync = VkBool32 { VK_TRUE };
+	const auto setting_thread_safety = VkBool32 { VK_TRUE };
+	const auto *setting_debug_action = "";
+	const auto setting_enable_message_limit = VkBool32 { VK_TRUE };
+	const auto setting_duplicate_message_limit = uint32_t { 3u };
+	auto setting_report_flags = std::array<const char *, 5> {
+		"info", "warn", "perf", "error", "verbose",
+	};
+
+	const auto settings = std::array<VkLayerSettingEXT, 7>({
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "validate_core",
+	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+	        .valueCount = 1,
+	        .pValues = &setting_validate_core,
+	    },
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "validate_sync",
+	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+	        .valueCount = 1,
+	        .pValues = &setting_validate_sync,
+	    },
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "thread_safety",
+	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+	        .valueCount = 1,
+	        .pValues = &setting_thread_safety,
+	    },
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "debug_action",
+	        .type = VK_LAYER_SETTING_TYPE_STRING_EXT,
+	        .valueCount = 1,
+	        .pValues = static_cast<const void *>(&setting_debug_action),
+	    },
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "report_flags",
+	        .type = VK_LAYER_SETTING_TYPE_STRING_EXT,
+	        .valueCount = setting_report_flags.size(),
+	        .pValues = static_cast<const void *>(setting_report_flags.data()),
+	    },
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "enable_message_limit",
+	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+	        .valueCount = 1,
+	        .pValues = &setting_enable_message_limit,
+	    },
+	    {
+	        .pLayerName = layer_name,
+	        .pSettingName = "duplicate_message_limit",
+	        .type = VK_LAYER_SETTING_TYPE_UINT32_EXT,
+	        .valueCount = 1u,
+	        .pValues = &setting_duplicate_message_limit,
+	    },
+	});
+
+	const VkLayerSettingsCreateInfoEXT layer_settings_create_info = {
+		.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT,
+		.settingCount = settings.size(),
+		.pSettings = settings.data()
+	};
+
 	auto layers = std::vector<const char *> {
 		"VK_LAYER_KHRONOS_validation",
 	};
 
 	auto instance_info = VkInstanceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+		.pNext = &layer_settings_create_info,
 		.pApplicationInfo = &app_info,
 		.enabledLayerCount = static_cast<uint32_t>(layers.size()),
 		.ppEnabledLayerNames = layers.data(),
@@ -172,32 +238,6 @@ void Instance::initialize_instance()
 
 	vkc(vk_create_instance(&instance_info, nullptr, &m_instance));
 	ensure(m_instance, "Failed to create vulkan instance");
-}
-
-void Instance::initialize_debug_messenger()
-{
-	const auto info = VkDebugUtilsMessengerCreateInfoEXT {
-		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-
-		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-		                   | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-		                   | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-		                   | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-
-		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-		               | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-		               | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-
-
-		.pfnUserCallback = &validation_layers_callback,
-
-		.pUserData = {},
-	};
-
-	ensure(
-	    !vk_create_debug_messenger(m_instance, &info, nullptr, &m_debug_messenger),
-	    "Failed to create vulkan debug utils messenger"
-	);
 }
 
 void Instance::load_library()
