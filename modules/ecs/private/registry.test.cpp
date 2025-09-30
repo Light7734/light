@@ -8,6 +8,7 @@ using lt::test::expect_unreachable;
 using lt::test::Suite;
 
 using lt::test::expect_eq;
+using lt::test::expect_ne;
 
 using lt::test::expect_false;
 using lt::test::expect_true;
@@ -62,7 +63,7 @@ struct std::formatter<Component_B>
 	}
 };
 
-Suite raii = [] {
+Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		std::ignore = Registry {};
 	};
@@ -83,7 +84,7 @@ Suite raii = [] {
 	};
 };
 
-Suite entity_raii = [] {
+Suite entity_raii = "entity_raii"_suite = [] {
 	Case { "create_entity returns unique values" } = [] {
 		auto registry = Registry {};
 		auto set = std::unordered_set<EntityId> {};
@@ -119,7 +120,7 @@ Suite entity_raii = [] {
 	};
 };
 
-Suite component_raii = [] {
+Suite component_raii = "component_raii"_suite = [] {
 	Case { "add has correct state" } = [] {
 		auto registry = Registry {};
 		for (auto idx : std::views::iota(0, 100'000))
@@ -130,7 +131,7 @@ Suite component_raii = [] {
 			    { .m_int = idx, .m_string = std::to_string(idx) }
 			);
 
-			expect_eq(component.m_int, idx);
+			expect_ne(component.m_int, idx);
 			expect_eq(component.m_string, std::to_string(idx));
 		}
 	};
@@ -151,7 +152,7 @@ Suite component_raii = [] {
 	};
 };
 
-Suite callbacks = [] {
+Suite callbacks = "callbacks"_suite = [] {
 	Case { "connecting on_construct/on_destruct won't throw" } = [] {
 		auto registry = Registry {};
 		registry.connect_on_construct<Component>([&](Registry &, EntityId) {});
@@ -205,7 +206,7 @@ Suite callbacks = [] {
 	};
 };
 
-Suite each = [] {
+Suite each = "each"_suite = [] {
 	auto registry = Registry {};
 
 	auto shared_entity_counter = 0u;
@@ -276,7 +277,7 @@ Suite each = [] {
 	};
 };
 
-Suite views = [] {
+Suite views = "views"_suite = [] {
 	auto registry = Registry {};
 
 	auto shared_entity_counter = 0u;

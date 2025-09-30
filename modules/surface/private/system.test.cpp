@@ -77,7 +77,8 @@ private:
 	Ref<ecs::Registry> m_registry = create_ref<ecs::Registry>();
 };
 
-Suite raii = [] {
+
+Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = Fixture {};
 		ignore = System { fixture.registry() };
@@ -117,7 +118,7 @@ Suite raii = [] {
 	};
 };
 
-Suite system_events = [] {
+Suite system_events = "system_events"_suite = [] {
 	Case { "on_register won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
@@ -136,7 +137,7 @@ Suite system_events = [] {
 	};
 };
 
-Suite registry_events = [] {
+Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_construct<SurfaceComponent> initializes component" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
@@ -194,7 +195,7 @@ Suite registry_events = [] {
 	};
 };
 
-Suite tick = [] {
+Suite tick = "tick"_suite = [] {
 	Case { "ticking on empty registry won't throw" } = [] {
 		auto fixture = Fixture {};
 		System { fixture.registry() }.tick(tick_info());
@@ -209,7 +210,7 @@ Suite tick = [] {
 	};
 };
 
-Suite tick_handles_events = [] {
+Suite tick_handles_events = "tick_handles_events"_suite = [] {
 	Case { "ticking clears previous tick's events" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
@@ -230,7 +231,7 @@ Suite tick_handles_events = [] {
 	};
 };
 
-Suite tick_handles_requests = [] {
+Suite tick_handles_requests = "tick_handles_requests"_suite = [] {
 	Case { "ticking clears requests" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };

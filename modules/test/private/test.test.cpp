@@ -3,7 +3,7 @@
 using lt::test::Case;
 using lt::test::Suite;
 
-Suite expects = []() {
+Suite expects = "expects"_suite = []() {
 	using lt::test::expect_unreachable;
 	using lt::test::expect_true;
 	using lt::test::expect_false;

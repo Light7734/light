@@ -15,7 +15,7 @@ using lt::test::expect_true;
 using Set = lt::ecs::SparseSet<int>;
 constexpr auto capacity = 100;
 
-Suite raii = [] {
+Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		std::ignore = Set {};
 		std::ignore = Set { Set::max_capacity };
@@ -32,7 +32,7 @@ Suite raii = [] {
 	};
 };
 
-Suite element_raii = [] {
+Suite element_raii = "element_raii"_suite = [] {
 	Case { "many inserts/removes won't throw" } = [] {
 		auto set = Set {};
 		for (auto idx : std::views::iota(0, 10'000))
@@ -107,7 +107,7 @@ Suite element_raii = [] {
 	};
 };
 
-Suite getters = [] {
+Suite getters = "getters"_suite = [] {
 	Case { "get_size returns correct values" } = [] {
 		auto set = Set {};
 		for (auto idx : std::views::iota(0, 10'000))
@@ -149,7 +149,7 @@ Suite getters = [] {
 	};
 };
 
-Suite clear = [] {
+Suite clear = "clear"_suite = [] {
 	Case { "post clear has correct state" } = [] {
 		auto set = Set { 0 };
 		for (auto idx : std::views::iota(0, 10'000))

@@ -58,7 +58,7 @@ private:
 	Ref<ecs::Registry> m_registry = create_ref<ecs::Registry>();
 };
 
-Suite raii = [] {
+Suite raii = "raii"_suite = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [&] {
 		System { Fixture {}.registry() };
 	};
@@ -76,7 +76,7 @@ Suite raii = [] {
 	};
 };
 
-Suite system_events = [] {
+Suite system_events = "system_events"_suite = [] {
 	Case { "on_register won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
@@ -97,7 +97,7 @@ Suite system_events = [] {
 	};
 };
 
-Suite registry_events = [] {
+Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_construct<InputComnent>" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
@@ -127,7 +127,7 @@ Suite registry_events = [] {
 	};
 };
 
-Suite tick = [] {
+Suite tick = "tick"_suite = [] {
 	Case { "Empty tick won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
