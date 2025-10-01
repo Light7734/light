@@ -18,7 +18,7 @@ using memory::NullOnMove;
 class Context
 {
 public:
-	Context(const ecs::Entity &surface_entity, Ref<app::SystemStats> system_stats);
+	Context(const ecs::Entity &surface_entity);
 
 	[[nodiscard]] auto instance() const -> VkInstance
 	{
@@ -36,8 +36,6 @@ public:
 	}
 
 private:
-	Ref<app::SystemStats> m_stats;
-
 	Surface m_surface;
 
 	Device m_device;

@@ -86,6 +86,8 @@ extern PFN_vkCmdBindPipeline vk_cmd_bind_pipeline;
 extern PFN_vkCmdDraw vk_cmd_draw;
 extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
 extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
+
+extern PFN_vkResetCommandBuffer vk_reset_command_buffer;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 } // namespace lt::renderer::vk

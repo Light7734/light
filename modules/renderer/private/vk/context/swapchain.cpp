@@ -7,7 +7,9 @@
 
 namespace lt::renderer::vk {
 
-Swapchain::Swapchain(const Device &device, const Surface &surface): m_device(device.vk())
+Swapchain::Swapchain(const Device &device, const Surface &surface)
+    : m_device(device.vk())
+    , m_resolution(surface.get_framebuffer_size())
 {
 	auto *physical_device = device.physical();
 
@@ -30,6 +32,7 @@ Swapchain::Swapchain(const Device &device, const Surface &surface): m_device(dev
 	constexpr auto desired_swapchain_image_count = uint32_t { 3 };
 	const auto surface_format = formats.front();
 	const auto queue_indices = device.get_family_indices();
+	m_format = surface_format.format;
 
 	auto create_info = VkSwapchainCreateInfoKHR {
 		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -45,7 +48,7 @@ Swapchain::Swapchain(const Device &device, const Surface &surface): m_device(dev
 		.pQueueFamilyIndices = queue_indices.data(),
 		.preTransform = capabilities.currentTransform,
 		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-		.presentMode = VK_PRESENT_MODE_FIFO_RELAXED_KHR, // TODO(Light): parameterize
+		.presentMode = VK_PRESENT_MODE_FIFO_KHR, // TODO(Light): parameterize
 		.clipped = VK_TRUE,
 		.oldSwapchain = nullptr,
 	};
@@ -84,6 +87,7 @@ Swapchain::Swapchain(const Device &device, const Surface &surface): m_device(dev
 
 		vkc(vk_create_image_view(device.vk(), &create_info, nullptr, &view));
 	}
+
 }
 
 Swapchain::~Swapchain()

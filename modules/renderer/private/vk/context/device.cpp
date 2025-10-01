@@ -10,9 +10,12 @@ Device::Device(const Surface &surface)
 	ensure(surface.vk(), "Failed to initialize vk::Device: null vulkan surface");
 
 	initialize_physical_device();
+	initialize_queue_indices(surface);
 	initialize_logical_device();
 	Instance::load_device_functions(m_device);
-	initialize_queue(surface);
+
+	vk_get_device_queue(m_device, m_graphics_queue_family_index, 0, &m_graphics_queue);
+	vk_get_device_queue(m_device, m_present_queue_family_index, 0, &m_present_queue);
 }
 
 Device::~Device()
@@ -54,12 +57,20 @@ void Device::initialize_logical_device()
 {
 	const float priorities = .0f;
 
-	auto queue_info = VkDeviceQueueCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-		.queueFamilyIndex = find_suitable_queue_family(),
-		.queueCount = 1u,
-		.pQueuePriorities = &priorities,
-	};
+	auto queue_infos = std::vector<VkDeviceQueueCreateInfo> {};
+	auto queue_families = std::set { m_graphics_queue_family_index, m_present_queue_family_index };
+
+	for (auto queue_family : queue_families)
+	{
+		queue_infos.emplace_back(
+		    VkDeviceQueueCreateInfo {
+		        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		        .queueFamilyIndex = queue_family,
+		        .queueCount = 1u,
+		        .pQueuePriorities = &priorities,
+		    }
+		);
+	}
 
 	auto physical_device_features = VkPhysicalDeviceFeatures {};
 
@@ -69,8 +80,8 @@ void Device::initialize_logical_device()
 
 	auto device_info = VkDeviceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.queueCreateInfoCount = 1,
-		.pQueueCreateInfos = &queue_info,
+		.queueCreateInfoCount = static_cast<uint32_t>(queue_infos.size()),
+		.pQueueCreateInfos = queue_infos.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
 		.ppEnabledExtensionNames = extensions.data(),
 		.pEnabledFeatures = &physical_device_features,
@@ -84,30 +95,28 @@ void Device::initialize_logical_device()
 
 [[nodiscard]] auto Device::find_suitable_queue_family() const -> uint32_t
 {
-	auto count = 0u;
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, nullptr);
-	ensure(count != 0u, "Failed to find any physical devices with Vulkan support");
-
-	auto families = std::vector<VkQueueFamilyProperties>(count);
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, families.data());
-
-	const auto required_flags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
-	for (auto idx = 0u; auto &family : families)
-	{
-		if ((family.queueFlags & required_flags) == required_flags)
-		{
-			return idx;
-		}
-	}
-
-	ensure(false, "Failed to find a suitable Vulkan queue family");
-	return 0;
+	// auto count = 0u;
+	// vk_get_physical_device_queue_family_properties(m_physical_device, &count, nullptr);
+	// ensure(count != 0u, "Failed to find any physical devices with Vulkan support");
+	//
+	// auto families = std::vector<VkQueueFamilyProperties>(count);
+	// vk_get_physical_device_queue_family_properties(m_physical_device, &count, families.data());
+	//
+	// const auto required_flags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
+	// for (auto idx = 0u; auto &family : families)
+	// {
+	// 	if ((family.queueFlags & required_flags) == required_flags)
+	// 	{
+	// 		return idx;
+	// 	}
+	// }
+	//
+	// ensure(false, "Failed to find a suitable Vulkan queue family");
+	// return 0;
 }
 
-void Device::initialize_queue(const Surface &surface)
+void Device::initialize_queue_indices(const Surface &surface)
 {
-	vk_get_device_queue(m_device, find_suitable_queue_family(), 0, &m_queue);
-
 	auto count = uint32_t { 0u };
 	vk_get_physical_device_queue_family_properties(m_physical_device, &count, nullptr);
 

@@ -12,14 +12,16 @@ public:
 	struct CreateInfo
 	{
 		Ref<ecs::Registry> registry;
+
 		ecs::Entity surface_entity;
+
 		Ref<app::SystemStats> system_stats;
 	};
 
 	[[nodiscard]] System(CreateInfo info)
 	    : m_registry(std::move(info.registry))
 	    , m_stats(info.system_stats)
-	    , m_context(info.surface_entity, info.system_stats)
+	    , m_context(info.surface_entity)
 	{
 		ensure(m_stats, "Failed to initialize system: null stats");
 		ensure(m_registry, "Failed to initialize renderer system: null registry");
@@ -35,19 +37,11 @@ public:
 
 	auto operator=(const System &) -> System & = delete;
 
-	void on_register() override
-	{
-	}
+	void on_register() override;
 
-	void on_unregister() override
-	{
-	}
+	void on_unregister() override;
 
-	void get_validation_state();
-
-	void tick(app::TickInfo tick) override
-	{
-	}
+	void tick(app::TickInfo tick) override;
 
 	[[nodiscard]] auto get_stats() const -> const app::SystemStats &
 	{

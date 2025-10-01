@@ -35,12 +35,22 @@ public:
 		return { m_graphics_queue_family_index, m_present_queue_family_index };
 	}
 
+	[[nodiscard]] auto get_graphics_queue() const -> VkQueue
+	{
+		return m_graphics_queue;
+	}
+
+	[[nodiscard]] auto get_present_queue() const -> VkQueue
+	{
+		return m_present_queue;
+	}
+
 private:
 	void initialize_physical_device();
 
 	void initialize_logical_device();
 
-	void initialize_queue(const class Surface &surface);
+	void initialize_queue_indices(const class Surface &surface);
 
 	[[nodiscard]] auto find_suitable_queue_family() const -> uint32_t;
 
@@ -49,7 +59,9 @@ private:
 
 	memory::NullOnMove<VkDevice> m_device = VK_NULL_HANDLE;
 
-	memory::NullOnMove<VkQueue> m_queue = VK_NULL_HANDLE;
+	memory::NullOnMove<VkQueue> m_graphics_queue = VK_NULL_HANDLE;
+
+	memory::NullOnMove<VkQueue> m_present_queue = VK_NULL_HANDLE;
 
 	uint32_t m_graphics_queue_family_index = VK_QUEUE_FAMILY_IGNORED;
 

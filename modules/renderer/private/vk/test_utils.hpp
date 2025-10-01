@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ranges>
+#include <renderer/vk/context/context.hpp>
 #include <renderer/vk/context/surface.hpp>
 #include <renderer/vk/debug/messenger.hpp>
 #include <surface/components.hpp>
@@ -32,7 +33,7 @@ public:
 	ValidationObserver()
 	    : m_messenger(
 	          Messenger::CreateInfo {
-	              .severity = all_severity,
+	              .severity = static_cast<Messenger::Severity>(warning | error),
 	              .type = lt::renderer::vk::Messenger::all_type,
 	              .callback = &callback,
 	              .user_data = &m_had_any_messages,
@@ -66,6 +67,22 @@ private:
 	Messenger m_messenger;
 	bool m_had_any_messages = false;
 };
+
+[[nodiscard]] inline auto create_context()
+    -> std::pair<lt::renderer::vk::Context, lt::surface::System>
+{
+	using lt::surface::SurfaceComponent;
+
+	auto registry = lt::create_ref<lt::ecs::Registry>();
+	auto entity = lt::ecs::Entity { registry, registry->create_entity() };
+	auto surface_system = lt::surface::System(registry);
+	entity.add<SurfaceComponent>(SurfaceComponent::CreateInfo {
+	    .title = "",
+	    .resolution = constants::resolution,
+	});
+
+	return { lt::renderer::vk::Context { entity }, std::move(surface_system) };
+}
 
 template<>
 struct std::formatter<VkExtent2D>

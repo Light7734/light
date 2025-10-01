@@ -6,6 +6,8 @@ add_library_module(renderer
     vk/context/device.cpp
     vk/context/swapchain.cpp
     vk/context/context.cpp
+    vk/renderer/pass.cpp
+    vk/renderer/renderer.cpp
     vk/pipeline.cpp
 )
 
@@ -14,6 +16,8 @@ PUBLIC
     app 
     ecs
     memory
+    assets
+    time
 PRIVATE
     surface
     pthread
@@ -28,6 +32,8 @@ add_test_module(renderer
     vk/context/device.test.cpp
     vk/context/swapchain.test.cpp
     vk/context/context.test.cpp
+    vk/renderer/pass.test.cpp
+    vk/renderer/renderer.test.cpp
     vk/pipeline.test.cpp
 ) 
 target_link_libraries(renderer_tests

@@ -24,7 +24,7 @@ public:
 		    .resolution = constants::resolution,
 		});
 
-		m_context = create_ref<Context>(*m_surface_entity, m_stats);
+		m_context = create_ref<Context>(*m_surface_entity);
 	}
 
 	[[nodiscard]] auto context() -> Ref<Context>
@@ -38,8 +38,6 @@ public:
 	}
 
 private:
-	Ref<app::SystemStats> m_stats;
-
 	Ref<ecs::Registry> m_registry;
 
 	Ref<surface::System> m_surface_system;

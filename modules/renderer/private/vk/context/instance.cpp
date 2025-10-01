@@ -86,6 +86,8 @@ PFN_vkCmdDraw vk_cmd_draw {};
 PFN_vkCmdSetViewport vk_cmd_set_viewport {};
 PFN_vkCmdSetScissor vk_cmd_set_scissors {};
 
+PFN_vkResetCommandBuffer vk_reset_command_buffer {};
+
 PFN_vkGetPhysicalDeviceSurfaceSupportKHR vk_get_physical_device_surface_support {};
 PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vk_get_physical_device_surface_capabilities {};
 PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vk_get_physical_device_surface_formats {};
@@ -370,6 +372,7 @@ void Instance::load_device_functions_impl(VkDevice device)
 	load_fn(vk_cmd_draw, "vkCmdDraw");
 	load_fn(vk_cmd_set_viewport, "vkCmdSetViewport");
 	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
+	load_fn(vk_reset_command_buffer, "vkResetCommandBuffer");
 }
 
 auto parse_message_type(VkDebugUtilsMessageTypeFlagsEXT message_types) -> const char *
