@@ -66,6 +66,11 @@ public:
 		return m_value;
 	}
 
+	[[nodiscard]] auto get() -> Underlying_T
+	{
+		return m_value;
+	}
+
 private:
 	Underlying_T m_value;
 };
