@@ -11,6 +11,7 @@ Swapchain::Swapchain(const Device &device, const Surface &surface)
     : m_device(device.vk())
     , m_resolution(surface.get_framebuffer_size())
 {
+	static auto idx = 0u;
 	auto *physical_device = device.physical();
 
 	auto capabilities = VkSurfaceCapabilitiesKHR {};
@@ -55,15 +56,16 @@ Swapchain::Swapchain(const Device &device, const Surface &surface)
 
 	vkc(vk_create_swapchain_khr(device.vk(), &create_info, nullptr, &m_swapchain));
 	vkc(vk_device_wait_idle(device.vk()));
+	set_object_name(device.vk(), m_swapchain.get(), "swapchain {}", idx++);
 
 	auto image_count = uint32_t { 0u };
 	vk_get_swapchain_images_khr(device.vk(), m_swapchain, &image_count, nullptr);
 
-	m_swapchain_images.resize(image_count);
-	m_swapchain_image_views.resize(image_count);
-	vk_get_swapchain_images_khr(device.vk(), m_swapchain, &image_count, m_swapchain_images.data());
+	m_images.resize(image_count);
+	m_image_views.resize(image_count);
+	vk_get_swapchain_images_khr(device.vk(), m_swapchain, &image_count, m_images.data());
 
-	for (auto [image, view] : std::views::zip(m_swapchain_images, m_swapchain_image_views))
+	for (auto [image, view] : std::views::zip(m_images, m_image_views))
 	{
 		auto create_info = VkImageViewCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -87,29 +89,11 @@ Swapchain::Swapchain(const Device &device, const Surface &surface)
 
 		vkc(vk_create_image_view(device.vk(), &create_info, nullptr, &view));
 	}
-
 }
 
 Swapchain::~Swapchain()
 {
-	try
-	{
-		if (m_device)
-		{
-			vkc(vk_device_wait_idle(m_device));
-			for (auto &view : m_swapchain_image_views)
-			{
-				vk_destroy_image_view(m_device, view, nullptr);
-			}
-
-			vk_destroy_swapchain_khr(m_device, m_swapchain, nullptr);
-		}
-	}
-	catch (const std::exception &exp)
-	{
-		log_err("Failed to destroy swapchain:");
-		log_err("\twhat: {}", exp.what());
-	}
+	destroy();
 }
 
 [[nodiscard]] auto Swapchain::get_optimal_image_count(

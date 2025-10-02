@@ -2,11 +2,17 @@
 
 #include <app/system.hpp>
 #include <ecs/entity.hpp>
-#include <renderer/vk/context/context.hpp>
 
 namespace lt::renderer {
 
-class System: app::ISystem
+namespace vk {
+class Context;
+class Renderer;
+class Pass;
+class ValidationObserver;
+} // namespace vk
+
+class System: public app::ISystem
 {
 public:
 	struct CreateInfo
@@ -18,16 +24,9 @@ public:
 		Ref<app::SystemStats> system_stats;
 	};
 
-	[[nodiscard]] System(CreateInfo info)
-	    : m_registry(std::move(info.registry))
-	    , m_stats(info.system_stats)
-	    , m_context(info.surface_entity)
-	{
-		ensure(m_stats, "Failed to initialize system: null stats");
-		ensure(m_registry, "Failed to initialize renderer system: null registry");
-	}
+	System(CreateInfo info);
 
-	~System() override = default;
+	~System() override;
 
 	System(System &&) = default;
 
@@ -41,7 +40,9 @@ public:
 
 	void on_unregister() override;
 
+
 	void tick(app::TickInfo tick) override;
+
 
 	[[nodiscard]] auto get_stats() const -> const app::SystemStats &
 	{
@@ -54,13 +55,22 @@ public:
 	}
 
 private:
+	class vk::ValidationObserver *m_validation_observer;
+
 	Ref<ecs::Registry> m_registry;
 
 	Ref<app::SystemStats> m_stats;
 
-	vk::Context m_context;
+	Scope<class vk::Context> m_context;
+
+	Ref<class vk::Pass> m_pass;
+
+	Scope<class vk::Renderer> m_renderer;
+
 
 	app::TickResult m_last_tick_result {};
+
+	uint32_t m_frame_idx {};
 };
 
 } // namespace lt::renderer

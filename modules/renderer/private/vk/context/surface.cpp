@@ -3,7 +3,7 @@
 
 namespace lt::renderer::vk {
 
-Surface::Surface(const ecs::Entity &surface_entity)
+Surface::Surface(ecs::Entity surface_entity): m_surface_entity(surface_entity)
 {
 	const auto &component = surface_entity.get<surface::SurfaceComponent>();
 
@@ -18,12 +18,6 @@ Surface::Surface(const ecs::Entity &surface_entity)
 
 	auto *instance = Instance::get();
 	auto result = vk_create_xlib_surface_khr(instance, &create_info, nullptr, &m_surface);
-
-	const auto &[width, height] = component.get_resolution();
-	m_framebuffer_size = {
-		.width = width,
-		.height = height,
-	};
 }
 
 Surface::~Surface()
@@ -32,6 +26,17 @@ Surface::~Surface()
 	{
 		vk_destroy_surface_khr(Instance::get(), m_surface, nullptr);
 	}
+}
+
+[[nodiscard]] auto Surface::get_framebuffer_size() const -> VkExtent2D
+{
+	const auto &[width, height] = //
+	    m_surface_entity.get<surface::SurfaceComponent>().get_resolution();
+
+	return {
+		.width = width,
+		.height = height,
+	};
 }
 
 } // namespace lt::renderer::vk

@@ -16,6 +16,16 @@ Device::Device(const Surface &surface)
 
 	vk_get_device_queue(m_device, m_graphics_queue_family_index, 0, &m_graphics_queue);
 	vk_get_device_queue(m_device, m_present_queue_family_index, 0, &m_present_queue);
+
+	if (m_present_queue.get() == m_graphics_queue.get())
+	{
+		set_object_name(m_device, m_present_queue.get(), "unified queue");
+	}
+	else
+	{
+		set_object_name(m_device, m_graphics_queue.get(), "graphics queue");
+		set_object_name(m_device, m_present_queue.get(), "present queue");
+	}
 }
 
 Device::~Device()

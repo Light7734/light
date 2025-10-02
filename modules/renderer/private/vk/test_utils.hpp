@@ -57,6 +57,16 @@ private:
 	{
 		std::ignore = message_severity;
 		std::ignore = message_type;
+		for (auto idx = 0; idx < vulkan_data->objectCount; ++idx)
+		{
+			auto object = vulkan_data->pObjects[idx];
+			std::println(
+			    "0x{:x}({}) = {}",
+			    object.objectHandle,
+			    string_VkObjectType(object.objectType),
+			    object.pObjectName ? object.pObjectName : "unnamed"
+			);
+		}
 
 		std::println("Validation message: {}", vulkan_data->pMessage);
 

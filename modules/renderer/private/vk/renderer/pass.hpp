@@ -62,20 +62,6 @@ public:
 			.primitiveRestartEnable = VK_FALSE,
 		};
 
-		auto viewport = VkViewport {
-			.x = 0u,
-			.y = 0u,
-			.width = static_cast<float>(context.swapchain().get_resolution().width),
-			.height = static_cast<float>(context.swapchain().get_resolution().height),
-			.minDepth = 0.0f,
-			.maxDepth = 0.0f,
-		};
-
-		auto scissor = VkRect2D {
-			.offset = { 0u, 0u },
-			.extent = context.swapchain().get_resolution(),
-		};
-
 		auto viewport_state = VkPipelineViewportStateCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.viewportCount = 1u,
@@ -103,8 +89,6 @@ public:
 		};
 
 		auto color_blend_attachment = VkPipelineColorBlendAttachmentState {
-			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
-			                  | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 			.blendEnable = VK_FALSE,
 			.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
 			.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -112,6 +96,8 @@ public:
 			.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
 			.alphaBlendOp = VK_BLEND_OP_ADD,
+			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
+			                  | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 		};
 
 		auto color_blend = VkPipelineColorBlendStateCreateInfo {
@@ -234,6 +220,22 @@ public:
 	auto operator=(Pass &&) -> Pass & = default;
 
 	auto operator=(const Pass &) -> Pass & = delete;
+
+	void replace_swapchain(const Swapchain &swapchain)
+	{
+		if (!m_device)
+		{
+			return;
+		}
+
+		vk_device_wait_idle(m_device);
+		for (auto &framebuffer : m_framebuffers)
+		{
+			vk_destroy_frame_buffer(m_device, framebuffer, nullptr);
+		}
+
+		m_framebuffers = swapchain.create_framebuffers_for_pass(m_pass);
+	}
 
 	[[nodiscard]] auto get_pass() -> VkRenderPass
 	{

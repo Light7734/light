@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ranges>
 #include <renderer/vk/context/context.hpp>
 #include <renderer/vk/debug/validation.hpp>
 #include <renderer/vk/renderer/pass.hpp>
@@ -10,6 +11,8 @@ namespace lt::renderer::vk {
 class Renderer
 {
 public:
+	static constexpr auto max_frames_in_flight = uint32_t { 3u };
+
 	Renderer(Context &context, Ref<Pass> pass)
 	    : m_device(context.device().vk())
 	    , m_graphics_queue(context.device().get_graphics_queue())
@@ -18,6 +21,11 @@ public:
 	    , m_pass(std::move(pass))
 	    , m_resolution(context.swapchain().get_resolution())
 	{
+		ensure(m_device, "Failed to initialize renderer: null device");
+		ensure(m_graphics_queue, "Failed to initialize renderer: null graphics queue");
+		ensure(m_present_queue, "Failed to initialize renderer: null present queue");
+		ensure(m_swapchain, "Failed to initialize renderer: null swapchain");
+
 		auto pool_info = VkCommandPoolCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
@@ -30,9 +38,9 @@ public:
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.commandPool = m_pool,
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1u,
+			.commandBufferCount = static_cast<uint32_t>(m_cmds.size()),
 		};
-		vkc(vk_allocate_command_buffers(m_device, &cmd_info, &m_cmd));
+		vkc(vk_allocate_command_buffers(m_device, &cmd_info, &m_cmds[0]));
 
 		auto semaphore_info = VkSemaphoreCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
@@ -43,11 +51,168 @@ public:
 			.flags = VK_FENCE_CREATE_SIGNALED_BIT,
 		};
 
-		vkc(vk_create_semaphore(m_device, &semaphore_info, nullptr, &m_image_available_semaphore));
-		vkc(vk_create_semaphore(m_device, &semaphore_info, nullptr, &m_render_finished_semaphore));
-		vkc(vk_create_fence(m_device, &fence_info, nullptr, &m_in_flight_fence));
+		for (auto idx : std::views::iota(0u, max_frames_in_flight))
+		{
+			vkc(vk_create_semaphore(
+			    m_device,
+			    &semaphore_info,
+			    nullptr,
+			    &m_aquire_image_semaphores[idx]
+			));
+
+			vkc(vk_create_fence(m_device, &fence_info, nullptr, &m_in_flight_fences[idx]));
+
+			set_object_name(
+			    m_device,
+			    m_aquire_image_semaphores[idx].get(),
+			    "aquire semaphore {}",
+			    idx
+			);
+
+			set_object_name(m_device, m_in_flight_fences[idx].get(), "frame fence {}", idx);
+
+			{
+				const auto name = std::format("frame fence {}", idx);
+				auto debug_info = VkDebugUtilsObjectNameInfoEXT {
+					.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+					.objectType = VK_OBJECT_TYPE_FENCE,
+					.objectHandle = reinterpret_cast<uint64_t>(
+					    static_cast<VkFence_T *>(m_in_flight_fences[idx].get())
+					),
+					.pObjectName = name.c_str(),
+				};
+				vk_set_debug_object_name(m_device, &debug_info);
+			}
+		}
+
+
+		m_submit_semaphores.resize(context.swapchain().get_image_count());
+		for (auto idx = 0; auto &semaphore : m_submit_semaphores)
+		{
+			vkc(vk_create_semaphore(m_device, &semaphore_info, nullptr, &semaphore));
+			set_object_name(m_device, semaphore.get(), "submit semaphore {}", idx++);
+		}
 	};
 
+	~Renderer()
+	{
+		if (!m_device)
+		{
+			return;
+		}
+
+		vkc(vk_device_wait_idle(m_device));
+
+		for (auto [semaphore, fence] :
+		     std::views::zip(m_aquire_image_semaphores, m_in_flight_fences))
+		{
+			vk_destroy_semaphore(m_device, semaphore, nullptr);
+			vk_destroy_fence(m_device, fence, nullptr);
+		}
+
+
+		for (auto &semaphore : m_submit_semaphores)
+		{
+			vk_destroy_semaphore(m_device, semaphore, nullptr);
+		}
+
+		vk_destroy_command_pool(m_device, m_pool, nullptr);
+	}
+
+	Renderer(Renderer &&) = default;
+
+	Renderer(const Renderer &) = delete;
+
+	auto operator=(Renderer &&) -> Renderer & = default;
+
+	auto operator=(const Renderer &) -> Renderer & = delete;
+
+	auto draw(uint32_t frame_idx) -> bool
+	{
+		ensure(
+		    frame_idx < max_frames_in_flight,
+		    "Failed to draw: frame_idx >= max_frames_in_flight"
+		);
+
+		auto &flight_fence = m_in_flight_fences[frame_idx];
+		auto &aquire_semaphore = m_aquire_image_semaphores[frame_idx];
+		auto &cmd = m_cmds[frame_idx];
+
+		try
+		{
+			vkc(vk_wait_for_fences(
+			    m_device,
+			    1u,
+			    &flight_fence,
+			    VK_TRUE,
+			    std::numeric_limits<uint64_t>::max()
+			));
+
+			auto image_idx = uint32_t {};
+			auto result = vk_acquire_next_image_khr(
+			    m_device,
+			    m_swapchain,
+			    UINT64_MAX,
+			    aquire_semaphore,
+			    VK_NULL_HANDLE,
+			    &image_idx
+			);
+			if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
+			{
+				return false;
+			}
+
+			vkc(vk_reset_fences(m_device, 1u, &flight_fence));
+			vkc(vk_reset_command_buffer(cmd, {}));
+			record_cmd(cmd, image_idx);
+
+			auto wait_stage = VkPipelineStageFlags {
+				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+			};
+			auto &submit_semaphore = m_submit_semaphores[image_idx];
+			auto submit_info = VkSubmitInfo {
+				.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+				.waitSemaphoreCount = 1u,
+				.pWaitSemaphores = &aquire_semaphore,
+				.pWaitDstStageMask = &wait_stage,
+				.commandBufferCount = 1u,
+				.pCommandBuffers = &cmd,
+				.signalSemaphoreCount = 1u,
+				.pSignalSemaphores = &submit_semaphore,
+			};
+
+			vkc(vk_queue_submit(m_graphics_queue, 1u, &submit_info, flight_fence));
+
+			auto present_info = VkPresentInfoKHR {
+				.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+				.waitSemaphoreCount = 1u,
+				.pWaitSemaphores = &submit_semaphore,
+				.swapchainCount = 1u,
+				.pSwapchains = &m_swapchain,
+				.pImageIndices = &image_idx,
+				.pResults = nullptr,
+			};
+
+			vk_queue_present_khr(m_present_queue, &present_info);
+		}
+		catch (const std::exception &exp)
+		{
+			log_dbg("EXCEPTION: {}", exp.what());
+		}
+
+		return true;
+	}
+
+	void replace_swapchain(const Swapchain &swapchain)
+	{
+		vk_device_wait_idle(m_device);
+
+		m_swapchain = swapchain.vk();
+		m_resolution = swapchain.get_resolution();
+		ensure(m_swapchain, "Failed to replace renderer's swapchain: null swapchain");
+	}
+
+private:
 	void record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 	{
 		auto cmd_begin_info = VkCommandBufferBeginInfo {
@@ -101,93 +266,18 @@ public:
 		vkc(vk_end_command_buffer(cmd));
 	}
 
-	void draw()
-	{
-		try
-		{
-			vkc(vk_wait_for_fences(m_device, 1u, &m_in_flight_fence, VK_TRUE, UINT64_MAX));
-			vkc(vk_reset_fences(m_device, 1u, &m_in_flight_fence));
 
-			auto image_idx = uint32_t {};
-			vkc(vk_acquire_next_image_khr(
-			    m_device,
-			    m_swapchain,
-			    UINT64_MAX,
-			    m_image_available_semaphore,
-			    VK_NULL_HANDLE,
-			    &image_idx
-			));
-
-			vkc(vk_reset_command_buffer(m_cmd, {}));
-			record_cmd(m_cmd, image_idx);
-
-			auto wait_stage = VkPipelineStageFlags {
-				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
-			};
-			auto submit_info = VkSubmitInfo {
-				.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-				.waitSemaphoreCount = 1u,
-				.pWaitSemaphores = &m_image_available_semaphore,
-				.pWaitDstStageMask = &wait_stage,
-				.commandBufferCount = 1u,
-				.pCommandBuffers = &m_cmd,
-				.signalSemaphoreCount = 1u,
-				.pSignalSemaphores = &m_render_finished_semaphore,
-			};
-
-			vkc(vk_queue_submit(m_graphics_queue, 1u, &submit_info, m_in_flight_fence));
-
-			auto present_info = VkPresentInfoKHR {
-				.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-				.waitSemaphoreCount = 1u,
-				.pWaitSemaphores = &m_render_finished_semaphore,
-				.swapchainCount = 1u,
-				.pSwapchains = &m_swapchain,
-				.pImageIndices = &image_idx,
-				.pResults = nullptr,
-			};
-
-			vk_queue_present_khr(m_present_queue, &present_info);
-		}
-		catch (const std::exception &exp)
-		{
-			log_dbg("EXCEPTION: {}", exp.what());
-		}
-	}
-
-	~Renderer()
-	{
-		if (!m_device)
-		{
-			return;
-		}
-
-		vk_destroy_semaphore(m_device, m_render_finished_semaphore, nullptr);
-		vk_destroy_semaphore(m_device, m_image_available_semaphore, nullptr);
-		vk_destroy_fence(m_device, m_in_flight_fence, nullptr);
-		vk_destroy_command_pool(m_device, m_pool, nullptr);
-	}
-
-	Renderer(Renderer &&) = default;
-
-	Renderer(const Renderer &) = delete;
-
-	auto operator=(Renderer &&) -> Renderer & = default;
-
-	auto operator=(const Renderer &) -> Renderer & = delete;
-
-private:
 	memory::NullOnMove<VkDevice> m_device = VK_NULL_HANDLE;
 
 	memory::NullOnMove<VkCommandPool> m_pool = VK_NULL_HANDLE;
 
-	memory::NullOnMove<VkCommandBuffer> m_cmd = VK_NULL_HANDLE;
+	std::array<memory::NullOnMove<VkCommandBuffer>, max_frames_in_flight> m_cmds {};
 
-	memory::NullOnMove<VkSemaphore> m_image_available_semaphore = VK_NULL_HANDLE;
+	std::array<memory::NullOnMove<VkSemaphore>, max_frames_in_flight> m_aquire_image_semaphores {};
 
-	memory::NullOnMove<VkSemaphore> m_render_finished_semaphore = VK_NULL_HANDLE;
+	std::vector<memory::NullOnMove<VkSemaphore>> m_submit_semaphores;
 
-	memory::NullOnMove<VkFence> m_in_flight_fence = VK_NULL_HANDLE;
+	std::array<memory::NullOnMove<VkFence>, max_frames_in_flight> m_in_flight_fences {};
 
 	memory::NullOnMove<VkSwapchainKHR> m_swapchain = VK_NULL_HANDLE;
 

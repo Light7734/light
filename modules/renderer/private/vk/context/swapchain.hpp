@@ -21,6 +21,28 @@ public:
 
 	auto operator=(const Swapchain &) const -> Swapchain & = delete;
 
+	void destroy()
+	{
+		try
+		{
+			if (m_device)
+			{
+				vkc(vk_device_wait_idle(m_device));
+				for (auto &view : m_image_views)
+				{
+					vk_destroy_image_view(m_device, view, nullptr);
+				}
+
+				vk_destroy_swapchain_khr(m_device, m_swapchain, nullptr);
+			}
+		}
+		catch (const std::exception &exp)
+		{
+			log_err("Failed to destroy swapchain:");
+			log_err("\twhat: {}", exp.what());
+		}
+	}
+
 	[[nodiscard]] auto vk() const -> VkSwapchainKHR
 	{
 		return m_swapchain;
@@ -36,10 +58,15 @@ public:
 		return m_format;
 	}
 
+    [[nodiscard]] auto get_image_count() const -> size_t
+    {
+        return m_images.size();
+    }
+
 	[[nodiscard]] auto create_framebuffers_for_pass(VkRenderPass pass) const
 	    -> std::vector<VkFramebuffer>
 	{
-		auto framebuffers = std::vector<VkFramebuffer>(m_swapchain_image_views.size());
+		auto framebuffers = std::vector<VkFramebuffer>(m_image_views.size());
 
 		for (auto idx = 0u; auto &framebuffer : framebuffers)
 		{
@@ -47,7 +74,7 @@ public:
 				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 				.renderPass = pass,
 				.attachmentCount = 1u,
-				.pAttachments = &m_swapchain_image_views[idx++],
+				.pAttachments = &m_image_views[idx++],
 				.width = m_resolution.width,
 				.height = m_resolution.height,
 				.layers = 1u
@@ -69,9 +96,9 @@ private:
 
 	memory::NullOnMove<VkSwapchainKHR> m_swapchain = VK_NULL_HANDLE;
 
-	std::vector<VkImage> m_swapchain_images;
+	std::vector<VkImage> m_images;
 
-	std::vector<VkImageView> m_swapchain_image_views;
+	std::vector<VkImageView> m_image_views;
 
 	VkExtent2D m_resolution;
 

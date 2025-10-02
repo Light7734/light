@@ -35,6 +35,12 @@ public:
 		return m_swapchain;
 	}
 
+	void recreate_swapchain()
+	{
+		m_swapchain.destroy();
+		m_swapchain = Swapchain { m_device, m_surface };
+	}
+
 private:
 	Surface m_surface;
 

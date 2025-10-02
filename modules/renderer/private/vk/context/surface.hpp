@@ -9,7 +9,7 @@ namespace lt::renderer::vk {
 class Surface
 {
 public:
-	Surface(const ecs::Entity &surface_entity);
+	Surface(ecs::Entity surface_entity);
 
 	~Surface();
 
@@ -26,15 +26,12 @@ public:
 		return m_surface;
 	}
 
-	[[nodiscard]] auto get_framebuffer_size() const -> VkExtent2D
-	{
-		return m_framebuffer_size;
-	}
+	[[nodiscard]] auto get_framebuffer_size() const -> VkExtent2D;
 
 private:
 	memory::NullOnMove<VkSurfaceKHR> m_surface = VK_NULL_HANDLE;
 
-	VkExtent2D m_framebuffer_size {};
+	ecs::Entity m_surface_entity;
 };
 
 } // namespace lt::renderer::vk

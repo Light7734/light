@@ -147,7 +147,7 @@ void Instance::initialize_instance()
 	const auto setting_thread_safety = VkBool32 { VK_TRUE };
 	const auto *setting_debug_action = "";
 	const auto setting_enable_message_limit = VkBool32 { VK_TRUE };
-	const auto setting_duplicate_message_limit = uint32_t { 3u };
+	const auto setting_duplicate_message_limit = uint32_t { UINT32_MAX };
 	auto setting_report_flags = std::array<const char *, 5> {
 		"info", "warn", "perf", "error", "verbose",
 	};

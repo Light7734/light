@@ -1,5 +1,8 @@
 #include <ranges>
 #include <renderer/system.hpp>
+#include <renderer/vk/context/context.hpp>
+#include <renderer/vk/renderer/renderer.hpp>
+#include <surface/components.hpp>
 #include <surface/system.hpp>
 #include <test/test.hpp>
 
