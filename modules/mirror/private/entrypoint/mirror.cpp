@@ -6,6 +6,7 @@
 #include <input/components.hpp>
 #include <input/system.hpp>
 #include <math/vec2.hpp>
+#include <renderer/system.hpp>
 #include <surface/events/keyboard.hpp>
 #include <surface/events/surface.hpp>
 #include <surface/system.hpp>
@@ -126,6 +127,7 @@ public:
 
 		unregister_system(m_input_system);
 		unregister_system(m_surface_system);
+		unregister_system(m_renderer_system);
 		unregister_system(m_mirror_system);
 	}
 
@@ -189,6 +191,15 @@ public:
 		    quit_action_key,
 		    debug_action_keys
 		);
+
+		auto entity = ecs::Entity { m_editor_registry, m_window };
+		Ref<app::SystemStats> system_stats = nullptr;
+
+		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
+		    .registry = m_editor_registry,
+		    .surface_entity = entity,
+		    .system_stats = system_stats,
+		});
 	}
 
 	void setup_input_system()
@@ -199,6 +210,7 @@ public:
 	{
 		register_system(m_surface_system);
 		register_system(m_input_system);
+		register_system(m_renderer_system);
 		register_system(m_mirror_system);
 	}
 
@@ -208,6 +220,8 @@ private:
 	Ref<lt::surface::System> m_surface_system;
 
 	Ref<lt::input::System> m_input_system;
+
+	Ref<lt::renderer::System> m_renderer_system;
 
 	Ref<MirrorSystem> m_mirror_system;
 

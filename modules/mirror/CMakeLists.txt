@@ -7,6 +7,7 @@ target_link_libraries(
   time
   input 
   surface
+  renderer
 )
 
 add_test_module(libmirror 
