@@ -45,7 +45,6 @@ function (add_library_module libname)
             target_link_libraries(${libname} PUBLIC base)
         endif ()
     endif ()
-
 endfunction ()
 
 function (add_executable_module exename)

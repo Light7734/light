@@ -2,6 +2,7 @@
 #include <surface/events/mouse.hpp>
 #include <surface/requests/surface.hpp>
 #include <surface/system.hpp>
+#include <time/timer.hpp>
 
 //
 #include <X11/Xlib.h>
@@ -10,6 +11,15 @@
 #include <X11/keysymdef.h>
 
 namespace lt::surface {
+
+template<int EventType>
+int XEventTypeEquals(Display *, XEvent *event, XPointer winptr)
+{
+	return (
+	    event->type == EventType
+	    && *(reinterpret_cast<Window *>(winptr)) == reinterpret_cast<XAnyEvent *>(event)->window
+	);
+}
 
 template<class... Ts>
 struct overloads: Ts...
@@ -274,6 +284,7 @@ void System::handle_events(SurfaceComponent &surface)
 			const auto new_height = event.xconfigure.height;
 			if (prev_width != new_width || prev_height != new_height)
 			{
+				log_dbg("resized: {} - {}", new_width, new_height);
 				surface.m_resolution.x = new_width;
 				surface.m_resolution.y = new_height;
 				queue.emplace_back<ResizedEvent>(ResizedEvent {
@@ -332,18 +343,95 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 {
 	surface.m_resolution = request.resolution;
 
-	const auto &[display, window, _] = surface.get_native_data();
+	auto &[display, window, _] = surface.m_native_data;
 	const auto &[width, height] = request.resolution;
-	XResizeWindow(display, window, width, height);
+	// XResizeWindow(display, window, width, height);
+
+	// get baseline serial number for X requests generated from XResizeWindow
+	uint64_t serial = NextRequest(display);
+
+	// request a new window size from the X server
+	XResizeWindow(display, window, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+
+	// flush output queue and wait for X server to processes the request
+	XSync(display, False);
+	// The documentation for XResizeWindow includes this important note:
+	//
+	//   If the override-redirect flag of the window is False and some
+	//   other client has selected SubstructureRedirectMask on the parent,
+	//   the X server generates a ConfigureRequest event, and no further
+	//   processing is performed.
+	//
+	// What this means, essentially, is that if this window is a top-level
+	// window, then it's the window manager (the "other client") that is
+	// responsible for changing this window's size.  So when we call
+	// XResizeWindow() on a top-level window, then instead of resizing
+	// the window immediately, the X server informs the window manager,
+	// and then the window manager sets our new size (usually it will be
+	// the size we asked for).  We receive a ConfigureNotify event when
+	// our new size has been set.
+	constexpr auto lifespan = std::chrono::milliseconds { 10 };
+	auto timer = Timer {};
+	auto event = XEvent {};
+	while (!XCheckIfEvent(
+	           display,
+	           &event,
+	           XEventTypeEquals<ConfigureNotify>,
+	           reinterpret_cast<XPointer>(&window) // NOLINT
+	       )
+	       || event.xconfigure.serial < serial)
+	{
+		std::this_thread::sleep_for(std::chrono::microseconds { 100 });
+		if (timer.elapsed_time() > lifespan)
+		{
+			log_err("Timed out waiting for XResizeWindow's event");
+			return;
+		}
+	}
+	// We don't need to update the component's state and handle the event in this funcion.
+	// Since handle_requests is called before handle_events.
+	// So we just put the event back into the queue and move on.
+	XPutBackEvent(display, &event);
+	XSync(display, False);
+	XFlush(display);
 }
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
 	surface.m_position = request.position;
 
-	const auto &[display, window, _] = surface.get_native_data();
+	auto &[display, window, _] = surface.m_native_data;
 	const auto &[x, y] = request.position;
+
+	// get baseline serial number for X requests generated from XResizeWindow
+	uint64_t serial = NextRequest(display);
 	XMoveWindow(display, window, static_cast<int>(x), static_cast<int>(y));
+
+	// flush output queue and wait for X server to processes the request
+	XSync(display, False);
+	constexpr auto lifespan = std::chrono::milliseconds { 10 };
+	auto timer = Timer {};
+	auto event = XEvent {};
+	while (!XCheckIfEvent(
+	           display,
+	           &event,
+	           XEventTypeEquals<ConfigureNotify>,
+	           reinterpret_cast<XPointer>(&window) // NOLINT
+	       )
+	       || event.xconfigure.serial < serial)
+	{
+		std::this_thread::sleep_for(std::chrono::microseconds { 100 });
+		if (timer.elapsed_time() > lifespan)
+		{
+			log_err("Timed out waiting for XMoveWindow's event");
+			return;
+		}
+	}
+	// We don't need to update the component's state and handle the event in this funcion.
+	// Since handle_requests is called before handle_events.
+	// So we just put the event back into the queue and move on.
+	XPutBackEvent(display, &event);
+	XSync(display, False);
 }
 
 void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
@@ -363,9 +451,8 @@ void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityR
 
 void System::tick(app::TickInfo tick)
 {
-	for (auto &dense : m_registry->view<SurfaceComponent>())
+	for (auto &[id, surface] : m_registry->view<SurfaceComponent>())
 	{
-		auto &surface = dense.second;
 		handle_requests(surface);
 		handle_events(surface);
 	}

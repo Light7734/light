@@ -74,6 +74,7 @@ System::System(CreateInfo info)
     : m_registry(std::move(info.registry))
     , m_stats(info.system_stats)
     , m_context(create_scope<vk::Context>(info.surface_entity))
+    , m_surface_entity(info.surface_entity)
 {
 	m_validation_observer = new vk::ValidationObserver();
 	// ensure(m_stats, "Failed to initialize system: null stats");
@@ -102,12 +103,22 @@ void System::on_unregister()
 
 void System::tick(app::TickInfo tick)
 {
-	if (!m_renderer->draw(m_frame_idx))
+	for (const auto &event : m_surface_entity.get<surface::SurfaceComponent>().peek_events())
+	{
+		if (std::holds_alternative<surface::ResizedEvent>(event))
+		{
+			m_context->recreate_swapchain();
+			m_renderer->replace_swapchain(m_context->swapchain());
+			m_pass->replace_swapchain(m_context->swapchain());
+		}
+	}
+
+	if (m_renderer->draw(m_frame_idx))
 	{
 		m_context->recreate_swapchain();
 		m_renderer->replace_swapchain(m_context->swapchain());
 		m_pass->replace_swapchain(m_context->swapchain());
-		m_renderer->draw(m_frame_idx);
+		m_renderer->draw(m_frame_idx); // don't drop the frame
 	}
 
 	m_frame_idx = (m_frame_idx + 1) % vk::Renderer::max_frames_in_flight;

@@ -15,6 +15,7 @@ target_link_libraries(surface PUBLIC
     PRIVATE
     logger 
     lt_debug
+    time
 )
 
 add_test_module(surface system.test.cpp)

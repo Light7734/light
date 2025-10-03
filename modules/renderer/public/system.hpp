@@ -59,6 +59,8 @@ private:
 
 	Ref<ecs::Registry> m_registry;
 
+	ecs::Entity m_surface_entity;
+
 	Ref<app::SystemStats> m_stats;
 
 	Scope<class vk::Context> m_context;
@@ -66,7 +68,6 @@ private:
 	Ref<class vk::Pass> m_pass;
 
 	Scope<class vk::Renderer> m_renderer;
-
 
 	app::TickResult m_last_tick_result {};
 

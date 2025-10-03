@@ -7,9 +7,7 @@
 
 namespace lt::renderer::vk {
 
-Swapchain::Swapchain(const Device &device, const Surface &surface)
-    : m_device(device.vk())
-    , m_resolution(surface.get_framebuffer_size())
+Swapchain::Swapchain(const Device &device, const Surface &surface): m_device(device.vk())
 {
 	static auto idx = 0u;
 	auto *physical_device = device.physical();
@@ -41,7 +39,7 @@ Swapchain::Swapchain(const Device &device, const Surface &surface)
 		.minImageCount = get_optimal_image_count(capabilities, desired_swapchain_image_count),
 		.imageFormat = surface_format.format,
 		.imageColorSpace = surface_format.colorSpace,
-		.imageExtent = surface.get_framebuffer_size(),
+		.imageExtent = capabilities.currentExtent,
 		.imageArrayLayers = 1u,
 		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -53,6 +51,7 @@ Swapchain::Swapchain(const Device &device, const Surface &surface)
 		.clipped = VK_TRUE,
 		.oldSwapchain = nullptr,
 	};
+	m_resolution = capabilities.currentExtent;
 
 	vkc(vk_create_swapchain_khr(device.vk(), &create_info, nullptr, &m_swapchain));
 	vkc(vk_device_wait_idle(device.vk()));

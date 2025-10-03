@@ -85,7 +85,6 @@ public:
 			}
 		}
 
-
 		m_submit_semaphores.resize(context.swapchain().get_image_count());
 		for (auto idx = 0; auto &semaphore : m_submit_semaphores)
 		{
@@ -152,7 +151,7 @@ public:
 			auto result = vk_acquire_next_image_khr(
 			    m_device,
 			    m_swapchain,
-			    UINT64_MAX,
+			    1000000ul,
 			    aquire_semaphore,
 			    VK_NULL_HANDLE,
 			    &image_idx
@@ -183,6 +182,7 @@ public:
 
 			vkc(vk_queue_submit(m_graphics_queue, 1u, &submit_info, flight_fence));
 
+			VkResult res;
 			auto present_info = VkPresentInfoKHR {
 				.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 				.waitSemaphoreCount = 1u,
@@ -190,7 +190,7 @@ public:
 				.swapchainCount = 1u,
 				.pSwapchains = &m_swapchain,
 				.pImageIndices = &image_idx,
-				.pResults = nullptr,
+				.pResults = &res,
 			};
 
 			vk_queue_present_khr(m_present_queue, &present_info);
@@ -210,6 +210,68 @@ public:
 		m_swapchain = swapchain.vk();
 		m_resolution = swapchain.get_resolution();
 		ensure(m_swapchain, "Failed to replace renderer's swapchain: null swapchain");
+
+		for (auto [semaphore, fence] :
+		     std::views::zip(m_aquire_image_semaphores, m_in_flight_fences))
+		{
+			vk_destroy_semaphore(m_device, semaphore, nullptr);
+			vk_destroy_fence(m_device, fence, nullptr);
+		}
+
+		for (auto &semaphore : m_submit_semaphores)
+		{
+			vk_destroy_semaphore(m_device, semaphore, nullptr);
+		}
+
+		auto semaphore_info = VkSemaphoreCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+		};
+
+		auto fence_info = VkFenceCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+			.flags = VK_FENCE_CREATE_SIGNALED_BIT,
+		};
+
+		for (auto idx : std::views::iota(0u, max_frames_in_flight))
+		{
+			vkc(vk_create_semaphore(
+			    m_device,
+			    &semaphore_info,
+			    nullptr,
+			    &m_aquire_image_semaphores[idx]
+			));
+
+			vkc(vk_create_fence(m_device, &fence_info, nullptr, &m_in_flight_fences[idx]));
+
+			set_object_name(
+			    m_device,
+			    m_aquire_image_semaphores[idx].get(),
+			    "aquire semaphore {}",
+			    idx
+			);
+
+			set_object_name(m_device, m_in_flight_fences[idx].get(), "frame fence {}", idx);
+
+			{
+				const auto name = std::format("frame fence {}", idx);
+				auto debug_info = VkDebugUtilsObjectNameInfoEXT {
+					.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+					.objectType = VK_OBJECT_TYPE_FENCE,
+					.objectHandle = reinterpret_cast<uint64_t>(
+					    static_cast<VkFence_T *>(m_in_flight_fences[idx].get())
+					),
+					.pObjectName = name.c_str(),
+				};
+				vk_set_debug_object_name(m_device, &debug_info);
+			}
+		}
+
+		m_submit_semaphores.resize(swapchain.get_image_count());
+		for (auto idx = 0; auto &semaphore : m_submit_semaphores)
+		{
+			vkc(vk_create_semaphore(m_device, &semaphore_info, nullptr, &semaphore));
+			set_object_name(m_device, semaphore.get(), "submit semaphore {}", idx++);
+		}
 	}
 
 private:

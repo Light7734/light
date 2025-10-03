@@ -255,7 +255,6 @@ public:
 private:
 	auto create_module(lt::assets::Blob blob) -> VkShaderModule
 	{
-		log_dbg("BLOB SIZE: {}", blob.size());
 		auto info = VkShaderModuleCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 			.codeSize = blob.size(),
