@@ -12,10 +12,7 @@ function (add_library_module libname)
         add_library(${libname} INTERFACE)
         target_include_directories(${libname} INTERFACE ${PUBLIC_INCLUDE_DIR})
 
-        # Do not link base against base :D
-        if (NOT ${libname} STREQUAL "base")
-            target_link_libraries(${libname} INTERFACE base)
-        endif ()
+        target_link_libraries(${libname} INTERFACE std)
 
     else () # Compiled library
         set(source_files)
@@ -40,11 +37,9 @@ function (add_library_module libname)
             PRIVATE ${PRIVATE_INCLUDE_DIR}
         )
 
-        # Do not link base against base :D
-        if (NOT ${libname} STREQUAL "base")
-            target_link_libraries(${libname} PUBLIC base)
-        endif ()
+        target_link_libraries(${libname} PUBLIC std)
     endif ()
+
 endfunction ()
 
 function (add_executable_module exename)
@@ -72,7 +67,7 @@ function (add_executable_module exename)
     )
 
     add_executable(${exename} ${source_files})
-    target_link_libraries(${exename} PRIVATE base)
+    target_link_libraries(${exename} PRIVATE std)
     target_include_directories(${exename} PRIVATE ${PUBLIC_INCLUDE_DIR} ${PRIVATE_INCLUDE_DIR})
 endfunction ()
 
@@ -105,7 +100,7 @@ function (add_test_module target_lib_name)
     )
 
     add_executable(${target_lib_name}_tests ${source_files})
-    target_link_libraries(${target_lib_name}_tests PRIVATE ${target_lib_name} base test)
+    target_link_libraries(${target_lib_name}_tests PRIVATE ${target_lib_name} std test)
     target_include_directories(${target_lib_name}_tests
         PRIVATE ${PUBLIC_INCLUDE_DIR}
         PRIVATE ${PRIVATE_INCLUDE_DIR}
@@ -141,7 +136,7 @@ function (add_fuzz_module target_lib_name)
     )
 
     add_executable(${target_lib_name}_fuzz ${source_files})
-    target_link_libraries(${target_lib_name}_fuzz PRIVATE ${target_lib_name} base fuzz_test)
+    target_link_libraries(${target_lib_name}_fuzz PRIVATE ${target_lib_name} std fuzz_test)
     target_link_options(${target_lib_name}_fuzz PRIVATE -fsanitize=fuzzer)
     target_compile_options(${target_lib_name}_fuzz PRIVATE -fsanitize=fuzzer)
     target_include_directories(${target_lib_name}_fuzz
