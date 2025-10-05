@@ -1,3 +1,4 @@
+#include <memory/reference.hpp>
 #include <renderer/vk/context/surface.hpp>
 #include <renderer/vk/debug/messenger.hpp>
 #include <renderer/vk/test_utils.hpp>
@@ -15,7 +16,7 @@ Suite raii = "surface"_suite = [] {
 	Case { "happy path won't throw" } = [&] {
 		auto observer = ValidationObserver {};
 
-		auto registry = lt::create_ref<Registry>();
+		auto registry = lt::memory::create_ref<Registry>();
 		auto entity = Entity { registry, registry->create_entity() };
 		auto surface_system = System(registry);
 
@@ -36,7 +37,7 @@ Suite raii = "surface"_suite = [] {
 
 	Case { "unhappy path throws" } = [&] {
 		auto observer = ValidationObserver {};
-		auto registry = lt::create_ref<Registry>();
+		auto registry = lt::memory::create_ref<Registry>();
 		auto entity = Entity { registry, registry->create_entity() };
 
 		entity.add<SurfaceComponent>(SurfaceComponent::CreateInfo {

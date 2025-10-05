@@ -2,12 +2,13 @@
 #include <ecs/registry.hpp>
 #include <ecs/serializer.hpp>
 #include <imgui.h>
+#include <memory/reference.hpp>
 #include <mirror/panels/asset_browser.hpp>
 #include <renderer/texture.hpp>
 
 namespace lt {
 
-AssetBrowserPanel::AssetBrowserPanel(Ref<Scene> active_scene)
+AssetBrowserPanel::AssetBrowserPanel(memory::Ref<Scene> active_scene)
     : m_current_directory("./data/assets")
     , m_assets_path("./data/assets")
     , m_active_scene(std::move(active_scene))

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ecs/entity.hpp>
+#include <memory/scope.hpp>
 #include <renderer/api.hpp>
 #include <renderer/frontend/context/device.hpp>
 #include <renderer/frontend/context/gpu.hpp>
@@ -14,7 +15,8 @@ namespace lt::renderer {
 class IContext
 {
 public:
-	static auto create(API target_api, const ecs::Entity &surface_entity) -> Scope<IContext>;
+	static auto create(API target_api, const ecs::Entity &surface_entity)
+	    -> memory::Scope<IContext>;
 	IContext() = default;
 
 	virtual ~IContext() = default;

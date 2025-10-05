@@ -1,5 +1,7 @@
 # engine
-add_subdirectory(./base)
+add_subdirectory(./std)
+add_subdirectory(./bitwise)
+add_subdirectory(./env)
 add_subdirectory(./memory)
 add_subdirectory(./time)
 add_subdirectory(./logger)

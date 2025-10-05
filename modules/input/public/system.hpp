@@ -2,6 +2,7 @@
 
 #include <app/system.hpp>
 #include <ecs/registry.hpp>
+#include <memory/reference.hpp>
 #include <surface/components.hpp>
 #include <surface/events/keyboard.hpp>
 #include <surface/events/mouse.hpp>
@@ -11,7 +12,7 @@ namespace lt::input {
 class System: public app::ISystem
 {
 public:
-	System(Ref<ecs::Registry> registry);
+	System(memory::Ref<ecs::Registry> registry);
 
 	void tick(app::TickInfo tick) override;
 
@@ -39,7 +40,7 @@ private:
 
 	void on_button_release(const lt::surface::ButtonReleasedEvent &event);
 
-	Ref<ecs::Registry> m_registry;
+	memory::Ref<ecs::Registry> m_registry;
 
 	std::array<bool, 512> m_keys {};
 

@@ -2,6 +2,7 @@
 
 #include <ecs/entity.hpp>
 #include <memory/pointer_types/null_on_move.hpp>
+#include <memory/scope.hpp>
 #include <renderer/frontend/context/context.hpp>
 
 namespace lt::renderer::vk {
@@ -42,19 +43,19 @@ public:
 	void recreate_swapchain() override
 	{
 		m_swapchain.reset();
-		// m_swapchain = create_scope<vk::Swapchain>(m_device, m_surface);
+		// m_swapchain = memory::create_scope<vk::Swapchain>(m_device, m_surface);
 	}
 
 private:
 	IInstance *m_instance;
 
-	Scope<ISurface> m_surface;
+	memory::Scope<ISurface> m_surface;
 
-	Scope<IGpu> m_gpu;
+	memory::Scope<IGpu> m_gpu;
 
-	Scope<IDevice> m_device;
+	memory::Scope<IDevice> m_device;
 
-	Scope<ISwapchain> m_swapchain;
+	memory::Scope<ISwapchain> m_swapchain;
 };
 
 } // namespace lt::renderer::vk

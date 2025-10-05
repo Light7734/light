@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
+
 namespace lt {
 
 class Event;
@@ -8,7 +11,8 @@ class SharedContext;
 class UserInterface
 {
 public:
-	static auto create(Ref<SharedContext> sharedContext) -> Scope<UserInterface>;
+	static auto create(memory::Ref<SharedContext> sharedContext)
+	    -> memory::Scope<UserInterface>;
 
 	static void dockspace_begin();
 
@@ -20,9 +24,9 @@ public:
 
 	virtual ~UserInterface() = default;
 
-	void init(Ref<SharedContext> sharedContext);
+	void init(memory::Ref<SharedContext> sharedContext);
 
-	virtual void platform_implementation(Ref<SharedContext> sharedContext) = 0;
+	virtual void platform_implementation(memory::Ref<SharedContext> sharedContext) = 0;
 
 	virtual void begin() = 0;
 

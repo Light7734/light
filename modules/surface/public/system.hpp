@@ -3,13 +3,14 @@
 #include <app/system.hpp>
 #include <ecs/registry.hpp>
 #include <math/vec2.hpp>
+#include <memory/reference.hpp>
 
 namespace lt::surface {
 
 class System: public app::ISystem
 {
 public:
-	[[nodiscard]] System(Ref<ecs::Registry> registry);
+	[[nodiscard]] System(memory::Ref<ecs::Registry> registry);
 
 	~System() override;
 
@@ -64,7 +65,7 @@ private:
 
 	void set_visibility(ecs::EntityId surface_entity, bool visible);
 
-	Ref<ecs::Registry> m_registry;
+	memory::Ref<ecs::Registry> m_registry;
 
 	app::TickResult m_last_tick_result;
 };

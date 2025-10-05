@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ecs/sparse_set.hpp>
+#include <memory/scope.hpp>
 
 namespace lt::ecs {
 
@@ -235,7 +236,7 @@ private:
 		constexpr auto type_id = get_type_id<T>();
 		if (!m_sparsed_sets.contains(type_id))
 		{
-			m_sparsed_sets[type_id] = create_scope<SparseSet<T, EntityId>>();
+			m_sparsed_sets[type_id] = memory::create_scope<SparseSet<T, EntityId>>();
 		}
 
 		auto *base_set = m_sparsed_sets[type_id].get();
@@ -249,7 +250,7 @@ private:
 
 	TypeId m_entity_count;
 
-	std::flat_map<TypeId, Scope<UnderlyingSparseSet_T>> m_sparsed_sets;
+	std::flat_map<TypeId, memory::Scope<UnderlyingSparseSet_T>> m_sparsed_sets;
 
 	std::flat_map<TypeId, Callback_T> m_on_construct_hooks;
 

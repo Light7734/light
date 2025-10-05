@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitwise/operations.hpp>
 #include <any>
 
 namespace lt::renderer {
@@ -8,10 +9,10 @@ enum class MessageSeverity : uint8_t
 {
 	none = 0u,
 
-	verbose = bit(0u),
-	info = bit(1u),
-	warning = bit(2u),
-	error = bit(3u),
+	verbose = bitwise::bit(0u),
+	info = bitwise::bit(1u),
+	warning = bitwise::bit(2u),
+	error = bitwise::bit(3u),
 
 	all = verbose | info | warning | error,
 };
@@ -19,9 +20,9 @@ enum class MessageSeverity : uint8_t
 enum class MessageType : uint8_t
 {
 	none = 0u,
-	general = bit(0u),
-	validation = bit(1u),
-	performance = bit(2u),
+	general = bitwise::bit(0u),
+	validation = bitwise::bit(1u),
+	performance = bitwise::bit(2u),
 
 	all = general | validation | performance,
 };

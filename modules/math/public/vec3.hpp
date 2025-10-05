@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <math/vec2.hpp>
 
 namespace lt::math {

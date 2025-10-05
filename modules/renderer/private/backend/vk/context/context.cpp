@@ -1,3 +1,4 @@
+#include <memory/scope.hpp>
 #include <renderer/backend/vk/context/context.hpp>
 #include <renderer/backend/vk/context/device.hpp>
 #include <renderer/backend/vk/context/gpu.hpp>
@@ -9,10 +10,10 @@ namespace lt::renderer::vk {
 
 Context::Context(const ecs::Entity &surface_entity)
     : m_instance(Instance::get())
-    , m_surface(create_scope<Surface>(m_instance, surface_entity))
-    , m_gpu(create_scope<Gpu>(m_instance))
-    , m_device(create_scope<Device>(m_gpu.get(), m_surface.get()))
-    , m_swapchain(create_scope<Swapchain>(m_surface.get(), m_gpu.get(), m_device.get()))
+    , m_surface(memory::create_scope<Surface>(m_instance, surface_entity))
+    , m_gpu(memory::create_scope<Gpu>(m_instance))
+    , m_device(memory::create_scope<Device>(m_gpu.get(), m_surface.get()))
+    , m_swapchain(memory::create_scope<Swapchain>(m_surface.get(), m_gpu.get(), m_device.get()))
 {
 	ensure(
 	    static_cast<Instance *>(m_instance)->vk(),

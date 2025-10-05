@@ -21,8 +21,8 @@ System::System(CreateInfo info)
 	m_renderer = IRenderer::create(m_api, *m_context, info.config.max_frames_in_flight);
 
 	// WIP(Light): attach debug messenger on messenger component construction
-	m_registry->connect_on_construct<renderer::MessengerComponent>([](ecs::Registry &registry,
-	                                                                  ecs::EntityId entity) {});
+	// m_registry->connect_on_construct<renderer::MessengerComponent>([](ecs::Registry &registry,
+	//                                                                   ecs::EntityId entity) {});
 }
 
 System::~System()

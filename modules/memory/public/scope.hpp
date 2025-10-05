@@ -1,10 +1,15 @@
 #pragma once
 
+#include <memory/scope.hpp>
 #include <memory>
 
 namespace lt::memory {
 
-/** Wrapper around std::unique_ptr. */
+/** Wrapper around std::unique_ptr.
+ *
+ * @note Currently just an alias, might turn into an implementation later.
+ * @ref https://en.cppreference.com/w/cpp/memory/unique_ptr.html
+ */
 template<typename t>
 using Scope = std::unique_ptr<t>;
 

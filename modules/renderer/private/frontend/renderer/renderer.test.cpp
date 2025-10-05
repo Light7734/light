@@ -1,3 +1,4 @@
+#include <memory/reference.hpp>
 #include <renderer/vk/renderer/renderer.hpp>
 #include <renderer/vk/test_utils.hpp>
 
@@ -12,7 +13,7 @@ Suite raii = "renderer_raii"_suite = [] {
 
 		std::ignore = Renderer(
 		    context,
-		    lt::create_ref<Pass>(
+		    lt::memory::create_ref<Pass>(
 		        context,
 		        ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 		        ShaderAsset { "./data/test_assets/triangle.frag.asset" }
@@ -30,7 +31,7 @@ Suite draw = "renderer_draw"_suite = [] {
 
 		auto renderer = Renderer(
 		    context,
-		    lt::create_ref<Pass>(
+		    lt::memory::create_ref<Pass>(
 		        context,
 		        ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 		        ShaderAsset { "./data/test_assets/triangle.frag.asset" }
@@ -47,7 +48,7 @@ Suite draw = "renderer_draw"_suite = [] {
 	Case { "post swapchain replacement renderer draw" } = [] {
 		auto observer = ValidationObserver {};
 		auto [context, _] = create_context();
-		auto pass = lt::create_ref<Pass>(
+		auto pass = lt::memory::create_ref<Pass>(
 		    context,
 		    ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 		    ShaderAsset { "./data/test_assets/triangle.frag.asset" }

@@ -1,10 +1,15 @@
 #pragma once
 
+#include <memory/reference.hpp>
 #include <memory>
 
 namespace lt::memory {
 
-/** Wrapper around std::shared_ptr. */
+/** Wrapper around std::shared_ptr.
+ *
+ * @note Currently just an alias, might turn into an implementation later.
+ * @ref https://en.cppreference.com/w/cpp/memory/shared_ptr.html
+ */
 template<typename t>
 using Ref = std::shared_ptr<t>;
 

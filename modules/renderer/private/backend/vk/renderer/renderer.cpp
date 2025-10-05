@@ -1,3 +1,4 @@
+#include <memory/reference.hpp>
 #include <renderer/backend/vk/context/swapchain.hpp>
 #include <renderer/backend/vk/renderer/renderer.hpp>
 
@@ -13,7 +14,7 @@ Renderer::Renderer(IContext &context, uint32_t max_frames_in_flight)
 	ensure(m_swapchain, "Failed to initialize renderer: null swapchain");
 
 	// TODO(Light): HARDCODED PASS!!!
-	m_pass = create_ref<vk::Pass>(
+	m_pass = memory::create_ref<vk::Pass>(
 	    context,
 	    assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 	    assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }

@@ -1,3 +1,5 @@
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
 #include <ranges>
 #include <renderer/system.hpp>
 #include <renderer/vk/context/context.hpp>
@@ -25,7 +27,7 @@ struct SurfaceContext
 
 struct RendererContext
 {
-	Ref<ecs::Registry> registry;
+	memory::Ref<ecs::Registry> registry;
 	System system;
 };
 
@@ -33,7 +35,7 @@ struct RendererContext
 {
 	using surface::SurfaceComponent;
 
-	auto surface_registry = create_ref<ecs::Registry>();
+	auto surface_registry = memory::create_ref<ecs::Registry>();
 	auto surface_entity = surface_registry->create_entity();
 	auto surface_system = surface::System(surface_registry);
 	surface_registry->add<SurfaceComponent>(
@@ -54,8 +56,8 @@ struct RendererContext
 {
 	auto surface_context = create_surface();
 	auto &[surface_system, surface_entity] = surface_context;
-	auto registry = create_ref<ecs::Registry>();
-	auto stats = create_ref<app::SystemStats>();
+	auto registry = memory::create_ref<ecs::Registry>();
+	auto stats = memory::create_ref<app::SystemStats>();
 
 	return {
 		std::move(surface_context),
@@ -83,7 +85,7 @@ public:
 		});
 	}
 
-	[[nodiscard]] auto registry() const -> Ref<ecs::Registry>
+	[[nodiscard]] auto registry() const -> memory::Ref<ecs::Registry>
 	{
 		return m_registry;
 	}
@@ -93,19 +95,21 @@ public:
 		return *m_surface_entity;
 	}
 
-	[[nodiscard]] auto stats() const -> Ref<app::SystemStats>
+	[[nodiscard]] auto stats() const -> memory::Ref<app::SystemStats>
 	{
 		return m_stats;
 	}
 
 private:
-	Ref<app::SystemStats> m_stats = create_ref<app::SystemStats>();
+	memory::Ref<app::SystemStats> m_stats = memory::create_ref<app::SystemStats>();
 
-	Ref<ecs::Registry> m_registry = create_ref<ecs::Registry>();
+	memory::Ref<ecs::Registry> m_registry = memory::create_ref<ecs::Registry>();
 
-	Ref<surface::System> m_surface_system = create_ref<surface::System>(m_registry);
+	memory::Ref<surface::System> m_surface_system = memory::create_ref<surface::System>(
+	    m_registry
+	);
 
-	Scope<ecs::Entity> m_surface_entity = create_scope<ecs::Entity>(
+	memory::Scope<ecs::Entity> m_surface_entity = memory::create_scope<ecs::Entity>(
 	    m_registry,
 	    m_registry->create_entity()
 	);

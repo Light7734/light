@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ecs/entity.hpp>
+#include <memory/scope.hpp>
 #include <renderer/api.hpp>
 
 namespace lt::renderer {
@@ -9,7 +10,7 @@ class IMessenger
 {
 public:
 	[[nodiscard]] static auto create(API target_api, class IInstance *instance, ecs::Entity entity)
-	    -> Scope<IMessenger>;
+	    -> memory::Scope<IMessenger>;
 
 	IMessenger() = default;
 

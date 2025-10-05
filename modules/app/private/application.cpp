@@ -1,5 +1,6 @@
 #include <app/application.hpp>
 #include <app/system.hpp>
+#include <memory/reference.hpp>
 
 namespace lt::app {
 
@@ -41,12 +42,12 @@ void Application::game_loop()
 	}
 }
 
-void Application::register_system(Ref<app::ISystem> system)
+void Application::register_system(memory::Ref<app::ISystem> system)
 {
 	m_systems.emplace_back(std::move(system));
 }
 
-void Application::unregister_system(Ref<app::ISystem> system)
+void Application::unregister_system(memory::Ref<app::ISystem> system)
 {
 	m_systems_to_be_unregistered.emplace_back(std::move(system));
 }

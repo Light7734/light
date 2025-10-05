@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/application.hpp>
+#include <memory/scope.hpp>
 
 auto main(int argc, char *argv[]) -> int32_t
 try
@@ -8,8 +9,7 @@ try
 	std::ignore = argc;
 	std::ignore = argv;
 
-	auto application = lt::Scope<lt::app::Application> {};
-
+	auto application = lt::memory::Scope<lt::app::Application> {};
 	application = lt::app::create_application();
 	if (!application)
 	{

@@ -3,6 +3,8 @@
 #include <app/system.hpp>
 #include <ecs/entity.hpp>
 #include <ecs/registry.hpp>
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
 #include <renderer/api.hpp>
 
 namespace lt::renderer {
@@ -21,7 +23,7 @@ public:
 	{
 		Configuration config;
 
-		Ref<ecs::Registry> registry;
+		memory::Ref<ecs::Registry> registry;
 
 		ecs::Entity surface_entity;
 	};
@@ -52,15 +54,15 @@ public:
 private:
 	API m_api;
 
-	Ref<ecs::Registry> m_registry;
+	memory::Ref<ecs::Registry> m_registry;
 
 	ecs::Entity m_surface_entity;
 
-	Scope<class IContext> m_context;
+	memory::Scope<class IContext> m_context;
 
-	Scope<class IRenderer> m_renderer;
+	memory::Scope<class IRenderer> m_renderer;
 
-	std::vector<Scope<class IMessenger>> m_messengers;
+	std::vector<memory::Scope<class IMessenger>> m_messengers;
 
 	app::TickResult m_last_tick_result {};
 

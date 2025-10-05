@@ -7,6 +7,7 @@
 #include <input/input.hpp>
 #include <input/key_codes.hpp>
 #include <math/vec4.hpp>
+#include <memory/reference.hpp>
 #include <mirror/layers/editor_layer.hpp>
 #include <renderer/framebuffer.hpp>
 #include <renderer/graphics_context.hpp>
@@ -20,11 +21,11 @@ EditorLayer::EditorLayer(const std::string &name)
     , m_scene_dir("")
     , m_direction { 0.0, 0.0 }
 {
-	m_scene = create_ref<Scene>();
+	m_scene = memory::create_ref<Scene>();
 
-	m_properties_panel = create_ref<PropertiesPanel>();
-	m_sceneHierarchyPanel = create_ref<SceneHierarchyPanel>(m_scene, m_properties_panel);
-	m_content_browser_panel = create_ref<AssetBrowserPanel>(m_scene);
+	m_properties_panel = memory::create_ref<PropertiesPanel>();
+	m_sceneHierarchyPanel = memory::create_ref<SceneHierarchyPanel>(m_scene, m_properties_panel);
+	m_content_browser_panel = memory::create_ref<AssetBrowserPanel>(m_scene);
 
 	m_framebuffer = Framebuffer::create(
 	    {

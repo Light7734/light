@@ -1,3 +1,5 @@
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
 #include <ui/gl/ui.hpp>
 #include <ui/ui.hpp>
 
@@ -25,15 +27,17 @@ namespace lt {
 
 UserInterface *UserInterface::s_context = nullptr;
 
-auto UserInterface::create(Ref<SharedContext> sharedContext) -> Scope<UserInterface>
+auto UserInterface::create(memory::Ref<SharedContext> sharedContext)
+    -> memory::Scope<UserInterface>
 {
-	auto scopeUserInterface = Scope<UserInterface> { nullptr };
+	auto scopeUserInterface = memory::Scope<UserInterface> { nullptr };
 
 	switch (GraphicsContext::get_graphics_api())
 	{
-	case GraphicsAPI::OpenGL: scopeUserInterface = create_scope<glUserInterface>(); break;
+	case GraphicsAPI::OpenGL: scopeUserInterface = memory::create_scope<glUserInterface>(); break;
 
-	case GraphicsAPI::DirectX: lt_win(scopeUserInterface = create_scope<dxUserInterface>();) break;
+	case GraphicsAPI::DirectX:
+		lt_win(scopeUserInterface = memory::create_scope<dxUserInterface>();) break;
 
 	default:
 		ensure(
@@ -65,7 +69,7 @@ UserInterface::UserInterface()
 	s_context = this;
 }
 
-void UserInterface::init(Ref<SharedContext> sharedContext)
+void UserInterface::init(memory::Ref<SharedContext> sharedContext)
 {
 	// create context
 	IMGUI_CHECKVERSION();

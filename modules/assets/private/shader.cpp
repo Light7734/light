@@ -2,8 +2,7 @@
 
 namespace lt::assets {
 
-ShaderAsset::ShaderAsset(const std::filesystem::path &path)
-    : m_stream(path, std::ios::binary | std::ios::beg)
+ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 {
 	constexpr auto total_metadata_size = //
 	    sizeof(AssetMetadata)            //

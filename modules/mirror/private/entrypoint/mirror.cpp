@@ -6,6 +6,9 @@
 #include <input/components.hpp>
 #include <input/system.hpp>
 #include <math/vec2.hpp>
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
+#include <renderer/components/messenger.hpp>
 #include <renderer/system.hpp>
 #include <surface/events/keyboard.hpp>
 #include <surface/events/surface.hpp>
@@ -14,11 +17,21 @@
 
 namespace lt {
 
+void renderer_callback(
+    renderer::MessageSeverity message_severity,
+    renderer::MessageType message_type,
+    renderer::MessengerCallbackData data,
+    std::any user_data
+)
+{
+	log_dbg("RENDERER CALLBACK: {}", data.message);
+}
+
 class MirrorSystem: public lt::app::ISystem
 {
 public:
 	MirrorSystem(
-	    Ref<ecs::Registry> registry,
+	    memory::Ref<ecs::Registry> registry,
 	    lt::input::InputAction::Key quit_action_key,
 	    std::array<lt::input::InputAction::Key, 4> debug_action_keys
 	)
@@ -27,6 +40,8 @@ public:
 	    , m_debug_action_keys(debug_action_keys)
 	{
 		using Surface = lt::surface::SurfaceComponent;
+
+
 		using Input = lt::input::InputComponent;
 
 		for (auto &[entity, surface, input] : m_registry->view<Surface, Input>())
@@ -99,7 +114,8 @@ public:
 	}
 
 private:
-	Ref<ecs::Registry> m_registry;
+	memory::Ref<ecs::Registry> m_registry;
+
 
 	lt::input::InputAction::Key m_quit_action_key;
 
@@ -113,7 +129,7 @@ class Mirror: public app::Application
 public:
 	Mirror()
 	{
-		m_editor_registry = create_ref<ecs::Registry>();
+		m_editor_registry = memory::create_ref<ecs::Registry>();
 
 		setup_window_system();
 		setup_input_system();
@@ -135,7 +151,7 @@ public:
 	{
 		using lt::input::InputComponent;
 		using lt::surface::SurfaceComponent;
-		m_surface_system = create_ref<lt::surface::System>(m_editor_registry);
+		m_surface_system = memory::create_ref<lt::surface::System>(m_editor_registry);
 
 		m_window = m_editor_registry->create_entity();
 		m_editor_registry->add<SurfaceComponent>(
@@ -185,21 +201,28 @@ public:
 		    }
 		);
 
-		m_input_system = create_ref<input::System>(m_editor_registry);
-		m_mirror_system = create_ref<MirrorSystem>(
+		m_input_system = memory::create_ref<input::System>(m_editor_registry);
+		m_mirror_system = memory::create_ref<MirrorSystem>(
 		    m_editor_registry,
 		    quit_action_key,
 		    debug_action_keys
 		);
 
 		auto entity = ecs::Entity { m_editor_registry, m_window };
-		Ref<app::SystemStats> system_stats = nullptr;
+		memory::Ref<app::SystemStats> system_stats = nullptr;
 
 		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
+		    .config = { .target_api = renderer::API::Vulkan, .max_frames_in_flight = 3u },
 		    .registry = m_editor_registry,
 		    .surface_entity = entity,
-		    .system_stats = system_stats,
 		});
+
+		// entity.add<renderer::MessengerComponent>({
+		//     .severities = renderer::MessageSeverity::all,
+		//     .types = renderer::MessageType::all,
+		//     .callback = &renderer_callback,
+		//     .user_data = this,
+		// });
 	}
 
 	void setup_input_system()
@@ -215,22 +238,22 @@ public:
 	}
 
 private:
-	Ref<ecs::Registry> m_editor_registry;
+	memory::Ref<ecs::Registry> m_editor_registry;
 
-	Ref<lt::surface::System> m_surface_system;
+	memory::Ref<lt::surface::System> m_surface_system;
 
-	Ref<lt::input::System> m_input_system;
+	memory::Ref<lt::input::System> m_input_system;
 
-	Ref<lt::renderer::System> m_renderer_system;
+	memory::Ref<lt::renderer::System> m_renderer_system;
 
-	Ref<MirrorSystem> m_mirror_system;
+	memory::Ref<MirrorSystem> m_mirror_system;
 
 	lt::ecs::EntityId m_window = lt::ecs::null_entity;
 };
 
-auto app::create_application() -> Scope<app::Application>
+auto app::create_application() -> memory::Scope<app::Application>
 {
-	return create_scope<Mirror>();
+	return memory::create_scope<Mirror>();
 }
 
 } // namespace lt

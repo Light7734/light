@@ -25,6 +25,7 @@ PUBLIC
     memory
     assets
     time
+    bitwise
 PRIVATE
     surface
     pthread

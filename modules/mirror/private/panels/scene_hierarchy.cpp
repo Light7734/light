@@ -1,5 +1,6 @@
 #include <ecs/components.hpp>
 #include <imgui.h>
+#include <memory/reference.hpp>
 #include <mirror/panels/properties.hpp>
 #include <mirror/panels/scene_hierarchy.hpp>
 
@@ -9,7 +10,10 @@ SceneHierarchyPanel::SceneHierarchyPanel(): m_context(nullptr), m_properties_pan
 {
 }
 
-SceneHierarchyPanel::SceneHierarchyPanel(Ref<Scene> context, Ref<PropertiesPanel> properties_panel)
+SceneHierarchyPanel::SceneHierarchyPanel(
+    memory::Ref<Scene> context,
+    memory::Ref<PropertiesPanel> properties_panel
+)
     : m_context(std::move(context))
     , m_properties_panel_context(std::move(properties_panel))
 {
@@ -36,7 +40,10 @@ void SceneHierarchyPanel::on_user_interface_update()
 	ImGui::End();
 }
 
-void SceneHierarchyPanel::set_context(Ref<Scene> context, Ref<PropertiesPanel> properties_panel)
+void SceneHierarchyPanel::set_context(
+    memory::Ref<Scene> context,
+    memory::Ref<PropertiesPanel> properties_panel
+)
 {
 	if (properties_panel)
 	{

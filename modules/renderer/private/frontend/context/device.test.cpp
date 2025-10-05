@@ -1,3 +1,4 @@
+#include <memory/reference.hpp>
 #include <ranges>
 #include <renderer/vk/context/device.hpp>
 #include <renderer/vk/context/surface.hpp>
@@ -17,7 +18,7 @@ constexpr auto resolution = math::uvec2 { 800u, 600u };
 
 Suite raii = "device_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
-		auto registry = create_ref<ecs::Registry>();
+		auto registry = memory::create_ref<ecs::Registry>();
 		auto surface_system = surface::System { registry };
 		auto entity = ecs::Entity { registry, registry->create_entity() };
 		entity.add<surface::SurfaceComponent>(surface::SurfaceComponent::CreateInfo {
@@ -30,7 +31,7 @@ Suite raii = "device_raii"_suite = [] {
 	};
 
 	Case { "many won't freeze/throw" } = [] {
-		auto registry = create_ref<ecs::Registry>();
+		auto registry = memory::create_ref<ecs::Registry>();
 		auto surface_system = surface::System { registry };
 		auto entity = ecs::Entity { registry, registry->create_entity() };
 		entity.add<surface::SurfaceComponent>(surface::SurfaceComponent::CreateInfo {
@@ -47,7 +48,7 @@ Suite raii = "device_raii"_suite = [] {
 	};
 
 	Case { "unhappy path throws" } = [] {
-		auto registry = create_ref<ecs::Registry>();
+		auto registry = memory::create_ref<ecs::Registry>();
 		auto surface_system = surface::System { registry };
 		auto entity = ecs::Entity { registry, registry->create_entity() };
 		entity.add<surface::SurfaceComponent>(surface::SurfaceComponent::CreateInfo {
@@ -62,7 +63,7 @@ Suite raii = "device_raii"_suite = [] {
 	};
 
 	Case { "post construct has correct state" } = [] {
-		auto registry = create_ref<ecs::Registry>();
+		auto registry = memory::create_ref<ecs::Registry>();
 		auto surface_system = surface::System { registry };
 		auto entity = ecs::Entity { registry, registry->create_entity() };
 		entity.add<surface::SurfaceComponent>(surface::SurfaceComponent::CreateInfo {
@@ -82,7 +83,7 @@ Suite raii = "device_raii"_suite = [] {
 	};
 
 	Case { "post destruct has correct state" } = [] {
-		auto registry = create_ref<ecs::Registry>();
+		auto registry = memory::create_ref<ecs::Registry>();
 		auto surface_system = surface::System { registry };
 		auto entity = ecs::Entity { registry, registry->create_entity() };
 		entity.add<surface::SurfaceComponent>(surface::SurfaceComponent::CreateInfo {

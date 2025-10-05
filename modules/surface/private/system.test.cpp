@@ -1,4 +1,6 @@
 #include <ecs/entity.hpp>
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
 #include <ranges>
 #include <surface/components.hpp>
 #include <surface/requests/surface.hpp>
@@ -41,7 +43,7 @@ struct overloads: Ts...
 class Fixture
 {
 public:
-	[[nodiscard]] auto registry() -> Ref<ecs::Registry>
+	[[nodiscard]] auto registry() -> memory::Ref<ecs::Registry>
 	{
 		return m_registry;
 	}
@@ -74,7 +76,7 @@ public:
 	}
 
 private:
-	Ref<ecs::Registry> m_registry = create_ref<ecs::Registry>();
+	memory::Ref<ecs::Registry> m_registry = memory::create_ref<ecs::Registry>();
 };
 
 
@@ -108,7 +110,7 @@ Suite raii = "raii"_suite = [] {
 
 	Case { "post destruct has correct state" } = [] {
 		auto fixture = Fixture {};
-		auto system = create_scope<System>(fixture.registry());
+		auto system = memory::create_scope<System>(fixture.registry());
 
 		fixture.add_surface_component();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
@@ -184,7 +186,7 @@ Suite registry_events = "registry_events"_suite = [] {
 
 	Case { "on_destrroy<SurfaceComponent> cleans up component" } = [] {
 		auto fixture = Fixture {};
-		auto system = create_scope<System>(fixture.registry());
+		auto system = memory::create_scope<System>(fixture.registry());
 
 		const auto &component = fixture.add_surface_component();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory/reference.hpp>
 #include <ranges>
 #include <renderer/backend/vk/context/context.hpp>
 #include <renderer/backend/vk/context/device.hpp>
@@ -37,7 +38,7 @@ private:
 
 	class Swapchain *m_swapchain {};
 
-	Ref<class Pass> m_pass;
+	memory::Ref<class Pass> m_pass;
 
 	VkCommandPool m_pool = VK_NULL_HANDLE;
 

@@ -1,5 +1,6 @@
 #include <input/components.hpp>
 #include <input/system.hpp>
+#include <memory/reference.hpp>
 
 namespace lt::input {
 
@@ -9,7 +10,7 @@ struct overloads: Ts...
 	using Ts::operator()...;
 };
 
-System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
+System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
 	ensure(m_registry, "Failed to initialize input system: null registry");
 }

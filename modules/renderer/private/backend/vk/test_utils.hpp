@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory/reference.hpp>
 #include <ranges>
 #include <renderer/backend/vk/context/context.hpp>
 #include <renderer/backend/vk/context/surface.hpp>
@@ -83,7 +84,7 @@ private:
 {
 	using lt::surface::SurfaceComponent;
 
-	auto registry = lt::create_ref<lt::ecs::Registry>();
+	auto registry = lt::memory::create_ref<lt::ecs::Registry>();
 	auto entity = lt::ecs::Entity { registry, registry->create_entity() };
 	auto surface_system = lt::surface::System(registry);
 	entity.add<SurfaceComponent>(SurfaceComponent::CreateInfo {

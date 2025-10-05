@@ -1,6 +1,8 @@
 #include <ecs/entity.hpp>
 #include <input/components.hpp>
 #include <input/system.hpp>
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
 #include <ranges>
 #include <test/test.hpp>
 
@@ -30,7 +32,7 @@ using test::Suite;
 class Fixture
 {
 public:
-	[[nodiscard]] auto registry() -> Ref<ecs::Registry>
+	[[nodiscard]] auto registry() -> memory::Ref<ecs::Registry>
 	{
 		return m_registry;
 	}
@@ -55,7 +57,7 @@ public:
 	}
 
 private:
-	Ref<ecs::Registry> m_registry = create_ref<ecs::Registry>();
+	memory::Ref<ecs::Registry> m_registry = memory::create_ref<ecs::Registry>();
 };
 
 Suite raii = "raii"_suite = "raii"_suite = [] {
@@ -110,7 +112,7 @@ Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_destrroy<InputComponent>" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = create_scope<System>(registry);
+		auto system = memory::create_scope<System>(registry);
 
 		auto entity_a = fixture.add_input_component();
 		auto entity_b = fixture.add_input_component();

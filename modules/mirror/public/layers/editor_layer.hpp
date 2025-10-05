@@ -3,6 +3,7 @@
 #include <app/layer.hpp>
 #include <imgui.h>
 #include <math/vec2.hpp>
+#include <memory/reference.hpp>
 #include <mirror/panels/asset_browser.hpp>
 #include <mirror/panels/properties.hpp>
 #include <mirror/panels/scene_hierarchy.hpp>
@@ -40,15 +41,15 @@ private:
 
 	float m_speed = 1000.0f;
 
-	Ref<Scene> m_scene;
+	memory::Ref<Scene> m_scene;
 
-	Ref<SceneHierarchyPanel> m_sceneHierarchyPanel;
+	memory::Ref<SceneHierarchyPanel> m_sceneHierarchyPanel;
 
-	Ref<PropertiesPanel> m_properties_panel;
+	memory::Ref<PropertiesPanel> m_properties_panel;
 
-	Ref<AssetBrowserPanel> m_content_browser_panel;
+	memory::Ref<AssetBrowserPanel> m_content_browser_panel;
 
-	Ref<Framebuffer> m_framebuffer;
+	memory::Ref<Framebuffer> m_framebuffer;
 
 	Entity m_camera_entity;
 

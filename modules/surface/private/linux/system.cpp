@@ -1,3 +1,4 @@
+#include <memory/reference.hpp>
 #include <surface/components.hpp>
 #include <surface/events/mouse.hpp>
 #include <surface/requests/surface.hpp>
@@ -44,7 +45,7 @@ constexpr auto all_events_mask = KeyPressMask |         //
                                  ColormapChangeMask |   //
                                  OwnerGrabButtonMask;
 
-System::System(Ref<ecs::Registry> registry): m_registry(std::move(registry))
+System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
 	ensure(m_registry, "Failed to initialize surface system: null registry");
 

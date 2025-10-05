@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory/scope.hpp>
 #include <renderer/api.hpp>
 
 namespace lt::renderer {
@@ -15,7 +16,7 @@ public:
 	};
 
 	static auto create(API target_api, class IContext &context, uint32_t max_frames_in_flight)
-	    -> Scope<IRenderer>;
+	    -> memory::Scope<IRenderer>;
 
 	IRenderer() = default;
 

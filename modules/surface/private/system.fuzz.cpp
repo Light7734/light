@@ -1,5 +1,6 @@
 #include <ecs/entity.hpp>
 #include <ecs/registry.hpp>
+#include <memory/reference.hpp>
 #include <surface/components.hpp>
 #include <surface/system.hpp>
 #include <test/fuzz.hpp>
@@ -89,7 +90,7 @@ void check_invariants()
 test::FuzzHarness harness = [](const uint8_t *data, size_t size) {
 	auto provider = test::FuzzDataProvider { data, size };
 
-	auto registry = create_ref<ecs::Registry>();
+	auto registry = memory::create_ref<ecs::Registry>();
 	auto system = surface::System { registry };
 
 	while (auto action = provider.consume<uint8_t>())

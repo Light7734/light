@@ -1,3 +1,5 @@
+#include <memory/reference.hpp>
+#include <memory/scope.hpp>
 #include <ranges>
 #include <renderer/interface/context.hpp>
 #include <renderer/vk/context/context.hpp>
@@ -29,8 +31,8 @@ class Fixture
 {
 public:
 	Fixture()
-	    : m_registry(lt::create_ref<lt::ecs::Registry>())
-	    , m_surface_system(lt::create_scope<lt::surface::System>(m_registry))
+	    : m_registry(lt::memory::create_ref<lt::ecs::Registry>())
+	    , m_surface_system(lt::memory::create_scope<lt::surface::System>(m_registry))
 	    , m_surface_entity(m_registry, m_registry->create_entity())
 	{
 	}
@@ -41,8 +43,8 @@ public:
 	}
 
 private:
-	lt::Ref<lt::ecs::Registry> m_registry;
-	lt::Scope<lt::surface::System> m_surface_system;
+	lt::memory::Ref<lt::ecs::Registry> m_registry;
+	lt::memory::Scope<lt::surface::System> m_surface_system;
 	lt::ecs::Entity m_surface_entity;
 };
 

@@ -41,6 +41,17 @@ public:
 		return *this;
 	}
 
+	auto operator->() -> Underlying_T
+	{
+		return m_value;
+	}
+
+	// NOLINTNEXTLINE
+	auto operator->() const -> const Underlying_T
+	{
+		return m_value;
+	}
+
 	auto operator&() const -> const Underlying_T *
 	{
 		return &m_value;
@@ -64,6 +75,11 @@ public:
 	operator Underlying_T()
 	{
 		return m_value;
+	}
+
+	operator uint64_t() const
+	{
+		return (uint64_t)m_value;
 	}
 
 	[[nodiscard]] auto get() -> Underlying_T

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <memory/reference.hpp>
 #include <mirror/panels/panel.hpp>
 #include <renderer/texture.hpp>
 
@@ -11,7 +12,7 @@ class Scene;
 class AssetBrowserPanel: public Panel
 {
 public:
-	AssetBrowserPanel(Ref<Scene> active_scene);
+	AssetBrowserPanel(memory::Ref<Scene> active_scene);
 
 	void on_user_interface_update();
 
@@ -33,15 +34,15 @@ private:
 
 	float m_file_padding = 8.0f;
 
-	Ref<Scene> m_active_scene;
+	memory::Ref<Scene> m_active_scene;
 
-	Ref<Texture> m_directory_texture;
+	memory::Ref<Texture> m_directory_texture;
 
-	Ref<Texture> m_scene_texture;
+	memory::Ref<Texture> m_scene_texture;
 
-	Ref<Texture> m_image_texture;
+	memory::Ref<Texture> m_image_texture;
 
-	Ref<Texture> m_text_texture;
+	memory::Ref<Texture> m_text_texture;
 };
 
 } // namespace lt
