@@ -19,7 +19,7 @@ public:
 	template<typename Component_T>
 	auto add(Component_T component) -> Component_T &
 	{
-		m_registry->add(m_identifier, component);
+		return m_registry->add(m_identifier, component);
 	}
 
 	template<typename Component_T>
@@ -41,7 +41,6 @@ public:
 
 private:
 	memory::Ref<Registry> m_registry;
-
 
 	EntityId m_identifier;
 };
