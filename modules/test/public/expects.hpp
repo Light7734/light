@@ -19,7 +19,7 @@ concept Printable = Formattable<T> || requires(std::ostream &stream, T value) {
 template<typename T>
 concept Testable = Printable<T> && std::equality_comparable<T>;
 
-constexpr void expect_unreachable(
+inline void expect_unreachable(
     std::source_location source_location = std::source_location::current()
 )
 {
