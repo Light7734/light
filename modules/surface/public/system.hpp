@@ -4,6 +4,7 @@
 #include <ecs/registry.hpp>
 #include <math/vec2.hpp>
 #include <memory/reference.hpp>
+#include <surface/components.hpp>
 
 namespace lt::surface {
 
@@ -26,6 +27,9 @@ public:
 
 	void on_unregister() override;
 
+	auto create_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
+	    -> std::optional<SurfaceComponent *>;
+
 	void tick(app::TickInfo tick) override;
 
 	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
@@ -34,8 +38,6 @@ public:
 	}
 
 private:
-	void on_surface_construct(ecs::Registry &registry, ecs::EntityId entity);
-
 	void on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity);
 
 	void handle_requests(struct SurfaceComponent &surface);

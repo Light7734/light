@@ -13,7 +13,10 @@ typedef struct _XDisplay Display;
 
 namespace lt::surface {
 
-/** Represents a platform's surface (eg. a Window). */
+/** Represents a platform's surface (eg. a Window).
+ *
+ * @note This is a "system component"
+ */
 class SurfaceComponent
 {
 public:
@@ -65,15 +68,6 @@ public:
 
 		bool visible;
 	};
-
-	SurfaceComponent(const CreateInfo &info)
-	    : m_title(info.title)
-	    , m_resolution(info.resolution)
-	    , m_vsync(info.vsync)
-	    , m_visible(info.visible)
-	    , m_native_data({})
-	{
-	}
 
 	[[nodiscard]] auto get_title() const -> std::string_view
 	{
@@ -127,6 +121,15 @@ public:
 	}
 
 private:
+	SurfaceComponent(const CreateInfo &info)
+	    : m_title(info.title)
+	    , m_resolution(info.resolution)
+	    , m_vsync(info.vsync)
+	    , m_visible(info.visible)
+	    , m_native_data({})
+	{
+	}
+
 	std::string m_title;
 
 	math::uvec2 m_resolution;

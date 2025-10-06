@@ -54,12 +54,6 @@ System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(regist
 	    "Failed to initialize surface system: registry has surface component(s)"
 	);
 
-	m_registry->connect_on_construct<SurfaceComponent>(
-	    [this](ecs::Registry &registry, ecs::EntityId entity) {
-		    on_surface_construct(registry, entity);
-	    }
-	);
-
 	m_registry->connect_on_destruct<SurfaceComponent>(
 	    [this](ecs::Registry &registry, ecs::EntityId entity) {
 		    on_surface_destruct(registry, entity);
@@ -106,97 +100,99 @@ void System::on_unregister()
 {
 }
 
-void System::on_surface_construct(ecs::Registry &registry, ecs::EntityId entity)
+auto System::create_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
+    -> std::optional<SurfaceComponent *>
+try
 {
-	try
+	auto &component = m_registry->add<SurfaceComponent>(entity, info);
+	auto &surface = m_registry->get<SurfaceComponent>(entity);
+	const auto &resolution = surface.get_resolution();
+	const auto &position = surface.get_position();
+	ensure_component_sanity(surface);
+
+	// TODO(Light): refactor "environment" into standalone module
+	// NOLINTNEXTLINE(concurrency-mt-unsafe)
+	auto *display_env = std::getenv("DISPLAY");
+	ensure(display_env != nullptr, "DISPLAY env var not found!");
+
+	auto *display = XOpenDisplay(display_env);
+	ensure(display, "Failed to open XDisplay with DISPLAY: {}", display_env);
+
+	auto root_window = XDefaultRootWindow(display);
+
+	auto border_width = 0;
+	auto depth = int32_t { CopyFromParent };
+	auto window_class = CopyFromParent;
+	auto *visual = (Visual *)CopyFromParent;
+
+	auto attribute_value_mask = CWBackPixel | CWEventMask;
+	auto attributes = XSetWindowAttributes {
+		.background_pixel = 0xffafe9af,
+		.event_mask = all_events_mask,
+	};
+
+	typedef struct Hints
 	{
-		auto &surface = registry.get<SurfaceComponent>(entity);
-		const auto &resolution = surface.get_resolution();
-		const auto &position = surface.get_position();
-		ensure_component_sanity(surface);
+		unsigned long flags;
+		unsigned long functions;
+		unsigned long decorations;
+		long inputMode;
+		unsigned long status;
+	} Hints;
 
-		// TODO(Light): refactor "environment" into standalone module
-		// NOLINTNEXTLINE(concurrency-mt-unsafe)
-		auto *display_env = std::getenv("DISPLAY");
-		ensure(display_env != nullptr, "DISPLAY env var not found!");
+	auto main_window = XCreateWindow(
+	    display,
+	    root_window,
+	    position.x,
+	    position.y,
+	    resolution.x,
+	    resolution.y,
+	    border_width,
+	    depth,
+	    window_class,
+	    visual,
+	    attribute_value_mask,
+	    &attributes
+	);
+	surface.m_native_data.display = display;
+	surface.m_native_data.window = main_window;
 
-		auto *display = XOpenDisplay(display_env);
-		ensure(display, "Failed to open XDisplay with DISPLAY: {}", display_env);
+	surface.m_native_data.wm_delete_message = XInternAtom(display, "WM_DELETE_WINDOW", False);
+	XSetWMProtocols(display, main_window, &surface.m_native_data.wm_delete_message, 1);
 
-		auto root_window = XDefaultRootWindow(display);
+	// code to remove decoration
+	auto hints = std::array<unsigned char, 5> { 2, 0, 0, 0, 0 };
+	const auto motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
 
-		auto border_width = 0;
-		auto depth = int32_t { CopyFromParent };
-		auto window_class = CopyFromParent;
-		auto *visual = (Visual *)CopyFromParent;
+	XChangeProperty(
+	    display,
+	    surface.m_native_data.window,
+	    motif_hints,
+	    motif_hints,
+	    32,
+	    PropModeReplace,
+	    hints.data(),
+	    5
+	);
 
-		auto attribute_value_mask = CWBackPixel | CWEventMask;
-		auto attributes = XSetWindowAttributes {
-			.background_pixel = 0xffafe9af,
-			.event_mask = all_events_mask,
-		};
+	XMapWindow(display, main_window);
+	XStoreName(display, main_window, surface.m_title.c_str());
+	XFlush(display);
 
-		typedef struct Hints
-		{
-			unsigned long flags;
-			unsigned long functions;
-			unsigned long decorations;
-			long inputMode;
-			unsigned long status;
-		} Hints;
-
-		auto main_window = XCreateWindow(
-		    display,
-		    root_window,
-		    position.x,
-		    position.y,
-		    resolution.x,
-		    resolution.y,
-		    border_width,
-		    depth,
-		    window_class,
-		    visual,
-		    attribute_value_mask,
-		    &attributes
-		);
-		surface.m_native_data.display = display;
-		surface.m_native_data.window = main_window;
-
-		surface.m_native_data.wm_delete_message = XInternAtom(display, "WM_DELETE_WINDOW", False);
-		XSetWMProtocols(display, main_window, &surface.m_native_data.wm_delete_message, 1);
-
-		// code to remove decoration
-		auto hints = std::array<unsigned char, 5> { 2, 0, 0, 0, 0 };
-		const auto motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
-
-		XChangeProperty(
-		    display,
-		    surface.m_native_data.window,
-		    motif_hints,
-		    motif_hints,
-		    32,
-		    PropModeReplace,
-		    hints.data(),
-		    5
-		);
-
-		XMapWindow(display, main_window);
-		XStoreName(display, main_window, surface.m_title.c_str());
-		XFlush(display);
-
-		if (!surface.is_visible())
-		{
-			XUnmapWindow(display, main_window);
-		}
-	}
-	catch (const std::exception &exp)
+	if (!surface.is_visible())
 	{
-		log_err("Exception thrown when on_constructing surface component");
-		log_err("\tentity: {}", entity);
-		log_err("\twhat: {}", exp.what());
-		registry.remove<SurfaceComponent>(entity);
-		throw;
+		XUnmapWindow(display, main_window);
 	}
+
+	return &component;
+}
+catch (const std::exception &exp)
+{
+	log_err("Exception thrown when on_constructing surface component");
+	log_err("\tentity: {}", entity);
+	log_err("\twhat: {}", exp.what());
+	m_registry->remove<SurfaceComponent>(entity);
+	return {};
 }
 
 void System::on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity)
@@ -285,7 +281,6 @@ void System::handle_events(SurfaceComponent &surface)
 			const auto new_height = event.xconfigure.height;
 			if (prev_width != new_width || prev_height != new_height)
 			{
-				log_dbg("resized: {} - {}", new_width, new_height);
 				surface.m_resolution.x = new_width;
 				surface.m_resolution.y = new_height;
 				queue.emplace_back<ResizedEvent>(ResizedEvent {
@@ -342,7 +337,7 @@ void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &r
 
 void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
 {
-	surface.m_resolution = request.resolution;
+	// surface.m_resolution = request.resolution;
 
 	auto &[display, window, _] = surface.m_native_data;
 	const auto &[width, height] = request.resolution;
