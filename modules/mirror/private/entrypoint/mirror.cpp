@@ -64,30 +64,25 @@ public:
 
 			if (input.get_action(m_quit_action_key).state == State::active)
 			{
-				log_dbg("Quit triggered! BYE!");
 				should_quit = true;
 			}
 			if (input.get_action(m_debug_action_keys[0]).state == State::active)
 			{
-				log_dbg("Deubg action 1");
 				surface.push_request(surface::ModifyPositionRequest({ x + 5, y + 5 }));
 			}
 
 			if (input.get_action(m_debug_action_keys[1]).state == State::active)
 			{
-				log_dbg("Deubg action 2");
 				surface.push_request(surface::ModifyPositionRequest({ x - 5, y - 5 }));
 			}
 
 			if (input.get_action(m_debug_action_keys[2]).state == State::active)
 			{
-				log_dbg("Deubg action 3");
 				surface.push_request(surface::ModifyResolutionRequest({ width + 5, height + 5 }));
 			}
 
 			if (input.get_action(m_debug_action_keys[3]).state == State::active)
 			{
-				log_dbg("Deubg action 4");
 				surface.push_request(surface::ModifyResolutionRequest({ width - 5, height - 5 }));
 			}
 		}
@@ -154,7 +149,7 @@ public:
 		m_surface_system = memory::create_ref<lt::surface::System>(m_editor_registry);
 
 		m_window = m_editor_registry->create_entity();
-		m_editor_registry->add<SurfaceComponent>(
+		m_surface_system->create_component(
 		    m_window,
 		    SurfaceComponent::CreateInfo {
 		        .title = "Editor Window",
@@ -217,12 +212,15 @@ public:
 		    .surface_entity = entity,
 		});
 
-		// entity.add<renderer::MessengerComponent>({
-		//     .severities = renderer::MessageSeverity::all,
-		//     .types = renderer::MessageType::all,
-		//     .callback = &renderer_callback,
-		//     .user_data = this,
-		// });
+		m_renderer_system->create_messenger_component(
+		    m_window,
+		    renderer::MessengerComponent::CreateInfo {
+		        .severities = renderer::MessageSeverity::all,
+		        .types = renderer::MessageType::all,
+		        .callback = &renderer_callback,
+		        .user_data = this,
+		    }
+		);
 	}
 
 	void setup_input_system()
