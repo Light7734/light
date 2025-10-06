@@ -3,6 +3,7 @@
 #include <ecs/entity.hpp>
 #include <memory/pointer_types/null_on_move.hpp>
 #include <memory/scope.hpp>
+#include <renderer/backend/vk/context/swapchain.hpp>
 #include <renderer/frontend/context/context.hpp>
 
 namespace lt::renderer::vk {
@@ -43,7 +44,11 @@ public:
 	void recreate_swapchain() override
 	{
 		m_swapchain.reset();
-		// m_swapchain = memory::create_scope<vk::Swapchain>(m_device, m_surface);
+		m_swapchain = memory::create_scope<vk::Swapchain>(
+		    m_surface.get(),
+		    m_gpu.get(),
+		    m_device.get()
+		);
 	}
 
 private:

@@ -44,6 +44,7 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	        .oldSwapchain = nullptr,
 	    }
 	);
+	m_resolution = capabilities.currentExtent;
 	m_device->name(m_swapchain, "swapchain {}", idx++);
 	m_device->wait_idle();
 

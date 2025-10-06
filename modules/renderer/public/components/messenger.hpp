@@ -1,7 +1,9 @@
 #pragma once
 
-#include <bitwise/operations.hpp>
 #include <any>
+#include <bitwise/operations.hpp>
+#include <memory/scope.hpp>
+#include <renderer/frontend/messenger.hpp>
 
 namespace lt::renderer {
 
@@ -36,18 +38,63 @@ using Callback_T = std::function<void(
     MessageSeverity message_severity,
     MessageType message_type,
     MessengerCallbackData data,
-    std::any user_data
+    std::any &user_data
 )>;
 
-struct MessengerComponent
+class MessengerComponent
 {
-	MessageSeverity severities;
+public:
+	friend class System;
 
-	MessageType types;
+	struct CreateInfo
+	{
+		MessageSeverity severities;
 
-	Callback_T callback;
+		MessageType types;
 
-	std::any user_data;
+		Callback_T callback;
+
+		std::any user_data;
+	};
+
+	[[nodiscard]] auto get_severities() const -> MessageSeverity
+	{
+		return m_severities;
+	}
+
+	[[nodiscard]] auto get_types() const -> MessageType
+	{
+		return m_types;
+	}
+
+	[[nodiscard]] auto get_callback() const -> const Callback_T &
+	{
+		return m_callback;
+	}
+
+	[[nodiscard]] auto get_user_data() -> std::any &
+	{
+		return m_user_data;
+	}
+
+private:
+	MessengerComponent(CreateInfo info)
+	    : m_severities(info.severities)
+	    , m_types(info.types)
+	    , m_callback(std::move(info.callback))
+	    , m_user_data(std::move(info.user_data))
+	{
+	}
+
+	MessageSeverity m_severities;
+
+	MessageType m_types;
+
+	Callback_T m_callback;
+
+	std::any m_user_data;
+
+	memory::Scope<IMessenger> m_implementation;
 };
 
 } // namespace lt::renderer

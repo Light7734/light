@@ -6,6 +6,7 @@
 #include <memory/reference.hpp>
 #include <memory/scope.hpp>
 #include <renderer/api.hpp>
+#include <renderer/components/messenger.hpp>
 
 namespace lt::renderer {
 
@@ -46,6 +47,8 @@ public:
 
 	void tick(app::TickInfo tick) override;
 
+	void create_messenger_component(ecs::EntityId entity, MessengerComponent::CreateInfo info);
+
 	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
 	{
 		return m_last_tick_result;
@@ -61,8 +64,6 @@ private:
 	memory::Scope<class IContext> m_context;
 
 	memory::Scope<class IRenderer> m_renderer;
-
-	std::vector<memory::Scope<class IMessenger>> m_messengers;
 
 	app::TickResult m_last_tick_result {};
 

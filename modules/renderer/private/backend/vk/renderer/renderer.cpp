@@ -136,6 +136,7 @@ void Renderer::replace_swapchain(ISwapchain *swapchain)
 	m_device->wait_idle();
 	m_swapchain = static_cast<Swapchain *>(swapchain);
 	m_resolution = m_swapchain->get_resolution();
+	m_pass->replace_swapchain(*swapchain);
 }
 
 void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)

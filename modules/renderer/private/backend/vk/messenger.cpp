@@ -7,13 +7,13 @@ Messenger::Messenger(IInstance *instance, ecs::Entity entity)
     , m_entity(std::move(entity))
 
 {
-	const auto &component = entity.get<MessengerComponent>();
+	const auto &component = m_entity.get<MessengerComponent>();
 
 	m_debug_messenger = m_instance->create_messenger(
 	    VkDebugUtilsMessengerCreateInfoEXT {
 	        .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-	        .messageSeverity = to_native_severity(component.severities),
-	        .messageType = to_native_type(component.types),
+	        .messageSeverity = to_native_severity(component.get_severities()),
+	        .messageType = to_native_type(component.get_types()),
 	        .pfnUserCallback = &native_callback,
 	        .pUserData = this,
 	    }
@@ -43,13 +43,13 @@ Messenger::~Messenger()
 
 		auto *messenger = (Messenger *)vulkan_user_data; // NOLINT
 		auto &component = messenger->m_entity.get<MessengerComponent>();
-		component.callback(
+		component.get_callback()(
 		    from_native_severity(severity),
 		    from_native_type(type),
 		    {
 		        .message = callback_data->pMessage,
 		    },
-		    component.user_data
+		    component.get_user_data()
 		);
 	}
 	catch (const std::exception &exp)

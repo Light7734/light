@@ -19,10 +19,6 @@ System::System(CreateInfo info)
 	ensure(m_registry, "Failed to initialize renderer system: null registry");
 
 	m_renderer = IRenderer::create(m_api, *m_context, info.config.max_frames_in_flight);
-
-	// WIP(Light): attach debug messenger on messenger component construction
-	// m_registry->connect_on_construct<renderer::MessengerComponent>([](ecs::Registry &registry,
-	//                                                                   ecs::EntityId entity) {});
 }
 
 System::~System()
@@ -61,5 +57,22 @@ void System::tick(app::TickInfo tick)
 
 	m_frame_idx = (m_frame_idx + 1) % m_max_frames_in_flight;
 }
+
+void System::create_messenger_component(ecs::EntityId entity, MessengerComponent::CreateInfo info)
+try
+{
+	auto &component = m_registry->add<MessengerComponent>(entity, std::move(info));
+	component.m_implementation = IMessenger::create(
+	    m_api,
+	    m_context->instance(),
+	    { m_registry, entity }
+	);
+}
+catch (const std::exception &exp)
+{
+	log_err("Failed to create renderer::MessengerComponent:");
+	log_err("\twhat: {}", exp.what());
+}
+
 
 } // namespace lt::renderer

@@ -13,7 +13,6 @@ namespace lt::renderer {
 	switch (target_api)
 	{
 	case API::Vulkan: return memory::create_scope<vk::Messenger>(instance, std::move(entity));
-
 	case API::Metal:
 	case API::DirectX: throw std::runtime_error { "Invalid API" };
 	}
