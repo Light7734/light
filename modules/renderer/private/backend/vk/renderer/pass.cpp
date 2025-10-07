@@ -5,11 +5,12 @@
 namespace lt::renderer::vk {
 
 Pass::Pass(
-    IContext &context,
-    lt::assets::ShaderAsset vertex_shader,
-    lt::assets::ShaderAsset fragment_shader
+    IDevice *device,
+    ISwapchain *swapchain,
+    const lt::assets::ShaderAsset &vertex_shader,
+    const lt::assets::ShaderAsset &fragment_shader
 )
-    : m_device(static_cast<Device *>(context.device()))
+    : m_device(static_cast<Device *>(device))
 {
 	auto *vertex_module = create_module(
 	    vertex_shader.unpack(lt::assets::ShaderAsset::BlobTag::code)
@@ -113,7 +114,7 @@ Pass::Pass(
 	);
 
 	auto attachment_description = VkAttachmentDescription {
-		.format = static_cast<Swapchain *>(context.swapchain())->get_format(),
+		.format = static_cast<Swapchain *>(swapchain)->get_format(),
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -176,8 +177,7 @@ Pass::Pass(
 	    }
 	);
 
-	m_framebuffers = static_cast<Swapchain *>(context.swapchain())
-	                     ->create_framebuffers_for_pass(m_pass);
+	m_framebuffers = static_cast<Swapchain *>(swapchain)->create_framebuffers_for_pass(m_pass);
 
 
 	m_device->destroy_shader_module(vertex_module);

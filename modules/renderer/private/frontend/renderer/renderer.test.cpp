@@ -1,74 +1,96 @@
 #include <memory/reference.hpp>
-#include <renderer/vk/renderer/renderer.hpp>
-#include <renderer/vk/test_utils.hpp>
-
-using ::lt::assets::ShaderAsset;
-using ::lt::renderer::vk::Pass;
-using ::lt::renderer::vk::Renderer;
+#include <renderer/frontend/renderer/renderer.hpp>
+#include <renderer/test/utils.hpp>
 
 Suite raii = "renderer_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
-		auto observer = ValidationObserver {};
-		auto [context, _] = create_context();
-
-		std::ignore = Renderer(
-		    context,
-		    lt::memory::create_ref<Pass>(
-		        context,
-		        ShaderAsset { "./data/test_assets/triangle.vert.asset" },
-		        ShaderAsset { "./data/test_assets/triangle.frag.asset" }
-		    )
+		auto fixture = FixtureDeviceSwapchain {};
+		ignore = lt::renderer::IRenderer::create(
+		    constants::api,
+		    fixture.device(),
+		    fixture.swapchain(),
+		    constants::frames_in_flight
 		);
+	};
 
-		expect_false(observer.had_any_messages());
+	Case { "unhappy path throws" } = [] {
+		auto fixture = FixtureDeviceSwapchain {};
+
+		expect_throw([&] {
+			ignore = lt::renderer::IRenderer::create(
+			    constants::api,
+			    nullptr,
+			    fixture.swapchain(),
+			    constants::frames_in_flight
+			);
+		});
+
+		expect_throw([&] {
+			ignore = lt::renderer::IRenderer::create(
+			    constants::api,
+			    fixture.device(),
+			    nullptr,
+			    constants::frames_in_flight
+			);
+		});
+
+		expect_throw([&] {
+			ignore = lt::renderer::IRenderer::create(
+			    constants::api,
+			    fixture.device(),
+			    nullptr,
+			    lt::renderer::IRenderer::frames_in_flight_upper_limit + 1
+			);
+		});
+
+		expect_throw([&] {
+			ignore = lt::renderer::IRenderer::create(
+			    constants::api,
+			    fixture.device(),
+			    nullptr,
+			    lt::renderer::IRenderer::frames_in_flight_lower_limit - 1
+			);
+		});
 	};
 };
 
 Suite draw = "renderer_draw"_suite = [] {
-	Case { "renderer draw" } = [] {
-		auto observer = ValidationObserver {};
-		auto [context, _] = create_context();
+	using enum lt::renderer::IRenderer::DrawResult;
 
-		auto renderer = Renderer(
-		    context,
-		    lt::memory::create_ref<Pass>(
-		        context,
-		        ShaderAsset { "./data/test_assets/triangle.vert.asset" },
-		        ShaderAsset { "./data/test_assets/triangle.frag.asset" }
-		    )
+	Case { "renderer draw" } = [] {
+		auto fixture = FixtureDeviceSwapchain {};
+		auto renderer = lt::renderer::IRenderer::create(
+		    constants::api,
+		    fixture.device(),
+		    fixture.swapchain(),
+		    constants::frames_in_flight
 		);
 
 		for (auto frame_idx : std::views::iota(0u, 30u))
 		{
-			expect_true(renderer.draw(frame_idx % Renderer::max_frames_in_flight));
+			expect_eq(renderer->draw(frame_idx % constants::frames_in_flight), success);
 		}
-		expect_false(observer.had_any_messages());
 	};
 
 	Case { "post swapchain replacement renderer draw" } = [] {
-		auto observer = ValidationObserver {};
-		auto [context, _] = create_context();
-		auto pass = lt::memory::create_ref<Pass>(
-		    context,
-		    ShaderAsset { "./data/test_assets/triangle.vert.asset" },
-		    ShaderAsset { "./data/test_assets/triangle.frag.asset" }
+		auto fixture = FixtureDeviceSwapchain {};
+		auto renderer = lt::renderer::IRenderer::create(
+		    constants::api,
+		    fixture.device(),
+		    fixture.swapchain(),
+		    constants::frames_in_flight
 		);
 
-		auto renderer = Renderer { context, pass };
-
 		for (auto frame_idx : std::views::iota(0u, 15u))
 		{
-			expect_true(renderer.draw(frame_idx % Renderer::max_frames_in_flight));
+			expect_eq(renderer->draw(frame_idx % constants::frames_in_flight), success);
 		}
 
-		context.recreate_swapchain();
-		renderer.replace_swapchain(context.swapchain());
-		pass->replace_swapchain(context.swapchain());
+		fixture.recreate_swapchain();
+		renderer->replace_swapchain(fixture.swapchain());
 		for (auto frame_idx : std::views::iota(0u, 15u))
 		{
-			expect_true(renderer.draw(frame_idx % Renderer::max_frames_in_flight));
+			expect_eq(renderer->draw(frame_idx % constants::frames_in_flight), success);
 		}
-
-		expect_false(observer.had_any_messages());
 	};
 };

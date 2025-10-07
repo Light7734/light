@@ -24,7 +24,6 @@ public:
 
 	auto operator=(const Messenger &) const -> Messenger & = delete;
 
-
 private:
 	static auto native_callback(
 	    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
@@ -45,7 +44,7 @@ private:
 
 	memory::NullOnMove<class Instance *> m_instance {};
 
-	ecs::Entity m_entity;
+	memory::Scope<ecs::Entity> m_entity;
 
 	VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
 

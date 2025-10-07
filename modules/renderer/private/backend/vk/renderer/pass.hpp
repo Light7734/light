@@ -3,7 +3,6 @@
 #include <assets/shader.hpp>
 #include <memory/pointer_types/null_on_move.hpp>
 #include <renderer/backend/vk/utils.hpp>
-#include <renderer/frontend/context/context.hpp>
 #include <renderer/frontend/renderer/pass.hpp>
 
 namespace lt::renderer::vk {
@@ -12,9 +11,10 @@ class Pass: public IPass
 {
 public:
 	Pass(
-	    IContext &context,
-	    lt::assets::ShaderAsset vertex_shader,
-	    lt::assets::ShaderAsset fragment_shader
+	    class IDevice *device,
+	    class ISwapchain *swapchain,
+	    const lt::assets::ShaderAsset &vertex_shader,
+	    const lt::assets::ShaderAsset &fragment_shader
 	);
 
 	~Pass() override;

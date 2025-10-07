@@ -91,7 +91,7 @@ public:
 	[[nodiscard]] auto acquire_image(
 	    VkSwapchainKHR swapchain,
 	    VkSemaphore semaphore,
-	    uint64_t timeout = 1'000'000
+	    uint64_t timeout = 100'000'000
 	) -> std::optional<uint32_t>;
 
 	[[nodiscard]] auto get_swapchain_images(VkSwapchainKHR swapchain) const -> std::vector<VkImage>;

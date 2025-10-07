@@ -29,7 +29,7 @@ enum class MessageType : uint8_t
 	all = general | validation | performance,
 };
 
-struct MessengerCallbackData
+struct MessageData
 {
 	std::string message;
 };
@@ -37,7 +37,7 @@ struct MessengerCallbackData
 using Callback_T = std::function<void(
     MessageSeverity message_severity,
     MessageType message_type,
-    MessengerCallbackData data,
+    MessageData data,
     std::any &user_data
 )>;
 

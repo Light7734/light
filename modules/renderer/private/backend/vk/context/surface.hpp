@@ -30,7 +30,7 @@ public:
 		return m_surface;
 	}
 
-	[[nodiscard]] auto get_framebuffer_size() const -> VkExtent2D;
+	[[nodiscard]] auto get_framebuffer_size() const -> math::uvec2 override;
 
 private:
 	class Instance *m_instance {};

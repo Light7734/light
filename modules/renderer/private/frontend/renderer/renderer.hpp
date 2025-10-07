@@ -8,6 +8,10 @@ namespace lt::renderer {
 class IRenderer
 {
 public:
+	static constexpr auto frames_in_flight_upper_limit = 5u;
+
+	static constexpr auto frames_in_flight_lower_limit = 1u;
+
 	enum class DrawResult : uint8_t
 	{
 		success = 0,
@@ -15,8 +19,12 @@ public:
 		error,
 	};
 
-	static auto create(API target_api, class IContext &context, uint32_t max_frames_in_flight)
-	    -> memory::Scope<IRenderer>;
+	[[nodiscard]] static auto create(
+	    Api target_api,
+	    class IDevice *device,
+	    class ISwapchain *swapchain,
+	    uint32_t max_frames_in_flight
+	) -> memory::Scope<IRenderer>;
 
 	IRenderer() = default;
 

@@ -1,52 +1,88 @@
 #include <memory/reference.hpp>
-#include <renderer/vk/context/surface.hpp>
-#include <renderer/vk/debug/messenger.hpp>
-#include <renderer/vk/test_utils.hpp>
+#include <renderer/frontend/context/instance.hpp>
+#include <renderer/frontend/context/surface.hpp>
+#include <renderer/test/utils.hpp>
 #include <surface/components.hpp>
 #include <surface/system.hpp>
 #include <test/test.hpp>
 
-using ::lt::ecs::Entity;
+using ::lt::ecs::EntityId;
 using ::lt::ecs::Registry;
-using ::lt::renderer::vk::Surface;
 using ::lt::surface::SurfaceComponent;
-using ::lt::surface::System;
 
 Suite raii = "surface"_suite = [] {
 	Case { "happy path won't throw" } = [&] {
-		auto observer = ValidationObserver {};
+		auto fixture = Fixture_SurfaceSystem {};
 
-		auto registry = lt::memory::create_ref<Registry>();
-		auto entity = Entity { registry, registry->create_entity() };
-		auto surface_system = System(registry);
+		const auto surface = lt::renderer::ISurface::create(
+		    constants::api,
+		    lt::renderer::IInstance::get(constants::api),
+		    fixture.surface_entity()
+		);
 
-		entity.add<SurfaceComponent>(SurfaceComponent::CreateInfo {
-		    .title = "",
-		    .resolution = constants::resolution,
-		    .visible = true,
-		});
-
-		const auto surface = Surface { entity };
-		const auto &[x, y] = surface.get_framebuffer_size();
-
+		const auto &[x, y] = surface->get_framebuffer_size();
 		expect_eq(x, constants::resolution.x);
 		expect_eq(y, constants::resolution.y);
-		expect_not_nullptr(surface.vk());
-		expect_false(observer.had_any_messages());
 	};
 
 	Case { "unhappy path throws" } = [&] {
-		auto observer = ValidationObserver {};
-		auto registry = lt::memory::create_ref<Registry>();
-		auto entity = Entity { registry, registry->create_entity() };
+		auto registry = lt::memory::create_ref<lt::ecs::Registry>();
+		auto entity = lt::ecs::Entity { registry, registry->create_entity() };
+		auto system = lt::surface::System(registry);
 
-		entity.add<SurfaceComponent>(SurfaceComponent::CreateInfo {
-		    .title = "",
-		    .resolution = constants::resolution,
-		    .visible = true,
+		expect_throw([&] {
+			std::ignore = lt::renderer::ISurface::create(
+			    constants::api,
+			    lt::renderer::IInstance::get(constants::api),
+			    entity
+			);
 		});
 
-		expect_throw([&] { Surface { entity }; });
-		expect_false(observer.had_any_messages());
+		system.create_surface_component(
+		    entity.id(),
+		    lt::surface::SurfaceComponent::CreateInfo {
+		        .title = "",
+		        .resolution = constants::resolution,
+		    }
+		);
+
+		expect_throw([&] {
+			std::ignore = lt::renderer::ISurface::create(constants::api, nullptr, entity);
+		});
+
+		expect_throw([&] {
+			std::ignore = lt::renderer::ISurface::create(
+			    lt::renderer::Api::none,
+			    lt::renderer::IInstance::get(constants::api),
+			    entity
+			);
+		});
+
+		expect_throw([&] {
+			std::ignore = lt::renderer::ISurface::create(
+			    lt::renderer::Api::direct_x,
+			    lt::renderer::IInstance::get(constants::api),
+			    entity
+			);
+		});
+
+		expect_throw([&] {
+			std::ignore = lt::renderer::ISurface::create(
+			    lt::renderer::Api::metal,
+			    lt::renderer::IInstance::get(constants::api),
+			    entity
+			);
+		});
+
+		// Ensure base creation info is non-throwing
+		std::ignore = lt::renderer::ISurface::create(
+		    constants::api,
+		    lt::renderer::IInstance::get(constants::api),
+		    entity
+		);
+	};
+
+	// TODO(Light): add torture tests
+	Case { "torture tests" } = [] {
 	};
 };

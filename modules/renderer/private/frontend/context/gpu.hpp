@@ -1,10 +1,16 @@
 #pragma once
 
+#include <memory/scope.hpp>
+#include <renderer/api.hpp>
+
 namespace lt::renderer {
 
 class IGpu
 {
 public:
+	[[nodiscard]] static auto create(Api target_api, class IInstance *instance)
+	    -> memory::Scope<IGpu>;
+
 	IGpu() = default;
 
 	virtual ~IGpu() = default;

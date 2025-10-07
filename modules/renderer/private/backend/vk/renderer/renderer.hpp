@@ -2,11 +2,9 @@
 
 #include <memory/reference.hpp>
 #include <ranges>
-#include <renderer/backend/vk/context/context.hpp>
 #include <renderer/backend/vk/context/device.hpp>
 #include <renderer/backend/vk/renderer/pass.hpp>
 #include <renderer/backend/vk/utils.hpp>
-#include <renderer/frontend/context/context.hpp>
 #include <renderer/frontend/renderer/pass.hpp>
 #include <renderer/frontend/renderer/renderer.hpp>
 
@@ -15,7 +13,7 @@ namespace lt::renderer::vk {
 class Renderer: public IRenderer
 {
 public:
-	Renderer(IContext &context, uint32_t max_frames_in_flight);
+	Renderer(class IDevice *device, class ISwapchain *swapchain, uint32_t max_frames_in_flight);
 
 	~Renderer() override;
 

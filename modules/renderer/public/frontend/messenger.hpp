@@ -9,7 +9,7 @@ namespace lt::renderer {
 class IMessenger
 {
 public:
-	[[nodiscard]] static auto create(API target_api, class IInstance *instance, ecs::Entity entity)
+	[[nodiscard]] static auto create(Api target_api, class IInstance *instance, ecs::Entity entity)
 	    -> memory::Scope<IMessenger>;
 
 	IMessenger() = default;

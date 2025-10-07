@@ -2,11 +2,13 @@
 
 namespace lt::renderer {
 
-enum class API : uint8_t
+enum class Api : uint8_t
 {
-	Vulkan,
-	DirectX,
-	Metal,
+	none = 0,
+
+	vulkan,
+	direct_x,
+	metal,
 };
 
 }

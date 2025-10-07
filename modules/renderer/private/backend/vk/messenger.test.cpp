@@ -1,6 +1,5 @@
 #include <renderer/backend/vk/context/surface.hpp>
 #include <renderer/backend/vk/debug/messenger.hpp>
-#include <renderer/backend/vk/test_utils.hpp>
 #include <surface/components.hpp>
 #include <surface/system.hpp>
 #include <test/expects.hpp>

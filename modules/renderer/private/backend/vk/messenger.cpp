@@ -4,10 +4,24 @@ namespace lt::renderer::vk {
 
 Messenger::Messenger(IInstance *instance, ecs::Entity entity)
     : m_instance(static_cast<Instance *>(instance))
-    , m_entity(std::move(entity))
+
+    // Move this to heap for pointer-stability of .pUserData
+    , m_entity(memory::create_scope<ecs::Entity>(std::move(entity)))
 
 {
-	const auto &component = m_entity.get<MessengerComponent>();
+	const auto &component = m_entity->get<MessengerComponent>();
+
+	ensure(
+	    component.get_severities() != MessageSeverity::none,
+	    "Failed to create vk::Messenger: severities == none"
+	);
+
+	ensure(
+	    component.get_types() != MessageType::none,
+	    "Failed to create vk::Messenger: types == none"
+	);
+
+	ensure(component.get_callback(), "Failed to create vk::Messenger: null callback");
 
 	m_debug_messenger = m_instance->create_messenger(
 	    VkDebugUtilsMessengerCreateInfoEXT {
@@ -15,7 +29,7 @@ Messenger::Messenger(IInstance *instance, ecs::Entity entity)
 	        .messageSeverity = to_native_severity(component.get_severities()),
 	        .messageType = to_native_type(component.get_types()),
 	        .pfnUserCallback = &native_callback,
-	        .pUserData = this,
+	        .pUserData = m_entity.get(),
 	    }
 	);
 }
@@ -41,8 +55,8 @@ Messenger::~Messenger()
 	{
 		ensure(vulkan_user_data, "Null vulkan_user_data received in messenger callback");
 
-		auto *messenger = (Messenger *)vulkan_user_data; // NOLINT
-		auto &component = messenger->m_entity.get<MessengerComponent>();
+		auto *messenger = std::bit_cast<ecs::Entity *>(vulkan_user_data);
+		auto &component = messenger->get<MessengerComponent>();
 		component.get_callback()(
 		    from_native_severity(severity),
 		    from_native_type(type),
@@ -102,22 +116,22 @@ Messenger::~Messenger()
 
 	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		flags &= std::to_underlying(error);
+		flags |= std::to_underlying(error);
 	}
 
 	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 	{
-		flags &= std::to_underlying(warning);
+		flags |= std::to_underlying(warning);
 	}
 
 	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
 	{
-		flags &= std::to_underlying(info);
+		flags |= std::to_underlying(info);
 	}
 
 	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
 	{
-		flags &= std::to_underlying(verbose);
+		flags |= std::to_underlying(verbose);
 	}
 
 	return static_cast<MessageSeverity>(flags);

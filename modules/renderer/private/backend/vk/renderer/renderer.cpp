@@ -4,9 +4,9 @@
 
 namespace lt::renderer::vk {
 
-Renderer::Renderer(IContext &context, uint32_t max_frames_in_flight)
-    : m_device(static_cast<Device *>(context.device()))
-    , m_swapchain(static_cast<Swapchain *>(context.swapchain()))
+Renderer::Renderer(IDevice *device, ISwapchain *swapchain, uint32_t max_frames_in_flight)
+    : m_device(static_cast<Device *>(device))
+    , m_swapchain(static_cast<Swapchain *>(swapchain))
     , m_resolution(m_swapchain->get_resolution())
     , m_max_frames_in_flight(max_frames_in_flight)
 {
@@ -15,7 +15,8 @@ Renderer::Renderer(IContext &context, uint32_t max_frames_in_flight)
 
 	// TODO(Light): HARDCODED PASS!!!
 	m_pass = memory::create_ref<vk::Pass>(
-	    context,
+	    m_device,
+	    m_swapchain,
 	    assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 	    assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 	);

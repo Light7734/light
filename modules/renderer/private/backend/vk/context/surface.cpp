@@ -32,15 +32,9 @@ Surface::~Surface()
 	m_instance->destroy_surface(m_surface);
 }
 
-[[nodiscard]] auto Surface::get_framebuffer_size() const -> VkExtent2D
+[[nodiscard]] auto Surface::get_framebuffer_size() const -> math::uvec2
 {
-	const auto &[width, height] = //
-	    m_surface_entity.get<surface::SurfaceComponent>().get_resolution();
-
-	return {
-		.width = width,
-		.height = height,
-	};
+	return m_surface_entity.get<surface::SurfaceComponent>().get_resolution();
 }
 
 } // namespace lt::renderer::vk
