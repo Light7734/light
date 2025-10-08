@@ -6,6 +6,7 @@ PUBLIC
     assets
     logger
     lt_debug
+    tbb
 )
 add_test_module(libasset_baker 
     bakers.test.cpp
