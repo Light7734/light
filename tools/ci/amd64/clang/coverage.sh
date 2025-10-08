@@ -2,16 +2,16 @@
 
 set -e
 cd $(git rev-parse --show-toplevel)/
-rm -rf ./build
-mkdir build/ && cd build
+rm -rf ./build && mkdir build/
 
 Xvfb :99 -screen 0 1024x768x16 &
 export CXX=$(which clang++)
 export CC=$(which clang)
 export DISPLAY=:99
 
-cmake .. \
--G Ninja \
+cmake . \
+-Bbuild \
+-GNinja \
 -DCMAKE_LINKER_TYPE=MOLD \
 -DENABLE_UNIT_TESTS=ON \
 -DENABLE_LLVM_COVERAGE=ON \

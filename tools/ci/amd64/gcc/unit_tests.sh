@@ -2,7 +2,7 @@
 
 set -e
 cd $(git rev-parse --show-toplevel)/
-rm -rf ./build && mkdir build/ && cd build
+rm -rf ./build && mkdir build/
 
 Xvfb :99 -screen 0 1024x768x16 &
 export CXX=$(which g++)
@@ -10,8 +10,9 @@ export CC=$(which gcc)
 export DISPLAY=:99
 
 # gcc uses libstdc++ by default
-cmake .. \
--G Ninja \
+cmake . \
+-Bbuild \
+-GNinja \
 -DCMAKE_LINKER_TYPE=MOLD \
 -DENABLE_UNIT_TESTS=ON \
 -DCMAKE_BUILD_TYPE=Release \
