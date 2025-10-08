@@ -30,7 +30,7 @@ cmake . \
 -Wl,-rpath,/libcxx_lsan/lib" \
 && cmake --build ./build -j`nproc`
 
-export LSAN_OPTIONS='suppressions=./tools/ci/amd64/clang/lsan.supp'
+export LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/amd64/clang/lsan.supp"
 
 for test in $(find ./build -type f -name '*_tests' -executable); do
   echo "Running $test"
