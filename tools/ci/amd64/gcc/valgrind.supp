@@ -1,4 +1,20 @@
 {
+    <insert_a_suppression_name_here>
+    Memcheck:Param
+    writev(vector[0])
+    fun:writev
+    fun:UnknownInlinedFun
+    fun:_xcb_conn_wait.part.0
+    fun:UnknownInlinedFun
+    fun:_xcb_out_send
+    fun:UnknownInlinedFun
+    fun:xcb_writev
+    fun:_XSend
+    fun:UnknownInlinedFun
+    fun:_XFlush
+    fun:XFlush
+}
+{
    xflush
    Memcheck:Param
    src:xcb_io.c:604
