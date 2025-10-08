@@ -60,7 +60,7 @@ Suite packing = "shader_pack"_suite = [] {
 
 		auto stream = std::ifstream {
 			out_path,
-			std::ios::binary | std::ios::beg,
+			std::ios::binary,
 		};
 		expect_true(stream.is_open());
 
