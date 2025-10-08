@@ -35,7 +35,7 @@ for test in $(find ./build -type f -name '*_tests' -executable); do
     "$test"
 done
 
-llvm-profdata merge --input-files './build/coverage/list' -o "./coverage/merged.profdata" 
+llvm-profdata merge --input-files './build/coverage/list' -o "./build/coverage/merged.profdata" 
 find ./build/modules -type f -name "*.profraw" -exec rm -fv {} +
 
 LLVM_COV_SHOW=$(llvm-cov show \
