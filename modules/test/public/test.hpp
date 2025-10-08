@@ -321,7 +321,6 @@ struct TestSuite
 	template<typename TSuite>
 	TestSuite(TSuite body)
 	{
-		std::println("CONSTRUCTOR");
 #ifndef LIGHT_SKIP_TESTS
 		details::Registry::register_suite(+body);
 #endif
