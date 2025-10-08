@@ -39,6 +39,11 @@ public:
 		return m_registry;
 	}
 
+	[[nodiscard]] auto id() const -> EntityId
+	{
+		return m_identifier;
+	}
+
 private:
 	memory::Ref<Registry> m_registry;
 
