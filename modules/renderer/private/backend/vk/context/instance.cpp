@@ -231,7 +231,7 @@ void Instance::initialize_instance()
 
 void Instance::load_library()
 {
-	library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
+	library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
 	ensure(library, "Failed to dlopen libvulkan.so");
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -248,8 +248,8 @@ void Instance::unload_library()
 		return;
 	}
 
-	dlclose(library);
-	library = nullptr;
+	// dlclose(library);
+	// library = nullptr;
 }
 
 void Instance::load_global_functions()
