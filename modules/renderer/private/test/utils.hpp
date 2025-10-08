@@ -30,6 +30,16 @@ constexpr auto frames_in_flight = uint32_t { 3u };
 
 } // namespace constants
 
+
+inline void noop_messenger_callback(
+    lt::renderer::IMessenger::MessageSeverity severity,
+    lt::renderer::IMessenger::MessageType type,
+    const lt::renderer::IMessenger::MessageData &data,
+    std::any &user_data
+)
+{
+}
+
 class Fixture_SurfaceSystem
 {
 public:
@@ -53,6 +63,12 @@ public:
                 },
                 .registry = registry(),
 		        .surface_entity = surface_entity(),
+                .debug_callback_info = {
+                    .severities = lt::renderer::IMessenger::MessageSeverity::all,
+                    .types= lt::renderer::IMessenger::MessageType::all,
+                    .callback = noop_messenger_callback,
+                    .user_data = {},
+                }
 		    } ;
 	}
 
@@ -154,33 +170,40 @@ public:
 
 	[[nodiscard]] auto has_any_messages() const -> bool
 	{
-		return m_has_any_messages;
+		return m_user_data->m_has_any_messages;
 	}
 
-	[[nodiscard]] auto has_any_messages_of(lt::renderer::MessageSeverity severity) const -> uint32_t
+	[[nodiscard]] auto has_any_messages_of(
+	    lt::renderer::IMessenger ::MessageSeverity severity
+	) const -> uint32_t
 	{
-		return m_severity_counter.contains(severity);
+		return m_user_data->m_severity_counter.contains(severity);
 	}
 
 private:
 	static void messenger_callback(
-	    lt::renderer::MessageSeverity severity,
-	    lt::renderer::MessageType type,
-	    lt::renderer::MessageData data,
+	    lt::renderer::IMessenger::MessageSeverity severity,
+	    lt::renderer::IMessenger::MessageType type,
+	    const lt::renderer::IMessenger::MessageData &data,
 	    std::any &user_data
 	)
 	{
-		std::ignore = type;
 		std::ignore = data;
+		std::ignore = type;
 
-		auto *fixture = std::any_cast<Fixture_RendererSystem *>(user_data);
+		auto *fixture = std::any_cast<UserData *>(user_data);
 		fixture->m_has_any_messages = true;
 		++fixture->m_severity_counter[severity];
 	}
 
-	std::unordered_map<lt::renderer::MessageSeverity, uint32_t> m_severity_counter;
+	struct UserData
+	{
+		std::unordered_map<lt::renderer::IMessenger::MessageSeverity, uint32_t> m_severity_counter;
 
-	bool m_has_any_messages {};
+		bool m_has_any_messages {};
+	};
+
+	lt::memory::Scope<UserData> m_user_data = lt::memory::create_scope<UserData>();
 
 	lt::renderer::System m_system = lt::renderer::System::CreateInfo {
 		.config = { 
@@ -189,11 +212,11 @@ private:
         },
 		.registry = registry(),
 		.surface_entity = surface_entity(),
-        .messenger_info = lt::renderer::MessengerComponent::CreateInfo {
-		        .severities = lt::renderer::MessageSeverity::all,
-		        .types = lt::renderer::MessageType::all,
+        .debug_callback_info = lt::renderer::IMessenger ::CreateInfo {
+		        .severities = lt::renderer::IMessenger ::MessageSeverity::all,
+		        .types = lt::renderer::IMessenger ::MessageType::all,
 		        .callback = &messenger_callback,
-		        .user_data = this,
+		        .user_data = m_user_data.get(),
         }
 	};
 };

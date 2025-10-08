@@ -33,21 +33,7 @@ System::System(CreateInfo info)
 	    frames_in_flight_upper_limit
 	);
 
-	if (info.messenger_info.has_value())
-	{
-		ensure(
-		    create_messenger_component(m_registry->create_entity(), info.messenger_info.value()),
-		    "Failed to initialize renderer::System: failed to create messenger component"
-		);
-	}
-	else
-	{
-		log_wrn(
-		    "Creating renderer::System without a default messenger component, this is not "
-		    "recommended"
-		);
-	}
-
+	m_messenger = IMessenger::create(m_api, m_instance, info.debug_callback_info);
 	m_surface = ISurface::create(m_api, m_instance, m_surface_entity);
 	m_gpu = IGpu::create(m_api, m_instance);
 	m_device = IDevice::create(m_api, m_gpu.get(), m_surface.get());
@@ -62,16 +48,6 @@ System::System(CreateInfo info)
 
 System::~System()
 {
-	auto entities_to_remove = std::vector<ecs::EntityId> {};
-	for (auto &[entity, surface] : m_registry->view<MessengerComponent>())
-	{
-		entities_to_remove.emplace_back(entity);
-	}
-
-	for (auto entity : entities_to_remove)
-	{
-		m_registry->remove<MessengerComponent>(entity);
-	}
 }
 
 void System::on_register()
@@ -107,25 +83,5 @@ void System::tick(app::TickInfo tick)
 
 	m_frame_idx = (m_frame_idx + 1) % m_max_frames_in_flight;
 }
-
-[[nodiscard]] auto System::create_messenger_component(
-    ecs::EntityId entity,
-    MessengerComponent::CreateInfo info
-) -> bool
-try
-{
-	auto &component = m_registry->add<MessengerComponent>(entity, std::move(info));
-	component.m_implementation = IMessenger::create(m_api, m_instance, { m_registry, entity });
-	// component.m_user_data = info.user_data;
-	return true;
-}
-catch (const std::exception &exp)
-{
-	log_err("Failed to create renderer::MessengerComponent:");
-	log_err("\twhat: {}", exp.what());
-	m_registry->remove<MessengerComponent>(entity);
-	return false;
-}
-
 
 } // namespace lt::renderer

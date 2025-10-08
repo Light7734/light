@@ -2,46 +2,20 @@
 
 namespace lt::renderer::vk {
 
-Messenger::Messenger(IInstance *instance, ecs::Entity entity)
+Messenger::Messenger(IInstance *instance, CreateInfo info)
     : m_instance(static_cast<Instance *>(instance))
-
-    // Move this to heap for pointer-stability of .pUserData
-    , m_entity(memory::create_scope<ecs::Entity>(std::move(entity)))
-
+    , m_user_data(std::move(info.user_data))
+    , m_debug_messenger(
+          m_instance,
+          VkDebugUtilsMessengerCreateInfoEXT {
+              .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+              .messageSeverity = to_native_severity(info.severities),
+              .messageType = to_native_type(info.types),
+              .pfnUserCallback = &native_callback,
+              .pUserData = this,
+          }
+      )
 {
-	const auto &component = m_entity->get<MessengerComponent>();
-
-	ensure(
-	    component.get_severities() != MessageSeverity::none,
-	    "Failed to create vk::Messenger: severities == none"
-	);
-
-	ensure(
-	    component.get_types() != MessageType::none,
-	    "Failed to create vk::Messenger: types == none"
-	);
-
-	ensure(component.get_callback(), "Failed to create vk::Messenger: null callback");
-
-	m_debug_messenger = m_instance->create_messenger(
-	    VkDebugUtilsMessengerCreateInfoEXT {
-	        .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-	        .messageSeverity = to_native_severity(component.get_severities()),
-	        .messageType = to_native_type(component.get_types()),
-	        .pfnUserCallback = &native_callback,
-	        .pUserData = m_entity.get(),
-	    }
-	);
-}
-
-Messenger::~Messenger()
-{
-	if (!m_instance)
-	{
-		return;
-	}
-
-	m_instance->destroy_messenger(m_debug_messenger);
 }
 
 /*static*/ auto Messenger::native_callback(
@@ -55,15 +29,14 @@ Messenger::~Messenger()
 	{
 		ensure(vulkan_user_data, "Null vulkan_user_data received in messenger callback");
 
-		auto *messenger = std::bit_cast<ecs::Entity *>(vulkan_user_data);
-		auto &component = messenger->get<MessengerComponent>();
-		component.get_callback()(
+		auto *messenger = std::bit_cast<vk::Messenger *>(vulkan_user_data);
+		messenger->m_user_callback(
 		    from_native_severity(severity),
 		    from_native_type(type),
 		    {
 		        .message = callback_data->pMessage,
 		    },
-		    component.get_user_data()
+		    messenger->m_user_data
 		);
 	}
 	catch (const std::exception &exp)

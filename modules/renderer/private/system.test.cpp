@@ -11,10 +11,8 @@ using namespace lt;
 using std::ignore;
 using test::Case;
 using test::expect_throw;
-using test::expect_true;
 using test::Suite;
 
-using lt::renderer::MessageSeverity;
 using renderer::System;
 
 struct SurfaceContext
@@ -30,15 +28,15 @@ struct RendererContext
 };
 
 
-Suite raii = "raii"_suite = [] {
+Suite raii = "system_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		ignore = Fixture_RendererSystem {};
 	};
 
 	Case { "happy path has no errors" } = [] {
 		auto fixture = Fixture_RendererSystem {};
-		expect_false(fixture.has_any_messages_of(MessageSeverity::error));
-		expect_false(fixture.has_any_messages_of(MessageSeverity::warning));
+		expect_false(fixture.has_any_messages_of(renderer::IMessenger::MessageSeverity::error));
+		expect_false(fixture.has_any_messages_of(renderer::IMessenger::MessageSeverity::warning));
 	};
 
 	Case { "unhappy path throws" } = [] {
@@ -85,7 +83,7 @@ Suite raii = "raii"_suite = [] {
 		});
 
 		expect_throw([=] mutable {
-			info.messenger_info = lt::renderer::MessengerComponent::CreateInfo {};
+			info.debug_callback_info = lt::renderer::IMessenger::CreateInfo {};
 			ignore = System { info };
 		});
 

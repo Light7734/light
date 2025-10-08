@@ -6,7 +6,7 @@
 #include <memory/reference.hpp>
 #include <memory/scope.hpp>
 #include <renderer/api.hpp>
-#include <renderer/components/messenger.hpp>
+#include <renderer/frontend/messenger.hpp>
 
 namespace lt::renderer {
 
@@ -34,7 +34,7 @@ public:
 
 		ecs::Entity surface_entity;
 
-		std::optional<MessengerComponent::CreateInfo> messenger_info;
+		IMessenger::CreateInfo debug_callback_info;
 	};
 
 	System(CreateInfo info);
@@ -79,11 +79,6 @@ public:
 	{
 		return m_renderer.get();
 	}
-
-	[[nodiscard]] auto create_messenger_component(
-	    ecs::EntityId entity,
-	    MessengerComponent::CreateInfo info
-	) -> bool;
 
 	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
 	{

@@ -3,6 +3,7 @@
 #include <any>
 #include <memory/pointer_types/null_on_move.hpp>
 #include <renderer/backend/vk/context/instance.hpp>
+#include <renderer/backend/vk/raii/raii.hpp>
 #include <renderer/backend/vk/vulkan.hpp>
 #include <renderer/components/messenger.hpp>
 #include <renderer/frontend/messenger.hpp>
@@ -12,17 +13,7 @@ namespace lt::renderer::vk {
 class Messenger: public IMessenger
 {
 public:
-	Messenger(IInstance *instance, ecs::Entity entity);
-
-	~Messenger() override;
-
-	Messenger(Messenger &&) = default;
-
-	Messenger(const Messenger &) = delete;
-
-	auto operator=(Messenger &&) -> Messenger & = default;
-
-	auto operator=(const Messenger &) const -> Messenger & = delete;
+	Messenger(IInstance *instance, CreateInfo info);
 
 private:
 	static auto native_callback(
@@ -42,15 +33,17 @@ private:
 
 	[[nodiscard]] static auto from_native_type(VkDebugUtilsMessageTypeFlagsEXT type) -> MessageType;
 
-	memory::NullOnMove<class Instance *> m_instance {};
+	class Instance *m_instance {};
 
-	memory::Scope<ecs::Entity> m_entity;
-
-	VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
+	raii::DebugMessenger m_debug_messenger;
 
 	MessageSeverity m_severities {};
 
 	MessageType m_types {};
+
+	Callback_T m_user_callback;
+
+	std::any m_user_data;
 };
 
 } // namespace lt::renderer::vk
