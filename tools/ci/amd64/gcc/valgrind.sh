@@ -28,5 +28,6 @@ for test in $(find ./build -type f -name '*_tests' -executable); do
     --show-leak-kinds=all \
     --track-origins=yes \
     --verbose \
+    --suppressions='./tools/ci/amd64/gcc/valgrind_suppressions' \
     --error-exitcode=255 ${test} || exit 1
 done
