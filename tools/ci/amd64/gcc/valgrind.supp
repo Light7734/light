@@ -823,3 +823,15 @@
    fun:_dl_catch_exception
    fun:_dl_catch_error
 }
+{
+   <xlib_uninit_writev>
+   Memcheck:Param
+   writev(vector[...])
+   fun:writev
+   obj:*libxcb.so*
+   obj:*libxcb.so*
+   fun:xcb_writev
+   fun:_XSend
+   fun:_XFlush
+   fun:XFlush
+}
