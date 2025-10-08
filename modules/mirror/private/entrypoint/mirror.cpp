@@ -18,9 +18,9 @@
 namespace lt {
 
 void renderer_callback(
-    renderer::MessageSeverity message_severity,
-    renderer::MessageType message_type,
-    renderer::MessageData data,
+    renderer::IMessenger::MessageSeverity message_severity,
+    renderer::IMessenger::MessageType message_type,
+    renderer::IMessenger::MessageData data,
     std::any &user_data
 )
 {
@@ -210,17 +210,12 @@ public:
 		    .config = { .target_api = renderer::Api::vulkan, .max_frames_in_flight = 3u },
 		    .registry = m_editor_registry,
 		    .surface_entity = entity,
-		});
-
-		std::ignore = m_renderer_system->create_messenger_component(
-		    m_window,
-		    renderer::MessengerComponent::CreateInfo {
-		        .severities = renderer::MessageSeverity::all,
-		        .types = renderer::MessageType::all,
+		    .debug_callback_info = renderer::IMessenger::CreateInfo {
+		        .severities = renderer::IMessenger::MessageSeverity::all,
+		        .types = renderer::IMessenger::MessageType::all,
 		        .callback = &renderer_callback,
 		        .user_data = this,
-		    }
-		);
+		    } });
 	}
 
 	void setup_input_system()
