@@ -1,4 +1,9 @@
 {
+   xflush
+   Memcheck:Param
+   src:xcb_io.c:604
+}
+{
    <insert_a_suppression_name_here>
    Memcheck:Param
    writev(vector[0])
