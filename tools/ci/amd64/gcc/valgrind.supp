@@ -3,7 +3,8 @@
    Memcheck:Param
    fun:XFlush
    fun:*
-}{
+}
+{
    <insert_a_suppression_name_here>
    Memcheck:Param
    writev(vector[0])
