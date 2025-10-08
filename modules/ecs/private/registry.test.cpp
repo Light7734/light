@@ -131,7 +131,7 @@ Suite component_raii = "component_raii"_suite = [] {
 			    { .m_int = idx, .m_string = std::to_string(idx) }
 			);
 
-			expect_ne(component.m_int, idx);
+			expect_eq(component.m_int, idx);
 			expect_eq(component.m_string, std::to_string(idx));
 		}
 	};
