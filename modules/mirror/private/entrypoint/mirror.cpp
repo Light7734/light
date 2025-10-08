@@ -20,8 +20,8 @@ namespace lt {
 void renderer_callback(
     renderer::MessageSeverity message_severity,
     renderer::MessageType message_type,
-    renderer::MessengerCallbackData data,
-    std::any user_data
+    renderer::MessageData data,
+    std::any &user_data
 )
 {
 	log_dbg("RENDERER CALLBACK: {}", data.message);
@@ -149,7 +149,7 @@ public:
 		m_surface_system = memory::create_ref<lt::surface::System>(m_editor_registry);
 
 		m_window = m_editor_registry->create_entity();
-		m_surface_system->create_component(
+		m_surface_system->create_surface_component(
 		    m_window,
 		    SurfaceComponent::CreateInfo {
 		        .title = "Editor Window",
@@ -207,12 +207,12 @@ public:
 		memory::Ref<app::SystemStats> system_stats = nullptr;
 
 		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
-		    .config = { .target_api = renderer::API::Vulkan, .max_frames_in_flight = 3u },
+		    .config = { .target_api = renderer::Api::vulkan, .max_frames_in_flight = 3u },
 		    .registry = m_editor_registry,
 		    .surface_entity = entity,
 		});
 
-		m_renderer_system->create_messenger_component(
+		std::ignore = m_renderer_system->create_messenger_component(
 		    m_window,
 		    renderer::MessengerComponent::CreateInfo {
 		        .severities = renderer::MessageSeverity::all,

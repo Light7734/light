@@ -10,7 +10,6 @@
 #include <memory/reference.hpp>
 #include <mirror/layers/editor_layer.hpp>
 #include <renderer/framebuffer.hpp>
-#include <renderer/graphics_context.hpp>
 #include <renderer/texture.hpp>
 #include <ui/ui.hpp>
 
