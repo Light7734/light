@@ -4,6 +4,7 @@
 #include <memory/reference.hpp>
 #include <memory/scope.hpp>
 #include <ranges>
+#include <surface/system.hpp>
 #include <test/test.hpp>
 
 // NOLINTBEGIN
@@ -48,9 +49,9 @@ public:
 	auto add_surface_component() -> ecs::EntityId
 	{
 		auto entity = m_registry->create_entity();
-		m_registry->add<surface::SurfaceComponent>(
+		m_surface_system.create_surface_component(
 		    entity,
-		    surface::SurfaceComponent::CreateInfo {}
+		    { .title = "", .resolution = { 20u, 20u } }
 		);
 
 		return entity;
@@ -58,6 +59,8 @@ public:
 
 private:
 	memory::Ref<ecs::Registry> m_registry = memory::create_ref<ecs::Registry>();
+
+	surface::System m_surface_system = surface::System { m_registry };
 };
 
 Suite raii = "raii"_suite = "raii"_suite = [] {
