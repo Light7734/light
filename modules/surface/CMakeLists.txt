@@ -12,6 +12,7 @@ target_link_libraries(surface PUBLIC
     app
     math
     memory
+    tbb
     PRIVATE
     logger 
     lt_debug

@@ -16,6 +16,7 @@ using test::expect_eq;
 using test::expect_ne;
 using test::expect_not_nullptr;
 using test::expect_throw;
+using test::expect_true;
 using test::Suite;
 
 [[nodiscard]] auto tick_info() -> app::TickInfo
@@ -48,35 +49,39 @@ public:
 		return m_registry;
 	}
 
-	auto add_surface_component(
+	auto create_component(
 	    SurfaceComponent::CreateInfo info = SurfaceComponent::CreateInfo {
 	        .title = title,
 	        .resolution = { width, height },
 	        .vsync = vsync,
 	        .visible = visible,
 	    }
-	) -> SurfaceComponent &
+	) -> std::optional<SurfaceComponent *>
 	{
 		auto entity = m_registry->create_entity();
-		return m_registry->add<SurfaceComponent>(entity, info);
+		m_system.create_surface_component(entity, info);
+
+		return &m_registry->get<SurfaceComponent>(entity);
 	}
 
-	void check_values(const SurfaceComponent &component)
+	void check_values(SurfaceComponent *component)
 	{
 #ifdef LIGHT_PLATFORM_LINUX
-		expect_not_nullptr(component.get_native_data().display);
-		expect_ne(component.get_native_data().window, 0);
+		expect_not_nullptr(component->get_native_data().display);
+		expect_ne(component->get_native_data().window, 0);
 #endif
 
-		expect_eq(component.get_resolution().x, width);
-		expect_eq(component.get_resolution().y, height);
-		expect_eq(component.get_title(), title);
-		expect_eq(component.is_vsync(), vsync);
-		expect_eq(component.is_visible(), visible);
+		expect_eq(component->get_resolution().x, width);
+		expect_eq(component->get_resolution().y, height);
+		expect_eq(component->get_title(), title);
+		expect_eq(component->is_vsync(), vsync);
+		expect_eq(component->is_visible(), visible);
 	}
 
 private:
 	memory::Ref<ecs::Registry> m_registry = memory::create_ref<ecs::Registry>();
+
+	System m_system { m_registry };
 };
 
 
@@ -96,10 +101,6 @@ Suite raii = "raii"_suite = [] {
 
 	Case { "unhappy path throws" } = [] {
 		expect_throw([] { ignore = System { {} }; });
-
-		auto fixture = Fixture {};
-		fixture.add_surface_component();
-		expect_throw([&] { ignore = System { fixture.registry() }; });
 	};
 
 	Case { "post construct has correct state" } = [] {
@@ -112,7 +113,7 @@ Suite raii = "raii"_suite = [] {
 		auto fixture = Fixture {};
 		auto system = memory::create_scope<System>(fixture.registry());
 
-		fixture.add_surface_component();
+		fixture.create_component();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
 
 		system.reset();
@@ -142,29 +143,28 @@ Suite system_events = "system_events"_suite = [] {
 Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_construct<SurfaceComponent> initializes component" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
 
-		const auto &component = fixture.add_surface_component();
+		const auto &component = fixture.create_component();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
-		fixture.check_values(component);
+		fixture.check_values(*component);
 	};
 
 	Case { "unhappy on_construct<SurfaceComponent> throws" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 
-		expect_throw([&] { fixture.add_surface_component({ .resolution = { width, 0 } }); });
+		expect_throw([&] { fixture.create_component({ .resolution = { width, 0 } }); });
 
-		expect_throw([&] { fixture.add_surface_component({ .resolution = { 0, height } }); });
+		expect_throw([&] { fixture.create_component({ .resolution = { 0, height } }); });
 
 		expect_throw([&] {
-			fixture.add_surface_component(
+			fixture.create_component(
 			    { .title = "", .resolution = { SurfaceComponent::max_dimension + 1, height } }
 			);
 		});
 
 		expect_throw([&] {
-			fixture.add_surface_component(
+			fixture.create_component(
 			    { .title = "", .resolution = { width, SurfaceComponent::max_dimension + 1 } }
 			);
 		});
@@ -172,7 +172,7 @@ Suite registry_events = "registry_events"_suite = [] {
 		auto big_str = std::string {};
 		big_str.resize(SurfaceComponent::max_title_length + 1);
 		expect_throw([&] {
-			fixture.add_surface_component({ .title = big_str, .resolution = { width, height } });
+			fixture.create_component({ .title = big_str, .resolution = { width, height } });
 		});
 	};
 
@@ -180,7 +180,7 @@ Suite registry_events = "registry_events"_suite = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 
-		expect_throw([&] { fixture.add_surface_component({ .resolution = { width, 0 } }); });
+		expect_throw([&] { fixture.create_component({ .resolution = { width, 0 } }); });
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
@@ -188,9 +188,9 @@ Suite registry_events = "registry_events"_suite = [] {
 		auto fixture = Fixture {};
 		auto system = memory::create_scope<System>(fixture.registry());
 
-		const auto &component = fixture.add_surface_component();
+		const auto &component = fixture.create_component();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
-		fixture.check_values(component);
+		fixture.check_values(*component);
 
 		system.reset();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
@@ -207,7 +207,7 @@ Suite tick = "tick"_suite = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 
-		fixture.add_surface_component();
+		fixture.create_component();
 		system.tick(tick_info());
 	};
 };
@@ -216,7 +216,7 @@ Suite tick_handles_events = "tick_handles_events"_suite = [] {
 	Case { "ticking clears previous tick's events" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
-		auto &surface = fixture.add_surface_component();
+		auto &surface = **fixture.create_component();
 
 		// flush window-creation events
 		system.tick(tick_info());
@@ -237,7 +237,7 @@ Suite tick_handles_requests = "tick_handles_requests"_suite = [] {
 	Case { "ticking clears requests" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
-		auto &surface = fixture.add_surface_component();
+		auto &surface = **fixture.create_component();
 
 		constexpr auto title = "ABC";
 		constexpr auto position = math::ivec2 { 50, 50 };

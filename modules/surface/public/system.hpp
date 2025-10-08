@@ -27,8 +27,7 @@ public:
 
 	void on_unregister() override;
 
-	auto create_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
-	    -> std::optional<SurfaceComponent *>;
+	void create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info);
 
 	void tick(app::TickInfo tick) override;
 

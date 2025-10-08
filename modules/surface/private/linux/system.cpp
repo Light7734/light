@@ -100,8 +100,7 @@ void System::on_unregister()
 {
 }
 
-auto System::create_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
-    -> std::optional<SurfaceComponent *>
+void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
 try
 {
 	auto &component = m_registry->add<SurfaceComponent>(entity, info);
@@ -183,8 +182,6 @@ try
 	{
 		XUnmapWindow(display, main_window);
 	}
-
-	return &component;
 }
 catch (const std::exception &exp)
 {
@@ -192,7 +189,6 @@ catch (const std::exception &exp)
 	log_err("\tentity: {}", entity);
 	log_err("\twhat: {}", exp.what());
 	m_registry->remove<SurfaceComponent>(entity);
-	return {};
 }
 
 void System::on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity)
@@ -394,7 +390,7 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
-	surface.m_position = request.position;
+	// surface.m_position = request.position;
 
 	auto &[display, window, _] = surface.m_native_data;
 	const auto &[x, y] = request.position;
@@ -428,6 +424,7 @@ void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequ
 	// So we just put the event back into the queue and move on.
 	XPutBackEvent(display, &event);
 	XSync(display, False);
+	XFlush(display);
 }
 
 void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
