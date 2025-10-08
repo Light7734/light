@@ -1,4 +1,9 @@
 {
+    ignore_xflush
+    Memcheck:*
+    fun:XFlush*
+}
+{
    <insert_a_suppression_name_here>
    Memcheck:Param
    writev(vector[0])
