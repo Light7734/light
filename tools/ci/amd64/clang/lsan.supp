@@ -1,0 +1,3 @@
+leak:libX11
+leak:_dlopen
+leak:_dlclose
