@@ -140,49 +140,49 @@ void Instance::initialize_instance()
 	};
 
 	const auto settings = std::array<VkLayerSettingEXT, 7>({
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "validate_core",
 	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
 	        .valueCount = 1,
 	        .pValues = &setting_validate_core,
 	    },
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "validate_sync",
 	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
 	        .valueCount = 1,
 	        .pValues = &setting_validate_sync,
 	    },
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "thread_safety",
 	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
 	        .valueCount = 1,
 	        .pValues = &setting_thread_safety,
 	    },
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "debug_action",
 	        .type = VK_LAYER_SETTING_TYPE_STRING_EXT,
 	        .valueCount = 1,
 	        .pValues = static_cast<const void *>(&setting_debug_action),
 	    },
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "report_flags",
 	        .type = VK_LAYER_SETTING_TYPE_STRING_EXT,
 	        .valueCount = setting_report_flags.size(),
 	        .pValues = static_cast<const void *>(setting_report_flags.data()),
 	    },
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "enable_message_limit",
 	        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
 	        .valueCount = 1,
 	        .pValues = &setting_enable_message_limit,
 	    },
-	    {
+	    VkLayerSettingEXT {
 	        .pLayerName = layer_name,
 	        .pSettingName = "duplicate_message_limit",
 	        .type = VK_LAYER_SETTING_TYPE_UINT32_EXT,

@@ -7,7 +7,6 @@
 #include <memory/scope.hpp>
 #include <renderer/api.hpp>
 #include <renderer/components/messenger.hpp>
-#include <renderer/frontend/renderer/renderer.hpp>
 
 namespace lt::renderer {
 
@@ -15,10 +14,10 @@ class System: public app::ISystem
 {
 public:
 	/** config.max_frames_in_flight should not be higher than this value. */
-	static constexpr auto frames_in_flight_upper_limit = IRenderer::frames_in_flight_upper_limit;
+	static constexpr auto frames_in_flight_upper_limit = 5u;
 
 	/** config.max_frames_in_flight should not be lower than this value. */
-	static constexpr auto frames_in_flight_lower_limit = IRenderer::frames_in_flight_lower_limit;
+	static constexpr auto frames_in_flight_lower_limit = 1u;
 
 	struct Configuration
 	{
