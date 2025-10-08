@@ -1,9 +1,9 @@
 {
-    ignore_xflush
-    Memcheck:*
-    fun:XFlush*
-}
-{
+   ignore_all_syscall_param_with_XFlush
+   Memcheck:Param
+   fun:XFlush
+   fun:*
+}{
    <insert_a_suppression_name_here>
    Memcheck:Param
    writev(vector[0])
