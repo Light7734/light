@@ -248,8 +248,8 @@ void Instance::unload_library()
 		return;
 	}
 
-	// dlclose(library);
-	//  library = nullptr;
+	dlclose(library);
+	library = nullptr;
 }
 
 void Instance::load_global_functions()
