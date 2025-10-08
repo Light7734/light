@@ -29,6 +29,7 @@ for test in $(find ./build -type f -name '*_tests' -executable); do
     --track-origins=yes \
     --verbose \
     --num-callers=50 \
+    --gen-suppressions=all \
     --suppressions='./tools/ci/amd64/gcc/valgrind.supp' \
     --error-exitcode=255 ${test} || exit 1
 done
