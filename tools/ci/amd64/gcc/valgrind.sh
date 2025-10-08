@@ -19,9 +19,9 @@ cmake . \
 -DENABLE_UNIT_TESTS=ON \
 -DCMAKE_BUILD_TYPE=Release \
 -DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" \
-&& cmake --build . -j `nproc`
+&& cmake --build ./build -j `nproc`
 
-for test in $(find ./ -type f -name '*_tests' -executable); do
+for test in $(find ./build -type f -name '*_tests' -executable); do
     echo "Running $test"
     valgrind \
     --leak-check=full \

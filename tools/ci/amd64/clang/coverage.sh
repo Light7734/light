@@ -17,12 +17,12 @@ cmake . \
 -DENABLE_LLVM_COVERAGE=ON \
 -DCMAKE_BUILD_TYPE=Release \
 -DCMAKE_CXX_FLAGS="-std=c++23 -stdlib=libc++ -g -fno-omit-frame-pointer" \
-&& cmake --build . -j `nproc`
+&& cmake --build ./build -j `nproc`
 
-mkdir -p ./coverage/ 
-for test in $(find ./ -type f -name '*_tests' -executable); do
-    export LLVM_PROFILE_FILE="./coverage/$(basename "$(dirname "$test")").profraw";
-    echo ${LLVM_PROFILE_FILE} >> ./coverage/list;
+mkdir -p ./build/coverage/ 
+for test in $(find ./build -type f -name '*_tests' -executable); do
+    export LLVM_PROFILE_FILE="./build/coverage/$(basename "$(dirname "$test")").profraw";
+    echo ${LLVM_PROFILE_FILE} >> ./build/coverage/list;
 
     gdb \
     --return-child-result \
@@ -36,12 +36,12 @@ for test in $(find ./ -type f -name '*_tests' -executable); do
 done
 
 llvm-profdata merge --input-files './coverage/list' -o "./coverage/merged.profdata" 
-find ./modules -type f -name "*.profraw" -exec rm -fv {} +
+find ./build/modules -type f -name "*.profraw" -exec rm -fv {} +
 
 LLVM_COV_SHOW=$(llvm-cov show \
         -instr-profile='./coverage/merged.profdata' \
-        $(find ./ -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) \
-        $(find ./ -type f -name '*\.a' -exec printf -- '-object %s ' {} \;) \
+        $(find ./build -type f -name '*_tests' -executable -exec printf -- '-object %s ' {} \;) \
+        $(find ./build -type f -name '*\.a' -exec printf -- '-object %s ' {} \;) \
         -ignore-filename-regex='\.test\.cpp$' \
         -ignore-filename-regex='\.fuzz\.cpp$'
 )

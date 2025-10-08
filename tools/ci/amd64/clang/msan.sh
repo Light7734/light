@@ -30,9 +30,9 @@ cmake . \
 -lc++ \
 -lc++abi \
 -Wl,-rpath,/libcxx_msan/lib" \
-&& cmake --build . -j`nproc`
+&& cmake --build ./build -j`nproc`
 
-for test in $(find ./ -type f -name '*_tests' -executable); do
+for test in $(find ./build -type f -name '*_tests' -executable); do
   echo "Running $test"
   "$test"
 done
