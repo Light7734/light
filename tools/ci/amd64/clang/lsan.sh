@@ -14,7 +14,7 @@ cmake . \
 -GNinja \
 -DCMAKE_LINKER_TYPE=MOLD \
 -DENABLE_UNIT_TESTS=ON \
--DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_BUILD_TYPE=Debug \
 -DCMAKE_CXX_FLAGS=" \
 -fsanitize=leak \
 -g \

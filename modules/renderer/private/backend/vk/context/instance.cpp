@@ -231,8 +231,12 @@ void Instance::initialize_instance()
 
 void Instance::load_library()
 {
-	library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
-	ensure(library, "Failed to dlopen libvulkan.so");
+	library = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
+    if(!library)
+    {
+        library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
+    }
+	ensure(library, "Failed to dlopen vulkan library");
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	vk_get_instance_proc_address = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
@@ -247,6 +251,10 @@ void Instance::unload_library()
 	{
 		return;
 	}
+
+	// calling dlclose causes many issues with runtime analyzers
+	// eg. https://github.com/google/sanitizers/issues/89
+	// with no noticable gains, so we just don't bother closing it.
 
 	// dlclose(library);
 	// library = nullptr;
