@@ -148,7 +148,58 @@ public:
 		);
 	}
 
+
+	[[nodiscard]] auto has_any_messages() const -> bool
+	{
+		return m_user_data->m_has_any_messages;
+	}
+
+	[[nodiscard]] auto has_any_messages_of(
+	    lt::renderer::IMessenger ::MessageSeverity severity
+	) const -> uint32_t
+	{
+		return m_user_data->m_severity_counter.contains(severity);
+	}
+
 private:
+	static void messenger_callback(
+	    lt::renderer::IMessenger::MessageSeverity severity,
+	    lt::renderer::IMessenger::MessageType type,
+	    const lt::renderer::IMessenger::MessageData &data,
+	    std::any &user_data
+	)
+	{
+		// I know this makes the tests too verbose...
+		// but makes it easier to figure out what the problem is when things fail on ci
+		log_trc("vulkan: {}", data.message);
+		std::ignore = data;
+		std::ignore = type;
+
+		auto *fixture = std::any_cast<UserData *>(user_data);
+		fixture->m_has_any_messages = true;
+		++fixture->m_severity_counter[severity];
+	}
+
+	struct UserData
+	{
+		std::unordered_map<lt::renderer::IMessenger::MessageSeverity, uint32_t> m_severity_counter;
+
+		bool m_has_any_messages {};
+	};
+
+	lt::memory::Scope<UserData> m_user_data = lt::memory::create_scope<UserData>();
+
+	lt::memory::Scope<lt::renderer::IMessenger> m_messenger = lt::renderer::IMessenger::create(
+	    constants::api,
+	    lt::renderer::IInstance::get(constants::api),
+	    lt::renderer::IMessenger ::CreateInfo {
+	        .severities = lt::renderer::IMessenger ::MessageSeverity::all,
+	        .types = lt::renderer::IMessenger ::MessageType::all,
+	        .callback = &messenger_callback,
+	        .user_data = m_user_data.get(),
+	    }
+	);
+
 	lt::memory::Scope<lt::renderer::IDevice> m_device {
 		lt::renderer::IDevice::create(constants::api, gpu(), surface())
 	};
@@ -188,6 +239,10 @@ private:
 	    std::any &user_data
 	)
 	{
+		// I know this makes the tests too verbose...
+		// but makes it easier to figure out what the problem is when things fail on ci
+		log_trc("vulkan: {}", data.message);
+
 		std::ignore = data;
 		std::ignore = type;
 

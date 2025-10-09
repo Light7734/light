@@ -41,7 +41,7 @@ public:
 	using Callback_T = std::function<void(
 	    MessageSeverity message_severity,
 	    MessageType message_type,
-	    MessageData data,
+	    const MessageData &data,
 	    std::any &user_data
 	)>;
 

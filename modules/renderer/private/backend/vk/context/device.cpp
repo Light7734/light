@@ -40,8 +40,16 @@ Device::~Device()
 		return;
 	}
 
-	vkc(vk_device_wait_idle(m_device));
-	vk_destroy_device(m_device, nullptr);
+	try
+	{
+		vkc(vk_device_wait_idle(m_device));
+		vk_destroy_device(m_device, nullptr);
+	}
+	catch (const std::exception &exp)
+	{
+		log_err("Failed to destroy vk device:");
+		log_err("\twhat: {}", exp.what());
+	}
 }
 
 void Device::initialize_logical_device()

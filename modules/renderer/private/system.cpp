@@ -47,8 +47,7 @@ System::System(CreateInfo info)
 }
 
 System::~System()
-{
-}
+= default;
 
 void System::on_register()
 {

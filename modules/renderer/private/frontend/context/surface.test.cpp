@@ -8,7 +8,6 @@
 
 using ::lt::ecs::EntityId;
 using ::lt::ecs::Registry;
-using ::lt::surface::SurfaceComponent;
 
 Suite raii = "surface"_suite = [] {
 	Case { "happy path won't throw" } = [&] {

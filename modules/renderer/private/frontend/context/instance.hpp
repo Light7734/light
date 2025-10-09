@@ -8,7 +8,6 @@ class IInstance
 {
 public:
 	[[nodiscard]] static auto get(Api target_api) -> IInstance *;
-
 	IInstance() = default;
 
 	virtual ~IInstance() = default;

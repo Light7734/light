@@ -1,6 +1,7 @@
 #include <app/system.hpp>
 #include <renderer/backend/vk/context/instance.hpp>
 #include <renderer/backend/vk/utils.hpp>
+#include <vulkan/vulkan_core.h>
 
 #if defined(_WIN32)
 	#error "Unsupported platform (currently)"
@@ -194,7 +195,7 @@ void Instance::initialize_instance()
 	const VkLayerSettingsCreateInfoEXT layer_settings_create_info = {
 		.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT,
 		.settingCount = settings.size(),
-		.pSettings = settings.data()
+		.pSettings = settings.data(),
 	};
 
 	auto layers = std::vector<const char *> {
@@ -231,11 +232,12 @@ void Instance::initialize_instance()
 
 void Instance::load_library()
 {
-	library = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
-    if(!library)
-    {
-        library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
-    }
+	constexpr auto runtime_loader_flags = RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL | RTLD_NODELETE;
+	library = dlopen("libvulkan.so.1", runtime_loader_flags);
+	if (!library)
+	{
+		library = dlopen("libvulkan.so", runtime_loader_flags);
+	}
 	ensure(library, "Failed to dlopen vulkan library");
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)

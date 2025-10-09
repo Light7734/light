@@ -76,6 +76,7 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 		m_device->name(image, "swapchain image {}", idx++);
 		m_device->name(view, "swapchain image view {}", idx++);
 	}
+	m_device->wait_idle();
 }
 
 Swapchain::~Swapchain()
@@ -90,6 +91,7 @@ Swapchain::~Swapchain()
 		m_device->wait_idle();
 		m_device->destroy_image_views(m_image_views);
 		m_device->destroy_swapchain(m_swapchain);
+		m_device->wait_idle();
 	}
 	catch (const std::exception &exp)
 	{

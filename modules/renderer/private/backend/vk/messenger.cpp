@@ -5,6 +5,7 @@ namespace lt::renderer::vk {
 Messenger::Messenger(IInstance *instance, CreateInfo info)
     : m_instance(static_cast<Instance *>(instance))
     , m_user_data(std::move(info.user_data))
+    , m_user_callback(std::move(info.callback))
     , m_debug_messenger(
           m_instance,
           VkDebugUtilsMessengerCreateInfoEXT {

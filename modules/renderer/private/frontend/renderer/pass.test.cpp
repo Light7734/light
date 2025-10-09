@@ -1,6 +1,9 @@
 #include <assets/shader.hpp>
+#include <renderer/frontend/messenger.hpp>
 #include <renderer/frontend/renderer/pass.hpp>
 #include <renderer/test/utils.hpp>
+
+using ::lt::renderer::IMessenger;
 
 Suite raii = "pass_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
@@ -14,6 +17,9 @@ Suite raii = "pass_raii"_suite = [] {
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 		);
+
+		expect_false(fixture.has_any_messages_of(IMessenger ::MessageSeverity::error));
+		expect_false(fixture.has_any_messages_of(IMessenger ::MessageSeverity::warning));
 	};
 
 	Case { "unhappy path throws" } = [] {

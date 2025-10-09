@@ -17,6 +17,7 @@ cmake . \
 -DCMAKE_BUILD_TYPE=Debug \
 -DCMAKE_CXX_FLAGS=" \
 -fsanitize=leak \
+-fno-common \
 -g \
 -fno-omit-frame-pointer \
 -std=c++23 \
@@ -28,11 +29,11 @@ cmake . \
 -lc++ \
 -lc++abi \
 -Wl,-rpath,/libcxx_lsan/lib" \
-&& cmake --build ./build -j`nproc`
+&& cmake --build ./build --target='renderer_tests' -j`nproc`
 
-export LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/amd64/clang/lsan.supp"
-
+export LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/amd64/clang/lsan.supp:fast_unwind_on_malloc=0:verbosity=1:report_objects=1"
+export LSAN_SYMBOLIZER_PATH="$(which llvm-symbolizer)"
 for test in $(find ./build -type f -name '*_tests' -executable); do
-  echo "Running $test"
-  "$test"
+    echo "Running $test"
+    "$test"
 done
