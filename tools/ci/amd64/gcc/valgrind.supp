@@ -1,4 +1,131 @@
 {
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_ZNK2lt8renderer2vk6Device17destroy_swapchainEP16VkSwapchainKHR_T
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_ZNK2lt8renderer2vk6Device17destroy_swapchainEP16VkSwapchainKHR_T
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_dbus_strdup
+   fun:UnknownInlinedFun
+   fun:UnknownInlinedFun
+   fun:internal_bus_get
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:UnknownInlinedFun
+   fun:UnknownInlinedFun
+   fun:loader_icd_scan
+   fun:UnknownInlinedFun
+   fun:UnknownInlinedFun
+   fun:terminator_EnumerateInstanceExtensionProperties
+   fun:vkEnumerateInstanceExtensionProperties
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/lib/libnvidia-glvkspirv.so.580.95.05
+   obj:/usr/lib/libnvidia-glvkspirv.so.580.95.05
+   obj:/usr/lib/libnvidia-glvkspirv.so.580.95.05
+   fun:_nv002nvvm
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_close_worker
+   fun:_dl_close
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:~Swapchain
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:~Swapchain
+}
+{
     <insert_a_suppression_name_here>
     Memcheck:Param
     writev(vector[0])

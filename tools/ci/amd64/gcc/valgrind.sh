@@ -18,7 +18,7 @@ cmake . \
 -DCMAKE_LINKER_TYPE=MOLD \
 -DENABLE_UNIT_TESTS=ON \
 -DCMAKE_BUILD_TYPE=Release \
--DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" \
+-DCMAKE_CXX_FLAGS="-std=c++23 -fno-omit-frame-pointer -fno-common -g" \
 && cmake --build ./build -j `nproc`
 
 for test in $(find ./build -type f -name '*_tests' -executable); do
