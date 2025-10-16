@@ -94,6 +94,12 @@ steps:
   commands:
     - ./tools/ci/static_analysis/cmake_format.sh
 
+- name: shell format
+  image: ci:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/static_analysis/shell_format.sh
+
 ---
 kind: pipeline
 type: docker 
