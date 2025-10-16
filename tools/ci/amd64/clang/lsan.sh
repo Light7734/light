@@ -10,12 +10,12 @@ export CC=$(which clang)
 export DISPLAY=:99
 
 cmake . \
--Bbuild \
--GNinja \
--DCMAKE_LINKER_TYPE=MOLD \
--DENABLE_UNIT_TESTS=ON \
--DCMAKE_BUILD_TYPE=Debug \
--DCMAKE_CXX_FLAGS=" \
+    -Bbuild \
+    -GNinja \
+    -DCMAKE_LINKER_TYPE=MOLD \
+    -DENABLE_UNIT_TESTS=ON \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_CXX_FLAGS=" \
 -fsanitize=leak \
 -fno-common \
 -g \
@@ -23,13 +23,13 @@ cmake . \
 -std=c++23 \
 -nostdinc++ \
 -isystem /libcxx_lsan/include/c++/v1/" \
--DCMAKE_EXE_LINKER_FLAGS=" \
+    -DCMAKE_EXE_LINKER_FLAGS=" \
 -fsanitize=leak \
 -L/libcxx_lsan/lib \
 -lc++ \
 -lc++abi \
--Wl,-rpath,/libcxx_lsan/lib" \
-&& cmake --build ./build --target='renderer_tests' -j`nproc`
+-Wl,-rpath,/libcxx_lsan/lib" &&
+    cmake --build ./build --target='renderer_tests' -j$(nproc)
 
 export LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/amd64/clang/lsan.supp:fast_unwind_on_malloc=0:verbosity=1:report_objects=1"
 export LSAN_SYMBOLIZER_PATH="$(which llvm-symbolizer)"

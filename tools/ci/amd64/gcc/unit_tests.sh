@@ -11,23 +11,23 @@ export DISPLAY=:99
 
 # gcc uses libstdc++ by default
 cmake . \
--Bbuild \
--GNinja \
--DCMAKE_LINKER_TYPE=MOLD \
--DENABLE_UNIT_TESTS=ON \
--DCMAKE_BUILD_TYPE=Release \
--DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" \
-&& cmake --build ./build -j `nproc`
+    -Bbuild \
+    -GNinja \
+    -DCMAKE_LINKER_TYPE=MOLD \
+    -DENABLE_UNIT_TESTS=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" &&
+    cmake --build ./build -j $(nproc)
 
 for test in $(find ./build -type f -name '*_tests' -executable); do
     echo "Running $test"
     gdb \
-    --return-child-result \
-    -ex='set confirm off' \
-    -ex='set pagination off' \
-    -ex='run' \
-    -ex='bt full' \
-    -ex='quit' \
-    -q \
-    "$test"
+        --return-child-result \
+        -ex='set confirm off' \
+        -ex='set pagination off' \
+        -ex='run' \
+        -ex='bt full' \
+        -ex='quit' \
+        -q \
+        "$test"
 done

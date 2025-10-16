@@ -10,12 +10,12 @@ export CC=$(which clang)
 export DISPLAY=:99
 
 cmake . \
--Bbuild \
--GNinja \
--DCMAKE_LINKER_TYPE=MOLD \
--DENABLE_UNIT_TESTS=ON \
--DCMAKE_BUILD_TYPE=Release \
--DCMAKE_CXX_FLAGS=" \
+    -Bbuild \
+    -GNinja \
+    -DCMAKE_LINKER_TYPE=MOLD \
+    -DENABLE_UNIT_TESTS=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_FLAGS=" \
 -fsanitize=memory \
 -fsanitize-memory-track-origins \
 -g \
@@ -23,16 +23,16 @@ cmake . \
 -std=c++23 \
 -nostdinc++ \
 -isystem /libcxx_msan/include/c++/v1/" \
--DCMAKE_EXE_LINKER_FLAGS=" \
+    -DCMAKE_EXE_LINKER_FLAGS=" \
 -fsanitize=memory \
 -fsanitize-memory-track-origins \
 -L/libcxx_msan/lib \
 -lc++ \
 -lc++abi \
--Wl,-rpath,/libcxx_msan/lib" \
-&& cmake --build ./build -j`nproc`
+-Wl,-rpath,/libcxx_msan/lib" &&
+    cmake --build ./build -j$(nproc)
 
 for test in $(find ./build -type f -name '*_tests' -executable); do
-  echo "Running $test"
-  "$test"
+    echo "Running $test"
+    "$test"
 done
