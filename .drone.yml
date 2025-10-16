@@ -82,6 +82,12 @@ steps:
   commands:
     - ./tools/ci/static_analysis/clang_tidy.sh
 
+- name: shell check
+  image: ci:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/static_analysis/shell_check.sh
+
 - name: clang format
   image: ci:latest
   pull: if-not-exists
