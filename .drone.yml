@@ -31,7 +31,7 @@ steps:
     - ./tools/ci/amd64/gcc/unit_tests.sh
 
 - name: valgrind
-  image: ci:latest 
+  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/gcc/valgrind.sh
@@ -55,7 +55,7 @@ steps:
     - ./tools/ci/amd64/clang/coverage.sh
 
 - name: leak sanitizer
-  image: ci:latest 
+  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/amd64/clang/lsan.sh
@@ -76,17 +76,23 @@ trigger:
 
 steps:
 - name: clang tidy
-  image: ci:latest 
+  image: ci:latest
   pull: if-not-exists
   privileged: true
   commands:
     - ./tools/ci/static_analysis/clang_tidy.sh
 
 - name: clang format
-  image: ci:latest 
+  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/static_analysis/clang_format.sh
+
+- name: cmake format
+  image: ci:latest
+  pull: if-not-exists
+  commands:
+    - ./tools/ci/static_analysis/cmake_format.sh
 
 ---
 kind: pipeline
