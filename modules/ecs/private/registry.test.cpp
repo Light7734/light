@@ -8,7 +8,6 @@ using lt::test::expect_unreachable;
 using lt::test::Suite;
 
 using lt::test::expect_eq;
-using lt::test::expect_ne;
 
 using lt::test::expect_false;
 using lt::test::expect_true;

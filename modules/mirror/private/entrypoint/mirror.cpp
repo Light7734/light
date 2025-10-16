@@ -24,6 +24,10 @@ void renderer_callback(
     std::any &user_data
 )
 {
+	std::ignore = message_severity;
+	std::ignore = message_type;
+	std::ignore = user_data;
+
 	log_dbg("RENDERER CALLBACK: {}", data.message);
 }
 
@@ -204,7 +208,6 @@ public:
 		);
 
 		auto entity = ecs::Entity { m_editor_registry, m_window };
-		memory::Ref<app::SystemStats> system_stats = nullptr;
 
 		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
 		    .config = { .target_api = renderer::Api::vulkan, .max_frames_in_flight = 3u },

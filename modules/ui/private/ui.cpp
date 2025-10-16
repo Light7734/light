@@ -4,7 +4,6 @@
 #include <ui/ui.hpp>
 
 #ifdef LIGHT_PLATFORM_WINDOWS
-	#include <renderer/dx/shared_context.hpp>
 	#include <renderer/dx/user_interface.hpp>
 #endif
 
@@ -14,7 +13,6 @@
 #include <input/events/keyboard.hpp>
 #include <input/events/mouse.hpp>
 #include <input/key_codes.hpp>
-#include <renderer/graphics_context.hpp>
 #include <utility>
 
 
@@ -27,8 +25,7 @@ namespace lt {
 
 UserInterface *UserInterface::s_context = nullptr;
 
-auto UserInterface::create(memory::Ref<SharedContext> sharedContext)
-    -> memory::Scope<UserInterface>
+auto UserInterface::create(memory::Ref<SharedContext> sharedContext) -> memory::Scope<UserInterface>
 {
 	auto scopeUserInterface = memory::Scope<UserInterface> { nullptr };
 

@@ -1,3 +1,4 @@
+#include <logger/logger.hpp>
 #include <test/test.hpp>
 
 using namespace ::lt::test;
@@ -84,14 +85,14 @@ try
 }
 catch (const std::exception &exp)
 {
-	std::println("Terminated due to uncaught exception:");
-	std::println("\twhat: {}", exp.what());
+	log_crt("Terminated due to uncaught exception:");
+	log_crt("\twhat: {}", exp.what());
 
 	return EXIT_FAILURE;
 }
 catch (...)
 {
-	std::println("Terminated due to uncaught non-std exception!");
+	log_crt("Terminated due to uncaught non-std exception!");
 
 	return EXIT_FAILURE;
 }

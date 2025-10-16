@@ -11,8 +11,7 @@ class SharedContext;
 class UserInterface
 {
 public:
-	static auto create(memory::Ref<SharedContext> sharedContext)
-	    -> memory::Scope<UserInterface>;
+	static auto create(memory::Ref<SharedContext> sharedContext) -> memory::Scope<UserInterface>;
 
 	static void dockspace_begin();
 
