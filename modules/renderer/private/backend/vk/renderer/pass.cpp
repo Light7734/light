@@ -10,15 +10,16 @@ Pass::Pass(
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
 )
-    : m_device(static_cast<Device *>(device)), m_layout(m_device->create_pipeline_layout(
-	    VkPipelineLayoutCreateInfo {
-	        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-	        .setLayoutCount = 0u,
-	        .pSetLayouts = nullptr,
-	        .pushConstantRangeCount = 0u,
-	        .pPushConstantRanges = nullptr,
-	    }
-	))
+    : m_device(static_cast<Device *>(device))
+    , m_layout(m_device->create_pipeline_layout(
+          VkPipelineLayoutCreateInfo {
+              .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+              .setLayoutCount = 0u,
+              .pSetLayouts = nullptr,
+              .pushConstantRangeCount = 0u,
+              .pPushConstantRanges = nullptr,
+          }
+      ))
 {
 	auto *vertex_module = create_module(
 	    vertex_shader.unpack(lt::assets::ShaderAsset::BlobTag::code)
@@ -111,7 +112,6 @@ Pass::Pass(
 		.blendConstants = { 0.0f, 0.0, 0.0, 0.0 },
 	};
 
-	
 
 	auto attachment_description = VkAttachmentDescription {
 		.format = static_cast<Swapchain *>(swapchain)->get_format(),

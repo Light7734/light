@@ -4,10 +4,7 @@
 
 namespace lt::surface {
 
-System::System(
-    memory::Ref<ecs::Registry> registry,
-    memory::Ref<app::EventMediator> event_mediator
-)
+System::System(memory::Ref<ecs::Registry> registry, memory::Ref<app::EventMediator> event_mediator)
     : m_registry(std::move(registry))
     , m_event_mediator(std::move(event_mediator))
 {
