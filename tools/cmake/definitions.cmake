@@ -1,5 +1,5 @@
 if(WIN32)
-  add_compile_definitions(LIGHT_PLATFORM_WINDOWS)
+    add_compile_definitions(LIGHT_PLATFORM_WINDOWS)
 elseif(UNIX)
-  add_compile_definitions(LIGHT_PLATFORM_LINUX)
+    add_compile_definitions(LIGHT_PLATFORM_LINUX)
 endif()
