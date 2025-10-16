@@ -1,6 +1,6 @@
-add_library_module(renderer
+add_library_module(
+    renderer
     system.cpp
-
     # Vulkan - backend
     backend/vk/messenger.cpp
     backend/vk/context/device.cpp
@@ -18,27 +18,17 @@ add_library_module(renderer
     frontend/context/surface.cpp
     frontend/context/swapchain.cpp
     frontend/renderer/renderer.cpp
-    frontend/renderer/pass.cpp
-)
+    frontend/renderer/pass.cpp)
 
-target_link_libraries(renderer
-PUBLIC 
-    app 
-    ecs
-    memory
-    assets
-    time
-    bitwise
-PRIVATE
-    surface
-    pthread
-)
+target_link_libraries(
+    renderer
+    PUBLIC app ecs memory assets time bitwise
+    PRIVATE surface pthread)
 
-add_test_module(renderer 
+add_test_module(
+    renderer
     test/utils.cpp
-
     system.test.cpp
-
     # general backend tests through the frontend
     frontend/messenger.test.cpp
     frontend/context/surface.test.cpp
@@ -46,17 +36,9 @@ add_test_module(renderer
     frontend/context/swapchain.test.cpp
     frontend/renderer/pass.test.cpp
     frontend/renderer/renderer.test.cpp
-
     # backend specific tests -- vk
     backend/vk/context/instance.test.cpp
-
-    # backend specific tests -- dx
-
-    # backend specific tests -- mt
-) 
-
-target_link_libraries(renderer_tests
-PRIVATE
-    surface
-    pthread
+    # backend specific tests -- dx backend specific tests -- mt
 )
+
+target_link_libraries(renderer_tests PRIVATE surface pthread)
