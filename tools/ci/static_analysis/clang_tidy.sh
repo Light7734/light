@@ -1,18 +1,22 @@
 #!/bin/bash
 
-set -e
-cd $(git rev-parse --show-toplevel)/
-rm -rf ./build && mkdir build/ && cd build
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)/"
 
-export CC=$(which clang)
+CC=$(which clang)
+export CC
 
-export CXX=$(which clang++)
+CXX=$(which clang++)
+export CXX
 
-cmake .. \
+cmake \
+    -S . \
+    -B build \
     -G Ninja \
-    -DCMAKE_LINKER_TYPE=MOLD \
-    -DENABLE_UNIT_TESTS=ON \
-    -DENABLE_STATIC_ANALYSIS=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_FLAGS="-std=c++23 -stdlib=libc++" &&
-    cmake --build . -j $(nproc)
+    -D CMAKE_LINKER_TYPE=MOLD \
+    -D ENABLE_UNIT_TESTS=ON \
+    -D ENABLE_STATIC_ANALYSIS=ON \
+    -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_CXX_FLAGS="-std=c++23 -stdlib=libc++"
+
+cmake --build . -j"$(nproc)"

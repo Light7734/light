@@ -16,5 +16,4 @@ done < <(find ./modules ./tools/cmake -type f \( -name 'CMakeLists.txt' -o -name
 if [ "$has_formatting_issues" -ne 0 ]; then
     echo "✅ All files are properly formatted! Well done! ^~^"
 fi
-
 exit ${has_formatting_issues}

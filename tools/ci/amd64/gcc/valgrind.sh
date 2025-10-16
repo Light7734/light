@@ -1,28 +1,37 @@
 #!/bin/bash
 
-export DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)/"
 
-set -e
-cd $(git rev-parse --show-toplevel)/
-rm -rf ./build && mkdir build/
+CC=$(which gcc)
+export CC
+
+CXX=$(which g++)
+export CXX
+
+DISPLAY=:99
+export DISPLAY
+
+DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
+export DEBUGINFOD_URLS
 
 Xvfb :99 -screen 0 1024x768x16 &
-export CXX=$(which g++)
-export CC=$(which gcc)
-export DISPLAY=:99
 
 # gcc uses libstdc++ by default
-cmake . \
-    -Bbuild \
-    -GNinja \
-    -DCMAKE_LINKER_TYPE=MOLD \
-    -DENABLE_UNIT_TESTS=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_FLAGS="-std=c++23 -fno-omit-frame-pointer -fno-common -g" &&
-    cmake --build ./build -j $(nproc)
+cmake \
+    -S . \
+    -B build \
+    -G Ninja \
+    -D CMAKE_LINKER_TYPE=MOLD \
+    -D ENABLE_UNIT_TESTS=ON \
+    -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_CXX_FLAGS="-std=c++23 -fno-omit-frame-pointer -fno-common -g"
 
-for test in $(find ./build -type f -name '*_tests' -executable); do
+cmake --build ./build -j"$(nproc)"
+
+while IFS= read -r -d '' test; do
     echo "Running $test"
+
     valgrind \
         --leak-check=full \
         --show-leak-kinds=all \
@@ -31,5 +40,6 @@ for test in $(find ./build -type f -name '*_tests' -executable); do
         --num-callers=50 \
         --gen-suppressions=all \
         --suppressions='./tools/ci/amd64/gcc/valgrind.supp' \
-        --error-exitcode=255 ${test} || exit 1
-done
+        --error-exitcode=255 "${test}" || exit 1
+
+done < <(find ./build -type f -name '*_tests' -executable -print0)

@@ -1,25 +1,32 @@
 #!/bin/bash
 
-set -e
-cd $(git rev-parse --show-toplevel)/
-rm -rf ./build && mkdir build/
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)/"
+
+CC=$(which gcc)
+export CC
+
+CXX=$(which g++)
+export CXX
+
+DISPLAY=:99
+export DISPLAY
 
 Xvfb :99 -screen 0 1024x768x16 &
-export CXX=$(which g++)
-export CC=$(which gcc)
-export DISPLAY=:99
 
 # gcc uses libstdc++ by default
-cmake . \
-    -Bbuild \
-    -GNinja \
-    -DCMAKE_LINKER_TYPE=MOLD \
-    -DENABLE_UNIT_TESTS=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer" &&
-    cmake --build ./build -j $(nproc)
+cmake \
+    -S . \
+    -B build \
+    -G Ninja \
+    -D CMAKE_LINKER_TYPE=MOLD \
+    -D ENABLE_UNIT_TESTS=ON \
+    -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer"
 
-for test in $(find ./build -type f -name '*_tests' -executable); do
+cmake --build ./build -j"$(nproc)"
+
+while IFS= read -r -d '' test; do
     echo "Running $test"
     gdb \
         --return-child-result \
@@ -30,4 +37,5 @@ for test in $(find ./build -type f -name '*_tests' -executable); do
         -ex='quit' \
         -q \
         "$test"
-done
+
+done < <(find ./build -type f -name '*_tests' -executable -print0)
