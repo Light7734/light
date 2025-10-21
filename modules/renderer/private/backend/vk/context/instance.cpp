@@ -217,6 +217,7 @@ void Instance::initialize_instance()
 		vkc(vk_enumerate_instance_extension_properties(nullptr, &count, nullptr));
 
 		auto extensions = std::vector<VkExtensionProperties>(count);
+		memset(extensions.data(), 0, extensions.size() * sizeof(VkExtensionProperties));
 		vkc(vk_enumerate_instance_extension_properties(nullptr, &count, extensions.data()));
 
 		// log_inf("Available vulkan instance extensions:");
@@ -232,7 +233,7 @@ void Instance::initialize_instance()
 
 void Instance::load_library()
 {
-	constexpr auto runtime_loader_flags = RTLD_NOW | RTLD_DEEPBIND | RTLD_LOCAL | RTLD_NODELETE;
+	constexpr auto runtime_loader_flags = RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE;
 	library = dlopen("libvulkan.so.1", runtime_loader_flags);
 	if (!library)
 	{

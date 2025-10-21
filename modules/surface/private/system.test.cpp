@@ -16,7 +16,6 @@ using test::expect_eq;
 using test::expect_ne;
 using test::expect_not_nullptr;
 using test::expect_throw;
-using test::expect_true;
 using test::Suite;
 
 [[nodiscard]] auto tick_info() -> app::TickInfo

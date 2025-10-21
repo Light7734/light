@@ -75,7 +75,6 @@ private:
 	void load_instance_functions();
 
 	void load_device_functions_impl(VkDevice device);
-
 	VkInstance m_instance = VK_NULL_HANDLE;
 
 	VkAllocationCallbacks *m_allocator = nullptr;

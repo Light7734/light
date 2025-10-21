@@ -11,14 +11,18 @@
 #include <X11/keysym.h>
 #include <X11/keysymdef.h>
 
+//
+
 namespace lt::surface {
 
 template<int EventType>
-int XEventTypeEquals(Display *, XEvent *event, XPointer winptr)
+auto XEventTypeEquals(Display *display, XEvent *event, char *winptr) -> int
 {
+	std::ignore = display;
 	return (
 	    event->type == EventType
-	    && *(reinterpret_cast<Window *>(winptr)) == reinterpret_cast<XAnyEvent *>(event)->window
+	    && *(std::bit_cast<const Window *>(winptr))
+	           == std::bit_cast<const XAnyEvent *>(event)->window
 	);
 }
 
@@ -160,7 +164,7 @@ try
 	XSetWMProtocols(display, main_window, &surface.m_native_data.wm_delete_message, 1);
 
 	// code to remove decoration
-	auto hints = std::array<unsigned char, 5> { 2, 0, 0, 0, 0 };
+	auto hints = std::array<const unsigned char, 5> { 2, 0, 0, 0, 0 };
 	const auto motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
 
 	XChangeProperty(
@@ -340,7 +344,7 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 	// XResizeWindow(display, window, width, height);
 
 	// get baseline serial number for X requests generated from XResizeWindow
-	uint64_t serial = NextRequest(display);
+	auto serial = NextRequest(display);
 
 	// request a new window size from the X server
 	XResizeWindow(display, window, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
@@ -396,7 +400,7 @@ void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequ
 	const auto &[x, y] = request.position;
 
 	// get baseline serial number for X requests generated from XResizeWindow
-	uint64_t serial = NextRequest(display);
+	auto serial = NextRequest(display);
 	XMoveWindow(display, window, static_cast<int>(x), static_cast<int>(y));
 
 	// flush output queue and wait for X server to processes the request

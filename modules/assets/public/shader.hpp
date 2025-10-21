@@ -32,32 +32,13 @@ public:
 	    AssetMetadata asset_metadata,
 	    Metadata metadata,
 	    Blob code_blob
-	)
-	{
-		auto stream = std::ofstream {
-			destination,
-			std::ios::binary | std::ios::trunc,
-		};
-		ensure(stream.is_open(), "Failed to pack shader asset to {}", destination.string());
-
-		// NOLINTBEGIN(cppcoreguidelines-pro-type-cstyle-cast)
-		stream.write((char *)&asset_metadata, sizeof(asset_metadata));
-		stream.write((char *)&metadata, sizeof(metadata));
-
-		auto code_blob_metadata = BlobMetadata {
-			.tag = std::to_underlying(BlobTag::code),
-			.offset = static_cast<size_t>(stream.tellp()) + sizeof(BlobMetadata),
-			.compression_type = CompressionType::none,
-			.compressed_size = code_blob.size(),
-			.uncompressed_size = code_blob.size(),
-		};
-		stream.write((char *)&code_blob_metadata, sizeof(BlobMetadata));
-
-		stream.write((char *)code_blob.data(), static_cast<long long>(code_blob.size()));
-		// NOLINTEND(cppcoreguidelines-pro-type-cstyle-cast)
-	}
+	);
 
 	ShaderAsset(const std::filesystem::path &path);
+
+	void unpack_to(BlobTag tag, std::span<std::byte> destination) const;
+
+	[[nodiscard]] auto unpack(BlobTag tag) const -> Blob;
 
 	[[nodiscard]] auto get_asset_metadata() const -> const AssetMetadata &
 	{
@@ -78,45 +59,6 @@ public:
 		);
 
 		return m_code_blob_metadata;
-	}
-
-	void unpack_to(BlobTag tag, std::span<std::byte> destination) const
-	{
-		ensure(
-		    tag == BlobTag::code,
-		    "Invalid blob tag for shader asset: {}",
-		    std::to_underlying(tag)
-		);
-
-		ensure(
-		    destination.size() >= m_code_blob_metadata.uncompressed_size,
-		    "Failed to unpack shader blob {} to destination ({}) of size {} since it's smaller "
-		    "than the blobl's uncompressed size: {}",
-		    std::to_underlying(tag),
-		    (size_t)(destination.data()), // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-		    destination.size(),
-		    m_code_blob_metadata.uncompressed_size
-		);
-
-		m_stream.seekg(static_cast<long long>(m_code_blob_metadata.offset));
-		m_stream.read(
-		    (char *)destination.data(), // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-		    static_cast<long long>(m_code_blob_metadata.uncompressed_size)
-		);
-	}
-
-	[[nodiscard]] auto unpack(BlobTag tag) const -> Blob
-	{
-		ensure(
-		    tag == BlobTag::code,
-		    "Invalid blob tag for shader asset: {}",
-		    std::to_underlying(tag)
-		);
-
-		auto blob = Blob(m_code_blob_metadata.uncompressed_size);
-		unpack_to(tag, blob);
-
-		return blob;
 	}
 
 private:

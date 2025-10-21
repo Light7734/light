@@ -40,10 +40,15 @@ Suite packing = "shader_pack"_suite = [] {
 			dummy_blob.emplace_back(static_cast<std::byte>(idx));
 		}
 
-		const auto expected_size =          //
-		    sizeof(AssetMetadata)           //
-		    + sizeof(ShaderAsset::Metadata) //
-		    + sizeof(BlobMetadata)          //
+		const auto expected_size =                    //
+		    sizeof(AssetMetadata::type)               //
+		    + sizeof(AssetMetadata::version)          //
+		    + sizeof(ShaderAsset::Metadata::type)     //
+		    + sizeof(BlobMetadata::tag)               //
+		    + sizeof(BlobMetadata::offset)            //
+		    + sizeof(BlobMetadata::compression_type)  //
+		    + sizeof(BlobMetadata::compressed_size)   //
+		    + sizeof(BlobMetadata::uncompressed_size) //
 		    + dummy_blob.size();
 
 		ShaderAsset::pack(
