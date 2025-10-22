@@ -34,14 +34,14 @@ cmake \
 -fsanitize-memory-track-origins \
 -g \
 -fno-omit-frame-pointer \
--std=c++23 \
+-std=c++26 \
 -nostdinc++ \
 -isystem /libcxx_msan/include/c++/v1/" \
     -D CMAKE_EXE_LINKER_FLAGS=" \
 -fsanitize=memory \
 -fsanitize-memory-track-origins \
 -g \
--std=c++23 \
+-std=c++26 \
 -L/msan/lib -Wl,-rpath,/msan/lib \
 -L/libcxx_msan/lib -Wl,-rpath,/libcxx_msan/lib \
 -lc++ \

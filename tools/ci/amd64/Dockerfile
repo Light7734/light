@@ -220,7 +220,7 @@ tar xf 'vulkansdk-linux-x86_64-1.4.328.1.tar.xz' \
         -fsanitize-ignorelist=/msan/ignorelist_all_sources \
         -fno-omit-frame-pointer \
         -g \
-        -std=c++23 \
+        -std=c++26 \
         -nostdinc++ \
         -isystem /libcxx_msan/include/c++/v1/"\
 && export CFLAGS="\
@@ -233,7 +233,7 @@ tar xf 'vulkansdk-linux-x86_64-1.4.328.1.tar.xz' \
     -fsanitize-memory-track-origins \
     -fsanitize-ignorelist=/msan/ignorelist_all_sources \
     -g \
-    -std=c++23 \
+    -std=c++26 \
     -L/msan/lib -Wl,-rpath,/msan/lib \
     -L/libcxx_msan/lib -Wl,-rpath,/libcxx_msan/lib \
     -lc++ \
@@ -272,7 +272,7 @@ export CXXFLAGS="\
         -fsanitize-ignorelist=/msan/ignorelist_all_sources \
         -fno-omit-frame-pointer \
         -g \
-        -std=c++23 \
+        -std=c++26 \
         -nostdinc++ \
         -isystem /libcxx_msan/include/c++/v1/"\
 && export CFLAGS="\
@@ -285,7 +285,7 @@ export CXXFLAGS="\
     -fsanitize-memory-track-origins \
     -fsanitize-ignorelist=/msan/ignorelist_all_sources \
     -g \
-    -std=c++23 \
+    -std=c++26 \
     -L/msan/lib -Wl,-rpath,/msan/lib \
     -L/libcxx_msan/lib -Wl,-rpath,/libcxx_msan/lib \
     -lc++ \

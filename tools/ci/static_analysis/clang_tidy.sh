@@ -17,6 +17,6 @@ cmake \
     -D ENABLE_UNIT_TESTS=ON \
     -D ENABLE_STATIC_ANALYSIS=ON \
     -D CMAKE_BUILD_TYPE=Release \
-    -D CMAKE_CXX_FLAGS="-std=c++23 -stdlib=libc++"
+    -D CMAKE_CXX_FLAGS="-std=c++26 -stdlib=libc++"
 
 cmake --build . -j"$(nproc)"
