@@ -96,6 +96,16 @@ public:
 
 	[[nodiscard]] auto get_swapchain_images(VkSwapchainKHR swapchain) const -> std::vector<VkImage>;
 
+	[[nodiscard]] auto get_memory_requirements(VkBuffer buffer) const -> VkMemoryRequirements;
+
+	/** binders / mappers  */
+	void bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset = 0u) const;
+
+	[[nodiscard]] auto map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
+	    -> std::span<std::byte>;
+
+	void unmap_memory(VkDeviceMemory memory);
+
 	/** create functions */
 	[[nodiscard]] auto create_swapchain(VkSwapchainCreateInfoKHR info) const -> VkSwapchainKHR;
 
@@ -120,9 +130,16 @@ public:
 	[[nodiscard]] auto create_fences(VkFenceCreateInfo info, uint32_t count) const
 	    -> std::vector<VkFence>;
 
+	[[nodiscard]] auto create_buffer(VkBufferCreateInfo info) const -> VkBuffer;
+
 	/** allocation functions */
+	[[nodiscard]] auto allocate_memory(VkMemoryAllocateInfo info) const -> VkDeviceMemory;
+
 	[[nodiscard]] auto allocate_command_buffers(VkCommandBufferAllocateInfo info) const
 	    -> std::vector<VkCommandBuffer>;
+
+	/** de-allocation functions */
+	void free_memory(VkDeviceMemory memory) const;
 
 	/** destroy functions */
 	void destroy_swapchain(VkSwapchainKHR swapchain) const;
@@ -152,6 +169,8 @@ public:
 	void destroy_fence(VkFence fence) const;
 
 	void destroy_fences(std::span<VkFence> fences) const;
+
+	void destroy_buffer(VkBuffer buffer) const;
 
 private:
 	template<typename T>

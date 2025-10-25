@@ -31,6 +31,7 @@ PFN_vkGetDeviceProcAddr vk_get_device_proc_address {};
 PFN_vkDestroyDevice vk_destroy_device {};
 PFN_vkGetPhysicalDeviceFeatures vk_get_physical_device_features {};
 PFN_vkEnumerateDeviceExtensionProperties vk_enumerate_device_extension_properties {};
+PFN_vkGetPhysicalDeviceMemoryProperties vk_get_physical_device_memory_properties {};
 
 // extension instance functions
 PFN_vkCmdBeginDebugUtilsLabelEXT vk_cmd_begin_debug_label {};
@@ -86,6 +87,16 @@ PFN_vkCmdBindPipeline vk_cmd_bind_pipeline {};
 PFN_vkCmdDraw vk_cmd_draw {};
 PFN_vkCmdSetViewport vk_cmd_set_viewport {};
 PFN_vkCmdSetScissor vk_cmd_set_scissors {};
+
+PFN_vkCreateBuffer vk_create_buffer {};
+PFN_vkDestroyBuffer vk_destroy_buffer {};
+PFN_vkGetBufferMemoryRequirements vk_get_buffer_memory_requirements {};
+PFN_vkAllocateMemory vk_allocate_memory {};
+PFN_vkBindBufferMemory vk_bind_buffer_memory {};
+PFN_vkMapMemory vk_map_memory {};
+PFN_vkUnmapMemory vk_unmap_memory {};
+PFN_vkFreeMemory vk_free_memory {};
+
 
 PFN_vkResetCommandBuffer vk_reset_command_buffer {};
 
@@ -298,6 +309,7 @@ void Instance::load_instance_functions()
 	load_fn(vk_destroy_device, "vkDestroyDevice");
 	load_fn(vk_get_physical_device_features, "vkGetPhysicalDeviceFeatures");
 	load_fn(vk_enumerate_device_extension_properties, "vkEnumerateDeviceExtensionProperties");
+	load_fn(vk_get_physical_device_memory_properties, "vkGetPhysicalDeviceMemoryProperties");
 
 	load_fn(vk_cmd_begin_debug_label, "vkCmdBeginDebugUtilsLabelEXT");
 	load_fn(vk_cmd_end_debug_label, "vkCmdEndDebugUtilsLabelEXT");
@@ -370,6 +382,14 @@ void Instance::load_device_functions_impl(VkDevice device)
 	load_fn(vk_cmd_draw, "vkCmdDraw");
 	load_fn(vk_cmd_set_viewport, "vkCmdSetViewport");
 	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
+	load_fn(vk_create_buffer, "vkCreateBuffer");
+	load_fn(vk_destroy_buffer, "vkDestroyBuffer");
+	load_fn(vk_allocate_memory, "vkAllocateMemory");
+	load_fn(vk_bind_buffer_memory, "vkBindBufferMemory");
+	load_fn(vk_map_memory, "vkMapMemory");
+	load_fn(vk_unmap_memory, "vkUnmapMemory");
+	load_fn(vk_free_memory, "vkFreeMemory");
+	load_fn(vk_get_buffer_memory_requirements, "vkGetBufferMemoryRequirements");
 	load_fn(vk_reset_command_buffer, "vkResetCommandBuffer");
 }
 

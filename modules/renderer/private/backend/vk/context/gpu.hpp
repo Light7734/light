@@ -30,6 +30,8 @@ public:
 	[[nodiscard]] auto get_surface_formats(VkSurfaceKHR surface) const
 	    -> std::vector<VkSurfaceFormatKHR>;
 
+	[[nodiscard]] auto get_memory_properties() const -> VkPhysicalDeviceMemoryProperties;
+
 private:
 	memory::NullOnMove<VkPhysicalDevice> m_gpu = VK_NULL_HANDLE;
 };

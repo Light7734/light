@@ -15,6 +15,7 @@ extern PFN_vkGetDeviceProcAddr vk_get_device_proc_address;
 extern PFN_vkDestroyDevice vk_destroy_device;
 extern PFN_vkGetPhysicalDeviceFeatures vk_get_physical_device_features;
 extern PFN_vkEnumerateDeviceExtensionProperties vk_enumerate_device_extension_properties;
+extern PFN_vkGetPhysicalDeviceMemoryProperties vk_get_physical_device_memory_properties;
 
 // extension instance functions
 extern PFN_vkCmdBeginDebugUtilsLabelEXT vk_cmd_begin_debug_label;
@@ -75,6 +76,15 @@ extern PFN_vkCmdBindPipeline vk_cmd_bind_pipeline;
 extern PFN_vkCmdDraw vk_cmd_draw;
 extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
 extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
+
+extern PFN_vkCreateBuffer vk_create_buffer;
+extern PFN_vkDestroyBuffer vk_destroy_buffer;
+extern PFN_vkGetBufferMemoryRequirements vk_get_buffer_memory_requirements;
+extern PFN_vkAllocateMemory vk_allocate_memory;
+extern PFN_vkBindBufferMemory vk_bind_buffer_memory;
+extern PFN_vkMapMemory vk_map_memory;
+extern PFN_vkUnmapMemory vk_unmap_memory;
+extern PFN_vkFreeMemory vk_free_memory;
 
 extern PFN_vkResetCommandBuffer vk_reset_command_buffer;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)

@@ -7,7 +7,6 @@
 
 namespace lt::renderer {
 
-
 class IMessenger
 {
 public:

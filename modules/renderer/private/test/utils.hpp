@@ -148,7 +148,6 @@ public:
 		);
 	}
 
-
 	[[nodiscard]] auto has_any_messages() const -> bool
 	{
 		return m_user_data->m_has_any_messages;

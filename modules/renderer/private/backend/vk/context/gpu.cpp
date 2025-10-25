@@ -67,5 +67,11 @@ Gpu::Gpu(IInstance *instance)
 	return formats;
 }
 
+[[nodiscard]] auto Gpu::get_memory_properties() const -> VkPhysicalDeviceMemoryProperties
+{
+	auto memory_properties = VkPhysicalDeviceMemoryProperties {};
+	vk_get_physical_device_memory_properties(m_gpu, &memory_properties);
+	return memory_properties;
+}
 
 } // namespace lt::renderer::vk

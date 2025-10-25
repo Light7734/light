@@ -207,6 +207,31 @@ void Device::wait_for_fences(std::span<VkFence> fences) const
 	return images;
 }
 
+[[nodiscard]] auto Device::get_memory_requirements(VkBuffer buffer) const -> VkMemoryRequirements
+{
+	auto requirements = VkMemoryRequirements {};
+	vk_get_buffer_memory_requirements(m_device, buffer, &requirements);
+	return requirements;
+}
+
+void Device::bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset /* = 0u */) const
+{
+	vkc(vk_bind_buffer_memory(m_device, buffer, memory, offset));
+}
+
+[[nodiscard]] auto Device::map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
+    -> std::span<std::byte>
+{
+	void *data = {};
+	vkc(vk_map_memory(m_device, memory, offset, size, {}, &data));
+	return { std::bit_cast<std::byte *>(data), size };
+}
+
+void Device::unmap_memory(VkDeviceMemory memory)
+{
+	vk_unmap_memory(m_device, memory);
+}
+
 [[nodiscard]] auto Device::create_swapchain(VkSwapchainCreateInfoKHR info) const -> VkSwapchainKHR
 {
 	auto *swapchain = VkSwapchainKHR {};
@@ -299,12 +324,31 @@ void Device::wait_for_fences(std::span<VkFence> fences) const
 	return fences;
 }
 
+[[nodiscard]] auto Device::create_buffer(VkBufferCreateInfo info) const -> VkBuffer
+{
+	auto *buffer = VkBuffer {};
+	vkc(vk_create_buffer(m_device, &info, nullptr, &buffer));
+	return buffer;
+}
+
 [[nodiscard]] auto Device::allocate_command_buffers(VkCommandBufferAllocateInfo info) const
     -> std::vector<VkCommandBuffer>
 {
 	auto command_buffers = std::vector<VkCommandBuffer>(info.commandBufferCount);
 	vkc(vk_allocate_command_buffers(m_device, &info, command_buffers.data()));
 	return command_buffers;
+}
+
+[[nodiscard]] auto Device::allocate_memory(VkMemoryAllocateInfo info) const -> VkDeviceMemory
+{
+	auto *memory = VkDeviceMemory {};
+	vkc(vk_allocate_memory(m_device, &info, nullptr, &memory));
+	return memory;
+}
+
+void Device::free_memory(VkDeviceMemory memory) const
+{
+	vk_free_memory(m_device, memory, nullptr);
 }
 
 void Device::destroy_swapchain(VkSwapchainKHR swapchain) const
@@ -387,6 +431,11 @@ void Device::destroy_fences(std::span<VkFence> fences) const
 	{
 		destroy_fence(fence);
 	}
+}
+
+void Device::destroy_buffer(VkBuffer buffer) const
+{
+	vk_destroy_buffer(m_device, buffer, nullptr);
 }
 
 } // namespace lt::renderer::vk
