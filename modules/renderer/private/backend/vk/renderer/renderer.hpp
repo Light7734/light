@@ -3,8 +3,10 @@
 #include <memory/reference.hpp>
 #include <ranges>
 #include <renderer/backend/vk/context/device.hpp>
+#include <renderer/backend/vk/data/buffer.hpp>
 #include <renderer/backend/vk/renderer/pass.hpp>
 #include <renderer/backend/vk/utils.hpp>
+#include <renderer/frontend/data/buffer.hpp>
 #include <renderer/frontend/renderer/pass.hpp>
 #include <renderer/frontend/renderer/renderer.hpp>
 
@@ -32,6 +34,13 @@ public:
 	void set_frame_constants(FrameConstants constants) override
 	{
 		m_frame_constants = constants;
+	}
+
+	void submit_sprite(
+	    const components::Sprite &sprite,
+	    const math::components::Transform &transform
+	) override
+	{
 	}
 
 private:

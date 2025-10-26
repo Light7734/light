@@ -75,10 +75,17 @@ void Device::initialize_logical_device()
 
 	auto extensions = std::vector<const char *> {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+	};
+
+	const auto dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+		.dynamicRendering = true,
 	};
 
 	auto device_info = VkDeviceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+		.pNext = &dynamic_rendering_features,
 		.queueCreateInfoCount = static_cast<uint32_t>(queue_infos.size()),
 		.pQueueCreateInfos = queue_infos.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),

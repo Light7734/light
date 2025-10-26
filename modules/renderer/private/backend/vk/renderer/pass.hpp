@@ -29,11 +29,6 @@ public:
 
 	void replace_swapchain(const ISwapchain &swapchain);
 
-	[[nodiscard]] auto get_pass() -> VkRenderPass
-	{
-		return m_pass;
-	}
-
 	[[nodiscard]] auto get_pipeline() -> VkPipeline
 	{
 		return m_pipeline;
@@ -53,8 +48,6 @@ private:
 	auto create_module(lt::assets::Blob blob) -> VkShaderModule;
 
 	memory::NullOnMove<class Device *> m_device {};
-
-	VkRenderPass m_pass = VK_NULL_HANDLE;
 
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 

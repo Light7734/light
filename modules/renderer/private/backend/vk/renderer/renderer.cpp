@@ -143,10 +143,77 @@ void Renderer::replace_swapchain(ISwapchain *swapchain)
 
 void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 {
-	auto cmd_begin_info = VkCommandBufferBeginInfo {
+	const auto cmd_begin_info = VkCommandBufferBeginInfo {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 		.flags = {},
 		.pInheritanceInfo = nullptr,
+	};
+
+	const auto begin_frame_barrier = VkImageMemoryBarrier {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.srcAccessMask = {},
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .image = m_swapchain->get_image(image_idx),
+        .subresourceRange = VkImageSubresourceRange{
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel   = 0u,
+            .levelCount     = VK_REMAINING_MIP_LEVELS,
+            .baseArrayLayer = 0u,
+            .layerCount     = VK_REMAINING_ARRAY_LAYERS,
+        },
+
+	};
+
+	const auto end_frame_barrier = VkImageMemoryBarrier {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		.dstAccessMask = {},
+		.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .image = m_swapchain->get_image(image_idx),
+
+        .subresourceRange = VkImageSubresourceRange{
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel   = 0u,
+            .levelCount     = VK_REMAINING_MIP_LEVELS,
+            .baseArrayLayer = 0u,
+            .layerCount     = VK_REMAINING_ARRAY_LAYERS,
+        },
+	};
+
+	const auto scissor = VkRect2D {
+		.offset = { .x = 0u, .y = 0u },
+		.extent = m_resolution,
+	};
+
+	const auto viewport = VkViewport {
+		.x = 0.0f,
+		.y = 0.0f,
+		.width = static_cast<float>(m_resolution.width),
+		.height = static_cast<float>(m_resolution.height),
+		.minDepth = 0.0f,
+		.maxDepth = 1.0f,
+	};
+
+	const auto color_attachment_info = VkRenderingAttachmentInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+		.imageView = m_swapchain->get_image_view(image_idx),
+		.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		.resolveMode = VK_RESOLVE_MODE_NONE,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.clearValue = VkClearValue { .color = { 0.93, 0.93, 0.93, 1.0 } },
+	};
+
+	const auto rendering_info = VkRenderingInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
+		.renderArea = scissor,
+		.layerCount = 1,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &color_attachment_info,
+
 	};
 
 	vkc(vk_begin_command_buffer(cmd, &cmd_begin_info));
@@ -158,46 +225,41 @@ void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 	    sizeof(FrameConstants),
 	    &m_frame_constants
 	);
-
-	auto clear_value = VkClearValue {
-			.color = { 
-                0.93,
-                0.93,
-                0.93,
-               1.0,
-            },
-		};
-
-	auto pass_begin_info = VkRenderPassBeginInfo {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-		.renderPass = m_pass->get_pass(),
-		.framebuffer = m_pass->get_framebuffers()[image_idx],
-		.renderArea = { .offset = {}, .extent = m_resolution },
-		.clearValueCount = 1u,
-		.pClearValues = &clear_value
-	};
-	vk_cmd_begin_render_pass(cmd, &pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+	vk_cmd_pipeline_barrier(
+	    cmd,
+	    VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	    VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	    0,
+	    0,
+	    nullptr,
+	    0,
+	    nullptr,
+	    1,
+	    &begin_frame_barrier
+	);
+	vk_cmd_begin_rendering(cmd, &rendering_info);
 	vk_cmd_bind_pipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pass->get_pipeline());
-
-	auto viewport = VkViewport {
-		.x = 0.0f,
-		.y = 0.0f,
-		.width = static_cast<float>(m_resolution.width),
-		.height = static_cast<float>(m_resolution.height),
-		.minDepth = 0.0f,
-		.maxDepth = 1.0f,
-	};
 	vk_cmd_set_viewport(cmd, 0, 1, &viewport);
-
-	auto scissor = VkRect2D {
-		.offset = { .x = 0u, .y = 0u },
-		.extent = m_resolution,
-	};
 	vk_cmd_set_scissors(cmd, 0, 1, &scissor);
-
 	vk_cmd_draw(cmd, 3, 1, 0, 0);
-	vk_cmd_end_render_pass(cmd);
+	vk_cmd_end_rendering(cmd);
+	vk_cmd_pipeline_barrier(
+	    cmd,
+	    VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	    VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+	    0,
+	    0,
+	    nullptr,
+	    0,
+	    nullptr,
+	    1,
+	    &end_frame_barrier
+	);
 	vkc(vk_end_command_buffer(cmd));
+}
+
+void submit_sprite(const components::Sprite &sprite, const math::components::Transform &transform)
+{
 }
 
 } // namespace lt::renderer::vk

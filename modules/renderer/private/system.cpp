@@ -1,6 +1,8 @@
 #include <camera/components.hpp>
 #include <math/algebra.hpp>
+#include <math/components/transform.hpp>
 #include <renderer/components/messenger.hpp>
+#include <renderer/components/sprite.hpp>
 #include <renderer/frontend/context/device.hpp>
 #include <renderer/frontend/context/gpu.hpp>
 #include <renderer/frontend/context/instance.hpp>
@@ -86,6 +88,13 @@ void System::tick(app::TickInfo tick)
 
 			break;
 		}
+	}
+
+	// for each sprite, submit a new "model matrix"  + "color" to go into the scene's SSBO
+	for (auto &[id, sprite, transform] :
+	     m_registry->view<components::Sprite, math::components::Transform>())
+	{
+		m_renderer->submit_sprite(sprite, transform);
 	}
 
 	m_renderer->set_frame_constants({ .view_projection = perspective });

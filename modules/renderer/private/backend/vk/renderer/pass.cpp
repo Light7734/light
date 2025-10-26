@@ -113,16 +113,16 @@ Pass::Pass(
 		.blendConstants = { 0.0f, 0.0, 0.0, 0.0 },
 	};
 
-	auto attachment_description = VkAttachmentDescription {
-		.format = static_cast<Swapchain *>(swapchain)->get_format(),
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	};
+	// auto attachment_description = VkAttachmentDescription {
+	// 	.format =,
+	// 	.samples = VK_SAMPLE_COUNT_1_BIT,
+	// 	.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 	.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+	// 	.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 	.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 	.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+	// 	.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// };
 
 	auto color_attachment_ref = VkAttachmentReference {
 		.attachment = 0,
@@ -144,21 +144,18 @@ Pass::Pass(
 		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 	};
 
-	m_pass = m_device->create_pass(
-	    VkRenderPassCreateInfo {
-	        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-	        .attachmentCount = 1u,
-	        .pAttachments = &attachment_description,
-	        .subpassCount = 1u,
-	        .pSubpasses = &subpass_description,
-	        .dependencyCount = 1u,
-	        .pDependencies = &pass_dependency,
-	    }
-	);
+	auto color_format = static_cast<Swapchain *>(swapchain)->get_format();
+	auto rendering_info = VkPipelineRenderingCreateInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
+		.colorAttachmentCount = 1u,
+		.pColorAttachmentFormats = &color_format,
+
+	};
 
 	m_pipeline = m_device->create_graphics_pipeline(
 	    VkGraphicsPipelineCreateInfo {
 	        .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+	        .pNext = &rendering_info,
 	        .stageCount = static_cast<uint32_t>(shader_stages.size()),
 	        .pStages = shader_stages.data(),
 	        .pVertexInputState = &vertex_input,
@@ -170,14 +167,14 @@ Pass::Pass(
 	        .pColorBlendState = &color_blend,
 	        .pDynamicState = &dynamic_state,
 	        .layout = m_layout,
-	        .renderPass = m_pass,
+	        .renderPass = VK_NULL_HANDLE,
 	        .subpass = 0u,
 	        .basePipelineHandle = VK_NULL_HANDLE,
 	        .basePipelineIndex = -1,
 	    }
 	);
 
-	m_framebuffers = static_cast<Swapchain *>(swapchain)->create_framebuffers_for_pass(m_pass);
+	// m_framebuffers = static_cast<Swapchain *>(swapchain)->create_framebuffers_for_pass(m_pass);
 
 	m_device->destroy_shader_module(vertex_module);
 	m_device->destroy_shader_module(fragment_module);
@@ -193,7 +190,7 @@ Pass::~Pass()
 	m_device->wait_idle();
 	m_device->destroy_framebuffers(m_framebuffers);
 	m_device->destroy_pipeline(m_pipeline);
-	m_device->destroy_pass(m_pass);
+	// m_device->destroy_pass(m_pass);
 	m_device->destroy_pipeline_layout(m_layout);
 }
 
@@ -206,7 +203,8 @@ void Pass::replace_swapchain(const ISwapchain &swapchain)
 
 	m_device->wait_idle();
 	m_device->destroy_framebuffers(m_framebuffers);
-	m_framebuffers = static_cast<const Swapchain &>(swapchain).create_framebuffers_for_pass(m_pass);
+	// m_framebuffers = static_cast<const Swapchain
+	// &>(swapchain).create_framebuffers_for_pass(m_pass);
 }
 
 auto Pass::create_module(lt::assets::Blob blob) -> VkShaderModule

@@ -88,6 +88,9 @@ extern PFN_vkUnmapMemory vk_unmap_memory;
 extern PFN_vkFreeMemory vk_free_memory;
 
 extern PFN_vkResetCommandBuffer vk_reset_command_buffer;
+
+extern PFN_vkCmdBeginRendering vk_cmd_begin_rendering;
+extern PFN_vkCmdEndRendering vk_cmd_end_rendering;
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 } // namespace lt::renderer::vk

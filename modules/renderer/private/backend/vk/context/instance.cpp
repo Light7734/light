@@ -100,12 +100,16 @@ PFN_vkFreeMemory vk_free_memory {};
 
 PFN_vkResetCommandBuffer vk_reset_command_buffer {};
 
+PFN_vkCmdBeginRendering vk_cmd_begin_rendering {};
+PFN_vkCmdEndRendering vk_cmd_end_rendering {};
+
 PFN_vkGetPhysicalDeviceSurfaceSupportKHR vk_get_physical_device_surface_support {};
 PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vk_get_physical_device_surface_capabilities {};
 PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vk_get_physical_device_surface_formats {};
 
 auto vk_create_xlib_surface_khr = PFN_vkCreateXlibSurfaceKHR {};
 auto vk_destroy_surface_khr = PFN_vkDestroySurfaceKHR {};
+
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
 Instance::Instance()
@@ -392,6 +396,9 @@ void Instance::load_device_functions_impl(VkDevice device)
 	load_fn(vk_free_memory, "vkFreeMemory");
 	load_fn(vk_get_buffer_memory_requirements, "vkGetBufferMemoryRequirements");
 	load_fn(vk_reset_command_buffer, "vkResetCommandBuffer");
+
+	load_fn(vk_cmd_begin_rendering, "vkCmdBeginRendering");
+	load_fn(vk_cmd_end_rendering, "vkCmdEndRendering");
 }
 
 auto Instance::enumerate_gpus() const -> std::vector<VkPhysicalDevice>

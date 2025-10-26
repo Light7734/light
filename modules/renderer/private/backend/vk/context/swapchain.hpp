@@ -49,6 +49,17 @@ public:
 		return m_images.size();
 	}
 
+	[[nodiscard]] auto get_image_view(uint32_t idx) -> VkImageView
+	{
+		return m_image_views[idx];
+	}
+
+	[[nodiscard]] auto get_image(uint32_t idx) -> VkImage
+	{
+		return m_images[idx];
+	}
+
+
 	[[nodiscard]] auto create_framebuffers_for_pass(VkRenderPass pass) const
 	    -> std::vector<VkFramebuffer>;
 

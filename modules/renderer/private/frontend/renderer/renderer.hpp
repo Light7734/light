@@ -1,7 +1,9 @@
 #pragma once
 
+#include <math/components/transform.hpp>
 #include <memory/scope.hpp>
 #include <renderer/api.hpp>
+#include <renderer/components/sprite.hpp>
 #include <renderer/data/frame_constants.hpp>
 
 namespace lt::renderer {
@@ -44,6 +46,11 @@ public:
 	virtual void replace_swapchain(class ISwapchain *swapchain) = 0;
 
 	virtual void set_frame_constants(FrameConstants constants) = 0;
+
+	virtual void submit_sprite(
+	    const components::Sprite &sprite,
+	    const math::components::Transform &transform
+	) = 0;
 };
 
 } // namespace lt::renderer
