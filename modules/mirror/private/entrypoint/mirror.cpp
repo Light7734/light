@@ -2,9 +2,11 @@
 #include <app/application.hpp>
 #include <app/entrypoint.hpp>
 #include <app/system.hpp>
+#include <camera/components.hpp>
 #include <ecs/entity.hpp>
 #include <input/components.hpp>
 #include <input/system.hpp>
+#include <math/trig.hpp>
 #include <math/vec2.hpp>
 #include <memory/reference.hpp>
 #include <memory/scope.hpp>
@@ -66,13 +68,18 @@ public:
 			const auto &[x, y] = surface.get_position();
 			const auto &[width, height] = surface.get_resolution();
 
+
 			if (input.get_action(m_quit_action_key).state == State::active)
 			{
 				should_quit = true;
 			}
 			if (input.get_action(m_debug_action_keys[0]).state == State::active)
 			{
-				surface.push_request(surface::ModifyPositionRequest({ x + 5, y + 5 }));
+				for (auto &[id, camera] :
+				     m_registry->view<lt::camera::components::PerspectiveCamera>())
+				{
+					camera.vertical_fov += (static_cast<float>(tick.delta_time.count()) * 40.0f);
+				}
 			}
 
 			if (input.get_action(m_debug_action_keys[1]).state == State::active)
@@ -219,6 +226,20 @@ public:
 		        .callback = &renderer_callback,
 		        .user_data = this,
 		    } });
+
+		m_camera_id = m_editor_registry->create_entity();
+
+		m_editor_registry->add(
+		    m_camera_id,
+		    camera::components::PerspectiveCamera {
+		        .vertical_fov = math::radians(90.0f),
+		        .near_plane = 0.1f,
+		        .far_plane = 30.0,
+		        .aspect_ratio = 1.0f,
+		        .background_color = math::vec4(1.0, 0.0, 0.0, 1.0),
+		        .is_primary = true,
+		    }
+		);
 	}
 
 	void setup_input_system()
@@ -245,6 +266,8 @@ private:
 	memory::Ref<MirrorSystem> m_mirror_system;
 
 	lt::ecs::EntityId m_window = lt::ecs::null_entity;
+
+	lt::ecs::EntityId m_camera_id = lt::ecs::null_entity;
 };
 
 auto app::create_application() -> memory::Scope<app::Application>

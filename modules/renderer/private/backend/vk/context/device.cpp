@@ -276,9 +276,18 @@ void Device::unmap_memory(VkDeviceMemory memory)
 	return pass;
 }
 
-[[nodiscard]] auto Device::create_pipeline_layout(VkPipelineLayoutCreateInfo info) const
-    -> VkPipelineLayout
+[[nodiscard]] auto Device::create_pipeline_layout(
+    std::vector<VkPushConstantRange> push_constant_ranges
+) const -> VkPipelineLayout
 {
+	auto info = VkPipelineLayoutCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.setLayoutCount = 0u,
+		.pSetLayouts = nullptr,
+		.pushConstantRangeCount = static_cast<uint32_t>(push_constant_ranges.size()),
+		.pPushConstantRanges = push_constant_ranges.data(),
+	};
+
 	auto *pipeline_layout = VkPipelineLayout {};
 	vkc(vk_create_pipeline_layout(m_device, &info, nullptr, &pipeline_layout));
 	return pipeline_layout;

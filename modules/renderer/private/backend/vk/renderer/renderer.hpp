@@ -29,6 +29,11 @@ public:
 
 	void replace_swapchain(ISwapchain *swapchain) override;
 
+	void set_frame_constants(FrameConstants constants) override
+	{
+		m_frame_constants = constants;
+	}
+
 private:
 	void record_cmd(VkCommandBuffer cmd, uint32_t image_idx);
 
@@ -51,6 +56,8 @@ private:
 	VkExtent2D m_resolution;
 
 	uint32_t m_max_frames_in_flight {};
+
+	FrameConstants m_frame_constants;
 };
 
 } // namespace lt::renderer::vk

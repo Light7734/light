@@ -9,6 +9,7 @@ template<typename T = float>
 struct mat4_impl
 {
 	using Column_T = vec4_impl<T>;
+
 	constexpr explicit mat4_impl(T scalar = 0)
 	    : values(
 	          {
@@ -43,7 +44,7 @@ struct mat4_impl
 	{
 	}
 
-	[[nodiscard]] constexpr auto identity() -> mat4_impl<T>
+	[[nodiscard]] static constexpr auto identity() -> mat4_impl<T>
 	{
 		return mat4_impl<T> {
 			{ 1 }, {},    {},    {},    //

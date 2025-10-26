@@ -87,6 +87,7 @@ PFN_vkCmdBindPipeline vk_cmd_bind_pipeline {};
 PFN_vkCmdDraw vk_cmd_draw {};
 PFN_vkCmdSetViewport vk_cmd_set_viewport {};
 PFN_vkCmdSetScissor vk_cmd_set_scissors {};
+PFN_vkCmdPushConstants vk_cmd_push_constants {};
 
 PFN_vkCreateBuffer vk_create_buffer {};
 PFN_vkDestroyBuffer vk_destroy_buffer {};
@@ -96,7 +97,6 @@ PFN_vkBindBufferMemory vk_bind_buffer_memory {};
 PFN_vkMapMemory vk_map_memory {};
 PFN_vkUnmapMemory vk_unmap_memory {};
 PFN_vkFreeMemory vk_free_memory {};
-
 
 PFN_vkResetCommandBuffer vk_reset_command_buffer {};
 
@@ -382,6 +382,7 @@ void Instance::load_device_functions_impl(VkDevice device)
 	load_fn(vk_cmd_draw, "vkCmdDraw");
 	load_fn(vk_cmd_set_viewport, "vkCmdSetViewport");
 	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
+	load_fn(vk_cmd_push_constants, "vkCmdPushConstants");
 	load_fn(vk_create_buffer, "vkCreateBuffer");
 	load_fn(vk_destroy_buffer, "vkDestroyBuffer");
 	load_fn(vk_allocate_memory, "vkAllocateMemory");

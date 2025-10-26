@@ -1,6 +1,7 @@
 #include <renderer/backend/vk/context/device.hpp>
 #include <renderer/backend/vk/context/swapchain.hpp>
 #include <renderer/backend/vk/renderer/pass.hpp>
+#include <renderer/data/frame_constants.hpp>
 
 namespace lt::renderer::vk {
 
@@ -12,12 +13,12 @@ Pass::Pass(
 )
     : m_device(static_cast<Device *>(device))
     , m_layout(m_device->create_pipeline_layout(
-          VkPipelineLayoutCreateInfo {
-              .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-              .setLayoutCount = 0u,
-              .pSetLayouts = nullptr,
-              .pushConstantRangeCount = 0u,
-              .pPushConstantRanges = nullptr,
+          std::vector<VkPushConstantRange> {
+              VkPushConstantRange {
+                  .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+                  .offset = 0u,
+                  .size = sizeof(FrameConstants),
+              },
           }
       ))
 {
@@ -112,7 +113,6 @@ Pass::Pass(
 		.blendConstants = { 0.0f, 0.0, 0.0, 0.0 },
 	};
 
-
 	auto attachment_description = VkAttachmentDescription {
 		.format = static_cast<Swapchain *>(swapchain)->get_format(),
 		.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -178,7 +178,6 @@ Pass::Pass(
 	);
 
 	m_framebuffers = static_cast<Swapchain *>(swapchain)->create_framebuffers_for_pass(m_pass);
-
 
 	m_device->destroy_shader_module(vertex_module);
 	m_device->destroy_shader_module(fragment_module);

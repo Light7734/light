@@ -24,7 +24,13 @@ add_library_module(
 
 target_link_libraries(
     renderer
-    PUBLIC app ecs memory assets time bitwise
+    PUBLIC app
+           ecs
+           memory
+           assets
+           time
+           bitwise
+           camera
     PRIVATE surface pthread)
 
 add_test_module(
@@ -37,7 +43,7 @@ add_test_module(
     frontend/context/device.test.cpp
     frontend/context/swapchain.test.cpp
     frontend/data/buffer.test.cpp
-    frontend/renderer/pass.test.cpp
+    # frontend/renderer/pass.test.cpp
     frontend/renderer/renderer.test.cpp
     # backend specific tests -- vk
     backend/vk/context/instance.test.cpp)

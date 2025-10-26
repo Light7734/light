@@ -39,6 +39,11 @@ public:
 		return m_pipeline;
 	}
 
+	[[nodiscard]] auto get_layout() -> VkPipelineLayout
+	{
+		return m_layout;
+	}
+
 	[[nodiscard]] auto get_framebuffers() -> std::vector<VkFramebuffer> &
 	{
 		return m_framebuffers;

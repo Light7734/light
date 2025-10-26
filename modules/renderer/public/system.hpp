@@ -55,31 +55,6 @@ public:
 
 	void tick(app::TickInfo tick) override;
 
-	[[nodiscard]] auto get_surface() -> class ISurface *
-	{
-		return m_surface.get();
-	}
-
-	[[nodiscard]] auto get_gpu() -> class IGpu *
-	{
-		return m_gpu.get();
-	}
-
-	[[nodiscard]] auto get_device() -> class IDevice *
-	{
-		return m_device.get();
-	}
-
-	[[nodiscard]] auto get_swapchain() -> class ISwapchain *
-	{
-		return m_swapchain.get();
-	}
-
-	[[nodiscard]] auto get_renderer() -> class IRenderer *
-	{
-		return m_renderer.get();
-	}
-
 	[[nodiscard]] auto get_last_tick_result() const -> const app::TickResult & override
 	{
 		return m_last_tick_result;

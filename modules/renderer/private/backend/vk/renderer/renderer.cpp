@@ -100,6 +100,7 @@ Renderer::~Renderer()
 	vk_reset_command_buffer(cmd, {});
 	record_cmd(cmd, *image_idx);
 
+
 	auto wait_stage = VkPipelineStageFlags { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	auto &submit_semaphore = m_submit_semaphores[*image_idx];
 	m_device->submit(
@@ -149,6 +150,14 @@ void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 	};
 
 	vkc(vk_begin_command_buffer(cmd, &cmd_begin_info));
+	vk_cmd_push_constants(
+	    cmd,
+	    m_pass->get_layout(),
+	    VK_SHADER_STAGE_VERTEX_BIT,
+	    0u,
+	    sizeof(FrameConstants),
+	    &m_frame_constants
+	);
 
 	auto clear_value = VkClearValue {
 			.color = { 
@@ -181,7 +190,7 @@ void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 	vk_cmd_set_viewport(cmd, 0, 1, &viewport);
 
 	auto scissor = VkRect2D {
-		.offset = { 0u, 0u },
+		.offset = { .x = 0u, .y = 0u },
 		.extent = m_resolution,
 	};
 	vk_cmd_set_scissors(cmd, 0, 1, &scissor);

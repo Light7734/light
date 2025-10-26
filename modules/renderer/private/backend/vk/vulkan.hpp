@@ -76,6 +76,7 @@ extern PFN_vkCmdBindPipeline vk_cmd_bind_pipeline;
 extern PFN_vkCmdDraw vk_cmd_draw;
 extern PFN_vkCmdSetViewport vk_cmd_set_viewport;
 extern PFN_vkCmdSetScissor vk_cmd_set_scissors;
+extern PFN_vkCmdPushConstants vk_cmd_push_constants;
 
 extern PFN_vkCreateBuffer vk_create_buffer;
 extern PFN_vkDestroyBuffer vk_destroy_buffer;

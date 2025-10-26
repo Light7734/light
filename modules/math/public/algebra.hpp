@@ -31,25 +31,29 @@ namespace lt::math {
  *
  * the 1 at [z][3] is to save the Z axis into the resulting W for perspective division.
  *
- * thanks to pikuma: https://www.youtube.com/watch?v=EqNcqBdrNyI
+ * @ref Thanks to pikuma for explaining the math behind this:
+ * https://www.youtube.com/watch?v=EqNcqBdrNyI
  */
 template<typename T>
 constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far)
 {
 	const T half_fov_tan = std::tan(field_of_view / static_cast<T>(2));
 
-	auto result = mat4_impl<T> { T { 0 } };
+	auto result = mat4_impl<T>::identity();
 
 	result[0][0] = T { 1 } / (aspect_ratio * half_fov_tan);
-
+	//
 	result[1][1] = T { 1 } / (half_fov_tan);
-
-	result[2][2] = -(z_far + z_near) / (z_far - z_near);
-
+	//
+	//	result[2][2] = -(z_far + z_near) / (z_far - z_near);
+	//
+	result[2][2] = z_far / (z_far - z_near);
+	//
 	result[2][3] = -T { 1 };
-
-	result[3][2] = -(T { 2 } * z_far * z_near) / (z_far - z_near);
-
+	//
+	// result[3][2] = -(T { 2 } * z_far * z_near) / (z_far - z_near);
+	result[3][2] = -(z_far * z_near) / (z_far - z_near);
+	//
 	return result;
 }
 

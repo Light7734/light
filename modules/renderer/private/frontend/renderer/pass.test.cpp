@@ -7,7 +7,7 @@ using ::lt::renderer::IMessenger;
 
 Suite raii = "pass_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
-		auto fixture = Fixture_RendererSystem {};
+		Fixture_ auto fixture = Fixture_RendererSystem {};
 		auto &system = fixture.renderer_system();
 
 		std::ignore = lt::renderer::IPass::create(

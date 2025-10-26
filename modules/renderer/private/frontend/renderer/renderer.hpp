@@ -2,6 +2,7 @@
 
 #include <memory/scope.hpp>
 #include <renderer/api.hpp>
+#include <renderer/data/frame_constants.hpp>
 
 namespace lt::renderer {
 
@@ -41,6 +42,8 @@ public:
 	[[nodiscard]] virtual auto draw(uint32_t frame_idx) -> DrawResult = 0;
 
 	virtual void replace_swapchain(class ISwapchain *swapchain) = 0;
+
+	virtual void set_frame_constants(FrameConstants constants) = 0;
 };
 
 } // namespace lt::renderer

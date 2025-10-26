@@ -1,3 +1,5 @@
+#include <camera/components.hpp>
+#include <math/algebra.hpp>
 #include <renderer/components/messenger.hpp>
 #include <renderer/frontend/context/device.hpp>
 #include <renderer/frontend/context/gpu.hpp>
@@ -70,6 +72,23 @@ void System::tick(app::TickInfo tick)
 		}
 	}
 
+	auto perspective = math::mat4::identity();
+	for (auto [id, camera] : m_registry->view<lt::camera::components::PerspectiveCamera>())
+	{
+		if (camera.is_primary)
+		{
+			perspective = math::perspective(
+			    camera.vertical_fov,
+			    camera.aspect_ratio,
+			    camera.near_plane,
+			    camera.far_plane
+			);
+
+			break;
+		}
+	}
+
+	m_renderer->set_frame_constants({ .view_projection = perspective });
 	if (m_renderer->draw(m_frame_idx) != IRenderer::DrawResult::success)
 	{
 		m_swapchain.reset();

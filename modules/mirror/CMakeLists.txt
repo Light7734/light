@@ -1,5 +1,6 @@
 add_library_module(libmirror)
-target_link_libraries(libmirror INTERFACE app time input surface renderer)
+target_link_libraries(libmirror INTERFACE app time input surface renderer
+                                          camera)
 
 add_test_module(
     libmirror layers/editor_layer.test.cpp panels/asset_browser.test.cpp

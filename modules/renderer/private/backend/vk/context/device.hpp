@@ -118,8 +118,9 @@ public:
 
 	[[nodiscard]] auto create_pass(VkRenderPassCreateInfo info) const -> VkRenderPass;
 
-	[[nodiscard]] auto create_pipeline_layout(VkPipelineLayoutCreateInfo info) const
-	    -> VkPipelineLayout;
+	[[nodiscard]] auto create_pipeline_layout(
+	    std::vector<VkPushConstantRange> push_constant_ranges
+	) const -> VkPipelineLayout;
 
 	[[nodiscard]] auto create_shader_module(VkShaderModuleCreateInfo info) const -> VkShaderModule;
 
