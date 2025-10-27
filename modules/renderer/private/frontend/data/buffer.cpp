@@ -1,5 +1,3 @@
-#pragma once
-
 #include <renderer/backend/vk/data/buffer.hpp>
 #include <renderer/frontend/data/buffer.hpp>
 

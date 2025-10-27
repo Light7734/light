@@ -16,7 +16,7 @@ Buffer::Buffer(IDevice *device, IGpu *gpu, const CreateInfo &info)
               .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
           }
       )
-    , m_memory(m_device, m_buffer, allocation_info_from_memory_requirements())
+    , m_memory(m_device, m_buffer, determine_allocation_info(info.usage))
     , m_size(info.size)
 {
 }
@@ -31,30 +31,18 @@ void Buffer::unmap() /* override */
 	m_device->unmap_memory(m_memory);
 }
 
-[[nodiscard]] auto Buffer::to_native_usage_flags(Usage usage) const -> VkBufferUsageFlags
-{
-	switch (usage)
-	{
-	case Usage::vertex: return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	case Usage::index: return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-	}
-
-	std::unreachable();
-}
-
-[[nodiscard]] auto Buffer::allocation_info_from_memory_requirements() const -> VkMemoryAllocateInfo
+[[nodiscard]] auto Buffer::determine_allocation_info(Usage usage) const -> VkMemoryAllocateInfo
 {
 	const auto requirements = m_device->get_memory_requirements(m_buffer);
 	auto memory_properties = m_gpu->get_memory_properties();
 
-	const auto required_properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-	                                 | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	const auto required_properties = to_native_memory_properties(usage);
 	auto type = 0u;
 	for (auto idx = 0; idx < memory_properties.memoryTypeCount; ++idx)
 	{
-		if ((requirements.memoryTypeBits & (1 << idx))
-		    && ((memory_properties.memoryTypes[idx].propertyFlags & required_properties)
-		        == required_properties))
+		const auto property_flags = memory_properties.memoryTypes[idx].propertyFlags;
+		if (has_correct_memory_type_bit(requirements.memoryTypeBits, idx)
+		    && has_required_memory_properties(required_properties, property_flags))
 
 		{
 			type = idx;
@@ -67,6 +55,52 @@ void Buffer::unmap() /* override */
 		.allocationSize = requirements.size,
 		.memoryTypeIndex = type,
 	};
+}
+
+[[nodiscard]] auto Buffer::to_native_usage_flags(Usage usage) const -> VkBufferUsageFlags
+{
+	switch (usage)
+	{
+	case Usage::vertex: return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	case Usage::index: return VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	case Usage::storage:
+		return VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+
+	case Usage::staging: return VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	}
+
+	std::unreachable();
+}
+
+[[nodiscard]] auto Buffer::to_native_memory_properties(Usage usage) const -> VkMemoryPropertyFlags
+{
+	switch (usage)
+	{
+	case Usage::vertex:
+	case Usage::index:
+	case Usage::storage: return VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+	case Usage::staging:
+		return VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	}
+
+	std::unreachable();
+}
+
+[[nodiscard]] auto Buffer::has_correct_memory_type_bit(uint32_t type_bits, uint32_t type_idx) const
+    -> bool
+{
+	return type_bits & (1 << type_idx);
+}
+
+[[nodiscard]] auto Buffer::has_required_memory_properties(
+    uint32_t required_properties,
+    uint32_t property_flags
+) const -> bool
+{
+	return (property_flags & required_properties) == required_properties;
 }
 
 } // namespace lt::renderer::vk

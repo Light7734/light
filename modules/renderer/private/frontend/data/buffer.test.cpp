@@ -8,16 +8,19 @@ Suite raii = "buffer_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 
-		ignore = IBuffer::create(
-		    lt::renderer::Api::vulkan,
-		    fixture.device(),
-		    fixture.gpu(),
-		    IBuffer::CreateInfo {
-		        .usage = IBuffer::Usage::vertex,
-		        .size = 1000u,
-		        .debug_name = "",
-		    }
-		);
+		for (auto idx = 0; idx <= std::to_underlying(IBuffer::Usage::staging); ++idx)
+		{
+			ignore = IBuffer::create(
+			    lt::renderer::Api::vulkan,
+			    fixture.device(),
+			    fixture.gpu(),
+			    IBuffer::CreateInfo {
+			        .usage = static_cast<IBuffer::Usage>(idx),
+			        .size = 1000u,
+			        .debug_name = "",
+			    }
+			);
+		}
 
 		expect_false(fixture.has_any_messages_of(error));
 		expect_false(fixture.has_any_messages_of(warning));
@@ -77,7 +80,7 @@ Suite raii = "buffer_raii"_suite = [] {
 			);
 		});
 
-		/** Make sure the default-case was good */
+		/** Make sure the default-case was OK */
 		ignore = IBuffer::create(lt::renderer::Api::vulkan, fixture.device(), fixture.gpu(), info);
 
 		expect_false(fixture.has_any_messages_of(error));
@@ -96,7 +99,7 @@ Suite mapping = "buffer_mapping"_suite = [] {
 		    fixture.device(),
 		    fixture.gpu(),
 		    IBuffer::CreateInfo {
-		        .usage = IBuffer::Usage::vertex,
+		        .usage = IBuffer::Usage::staging,
 		        .size = size,
 		        .debug_name = "",
 		    }

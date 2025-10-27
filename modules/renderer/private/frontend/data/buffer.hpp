@@ -8,11 +8,15 @@ namespace lt::renderer {
 class IBuffer
 {
 public:
-	enum Usage : uint8_t
+	enum class Usage : uint8_t
 	{
 		vertex,
 
 		index,
+
+		storage,
+
+		staging,
 	};
 
 	struct CreateInfo
@@ -22,6 +26,13 @@ public:
 		size_t size;
 
 		std::string debug_name;
+	};
+
+	struct CopyInfo
+	{
+		size_t offset;
+
+		size_t size;
 	};
 
 	[[nodiscard]] static auto create(
