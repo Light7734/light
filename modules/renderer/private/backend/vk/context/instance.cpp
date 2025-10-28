@@ -29,7 +29,7 @@ PFN_vkGetPhysicalDeviceQueueFamilyProperties vk_get_physical_device_queue_family
 PFN_vkCreateDevice vk_create_device {};
 PFN_vkGetDeviceProcAddr vk_get_device_proc_address {};
 PFN_vkDestroyDevice vk_destroy_device {};
-PFN_vkGetPhysicalDeviceFeatures vk_get_physical_device_features {};
+PFN_vkGetPhysicalDeviceFeatures2 vk_get_physical_device_features {};
 PFN_vkEnumerateDeviceExtensionProperties vk_enumerate_device_extension_properties {};
 PFN_vkGetPhysicalDeviceMemoryProperties vk_get_physical_device_memory_properties {};
 
@@ -88,6 +88,14 @@ PFN_vkCmdDraw vk_cmd_draw {};
 PFN_vkCmdSetViewport vk_cmd_set_viewport {};
 PFN_vkCmdSetScissor vk_cmd_set_scissors {};
 PFN_vkCmdPushConstants vk_cmd_push_constants {};
+PFN_vkCmdCopyBuffer vk_cmd_copy_buffer {};
+
+PFN_vkCreateDescriptorSetLayout vk_create_descriptor_set_layout {};
+PFN_vkDestroyDescriptorSetLayout vk_destroy_descriptor_set_layout {};
+PFN_vkCreateDescriptorPool vk_create_descriptor_pool {};
+PFN_vkDestroyDescriptorPool vk_destroy_descriptor_pool {};
+PFN_vkAllocateDescriptorSets vk_allocate_descriptor_sets {};
+PFN_vkFreeDescriptorSets vk_free_descriptor_sets {};
 
 PFN_vkCreateBuffer vk_create_buffer {};
 PFN_vkDestroyBuffer vk_destroy_buffer {};
@@ -142,6 +150,7 @@ void Instance::initialize_instance()
 		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
 		VK_KHR_SURFACE_EXTENSION_NAME,
 		VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
+		VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 	};
 
 	const char *layer_name = "VK_LAYER_KHRONOS_validation";
@@ -387,6 +396,13 @@ void Instance::load_device_functions_impl(VkDevice device)
 	load_fn(vk_cmd_set_viewport, "vkCmdSetViewport");
 	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
 	load_fn(vk_cmd_push_constants, "vkCmdPushConstants");
+	load_fn(vk_cmd_copy_buffer, "vkCmdCopyBuffer");
+	load_fn(vk_create_descriptor_set_layout, "vkCreateDescriptorSetLayout");
+	load_fn(vk_destroy_descriptor_set_layout, "vkDestroyDescriptorSetLayout");
+	load_fn(vk_create_descriptor_pool, "vkCreateDescriptorPool");
+	load_fn(vk_destroy_descriptor_pool, "vkDestroyDescriptorPool");
+	load_fn(vk_allocate_descriptor_sets, "vkAllocateDescriptorSets");
+	load_fn(vk_free_descriptor_sets, "vkFreeDescriptorSets");
 	load_fn(vk_create_buffer, "vkCreateBuffer");
 	load_fn(vk_destroy_buffer, "vkDestroyBuffer");
 	load_fn(vk_allocate_memory, "vkAllocateMemory");
