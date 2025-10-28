@@ -4,7 +4,7 @@
 #include <renderer/backend/vk/vulkan.hpp>
 
 
-namespace lt::renderer::vk::raii { // NOLINTBEGIN(cppcoreguidelines-special-member-functions)
+namespace lt::renderer::vk::raii {
 
 class DebugMessenger
 {
@@ -23,13 +23,20 @@ public:
 		}
 	}
 
+	DebugMessenger(DebugMessenger &&) = default;
+
+	DebugMessenger(const DebugMessenger &) = delete;
+
+	auto operator=(DebugMessenger &&) -> DebugMessenger & = default;
+
+	auto operator=(const DebugMessenger &) -> DebugMessenger & = delete;
+
 private:
 	memory::NullOnMove<Instance *> m_instance {};
 
 	VkDebugUtilsMessengerEXT m_object;
 };
 
-// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class Buffer
 {
 public:
@@ -46,6 +53,14 @@ public:
 			m_device->destroy_buffer(m_object);
 		}
 	}
+
+	Buffer(Buffer &&) = default;
+
+	Buffer(const Buffer &) = delete;
+
+	auto operator=(Buffer &&) -> Buffer & = default;
+
+	auto operator=(const Buffer &) -> Buffer & = delete;
 
 	[[nodiscard]] auto operator*() const -> VkBuffer
 	{
@@ -81,6 +96,14 @@ public:
 		}
 	}
 
+	Memory(Memory &&) = default;
+
+	Memory(const Memory &) = delete;
+
+	auto operator=(Memory &&) -> Memory & = default;
+
+	auto operator=(const Memory &) -> Memory & = delete;
+
 	[[nodiscard]] auto operator*() const -> VkDeviceMemory
 	{
 		return m_object;
@@ -98,5 +121,4 @@ private:
 };
 
 
-// NOLINTEND(cppcoreguidelines-special-member-functions)
 } // namespace lt::renderer::vk::raii
