@@ -1,3 +1,5 @@
 CompileFlags:
+  DriverMode: cl
   Add:
-    - -Xclang=-std=c++23
+    - /EHsc
+    - /std:c++latest
