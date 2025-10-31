@@ -9,9 +9,9 @@ try
 }
 catch (const std::exception &exp)
 {
-	std::cout << "Fuzz input resulted in uncaught exception:\n";
-	std::cout << "\texception.what: " << exp.what() << '\n';
-	std::cout << "\tinput size: " << size << '\n';
+	std::println("Fuzz input resulted in uncaught exception:");
+	std::println("\twhat: {}", exp.what());
+	std::println("\tinput size: {}", size);
 
 	return EXIT_FAILURE;
 }

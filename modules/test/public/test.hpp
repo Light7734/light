@@ -178,21 +178,23 @@ private:
 		{
 		case ExecutionPolicy::normal:
 		{
-			std::cout << "[-------STATS------]\n"
-			          << "suites:\n"
-			          << "\ttotal: " << m_total_suite_count << '\n'
-			          << "\tpassed: " << m_passed_suite_count << '\n'
-			          << "\tfailed: " << m_failed_suite_count << '\n'
-			          << "\tmatched: " << m_matched_suite_count << '\n'
-			          << "\tskipped: " << m_skipped_suite_count << '\n'
-			          << "tests:\n"
-			          << "\ttotal: " << m_total_case_count << '\n'
-			          << "\tpassed: " << m_passed_case_count << '\n'
-			          << "\tfailed: " << m_failed_case_count << '\n'
-			          << "\tmatched: " << m_matched_case_count << '\n'
-			          << "\tskipped: " << m_skipped_case_count << '\n';
+			std::println("[-------STATS------]");
 
-			std::cout << "________________________________________________________________\n\n\n";
+			std::println("suites:");
+			std::println("\ttotal: {}", m_total_suite_count);
+			std::println("\tpassed: {}", m_passed_suite_count);
+			std::println("\tfailed: {}", m_failed_suite_count);
+			std::println("\tmatched: {}", m_matched_suite_count);
+			std::println("\tskipped: {}", m_skipped_suite_count);
+
+			std::println("tests:");
+			std::println("\ttotal: {}", m_total_case_count);
+			std::println("\tpassed: {}", m_passed_case_count);
+			std::println("\tfailed: {}", m_failed_case_count);
+			std::println("\tmatched: {}", m_matched_case_count);
+			std::println("\tskipped: {}", m_skipped_case_count);
+
+			std::println("________________________________________________________________");
 
 			return m_failed_case_count;
 		}
@@ -214,7 +216,7 @@ private:
 
 	Registry()
 	{
-		std::cout << "________________________________________________________________\n";
+		std::println("________________________________________________________________");
 	}
 
 	[[nodiscard]] static auto instance() -> Registry &
@@ -289,16 +291,16 @@ private:
 		}
 		Registry::increment_matched_case_count();
 
-		std::cout << "[Running-----------] --> ";
-		std::cout << m_name << '\n';
+		std::println("[Running-----------] --> ");
+		std::println("{}", m_name);
 		try
 		{
 			test();
 		}
 		catch (const std::exception &exp)
 		{
-			std::cout << exp.what() << "\n";
-			std::cout << "[-----------FAIL !!]" << "\n\n";
+			std::println("{}", exp.what());
+			std::println("[-----------FAIL !!]");
 			Registry::increment_failed_case_count();
 
 			if (Registry::should_return_on_failure())
@@ -310,7 +312,7 @@ private:
 		}
 
 		Registry::increment_passed_case_count();
-		std::cout << "[--------SUCCESS :D]" << "\n\n";
+		std::println("[--------SUCCESS :D]");
 	}
 
 	std::string_view m_name;
