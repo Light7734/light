@@ -1,10 +1,17 @@
 #pragma once
 
-#include <format>
-#include <print>
+#include <cstdint>
+#include <fmt/chrono.h>
+#include <fmt/format.h>
+#include <source_location>
+#include <string_view>
+#include <thread>
+#include <utility>
+
+namespace lt::log {
 
 /** Severity of a log message. */
-enum class LogLvl : uint8_t
+enum class Level : uint8_t
 {
 	/** Lowest and most vebose log level, for tracing execution paths and events */
 	trace = 0,
@@ -28,62 +35,151 @@ enum class LogLvl : uint8_t
 	off = 6,
 };
 
-/** Simple console logger */
-class Logger
+namespace details {
+
+inline auto thread_hash_id() noexcept -> std::uint64_t
 {
-public:
-	void static show_imgui_window();
+	return static_cast<std::uint64_t>(std::hash<std::thread::id> {}(std::this_thread::get_id()));
+}
 
-	template<typename... Args>
-	void static log(LogLvl lvl, std::format_string<Args...> fmt, Args &&...args) noexcept
+} // namespace details
+
+template<typename... Args>
+struct [[maybe_unused]] print
+{
+	[[maybe_unused]] print(
+	    Level level,
+	    const std::source_location &location,
+	    std::format_string<Args...> format,
+	    Args &&...arguments
+	) noexcept
 	{
-		std::ignore = lvl;
-		std::println(fmt, std::forward<Args>(args)...);
+		constexpr auto to_string = [](Level level, auto location) {
+			// clang-format off
+			switch (level)
+			{
+			using enum Level;
+			case trace   : return "\033[1;37m| trc |\033[0m";
+			case debug   : return "\033[1;36m| dbg |\033[0m";
+			case info    : return "\033[1;32m| inf |\033[0m";
+			case warn    : return "\033[1;33m| wrn |\033[0m";
+			case error   : return "\033[1;31m| err |\033[0m";
+			case critical: return "\033[1;41m| crt |\033[0m";
+			case off: return "off";
+			}
+			// clang-format on
+
+			std::unreachable();
+		};
+
+		const auto path = std::filesystem::path { location.file_name() };
+
+		std::println(
+		    "{} {} ==> {}",
+		    to_string(level, location),
+		    std::format("{}:{}", path.filename().c_str(), location.line()),
+		    std::format(format, std::forward<Args &&>(arguments)...)
+		);
 	}
-
-	void static log(LogLvl lvl, const char *message) noexcept
-	{
-		std::ignore = lvl;
-		std::println("{}", message);
-	}
-
-
-private:
-	Logger() = default;
 };
 
 template<typename... Args>
-void log_trc(std::format_string<Args...> fmt, Args &&...args) noexcept
-{
-	Logger::log(LogLvl::trace, fmt, std::forward<Args>(args)...);
-}
+print(Level level, std::format_string<Args...>, Args &&...) noexcept -> print<Args...>;
 
 template<typename... Args>
-void log_dbg(std::format_string<Args...> fmt, Args &&...args) noexcept
+struct [[maybe_unused]] trace
 {
-	Logger::log(LogLvl::debug, fmt, std::forward<Args>(args)...);
-}
+	[[maybe_unused]] trace(
+	    std::format_string<Args...> format,
+	    Args &&...arguments,
+	    const std::source_location &location = std::source_location::current()
+	) noexcept
+	{
+		print(Level::trace, location, format, std::forward<Args &&>(arguments)...);
+	}
+};
 
 template<typename... Args>
-void log_inf(std::format_string<Args...> fmt, Args &&...args) noexcept
-{
-	Logger::log(LogLvl::info, fmt, std::forward<Args>(args)...);
-}
+trace(std::format_string<Args...>, Args &&...) noexcept -> trace<Args...>;
 
 template<typename... Args>
-void log_wrn(std::format_string<Args...> fmt, Args &&...args) noexcept
+struct [[maybe_unused]] debug
 {
-	Logger::log(LogLvl::warn, fmt, std::forward<Args>(args)...);
-}
+	[[maybe_unused]] debug(
+	    std::format_string<Args...> format,
+	    Args &&...arguments,
+	    const std::source_location &location = std::source_location::current()
+	) noexcept
+	{
+		print(Level::debug, location, format, std::forward<Args &&>(arguments)...);
+	}
+};
 
 template<typename... Args>
-void log_err(std::format_string<Args...> fmt, Args &&...args) noexcept
-{
-	Logger::log(LogLvl::error, fmt, std::forward<Args>(args)...);
-}
+debug(std::format_string<Args...>, Args &&...) noexcept -> debug<Args...>;
 
 template<typename... Args>
-void log_crt(std::format_string<Args...> fmt, Args &&...args) noexcept
+struct [[maybe_unused]] info
 {
-	Logger::log(LogLvl::critical, fmt, std::forward<Args>(args)...);
-}
+	[[maybe_unused]] info(
+	    std::format_string<Args...> format,
+	    Args &&...arguments,
+	    const std::source_location &location = std::source_location::current()
+	) noexcept
+	{
+		print(Level::info, location, format, std::forward<Args &&>(arguments)...);
+	}
+};
+
+template<typename... Args>
+info(std::format_string<Args...>, Args &&...) noexcept -> info<Args...>;
+
+template<typename... Args>
+struct [[maybe_unused]] warn
+{
+	[[maybe_unused]] warn(
+	    std::format_string<Args...> format,
+	    Args &&...arguments,
+	    const std::source_location &location = std::source_location::current()
+	) noexcept
+	{
+		print(Level::warn, location, format, std::forward<Args &&>(arguments)...);
+	}
+};
+
+template<typename... Args>
+warn(std::format_string<Args...>, Args &&...) noexcept -> warn<Args...>;
+
+template<typename... Args>
+struct [[maybe_unused]] error
+{
+	[[maybe_unused]] error(
+	    std::format_string<Args...> format,
+	    Args &&...arguments,
+	    const std::source_location &location = std::source_location::current()
+	) noexcept
+	{
+		print(Level::error, location, format, std::forward<Args &&>(arguments)...);
+	}
+};
+
+template<typename... Args>
+error(std::format_string<Args...>, Args &&...) noexcept -> error<Args...>;
+
+template<typename... Args>
+struct [[maybe_unused]] critical
+{
+	[[maybe_unused]] critical(
+	    std::format_string<Args...> format,
+	    Args &&...arguments,
+	    const std::source_location &location = std::source_location::current()
+	) noexcept
+	{
+		print(Level::critical, location, format, std::forward<Args &&>(arguments)...);
+	}
+};
+
+template<typename... Args>
+critical(std::format_string<Args...>, Args &&...) noexcept -> critical<Args...>;
+
+} // namespace lt::log

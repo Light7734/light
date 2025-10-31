@@ -1,1 +1,2 @@
-add_library_module(logger logger.cpp)
+add_library_module(logger)
+add_test_module(logger logger.test.cpp)
