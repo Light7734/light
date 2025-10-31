@@ -91,8 +91,8 @@ System::~System()
 	}
 	catch (const std::exception &exp)
 	{
-		log_err("Uncaught exception in surface::~System:");
-		log_err("\twhat: {}", exp.what());
+		log::error("Uncaught exception in surface::~System:");
+		log::error("\twhat: {}", exp.what());
 	}
 }
 
@@ -189,9 +189,9 @@ try
 }
 catch (const std::exception &exp)
 {
-	log_err("Exception thrown when on_constructing surface component");
-	log_err("\tentity: {}", entity);
-	log_err("\twhat: {}", exp.what());
+	log::error("Exception thrown when on_constructing surface component");
+	log::error("\tentity: {}", entity);
+	log::error("\twhat: {}", exp.what());
 	m_registry->remove<SurfaceComponent>(entity);
 }
 
@@ -200,7 +200,7 @@ void System::on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity)
 	const auto &[display, window, _] = registry.get<SurfaceComponent>(entity).get_native_data();
 	if (!display)
 	{
-		log_wrn("Surface component destroyed with null display");
+		log::warn("Surface component destroyed with null display");
 		return;
 	}
 
@@ -316,7 +316,7 @@ void System::handle_requests(SurfaceComponent &surface)
 		[&](const ModifyResolutionRequest &request) { modify_resolution(surface, request); },
 		[&](const ModifyPositionRequest &request) { modify_position(surface, request); },
 		[&](const ModifyVisibilityRequest &request) { modify_visiblity(surface, request); },
-		[&](const auto &) { log_err("Unknown surface request"); },
+		[&](const auto &) { log::error("Unknown surface request"); },
 	};
 
 	for (const auto &request : surface.peek_requests())
@@ -380,7 +380,7 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 		std::this_thread::sleep_for(std::chrono::microseconds { 100 });
 		if (timer.elapsed_time() > lifespan)
 		{
-			log_err("Timed out waiting for XResizeWindow's event");
+			log::error("Timed out waiting for XResizeWindow's event");
 			return;
 		}
 	}
@@ -419,7 +419,7 @@ void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequ
 		std::this_thread::sleep_for(std::chrono::microseconds { 100 });
 		if (timer.elapsed_time() > lifespan)
 		{
-			log_err("Timed out waiting for XMoveWindow's event");
+			log::error("Timed out waiting for XMoveWindow's event");
 			return;
 		}
 	}

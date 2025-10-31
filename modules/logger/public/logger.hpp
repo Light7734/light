@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <source_location>
-#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -78,13 +78,14 @@ struct [[maybe_unused]] print
 		    "{} {} ==> {}",
 		    to_string(level, location),
 		    std::format("{}:{}", path.filename().c_str(), location.line()),
-		    std::format(format, std::forward<Args &&>(arguments)...)
+		    std::format(format, std::forward<Args>(arguments)...)
 		);
 	}
 };
 
 template<typename... Args>
-print(Level level, std::format_string<Args...>, Args &&...) noexcept -> print<Args...>;
+print(Level, const std::source_location &, std::format_string<Args...>, Args &&...) noexcept
+    -> print<Args...>;
 
 template<typename... Args>
 struct [[maybe_unused]] trace
@@ -95,7 +96,7 @@ struct [[maybe_unused]] trace
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::trace, location, format, std::forward<Args &&>(arguments)...);
+		print(Level::trace, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -111,7 +112,7 @@ struct [[maybe_unused]] debug
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::debug, location, format, std::forward<Args &&>(arguments)...);
+		print(Level::debug, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -127,7 +128,7 @@ struct [[maybe_unused]] info
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::info, location, format, std::forward<Args &&>(arguments)...);
+		print(Level::info, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -143,7 +144,7 @@ struct [[maybe_unused]] warn
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::warn, location, format, std::forward<Args &&>(arguments)...);
+		print(Level::warn, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -159,7 +160,7 @@ struct [[maybe_unused]] error
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::error, location, format, std::forward<Args &&>(arguments)...);
+		print(Level::error, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -175,7 +176,7 @@ struct [[maybe_unused]] critical
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::critical, location, format, std::forward<Args &&>(arguments)...);
+		print(Level::critical, location, format, std::forward<Args>(arguments)...);
 	}
 };
 

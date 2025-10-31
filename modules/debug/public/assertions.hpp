@@ -1,7 +1,6 @@
 #pragma once
 
 #include <format>
-#include <logger/logger.hpp>
 #include <source_location>
 
 namespace lt {
@@ -27,7 +26,6 @@ struct ensure
 		}
 	}
 };
-
 
 template<typename Expression_T, typename... Args_T>
 ensure(Expression_T, std::format_string<Args_T...>, Args_T &&...)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <logger/logger.hpp>
 
 namespace lt::app {
 
@@ -72,7 +73,7 @@ public:
 	{
 		auto diag = m_diagnosis.emplace_back(std::move(diagnosis));
 
-		log_dbg("message: {}", diag.message);
+		log::debug("message: {}", diag.message);
 	}
 
 	[[nodiscard]] auto empty_diagnosis() const -> bool

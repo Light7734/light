@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/application.hpp>
+#include <logger/logger.hpp>
 #include <memory/scope.hpp>
 
 auto main(int argc, char *argv[]) -> int32_t
@@ -21,7 +22,7 @@ try
 }
 catch (const std::exception &exp)
 {
-	log_crt("Terminating due to uncaught exception:");
-	log_crt("\texception.what(): {}", exp.what());
+	lt::log::critical("Terminating due to uncaught exception:");
+	lt::log::critical("\texception.what(): {}", exp.what());
 	return EXIT_FAILURE;
 }

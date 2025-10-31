@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assets/shader.hpp>
+#include <logger/logger.hpp>
 
 inline void bake_shader(
     const std::filesystem::path &in_path,
@@ -13,7 +14,7 @@ inline void bake_shader(
 
 	auto glsl_path = in_path.string();
 	auto spv_path = std::format("{}.spv", glsl_path);
-	log_trc(
+	lt::log::trace(
 	    "Compiling {} shader {} -> {}",
 	    type == vertex ? "vertex" : "fragment",
 	    glsl_path,
@@ -46,7 +47,7 @@ inline void bake_shader(
 	auto bytes = std::vector<std::byte>(size);
 	stream.seekg(0, std::ios::beg);
 	stream.read((char *)bytes.data(), size); // NOLINT
-	log_dbg("BYTES: {}", bytes.size());
+	lt::log::debug("BYTES: {}", bytes.size());
 	stream.close();
 	std::filesystem::remove(spv_path);
 

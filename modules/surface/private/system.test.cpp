@@ -268,11 +268,11 @@ Suite tick_handles_requests = "tick_handles_requests"_suite = [] {
 		expect_eq(surface.get_position(), position);
 		expect_eq(surface.get_resolution(), resolution);
 
-		log_dbg("EVENT COUNT: {}", surface.peek_events().size());
+		log::debug("EVENT COUNT: {}", surface.peek_events().size());
 		for (const auto &event : surface.peek_events())
 		{
 			const auto visitor = overloads {
-				[&](auto event) { log_dbg("event: {}", event.to_string()); },
+				[&](auto event) { log::debug("event: {}", event.to_string()); },
 			};
 
 			std::visit(visitor, event);

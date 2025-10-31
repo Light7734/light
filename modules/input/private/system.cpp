@@ -101,7 +101,7 @@ void System::on_key_press(const lt::surface::KeyPressedEvent &event)
 {
 	if (event.get_key() > m_keys.size())
 	{
-		log_dbg(
+		log::debug(
 		    "Key code larger than key container size, implement platform-dependant "
 		    "key-code-mapping!"
 		);
@@ -116,7 +116,7 @@ void System::on_key_release(const lt::surface::KeyReleasedEvent &event)
 {
 	if (event.get_key() > m_keys.size())
 	{
-		log_dbg(
+		log::debug(
 		    "Key code larger than key container size, implement platform-dependant "
 		    "key-code-mapping!"
 		);

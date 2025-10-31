@@ -55,10 +55,10 @@ public:
 			auto new_capacity = std::max(static_cast<size_t>(identifier + 1), m_sparse.size() * 2);
 			new_capacity = std::min(new_capacity, max_capacity);
 
-			// log_dbg("Increasing sparse vector size:", m_dead_count);
-			// log_dbg("\tdead_count: {}", m_dead_count);
-			// log_dbg("\talive_count: {}", m_alive_count);
-			// log_dbg("\tsparse.size: {} -> {}", m_sparse.size(), new_capacity);
+			// log::debug("Increasing sparse vector size:", m_dead_count);
+			// log::debug("\tdead_count: {}", m_dead_count);
+			// log::debug("\talive_count: {}", m_alive_count);
+			// log::debug("\tsparse.size: {} -> {}", m_sparse.size(), new_capacity);
 
 			m_sparse.resize(new_capacity, null_identifier);
 		}

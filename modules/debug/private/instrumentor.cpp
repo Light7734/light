@@ -15,7 +15,7 @@ void Instrumentor::end_session_impl()
 {
 	if (m_current_session_count == 0u)
 	{
-		log_wrn("0 profiling for the ended session");
+		log::warn("0 profiling for the ended session");
 	}
 
 	m_current_session_count = 0u;

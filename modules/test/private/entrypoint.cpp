@@ -85,14 +85,14 @@ try
 }
 catch (const std::exception &exp)
 {
-	log_crt("Terminated due to uncaught exception:");
-	log_crt("\twhat: {}", exp.what());
+	lt::log::critical("Terminated due to uncaught exception:");
+	lt::log::critical("\twhat: {}", exp.what());
 
 	return EXIT_FAILURE;
 }
 catch (...)
 {
-	log_crt("Terminated due to uncaught non-std exception!");
+	lt::log::critical("Terminated due to uncaught non-std exception!");
 
 	return EXIT_FAILURE;
 }
