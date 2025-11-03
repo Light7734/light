@@ -121,11 +121,7 @@ steps:
   image: documentation:latest
   pull: if-not-exists
   commands:
-    - pwd
     - cd docs
-    - mkdir generated
-    - touch generated/changelogs.rst
-    - touch generated/api.rst
     - sphinx-build -M html . .
 
     - rm -rf /light_docs_dev/*
