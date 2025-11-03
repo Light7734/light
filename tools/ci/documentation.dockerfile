@@ -20,8 +20,7 @@ RUN apk add --no-cache \
     openssh
 
 RUN pip install --no-cache-dir --break-system-packages \
-    conan \
-    gitpython \
     Sphinx \
     sphinx_rtd_theme \
-    && conan profile detect
+    gitpython \
+    breathe
