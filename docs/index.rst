@@ -23,10 +23,10 @@
    guidelines/conventions.rst
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Generated Docs
+   :maxdepth: 3
+   :caption: API
 
-   generated/api.rst
-   generated/changelog.rst
+   api/app.rst
+   api/renderer.rst
 
 
