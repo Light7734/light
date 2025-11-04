@@ -1,3 +1,4 @@
+#include <logger/logger.hpp>
 #include <ranges>
 #include <renderer/backend/vk/context/device.hpp>
 #include <renderer/backend/vk/context/gpu.hpp>
@@ -95,8 +96,8 @@ Swapchain::~Swapchain()
 	}
 	catch (const std::exception &exp)
 	{
-		log_err("Failed to destroy swapchain:");
-		log_err("\twhat: {}", exp.what());
+		log::error("Failed to destroy swapchain:");
+		log::error("\twhat: {}", exp.what());
 	}
 }
 

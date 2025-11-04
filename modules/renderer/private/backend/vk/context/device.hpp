@@ -119,6 +119,7 @@ public:
 	[[nodiscard]] auto create_pass(VkRenderPassCreateInfo info) const -> VkRenderPass;
 
 	[[nodiscard]] auto create_pipeline_layout(
+	    std::vector<VkDescriptorSetLayout> descriptor_set_layout,
 	    std::vector<VkPushConstantRange> push_constant_ranges
 	) const -> VkPipelineLayout;
 
@@ -133,14 +134,28 @@ public:
 
 	[[nodiscard]] auto create_buffer(VkBufferCreateInfo info) const -> VkBuffer;
 
+	[[nodiscard]] auto create_descriptor_set_layout(VkDescriptorSetLayoutCreateInfo info) const
+	    -> VkDescriptorSetLayout;
+
+	[[nodiscard]] auto create_desscriptor_pool(VkDescriptorPoolCreateInfo info) const
+	    -> VkDescriptorPool;
+
 	/** allocation functions */
 	[[nodiscard]] auto allocate_memory(VkMemoryAllocateInfo info) const -> VkDeviceMemory;
 
 	[[nodiscard]] auto allocate_command_buffers(VkCommandBufferAllocateInfo info) const
 	    -> std::vector<VkCommandBuffer>;
 
+	[[nodiscard]] auto allocate_descriptor_set(VkDescriptorSetAllocateInfo info) const
+	    -> VkDescriptorSet;
+
 	/** de-allocation functions */
 	void free_memory(VkDeviceMemory memory) const;
+
+	void free_descriptor_set(
+	    VkDescriptorPool descriptor_pool,
+	    VkDescriptorSet descriptor_set
+	) const;
 
 	/** destroy functions */
 	void destroy_swapchain(VkSwapchainKHR swapchain) const;
@@ -172,6 +187,10 @@ public:
 	void destroy_fences(std::span<VkFence> fences) const;
 
 	void destroy_buffer(VkBuffer buffer) const;
+
+	void destroy_descriptor_set_layout(VkDescriptorSetLayout layout) const;
+
+	void destroy_descriptor_pool(VkDescriptorPool pool) const;
 
 private:
 	template<typename T>

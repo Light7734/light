@@ -244,10 +244,10 @@ void Instance::initialize_instance()
 		memset(extensions.data(), 0, extensions.size() * sizeof(VkExtensionProperties));
 		vkc(vk_enumerate_instance_extension_properties(nullptr, &count, extensions.data()));
 
-		// log_inf("Available vulkan instance extensions:");
+		// log::info("Available vulkan instance extensions:");
 		for (auto &ext : extensions)
 		{
-			// log_inf("\t{} @ {}", ext.extensionName, ext.specVersion);
+			// log::info("\t{} @ {}", ext.extensionName, ext.specVersion);
 		}
 	}
 
@@ -293,7 +293,7 @@ void Instance::load_global_functions()
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		pfn = reinterpret_cast<T>(vk_get_instance_proc_address(nullptr, fn_name));
 		ensure(pfn, "Failed to load vulkan global function: {}", fn_name);
-		// log_trc("Loaded global function: {}", fn_name);
+		// log::trace("Loaded global function: {}", fn_name);
 	};
 
 	load_fn(vk_create_instance, "vkCreateInstance");
@@ -307,7 +307,7 @@ void Instance::load_instance_functions()
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		pfn = reinterpret_cast<T>(vk_get_instance_proc_address(m_instance, fn_name));
 		ensure(pfn, "Failed to load vulkan instance function: {}", fn_name);
-		// log_trc("Loaded instance function: {}", fn_name);
+		// log::trace("Loaded instance function: {}", fn_name);
 	};
 
 	load_fn(vk_destroy_instance, "vkDestroyInstance");
@@ -352,7 +352,7 @@ void Instance::load_device_functions_impl(VkDevice device)
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		pfn = reinterpret_cast<T>(vk_get_device_proc_address(device, fn_name));
 		ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
-		// log_trc("Loaded device function: {}", fn_name);
+		// log::trace("Loaded device function: {}", fn_name);
 	};
 
 	load_fn(vk_get_device_queue, "vkGetDeviceQueue");

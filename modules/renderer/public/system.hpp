@@ -10,6 +10,16 @@
 
 namespace lt::renderer {
 
+/** The main rendering engine.
+ *
+ * Responsible for:
+ * - Creating a rendering backend context (vk/dx/mt)
+ * - Connecting the context to the physical devices (select gpu, create surface, logical device)
+ * - Rendering the scene represented in registry via lt::renderer::components.
+ *
+ * @todo(Light): Add DirectX12 support
+ * @todo(Light): Add Metal support
+ */
 class System: public app::ISystem
 {
 public:
@@ -61,6 +71,12 @@ public:
 	}
 
 private:
+	void handle_surface_resized_events();
+
+	void submit_scene();
+
+	void recreate_swapchain();
+
 	Api m_api;
 
 	memory::Ref<ecs::Registry> m_registry;

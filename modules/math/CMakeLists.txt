@@ -1,1 +1,11 @@
-add_library_module(math)
+add_library_module(
+    NAME
+    math
+    INTERFACES
+    algebra.cppm
+    mat4.cppm
+    trig.cppm
+    vec2.cppm
+    vec3.cppm
+    vec4.cppm
+    components/transform.cppm)

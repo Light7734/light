@@ -1,4 +1,5 @@
 //
+#include <logger/logger.hpp>
 #include <renderer/backend/vk/context/device.hpp>
 #include <renderer/backend/vk/context/gpu.hpp>
 #include <renderer/backend/vk/context/surface.hpp>
@@ -47,8 +48,8 @@ Device::~Device()
 	}
 	catch (const std::exception &exp)
 	{
-		log_err("Failed to destroy vk device:");
-		log_err("\twhat: {}", exp.what());
+		log::error("Failed to destroy vk device:");
+		log::error("\twhat: {}", exp.what());
 	}
 }
 
@@ -76,26 +77,106 @@ void Device::initialize_logical_device()
 	auto extensions = std::vector<const char *> {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+		VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
 	};
 
+	auto descriptor_indexing_features = m_gpu->get_descriptor_indexing_features();
+	log::debug("");
+
+	log::debug(
+	    "shaderInputAttachmentArrayDynamicIndexing: {}",
+	    descriptor_indexing_features.shaderInputAttachmentArrayDynamicIndexing
+	);
+	log::debug(
+	    " shaderUniformTexelBufferArrayDynamicIndexing: {}",
+	    descriptor_indexing_features.shaderUniformTexelBufferArrayDynamicIndexing
+	);
+	log::debug(
+	    " shaderStorageTexelBufferArrayDynamicIndexing: {}",
+	    descriptor_indexing_features.shaderStorageTexelBufferArrayDynamicIndexing
+	);
+	log::debug(
+	    " shaderUniformBufferArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderUniformBufferArrayNonUniformIndexing
+	);
+	log::debug(
+	    " shaderSampledImageArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing
+	);
+	log::debug(
+	    " shaderStorageBufferArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderStorageBufferArrayNonUniformIndexing
+	);
+	log::debug(
+	    " shaderStorageImageArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderStorageImageArrayNonUniformIndexing
+	);
+	log::debug(
+	    " shaderInputAttachmentArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderInputAttachmentArrayNonUniformIndexing
+	);
+	log::debug(
+	    " shaderUniformTexelBufferArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderUniformTexelBufferArrayNonUniformIndexing
+	);
+	log::debug(
+	    " shaderStorageTexelBufferArrayNonUniformIndexing: {}",
+	    descriptor_indexing_features.shaderStorageTexelBufferArrayNonUniformIndexing
+	);
+	log::debug(
+	    " descriptorBindingUniformBufferUpdateAfterBind: {}",
+	    descriptor_indexing_features.descriptorBindingUniformBufferUpdateAfterBind
+	);
+	log::debug(
+	    " descriptorBindingSampledImageUpdateAfterBind: {}",
+	    descriptor_indexing_features.descriptorBindingSampledImageUpdateAfterBind
+	);
+	log::debug(
+	    " descriptorBindingStorageImageUpdateAfterBind: {}",
+	    descriptor_indexing_features.descriptorBindingStorageImageUpdateAfterBind
+	);
+	log::debug(
+	    " descriptorBindingStorageBufferUpdateAfterBind: {}",
+	    descriptor_indexing_features.descriptorBindingStorageBufferUpdateAfterBind
+	);
+	log::debug(
+	    " descriptorBindingUniformTexelBufferUpdateAfterBind: {}",
+	    descriptor_indexing_features.descriptorBindingUniformTexelBufferUpdateAfterBind
+	);
+	log::debug(
+	    " descriptorBindingStorageTexelBufferUpdateAfterBind: {}",
+	    descriptor_indexing_features.descriptorBindingStorageTexelBufferUpdateAfterBind
+	);
+	log::debug(
+	    " descriptorBindingUpdateUnusedWhilePending: {}",
+	    descriptor_indexing_features.descriptorBindingUpdateUnusedWhilePending
+	);
+	log::debug(
+	    " descriptorBindingPartiallyBound: {}",
+	    descriptor_indexing_features.descriptorBindingPartiallyBound
+	);
+	log::debug(
+	    " descriptorBindingVariableDescriptorCount: {}",
+	    descriptor_indexing_features.descriptorBindingVariableDescriptorCount
+	);
+	log::debug(" runtimeDescriptorArray: {}", descriptor_indexing_features.runtimeDescriptorArray);
 	const auto dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+		.pNext = &descriptor_indexing_features,
 		.dynamicRendering = true,
 	};
 
-	auto device_info = VkDeviceCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = &dynamic_rendering_features,
-		.queueCreateInfoCount = static_cast<uint32_t>(queue_infos.size()),
-		.pQueueCreateInfos = queue_infos.data(),
-		.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-		.ppEnabledExtensionNames = extensions.data(),
-		.pEnabledFeatures = &physical_device_features,
-	};
 
-	ensure(
-	    !vk_create_device(m_gpu->vk(), &device_info, nullptr, &m_device),
-	    "Failed to create logical vulkan device"
+	m_device = m_gpu->create_device(
+	    VkDeviceCreateInfo {
+	        .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+	        .pNext = &dynamic_rendering_features,
+	        .queueCreateInfoCount = static_cast<uint32_t>(queue_infos.size()),
+	        .pQueueCreateInfos = queue_infos.data(),
+	        .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+	        .ppEnabledExtensionNames = extensions.data(),
+	        .pEnabledFeatures = &physical_device_features,
+	    }
 	);
 }
 
@@ -284,13 +365,14 @@ void Device::unmap_memory(VkDeviceMemory memory)
 }
 
 [[nodiscard]] auto Device::create_pipeline_layout(
+    std::vector<VkDescriptorSetLayout> descriptor_set_layout,
     std::vector<VkPushConstantRange> push_constant_ranges
 ) const -> VkPipelineLayout
 {
 	auto info = VkPipelineLayoutCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.setLayoutCount = 0u,
-		.pSetLayouts = nullptr,
+		.setLayoutCount = static_cast<uint32_t>(descriptor_set_layout.size()),
+		.pSetLayouts = descriptor_set_layout.data(),
 		.pushConstantRangeCount = static_cast<uint32_t>(push_constant_ranges.size()),
 		.pPushConstantRanges = push_constant_ranges.data(),
 	};
@@ -346,6 +428,21 @@ void Device::unmap_memory(VkDeviceMemory memory)
 	vkc(vk_create_buffer(m_device, &info, nullptr, &buffer));
 	return buffer;
 }
+[[nodiscard]] auto Device::create_desscriptor_pool(VkDescriptorPoolCreateInfo info) const
+    -> VkDescriptorPool
+{
+	auto *pool = VkDescriptorPool {};
+	vkc(vk_create_descriptor_pool(m_device, &info, nullptr, &pool));
+	return pool;
+}
+
+[[nodiscard]] auto Device::create_descriptor_set_layout(VkDescriptorSetLayoutCreateInfo info) const
+    -> VkDescriptorSetLayout
+{
+	auto *layout = VkDescriptorSetLayout {};
+	vkc(vk_create_descriptor_set_layout(m_device, &info, nullptr, &layout));
+	return layout;
+}
 
 [[nodiscard]] auto Device::allocate_command_buffers(VkCommandBufferAllocateInfo info) const
     -> std::vector<VkCommandBuffer>
@@ -362,9 +459,25 @@ void Device::unmap_memory(VkDeviceMemory memory)
 	return memory;
 }
 
+[[nodiscard]] auto Device::allocate_descriptor_set(VkDescriptorSetAllocateInfo info) const
+    -> VkDescriptorSet
+{
+	auto *descriptor_set = VkDescriptorSet {};
+	vkc(vk_allocate_descriptor_sets(m_device, &info, &descriptor_set));
+	return descriptor_set;
+}
+
 void Device::free_memory(VkDeviceMemory memory) const
 {
 	vk_free_memory(m_device, memory, nullptr);
+}
+
+void Device::free_descriptor_set(
+    VkDescriptorPool descriptor_pool,
+    VkDescriptorSet descriptor_set
+) const
+{
+	vkc(vk_free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
 }
 
 void Device::destroy_swapchain(VkSwapchainKHR swapchain) const
@@ -452,6 +565,16 @@ void Device::destroy_fences(std::span<VkFence> fences) const
 void Device::destroy_buffer(VkBuffer buffer) const
 {
 	vk_destroy_buffer(m_device, buffer, nullptr);
+}
+
+void Device::destroy_descriptor_set_layout(VkDescriptorSetLayout layout) const
+{
+	vk_destroy_descriptor_set_layout(m_device, layout, nullptr);
+}
+
+void Device::destroy_descriptor_pool(VkDescriptorPool pool) const
+{
+	vk_destroy_descriptor_pool(m_device, pool, nullptr);
 }
 
 } // namespace lt::renderer::vk

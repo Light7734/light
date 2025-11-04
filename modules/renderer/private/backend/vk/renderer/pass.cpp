@@ -12,16 +12,85 @@ Pass::Pass(
     const lt::assets::ShaderAsset &fragment_shader
 )
     : m_device(static_cast<Device *>(device))
-    , m_layout(m_device->create_pipeline_layout(
-          std::vector<VkPushConstantRange> {
-              VkPushConstantRange {
-                  .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-                  .offset = 0u,
-                  .size = sizeof(FrameConstants),
-              },
-          }
-      ))
 {
+	auto binding = VkDescriptorSetLayoutBinding {
+		.binding = 0,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = 1'000,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
+
+	const auto descriptor_binding_flags = VkDescriptorBindingFlagsEXT {
+		VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT_EXT
+		    | VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT
+		    | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT
+		    | VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT_EXT,
+	};
+
+	constexpr auto descriptor_count = uint32_t { 1'000 };
+
+	auto descriptor_binding_flags_info = VkDescriptorSetLayoutBindingFlagsCreateInfoEXT {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT,
+		.bindingCount = 1,
+		.pBindingFlags = &descriptor_binding_flags,
+	};
+
+
+	m_vertices_descriptor_set_layout = m_device->create_descriptor_set_layout(
+	    {
+	        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+	        .pNext = &descriptor_binding_flags_info,
+	        .flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT,
+	        .bindingCount = 1u,
+	        .pBindings = &binding,
+
+	    }
+	);
+
+	auto pool_size = VkDescriptorPoolSize {
+		.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = descriptor_count,
+	};
+
+	m_descriptor_pool = m_device->create_desscriptor_pool(
+	    {
+	        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+	        .poolSizeCount = 1u,
+	        .pPoolSizes = &pool_size,
+	    }
+	);
+
+	auto descriptor_set_variable_descriptor_count_info
+	    = VkDescriptorSetVariableDescriptorCountAllocateInfo {
+		      .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO,
+		      .descriptorSetCount = 1u,
+		      .pDescriptorCounts = &descriptor_count,
+	      };
+
+	m_vertices_descriptor_set = m_device->allocate_descriptor_set(
+	    VkDescriptorSetAllocateInfo {
+	        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+	        .pNext = &descriptor_set_variable_descriptor_count_info,
+	        .descriptorPool = m_descriptor_pool,
+	        .descriptorSetCount = 1u,
+	        .pSetLayouts = &m_vertices_descriptor_set_layout,
+	    }
+	);
+
+	m_layout = m_device->create_pipeline_layout(
+	    std::vector<VkDescriptorSetLayout> {
+	        m_vertices_descriptor_set_layout,
+	    },
+
+	    std::vector<VkPushConstantRange> {
+	        VkPushConstantRange {
+	            .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	            .offset = 0u,
+	            .size = sizeof(FrameConstants),
+	        },
+	    }
+	);
+
 	auto *vertex_module = create_module(
 	    vertex_shader.unpack(lt::assets::ShaderAsset::BlobTag::code)
 	);
@@ -188,6 +257,11 @@ Pass::~Pass()
 	}
 
 	m_device->wait_idle();
+
+	m_device->destroy_descriptor_set_layout(m_vertices_descriptor_set_layout);
+	m_device->free_descriptor_set(m_descriptor_pool, m_vertices_descriptor_set);
+	m_device->destroy_descriptor_pool(m_descriptor_pool);
+
 	m_device->destroy_framebuffers(m_framebuffers);
 	m_device->destroy_pipeline(m_pipeline);
 	// m_device->destroy_pass(m_pass);

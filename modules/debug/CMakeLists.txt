@@ -1,4 +1,2 @@
-add_library_module(lt_debug instrumentor.cpp)
+add_library_module(NAME lt_debug INTERFACES instrumentor.cppm assertions.cppm)
 target_link_libraries(lt_debug PUBLIC logger)
-target_precompile_headers(lt_debug PUBLIC
-                          ${CMAKE_CURRENT_SOURCE_DIR}/private/pch.hpp)

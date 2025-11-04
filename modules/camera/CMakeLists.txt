@@ -1,3 +1,3 @@
-add_library_module(camera)
+add_library_module(NAME camera INTERFACES components.cppm)
 
-target_link_libraries(camera INTERFACE math)
+target_link_libraries(camera PUBLIC math)

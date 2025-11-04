@@ -44,6 +44,7 @@ System::System(CreateInfo info)
 	m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
 	m_renderer = { IRenderer::create(
 		m_api,
+		m_gpu.get(),
 		m_device.get(),
 		m_swapchain.get(),
 		info.config.max_frames_in_flight
@@ -64,6 +65,18 @@ void System::tick(app::TickInfo tick)
 {
 	std::ignore = tick;
 
+	handle_surface_resized_events();
+	auto frame_result = m_renderer->frame(m_frame_idx, [this] { submit_scene(); });
+
+	if (frame_result == IRenderer::Result::invalid_swapchain)
+	{
+		recreate_swapchain();
+	}
+	m_frame_idx = (m_frame_idx + 1) % m_max_frames_in_flight;
+}
+
+void System::handle_surface_resized_events()
+{
 	for (const auto &event : m_surface_entity.get<surface::SurfaceComponent>().peek_events())
 	{
 		if (std::holds_alternative<surface::ResizedEvent>(event))
@@ -71,9 +84,15 @@ void System::tick(app::TickInfo tick)
 			m_swapchain.reset();
 			m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
 			m_renderer->replace_swapchain(m_swapchain.get());
+
+			// No need to process multiple resize events
+			break;
 		}
 	}
+}
 
+void System::submit_scene()
+{
 	auto perspective = math::mat4::identity();
 	for (auto [id, camera] : m_registry->view<lt::camera::components::PerspectiveCamera>())
 	{
@@ -90,24 +109,20 @@ void System::tick(app::TickInfo tick)
 		}
 	}
 
-	// for each sprite, submit a new "model matrix"  + "color" to go into the scene's SSBO
+	m_renderer->set_frame_constants({ .view_projection = perspective });
 	for (auto &[id, sprite, transform] :
 	     m_registry->view<components::Sprite, math::components::Transform>())
 	{
 		m_renderer->submit_sprite(sprite, transform);
 	}
+}
 
-	m_renderer->set_frame_constants({ .view_projection = perspective });
-	if (m_renderer->draw(m_frame_idx) != IRenderer::DrawResult::success)
-	{
-		m_swapchain.reset();
-		m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
-		m_renderer->replace_swapchain(m_swapchain.get());
-
-		std::ignore = m_renderer->draw(m_frame_idx); // drop the frame if failed twice
-	}
-
-	m_frame_idx = (m_frame_idx + 1) % m_max_frames_in_flight;
+void System::recreate_swapchain()
+{
+	log::trace("Re-creating swapchaain");
+	m_swapchain.reset();
+	m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
+	m_renderer->replace_swapchain(m_swapchain.get());
 }
 
 } // namespace lt::renderer

@@ -7,6 +7,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		ignore = lt::renderer::IRenderer::create(
 		    constants::api,
+		    fixture.gpu(),
 		    fixture.device(),
 		    fixture.swapchain(),
 		    constants::frames_in_flight
@@ -20,6 +21,7 @@ Suite raii = "renderer_raii"_suite = [] {
 			ignore = lt::renderer::IRenderer::create(
 			    constants::api,
 			    nullptr,
+			    fixture.device(),
 			    fixture.swapchain(),
 			    constants::frames_in_flight
 			);
@@ -28,6 +30,17 @@ Suite raii = "renderer_raii"_suite = [] {
 		expect_throw([&] {
 			ignore = lt::renderer::IRenderer::create(
 			    constants::api,
+			    fixture.gpu(),
+			    nullptr,
+			    fixture.swapchain(),
+			    constants::frames_in_flight
+			);
+		});
+
+		expect_throw([&] {
+			ignore = lt::renderer::IRenderer::create(
+			    constants::api,
+			    fixture.gpu(),
 			    fixture.device(),
 			    nullptr,
 			    constants::frames_in_flight
@@ -37,6 +50,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		expect_throw([&] {
 			ignore = lt::renderer::IRenderer::create(
 			    constants::api,
+			    fixture.gpu(),
 			    fixture.device(),
 			    nullptr,
 			    lt::renderer::IRenderer::frames_in_flight_upper_limit + 1
@@ -46,6 +60,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		expect_throw([&] {
 			ignore = lt::renderer::IRenderer::create(
 			    constants::api,
+			    fixture.gpu(),
 			    fixture.device(),
 			    nullptr,
 			    lt::renderer::IRenderer::frames_in_flight_lower_limit - 1
@@ -55,12 +70,13 @@ Suite raii = "renderer_raii"_suite = [] {
 };
 
 Suite draw = "renderer_draw"_suite = [] {
-	using enum lt::renderer::IRenderer::DrawResult;
+	using enum lt::renderer::IRenderer::Result;
 
 	Case { "renderer draw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		auto renderer = lt::renderer::IRenderer::create(
 		    constants::api,
+		    fixture.gpu(),
 		    fixture.device(),
 		    fixture.swapchain(),
 		    constants::frames_in_flight
@@ -68,7 +84,7 @@ Suite draw = "renderer_draw"_suite = [] {
 
 		for (auto frame_idx : std::views::iota(0u, 30u))
 		{
-			expect_eq(renderer->draw(frame_idx % constants::frames_in_flight), success);
+			expect_eq(renderer->frame(frame_idx % constants::frames_in_flight, [] {}), success);
 		}
 	};
 
@@ -76,6 +92,7 @@ Suite draw = "renderer_draw"_suite = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		auto renderer = lt::renderer::IRenderer::create(
 		    constants::api,
+		    fixture.gpu(),
 		    fixture.device(),
 		    fixture.swapchain(),
 		    constants::frames_in_flight
@@ -83,14 +100,14 @@ Suite draw = "renderer_draw"_suite = [] {
 
 		for (auto frame_idx : std::views::iota(0u, 15u))
 		{
-			expect_eq(renderer->draw(frame_idx % constants::frames_in_flight), success);
+			expect_eq(renderer->frame(frame_idx % constants::frames_in_flight, [] {}), success);
 		}
 
 		fixture.recreate_swapchain();
 		renderer->replace_swapchain(fixture.swapchain());
 		for (auto frame_idx : std::views::iota(0u, 15u))
 		{
-			expect_eq(renderer->draw(frame_idx % constants::frames_in_flight), success);
+			expect_eq(renderer->frame(frame_idx % constants::frames_in_flight, [] {}), success);
 		}
 	};
 };

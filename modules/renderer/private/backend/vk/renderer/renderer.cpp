@@ -4,11 +4,30 @@
 
 namespace lt::renderer::vk {
 
-Renderer::Renderer(IDevice *device, ISwapchain *swapchain, uint32_t max_frames_in_flight)
+Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, uint32_t max_frames_in_flight)
     : m_device(static_cast<Device *>(device))
     , m_swapchain(static_cast<Swapchain *>(swapchain))
     , m_resolution(m_swapchain->get_resolution())
     , m_max_frames_in_flight(max_frames_in_flight)
+    , m_staging_offset()
+    , m_vertex_buffer(
+          device,
+          gpu,
+          IBuffer::CreateInfo {
+              .usage = IBuffer::Usage::vertex,
+              .size = 1'000'000,
+              .debug_name = "vertex buffer",
+          }
+      )
+    , m_staging_buffer(
+          device,
+          gpu,
+          IBuffer::CreateInfo {
+              .usage = IBuffer::Usage::staging,
+              .size = 1'000'000,
+              .debug_name = "staging buffer",
+          }
+      )
 {
 	ensure(m_device, "Failed to initialize renderer: null device");
 	ensure(m_swapchain, "Failed to initialize renderer: null swapchain");
@@ -17,7 +36,7 @@ Renderer::Renderer(IDevice *device, ISwapchain *swapchain, uint32_t max_frames_i
 	m_pass = memory::create_ref<vk::Pass>(
 	    m_device,
 	    m_swapchain,
-	    assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
+	    assets::ShaderAsset { "./data/test_assets/sprite.vert.asset" },
 	    assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 	);
 
@@ -25,6 +44,15 @@ Renderer::Renderer(IDevice *device, ISwapchain *swapchain, uint32_t max_frames_i
 	    VkCommandPoolCreateInfo {
 	        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 	        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+	        .queueFamilyIndex = m_device->get_family_indices()[0],
+	    }
+	);
+
+
+	m_transient_pool = m_device->create_command_pool(
+	    VkCommandPoolCreateInfo {
+	        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+	        .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
 	        .queueFamilyIndex = m_device->get_family_indices()[0],
 	    }
 	);
@@ -73,9 +101,10 @@ Renderer::~Renderer()
 	m_device->destroy_semaphores(m_submit_semaphores);
 	m_device->destroy_fences(m_frame_fences);
 	m_device->destroy_command_pool(m_pool);
+	m_device->destroy_command_pool(m_transient_pool);
 }
 
-[[nodiscard]] auto Renderer::draw(uint32_t frame_idx) -> DrawResult
+[[nodiscard]] auto Renderer::frame(uint32_t frame_idx, std::function<void()> submit_scene) -> Result
 {
 	ensure(
 	    frame_idx < m_max_frames_in_flight,
@@ -93,13 +122,14 @@ Renderer::~Renderer()
 	auto image_idx = m_device->acquire_image(m_swapchain->vk(), aquire_semaphore);
 	if (!image_idx.has_value())
 	{
-		return {};
+		return Result::invalid_swapchain;
 	}
 
 	m_device->reset_fence(frame_fence);
-	vk_reset_command_buffer(cmd, {});
-	record_cmd(cmd, *image_idx);
 
+	map_buffers(frame_idx);
+	submit_scene();
+	record_cmd(cmd, *image_idx);
 
 	auto wait_stage = VkPipelineStageFlags { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	auto &submit_semaphore = m_submit_semaphores[*image_idx];
@@ -130,7 +160,8 @@ Renderer::~Renderer()
 	        .pResults = &result,
 	    }
 	);
-	return DrawResult::success;
+
+	return Result::success;
 }
 
 void Renderer::replace_swapchain(ISwapchain *swapchain)
@@ -139,6 +170,39 @@ void Renderer::replace_swapchain(ISwapchain *swapchain)
 	m_swapchain = static_cast<Swapchain *>(swapchain);
 	m_resolution = m_swapchain->get_resolution();
 	m_pass->replace_swapchain(*swapchain);
+}
+
+void Renderer::map_buffers(uint32_t frame_idx)
+{
+	using components::Sprite;
+
+	m_current_sprite_idx = 0;
+	m_staging_map = m_staging_buffer.map();
+	auto frame_segment_size = m_staging_map.size() / m_max_frames_in_flight;
+
+	m_staging_offset = frame_segment_size * frame_idx;
+	m_staging_map = m_staging_map.subspan(m_staging_offset, frame_segment_size);
+
+	m_sprite_vertex_map = std::span<Sprite::Vertex>(
+	    std::bit_cast<Sprite::Vertex *>(m_staging_map.data()),
+	    m_staging_map.size() / sizeof(Sprite::Vertex)
+	);
+}
+
+void Renderer::flush_buffers(VkCommandBuffer cmd)
+{
+	m_staging_map = {};
+	m_sprite_vertex_map = {};
+
+	m_staging_buffer.unmap();
+	const auto buffer_copy_info = VkBufferCopy {
+
+		.srcOffset = m_staging_offset,
+		.dstOffset = m_staging_offset,
+		.size = m_current_sprite_idx * sizeof(components::Sprite::Vertex),
+	};
+
+	vk_cmd_copy_buffer(cmd, m_staging_buffer.vk(), m_vertex_buffer.vk(), 1u, &buffer_copy_info);
 }
 
 void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
@@ -216,7 +280,10 @@ void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 
 	};
 
+	vk_reset_command_buffer(cmd, {});
 	vkc(vk_begin_command_buffer(cmd, &cmd_begin_info));
+	flush_buffers(cmd);
+
 	vk_cmd_push_constants(
 	    cmd,
 	    m_pass->get_layout(),
@@ -241,7 +308,7 @@ void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 	vk_cmd_bind_pipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pass->get_pipeline());
 	vk_cmd_set_viewport(cmd, 0, 1, &viewport);
 	vk_cmd_set_scissors(cmd, 0, 1, &scissor);
-	vk_cmd_draw(cmd, 3, 1, 0, 0);
+	vk_cmd_draw(cmd, m_current_sprite_idx, 1, 0, 0);
 	vk_cmd_end_rendering(cmd);
 	vk_cmd_pipeline_barrier(
 	    cmd,
@@ -258,8 +325,45 @@ void Renderer::record_cmd(VkCommandBuffer cmd, uint32_t image_idx)
 	vkc(vk_end_command_buffer(cmd));
 }
 
-void submit_sprite(const components::Sprite &sprite, const math::components::Transform &transform)
+void Renderer::submit_sprite(
+    const components::Sprite &sprite,
+    const math::components::Transform &transform
+)
 {
+	using components::Sprite;
+
+	const auto &[x, y, z] = transform.translation;
+	const auto &[width, height, _] = transform.scale;
+
+	m_sprite_vertex_map[m_current_sprite_idx++] = components::Sprite::Vertex {
+		.position = { x, y + height, z },
+		.color = sprite.color,
+	};
+
+	m_sprite_vertex_map[m_current_sprite_idx++] = components::Sprite::Vertex {
+		.position = { x + width, y + height, z },
+		.color = sprite.color,
+	};
+
+	m_sprite_vertex_map[m_current_sprite_idx++] = components::Sprite::Vertex {
+		.position = { x + width, y, z },
+		.color = sprite.color,
+	};
+
+	m_sprite_vertex_map[m_current_sprite_idx++] = components::Sprite::Vertex {
+		.position = { x + width, y, z },
+		.color = sprite.color,
+	};
+
+	m_sprite_vertex_map[m_current_sprite_idx++] = components::Sprite::Vertex {
+		.position = { x, y, z },
+		.color = sprite.color,
+	};
+
+	m_sprite_vertex_map[m_current_sprite_idx++] = components::Sprite::Vertex {
+		.position = { x, y + height, z },
+		.color = sprite.color,
+	};
 }
 
 } // namespace lt::renderer::vk

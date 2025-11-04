@@ -1,5 +1,6 @@
 #pragma once
 
+#include <logger/logger.hpp>
 #include <memory/reference.hpp>
 #include <renderer/components/messenger.hpp>
 #include <renderer/frontend/context/device.hpp>
@@ -170,7 +171,7 @@ private:
 	{
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
-		log_trc("vulkan: {}", data.message);
+		lt::log::trace("vulkan: {}", data.message);
 		std::ignore = data;
 		std::ignore = type;
 
@@ -240,7 +241,7 @@ private:
 	{
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
-		log_trc("vulkan: {}", data.message);
+		lt::log::trace("vulkan: {}", data.message);
 
 		std::ignore = data;
 		std::ignore = type;

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assets/shader.hpp>
-#include <logger/logger.hpp>
 
 inline void bake_shader(
     const std::filesystem::path &in_path,
@@ -34,7 +32,7 @@ inline void bake_shader(
 	);
 
 	auto stream = std::ifstream(spv_path, std::ios::binary);
-	lt::ensure(
+	lt::debug::ensure(
 	    stream.is_open(),
 	    "Failed to open compiled {} shader at: {}",
 	    type == vertex ? "vert" : "frag",

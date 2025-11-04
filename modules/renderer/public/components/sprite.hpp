@@ -69,9 +69,7 @@ struct Sprite
 		}
 	};
 
-	memory::Ref<assets::ShaderAsset> vertex_shader;
-
-	memory::Ref<assets::ShaderAsset> fragment_shader;
+	math::vec3 color;
 };
 
 } // namespace lt::renderer::components

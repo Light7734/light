@@ -1,3 +1,4 @@
+#include <logger/logger.hpp>
 #include <renderer/backend/vk/messenger.hpp>
 
 namespace lt::renderer::vk {
@@ -42,8 +43,8 @@ Messenger::Messenger(IInstance *instance, CreateInfo info)
 	}
 	catch (const std::exception &exp)
 	{
-		log_err("Uncaught exception in messenger callback:");
-		log_err("\twhat: {}", exp.what());
+		log::error("Uncaught exception in messenger callback:");
+		log::error("\twhat: {}", exp.what());
 	}
 
 	return VK_FALSE;

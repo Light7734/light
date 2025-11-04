@@ -54,6 +54,12 @@ private:
 	VkPipelineLayout m_layout = VK_NULL_HANDLE;
 
 	std::vector<VkFramebuffer> m_framebuffers;
+
+	VkDescriptorPool m_descriptor_pool = VK_NULL_HANDLE;
+
+	VkDescriptorSetLayout m_vertices_descriptor_set_layout;
+
+	VkDescriptorSet m_vertices_descriptor_set = VK_NULL_HANDLE;
 };
 
 } // namespace lt::renderer::vk

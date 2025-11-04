@@ -1,3 +1,4 @@
+#include <logger/logger.hpp>
 #include <memory/reference.hpp>
 #include <renderer/frontend/context/instance.hpp>
 #include <renderer/frontend/context/surface.hpp>

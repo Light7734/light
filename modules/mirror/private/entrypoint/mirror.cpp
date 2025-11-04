@@ -6,11 +6,13 @@
 #include <ecs/entity.hpp>
 #include <input/components.hpp>
 #include <input/system.hpp>
+#include <math/components/transform.hpp>
 #include <math/trig.hpp>
 #include <math/vec2.hpp>
 #include <memory/reference.hpp>
 #include <memory/scope.hpp>
 #include <renderer/components/messenger.hpp>
+#include <renderer/components/sprite.hpp>
 #include <renderer/system.hpp>
 #include <surface/events/keyboard.hpp>
 #include <surface/events/surface.hpp>
@@ -30,7 +32,7 @@ void renderer_callback(
 	std::ignore = message_type;
 	std::ignore = user_data;
 
-	log_dbg("RENDERER CALLBACK: {}", data.message);
+	log::debug("RENDERER CALLBACK: {}", data.message);
 }
 
 class MirrorSystem: public lt::app::ISystem
@@ -145,7 +147,7 @@ public:
 
 	void on_window_close()
 	{
-		log_inf("Window close requested...");
+		log::info("Window close requested...");
 
 		unregister_system(m_input_system);
 		unregister_system(m_surface_system);
@@ -227,6 +229,21 @@ public:
 		        .user_data = this,
 		    } });
 
+		m_sprite_id = m_editor_registry->create_entity();
+
+		m_editor_registry->add(
+		    m_sprite_id,
+		    renderer::components::Sprite { .color = lt::math::vec3 { 1.0f, 0.0f, 0.0f } }
+		);
+		m_editor_registry->add(
+		    m_sprite_id,
+		    math::components::Transform {
+		        .translation = { -5.0, -5.0, 0.5 },
+		        .scale = { 5.0, 5.0, 1.0 },
+		        .rotation = {},
+		    }
+		);
+
 		m_camera_id = m_editor_registry->create_entity();
 
 		m_editor_registry->add(
@@ -268,6 +285,8 @@ private:
 	lt::ecs::EntityId m_window = lt::ecs::null_entity;
 
 	lt::ecs::EntityId m_camera_id = lt::ecs::null_entity;
+
+	lt::ecs::EntityId m_sprite_id = lt::ecs::null_entity;
 };
 
 auto app::create_application() -> memory::Scope<app::Application>

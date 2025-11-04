@@ -7,11 +7,13 @@ namespace lt::renderer {
 
 [[nodiscard]] /* static */ auto IRenderer::create(
     Api target_api,
+    IGpu *gpu,
     IDevice *device,
     ISwapchain *swapchain,
     uint32_t max_frames_in_flight
 ) -> memory::Scope<IRenderer>
 {
+	ensure(gpu, "Failed to create renderer::IRenderer: null gpu");
 	ensure(device, "Failed to create renderer::IRenderer: null device");
 	ensure(swapchain, "Failed to create renderer::IRenderer: null swapchain");
 	ensure(
@@ -28,7 +30,7 @@ namespace lt::renderer {
 	switch (target_api)
 	{
 	case Api::vulkan:
-		return memory::create_scope<vk::Renderer>(device, swapchain, max_frames_in_flight);
+		return memory::create_scope<vk::Renderer>(gpu, device, swapchain, max_frames_in_flight);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };

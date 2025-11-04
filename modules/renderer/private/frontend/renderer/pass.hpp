@@ -9,6 +9,7 @@ class ShaderAsset;
 
 namespace lt::renderer {
 
+
 class IPass
 {
 public:
