@@ -1,21 +1,24 @@
-#pragma once
+export module input.events;
 
-#include <math/vec2.hpp>
+import input.codes;
+import math.vec2;
+
+import std;
 
 namespace lt::input {
 
-class AnalogEvent
+export class AnalogEvent
 {
 public:
-	AnalogEvent(uint32_t input_code, math::uvec2 pointer_position)
-	    : m_input_code(input_code)
+	AnalogEvent(Key key, math::uvec2 pointer_position)
+	    : m_key(key)
 	    , m_pointer_position(pointer_position)
 	{
 	}
 
-	[[nodiscard]] auto get_code() const -> uint32_t
+	[[nodiscard]] auto get_key() const -> Key
 	{
-		return m_input_code;
+		return m_key;
 	};
 
 	[[nodiscard]] auto get_pointer_position() const -> math::uvec2
@@ -25,20 +28,14 @@ public:
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		auto stream = std::stringstream {};
 		const auto &[x, y] = m_pointer_position;
-		stream << "input::AnalogEvent: " << m_input_code << " @ " << x << ", " << y;
-		return stream.str();
+		return std::format("input::AnalogEvent: {} @ {}, {}", std::to_underlying(m_key), x, y);
 	}
 
 private:
-	uint32_t m_input_code;
+	Key m_key;
 
 	math::uvec2 m_pointer_position;
-};
-
-class AxisEvent
-{
 };
 
 } // namespace lt::input

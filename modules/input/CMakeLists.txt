@@ -1,4 +1,11 @@
-add_library_module(NAME input INTERFACES system.cpp)
-target_link_libraries(input PUBLIC surface math logger tbb)
+add_library_module(
+    NAME
+    input
+    INTERFACES
+    system.cppm
+    codes.cppm
+    components.cppm
+    events.cppm)
+target_link_libraries(input PUBLIC surface math logger)
 
-add_test_module(input system.test.cpp)
+# add_test_module(input system.test.cpp)

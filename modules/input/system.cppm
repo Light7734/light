@@ -1,11 +1,14 @@
-#pragma once
-
-#include <app/system.hpp>
-#include <ecs/registry.hpp>
-#include <memory/reference.hpp>
-#include <surface/components.hpp>
-#include <surface/events/keyboard.hpp>
-#include <surface/events/mouse.hpp>
+export module input.system;
+export import :components;
+import logger;
+import app.system;
+import debug.assertions;
+import ecs.registry;
+import memory.reference;
+import surface.system;
+import surface.events;
+import math.vec2;
+import std;
 
 namespace lt::input {
 
@@ -56,12 +59,7 @@ private:
 
 
 module :private;
-
-#include <input/components.hpp>
-#include <input/system.hpp>
-#include <memory/reference.hpp>
-
-namespace lt::input {
+using namespace lt::input;
 
 template<class... Ts>
 struct overloads: Ts...
@@ -71,7 +69,7 @@ struct overloads: Ts...
 
 System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
-	ensure(m_registry, "Failed to initialize input system: null registry");
+	debug::ensure(m_registry, "Failed to initialize input system: null registry");
 }
 
 void System::tick(app::TickInfo tick)
@@ -92,7 +90,7 @@ void System::tick(app::TickInfo tick)
 		// instead of brute-force checking all of them.
 		for (auto &action : input.m_actions)
 		{
-			auto code = action.trigger.mapped_keycode;
+			auto code = std::to_underlying(action.trigger.mapped_keycode);
 			if (code < m_keys.size() && m_keys[code])
 			{
 				if (action.state == InputAction::State::triggered)
@@ -200,5 +198,3 @@ void System::on_button_release(const lt::surface::ButtonReleasedEvent &event)
 {
 	m_buttons[event.get_button()] = false;
 }
-
-} // namespace lt::input
