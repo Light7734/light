@@ -1,8 +1,7 @@
 export module renderer.backend.vk.gpu;
 import renderer.backend.vk.library_wrapper;
 import debug.assertions;
-import renderer.frontend.instance;
-import renderer.frontend.gpu;
+import renderer.frontend;
 import renderer.backend.vk.instance;
 import memory.null_on_move;
 import std;
@@ -47,6 +46,8 @@ public:
 	// 	return m_queue_family_properties;
 	// }
 
+	[[nodiscard]] auto vk() -> vk::Gpu &;
+
 private:
 	vk::Gpu m_gpu;
 
@@ -84,6 +85,11 @@ Gpu::Gpu(IInstance *instance)
 
 	m_memory_properties = m_gpu.get_memory_properties();
 	m_queue_family_properties = m_gpu.get_queue_family_properties();
+}
+
+[[nodiscard]] auto Gpu::vk() -> vk::Gpu &
+{
+	return m_gpu;
 }
 
 // [[nodiscard]] auto Gpu::queue_family_supports_presentation(

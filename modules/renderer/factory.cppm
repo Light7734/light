@@ -1,16 +1,13 @@
-export module renderer.backend.factory;
-import memory.scope;
-import renderer.frontend.device;
+export module renderer.factory;
+import renderer.frontend;
 import renderer.backend.vk.device;
-import debug.assertions;
-import ecs.entity;
 import renderer.backend.vk.instance;
 import renderer.backend.vk.gpu;
 import renderer.backend.vk.surface;
-import renderer.frontend.instance;
-import renderer.frontend.surface;
-import renderer.frontend.gpu;
 import renderer.api;
+import memory.scope;
+import debug.assertions;
+import ecs.entity;
 import std;
 
 export namespace lt::renderer {
@@ -83,3 +80,4 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+}

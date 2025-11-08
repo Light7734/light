@@ -39,6 +39,8 @@ constexpr auto max_memory_types = VK_MAX_MEMORY_TYPES;
 constexpr auto max_memory_heaps = VK_MAX_MEMORY_HEAPS;
 constexpr auto uuid_size = VK_UUID_SIZE;
 
+constexpr auto queue_family_ignored = VK_QUEUE_FAMILY_IGNORED;
+
 } // namespace constants
 
 
@@ -60,7 +62,6 @@ constexpr auto physical_device_properties_2
 
 namespace device_extension_names {
 
-constexpr auto xlib_surface = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
 constexpr auto swapchain = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 constexpr auto dynamic_rendering = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
 constexpr auto descriptor_indexing = VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME;
@@ -74,7 +75,8 @@ void unload_library();
 
 void load_global_functions();
 
-void load_device_functions(VkDevice device);
+[[nodiscard]]
+auto enumerate_instance_extension_properties() -> std::vector<VkExtensionProperties>;
 
 using Version_T = uint32_t;
 
@@ -91,8 +93,49 @@ struct ApplicationInfo
 	Version_T api_version;
 };
 
+namespace PipelineStageFlags {
+enum T : VkFlags // NOLINT
+{
+	top_of_pipe_bit = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+	draw_indirect_bit = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+	vertex_input_bit = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+	vertex_shader_bit = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	tessellation_control_shader_bit = VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT,
+	tessellation_evaluation_shader_bit = VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT,
+	geometry_shader_bit = VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT,
+	fragment_shader_bit = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	early_fragment_tests_bit = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+	late_fragment_tests_bit = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	color_attachment_output_bit = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	compute_shader_bit = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	transfer_bit = VK_PIPELINE_STAGE_TRANSFER_BIT,
+	bottom_of_pipe_bit = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+	host_bit = VK_PIPELINE_STAGE_HOST_BIT,
+	all_graphics_bit = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+	all_commands_bit = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+	none = VK_PIPELINE_STAGE_NONE,
+	transform_feedback_bit_ext = VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT,
+	conditional_rendering_bit_ext = VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT,
+	acceleration_structure_build_bit_khr = VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+	ray_tracing_shader_bit_khr = VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+	fragment_density_process_bit_ext = VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT,
+	fragment_shading_rate_attachment_bit_khr
+	= VK_PIPELINE_STAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR,
+	task_shader_bit_ext = VK_PIPELINE_STAGE_TASK_SHADER_BIT_EXT,
+	mesh_shader_bit_ext = VK_PIPELINE_STAGE_MESH_SHADER_BIT_EXT,
+	command_preprocess_bit_ext = VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_EXT,
+	shading_rate_image_bit_nv = VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV,
+	ray_tracing_shader_bit_nv = VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV,
+	acceleration_structure_build_bit_nv = VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV,
+	task_shader_bit_nv = VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV,
+	mesh_shader_bit_nv = VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV,
+	command_preprocess_bit_nv = VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV,
+	none_khr = VK_PIPELINE_STAGE_NONE_KHR,
+};
+};
+
 namespace QueueFlags {
-enum T : std::underlying_type_t<VkQueueFlagBits> // NOLINT
+enum T : VkFlags // NOLINT
 {
 	graphics_bit = VK_QUEUE_GRAPHICS_BIT,
 	compute_bit = VK_QUEUE_COMPUTE_BIT,
@@ -106,7 +149,7 @@ enum T : std::underlying_type_t<VkQueueFlagBits> // NOLINT
 }
 
 namespace MemoryHeapFlags {
-enum T : std::underlying_type_t<VkMemoryHeapFlagBits> // NOLINT
+enum T : VkFlags // NOLINT
 {
 
 	device_local_bit = VK_MEMORY_HEAP_DEVICE_LOCAL_BIT,
@@ -116,7 +159,7 @@ enum T : std::underlying_type_t<VkMemoryHeapFlagBits> // NOLINT
 };
 
 namespace MemoryPropertyFlags {
-enum T : std::underlying_type_t<VkMemoryPropertyFlagBits> // NOLINT
+enum T : VkFlags // NOLINT
 {
 
 	device_local_bit = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -226,6 +269,8 @@ private:
 class Gpu
 {
 public:
+	friend class Device;
+
 	enum class Type : uint8_t
 	{
 		other = 0,
@@ -292,6 +337,35 @@ public:
 		Bool32 sparse_residency_aliased;
 		Bool32 variable_multisample_rate;
 		Bool32 inherited_queries;
+	};
+
+	struct DynamicRenderingFeatures
+	{
+		bool enabled;
+	};
+
+	struct DescriptorIndexingFeatures
+	{
+		Bool32 shader_input_attachment_array_dynamic_indexing;
+		Bool32 shader_uniform_texel_buffer_array_dynamic_indexing;
+		Bool32 shader_storage_texel_buffer_array_dynamic_indexing;
+		Bool32 shader_uniform_buffer_array_non_uniform_indexing;
+		Bool32 shader_sampled_image_array_non_uniform_indexing;
+		Bool32 shader_storage_buffer_array_non_uniform_indexing;
+		Bool32 shader_storage_image_array_non_uniform_indexing;
+		Bool32 shader_input_attachment_array_non_uniform_indexing;
+		Bool32 shader_uniform_texel_buffer_array_non_uniform_indexing;
+		Bool32 shader_storage_texel_buffer_array_non_uniform_indexing;
+		Bool32 descriptor_binding_uniform_buffer_update_after_bind;
+		Bool32 descriptor_binding_sampled_image_update_after_bind;
+		Bool32 descriptor_binding_storage_image_update_after_bind;
+		Bool32 descriptor_binding_storage_buffer_update_after_bind;
+		Bool32 descriptor_binding_uniform_texel_buffer_update_after_bind;
+		Bool32 descriptor_binding_storage_texel_buffer_update_after_bind;
+		Bool32 descriptor_binding_update_unused_while_pending;
+		Bool32 descriptor_binding_partially_bound;
+		Bool32 descriptor_binding_variable_descriptor_count;
+		Bool32 runtime_descriptor_array;
 	};
 
 	struct Limits
@@ -440,10 +514,7 @@ public:
 
 	struct MemoryProperties
 	{
-		std::uint32_t memory_type_count;
 		std::array<MemoryType, constants::max_memory_types> memory_types;
-
-		std::uint32_t memory_heap_count;
 		std::array<MemoryHeap, constants::max_memory_heaps> memory_heaps;
 	};
 
@@ -470,9 +541,14 @@ public:
 
 	~Gpu();
 
-	[[nodiscard]] auto get_properties() const -> Properties;
-
 	[[nodiscard]] auto get_features() const -> Features;
+
+	[[nodiscard]] auto get_supported_dynamic_rendering_features() const -> DynamicRenderingFeatures;
+
+	[[nodiscard]] auto get_supported_descriptor_indexing_features() const
+	    -> DescriptorIndexingFeatures;
+
+	[[nodiscard]] auto get_properties() const -> Properties;
 
 	[[nodiscard]] auto get_memory_properties() const -> MemoryProperties;
 
@@ -494,21 +570,124 @@ private:
 	VkInstance m_instance {};
 };
 
+
+class Semaphore
+{
+public:
+	friend class Device;
+	friend class Queue;
+
+	Semaphore() = default;
+
+	Semaphore(Semaphore &&) = default;
+
+	Semaphore(const Semaphore &) = delete;
+
+	auto operator=(Semaphore &&) -> Semaphore & = default;
+
+	auto operator=(const Semaphore &) -> Semaphore & = delete;
+
+	~Semaphore();
+
+	auto operator&() -> VkSemaphore *
+	{
+		return &m_semaphore;
+	}
+
+private:
+	VkDevice m_device;
+
+	VkSemaphore m_semaphore;
+};
+
+class Fence
+{
+public:
+	friend class Device;
+	friend class Queue;
+
+	Fence() = default;
+
+	Fence(Fence &&) = default;
+
+	Fence(const Fence &) = delete;
+
+	auto operator=(Fence &&) -> Fence & = default;
+
+	auto operator=(const Fence &) -> Fence & = delete;
+
+	~Fence();
+
+	auto operator&() -> VkFence *
+	{
+		return &m_fence;
+	}
+
+	operator VkFence()
+	{
+		return m_fence;
+	}
+
+private:
+	VkDevice m_device;
+
+	VkFence m_fence;
+};
+
+class Swapchain
+{
+public:
+	friend class Device;
+
+	auto operator&() -> VkSwapchainKHR *
+	{
+		return &m_swapchain;
+	}
+
+	auto VkSwapchainKHR()
+	{
+		return m_swapchain;
+	}
+
+private:
+	::VkSwapchainKHR m_swapchain;
+};
+
+class CommandBuffer
+{
+public:
+	friend class Device;
+
+	auto operator&() -> VkCommandBuffer *
+	{
+		return &m_command_buffer;
+	}
+
+private:
+	VkCommandBuffer m_command_buffer;
+};
+
 class Device
 {
 public:
+	friend class Queue;
+
 	struct CreateInfo
 	{
 		std::set<std::uint32_t> queue_indices;
 
 		std::vector<std::string> extensions;
 
-		Gpu::Features required_gpu_features;
+		Gpu::Features features;
+
+		std::optional<Gpu::DynamicRenderingFeatures> dynamic_rendering_features;
+
+		std::optional<Gpu::DescriptorIndexingFeatures> descriptor_indexing_features;
 	};
 
 	Device() = default;
 
-	Device(CreateInfo info);
+	Device(const Gpu &gpu, CreateInfo info);
 
 	Device(Device &&) = default;
 
@@ -520,13 +699,242 @@ public:
 
 	~Device();
 
+	void load_functions();
+
+	/** work functions */
+	void submit(VkSubmitInfo info, VkFence fence) const;
+
+	void present(VkPresentInfoKHR info) const;
+
+	void wait_idle() const;
+
+	void wait_for_fence(VkFence fence) const;
+
+	void wait_for_fences(std::span<VkFence> fences) const;
+
+	void reset_fence(VkFence fence) const;
+
+	void reset_fences(std::span<VkFence> fences) const;
+
+	/** getter functions */
+	[[nodiscard]] auto acquire_image(
+	    VkSwapchainKHR swapchain,
+	    VkSemaphore semaphore,
+	    uint64_t timeout = 100'000'000
+	) -> std::optional<uint32_t>;
+
+	[[nodiscard]] auto get_swapchain_images(VkSwapchainKHR swapchain) const -> std::vector<VkImage>;
+
+	[[nodiscard]] auto get_memory_requirements(VkBuffer buffer) const -> VkMemoryRequirements;
+
+	/** binders / mappers  */
+	void bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset = 0u) const;
+
+	[[nodiscard]] auto map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
+	    -> std::span<std::byte>;
+
+	void unmap_memory(VkDeviceMemory memory);
+
+	/** create functions */
+	[[nodiscard]] auto create_swapchain(VkSwapchainCreateInfoKHR info) const -> VkSwapchainKHR;
+
+	[[nodiscard]] auto create_framebuffer(VkFramebufferCreateInfo info) const -> VkFramebuffer;
+
+	[[nodiscard]] auto create_image_view(VkImageViewCreateInfo info) const -> VkImageView;
+
+	[[nodiscard]] auto create_graphics_pipeline(VkGraphicsPipelineCreateInfo info) const
+	    -> VkPipeline;
+
+	[[nodiscard]] auto create_pass(VkRenderPassCreateInfo info) const -> VkRenderPass;
+
+	[[nodiscard]] auto create_pipeline_layout(
+	    std::vector<VkDescriptorSetLayout> descriptor_set_layout,
+	    std::vector<VkPushConstantRange> push_constant_ranges
+	) const -> VkPipelineLayout;
+
+	[[nodiscard]] auto create_shader_module(VkShaderModuleCreateInfo info) const -> VkShaderModule;
+
+	[[nodiscard]] auto create_command_pool(VkCommandPoolCreateInfo info) const -> VkCommandPool;
+
+	[[nodiscard]] auto create_semaphores(uint32_t count) const -> std::vector<VkSemaphore>;
+
+	[[nodiscard]] auto create_fences(VkFenceCreateInfo info, uint32_t count) const
+	    -> std::vector<VkFence>;
+
+	[[nodiscard]] auto create_buffer(VkBufferCreateInfo info) const -> VkBuffer;
+
+	[[nodiscard]] auto create_descriptor_set_layout(VkDescriptorSetLayoutCreateInfo info) const
+	    -> VkDescriptorSetLayout;
+
+	[[nodiscard]] auto create_desscriptor_pool(VkDescriptorPoolCreateInfo info) const
+	    -> VkDescriptorPool;
+
+	/** allocation functions */
+	[[nodiscard]] auto allocate_memory(VkMemoryAllocateInfo info) const -> VkDeviceMemory;
+
+	[[nodiscard]] auto allocate_command_buffers(VkCommandBufferAllocateInfo info) const
+	    -> std::vector<VkCommandBuffer>;
+
+	[[nodiscard]] auto allocate_descriptor_set(VkDescriptorSetAllocateInfo info) const
+	    -> VkDescriptorSet;
+
+	/** de-allocation functions */
+	void free_memory(VkDeviceMemory memory) const;
+
+	void free_descriptor_set(
+	    VkDescriptorPool descriptor_pool,
+	    VkDescriptorSet descriptor_set
+	) const;
+
+	/** destroy functions */
+	void destroy_swapchain(VkSwapchainKHR swapchain) const;
+
+	void destroy_framebuffer(VkFramebuffer framebuffer) const;
+
+	void destroy_framebuffers(std::span<VkFramebuffer> framebuffers) const;
+
+	void destroy_image_view(VkImageView image_view) const;
+
+	void destroy_image_views(std::span<VkImageView> image_views) const;
+
+	void destroy_pipeline(VkPipeline pipeline) const;
+
+	void destroy_pass(VkRenderPass pass) const;
+
+	void destroy_pipeline_layout(VkPipelineLayout pipeline_layout) const;
+
+	void destroy_shader_module(VkShaderModule shader_module) const;
+
+	void destroy_command_pool(VkCommandPool command_pool) const;
+
+	void destroy_semaphore(VkSemaphore semaphore) const;
+
+	void destroy_semaphores(std::span<VkSemaphore> semaphores) const;
+
+	void destroy_fence(VkFence fence) const;
+
+	void destroy_fences(std::span<VkFence> fences) const;
+
+	void destroy_buffer(VkBuffer buffer) const;
+
+	void destroy_descriptor_set_layout(VkDescriptorSetLayout layout) const;
+
+	void destroy_descriptor_pool(VkDescriptorPool pool) const;
+
+	/** utilities */
+	template<typename T, typename... Args>
+	void name(T &object, std::format_string<Args...> fmt, Args &&...args);
+
+	template<typename T>
+	void name(T &object, const char *name);
+
 private:
 	memory::NullOnMove<VkDevice> m_device {};
 };
 
-[[nodiscard]]
-auto enumerate_instance_extension_properties() -> std::vector<VkExtensionProperties>;
+class Queue
+{
+public:
+	friend class Device;
 
+	constexpr static auto object_type = VK_OBJECT_TYPE_QUEUE;
+
+	struct SubmitInfo
+	{
+		CommandBuffer command_buffer;
+
+		PipelineStageFlags::T wait_stages;
+
+		Semaphore wait_semaphore;
+
+		Semaphore signal_semaphore;
+
+		Fence signal_fence;
+	};
+
+	struct PresentInfo
+	{
+		Semaphore wait_semaphore;
+
+		Swapchain swapchain;
+
+		uint32_t image_idx;
+	};
+
+	Queue() = default;
+
+	Queue(Device &device, uint32_t queue_family_idx, uint32_t queue_idx);
+
+	Queue(Queue &&) = default;
+
+	Queue(const Queue &) = delete;
+
+	auto operator=(Queue &&) -> Queue & = default;
+
+	auto operator=(const Queue &) -> Queue & = delete;
+
+	~Queue();
+
+	void submit(SubmitInfo info) const;
+
+	void present(PresentInfo info) const;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkQueue
+	{
+		return m_queue;
+	}
+
+	memory::NullOnMove<VkDevice> m_device;
+
+	VkQueue m_queue;
+};
+
+} // namespace lt::renderer::vk
+
+
+/** ================================ **/
+/** Private Template Implementations **/
+/** ================================ **/
+PFN_vkSetDebugUtilsObjectNameEXT vk_set_debug_object_name {}; // NOLINT
+namespace lt::renderer::vk {
+
+void vkc(VkResult result)
+{
+	if (result)
+	{
+		throw std::runtime_error {
+			std::format("Vulkan call failed with result: {}", std::to_underlying(result))
+		};
+	}
+}
+
+template<typename T, typename... Args>
+void Device::name(T &object, std::format_string<Args...> fmt, Args &&...args)
+{
+	const auto name = std::format(fmt, std::forward<Args>(args)...);
+	auto info = VkDebugUtilsObjectNameInfoEXT {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+		.objectType = T::object_type,
+		.objectHandle = (uint64_t)(object.get_vk_handle()),
+		.pObjectName = name.c_str(),
+	};
+
+	vkc(vk_set_debug_object_name(m_device, &info));
+}
+
+template<typename T>
+void Device::name(T &object, const char *name)
+{
+	auto info = VkDebugUtilsObjectNameInfoEXT {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+		.objectType = T::object_type,
+		.objectHandle = (uint64_t)(object.get_vk_handle()),
+		.pObjectName = name,
+	};
+
+	vkc(vk_set_debug_object_name(m_device, &info));
+}
 
 } // namespace lt::renderer::vk
 
@@ -562,7 +970,6 @@ PFN_vkDestroyDebugUtilsMessengerEXT vk_destroy_debug_messenger {};
 PFN_vkQueueBeginDebugUtilsLabelEXT vk_queue_begin_debug_label {};
 PFN_vkQueueEndDebugUtilsLabelEXT vk_queue_end_debug_label {};
 PFN_vkQueueInsertDebugUtilsLabelEXT vk_queue_insert_debug_label {};
-PFN_vkSetDebugUtilsObjectNameEXT vk_set_debug_object_name {};
 PFN_vkSetDebugUtilsObjectTagEXT vk_set_debug_object_tag {};
 PFN_vkSubmitDebugUtilsMessageEXT vk_submit_debug_message {};
 
@@ -664,15 +1071,6 @@ void load_library()
 	);
 }
 
-void vkc(VkResult result)
-{
-	if (result)
-	{
-		throw std::runtime_error {
-			std::format("Vulkan call failed with result: {}", std::to_underlying(result))
-		};
-	}
-}
 
 void unload_library()
 {
@@ -746,10 +1144,10 @@ void Instance::load_functions()
 	load_fn(vk_destroy_surface_khr, "vkDestroySurfaceKHR");
 }
 
-void load_device_functions(VkDevice device)
+void Device::load_functions()
 {
-	const auto load_fn = [device]<typename T>(T &pfn, const char *fn_name) {
-		pfn = std::bit_cast<T>(vk_get_device_proc_address(device, fn_name));
+	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
+		pfn = std::bit_cast<T>(vk_get_device_proc_address(m_device, fn_name));
 		lt::debug::ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
 	};
 
@@ -910,6 +1308,336 @@ Surface::~Surface()
 	return gpus;
 }
 
+[[nodiscard]] auto Gpu::get_features() const -> Features
+{
+	auto features_2 = VkPhysicalDeviceFeatures2 {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+	};
+	vk_get_physical_device_features(m_physical_device, &features_2);
+	const auto features = features_2.features;
+
+	return Features {
+		// clang-format off
+		 .robust_buffer_access = features.robustBufferAccess,
+		 .full_draw_index_uint32 = features.fullDrawIndexUint32,
+		 .image_cube_array = features.imageCubeArray,
+		 .independent_blend = features.independentBlend,
+		 .geometry_shader = features.geometryShader,
+		 .tessellation_shader = features.tessellationShader,
+		 .sample_rate_shading = features.sampleRateShading,
+		 .dual_src_blend = features.dualSrcBlend,
+		 .logic_op = features.logicOp,
+		 .multi_draw_indirect = features.multiDrawIndirect,
+		 .draw_indirect_first_instance = features.drawIndirectFirstInstance,
+		 .depth_clamp = features.depthClamp,
+		 .depth_bias_clamp = features.depthBiasClamp,
+		 .fill_mode_non_solid = features.fillModeNonSolid,
+		 .depth_bounds = features.depthBounds,
+		 .wide_lines = features.wideLines,
+		 .large_points = features.largePoints,
+		 .alpha_to_one = features.alphaToOne,
+		 .multi_viewport = features.multiViewport,
+		 .sampler_anisotropy = features.samplerAnisotropy,
+		 .texture_compression_etc2 = features.textureCompressionETC2,
+		 .texture_compression_astc_ldr = features.textureCompressionASTC_LDR,
+		 .texture_compression_bc = features.textureCompressionBC,
+		 .occlusion_query_precise = features.occlusionQueryPrecise,
+		 .pipeline_statistics_query = features.pipelineStatisticsQuery,
+		 .vertex_pipeline_stores_and_atomics = features.vertexPipelineStoresAndAtomics,
+		 .fragment_stores_and_atomics = features.fragmentStoresAndAtomics,
+		 .shader_tessellation_and_geometry_point_size = features.shaderTessellationAndGeometryPointSize,
+		 .shader_image_gather_extended = features.shaderImageGatherExtended,
+		 .shader_storage_image_extended_formats = features.shaderStorageImageExtendedFormats,
+		 .shader_storage_image_multisample = features.shaderStorageImageMultisample,
+		 .shader_storage_image_read_without_format = features.shaderStorageImageReadWithoutFormat,
+		 .shader_storage_image_write_without_format = features.shaderStorageImageWriteWithoutFormat,
+		 .shader_uniform_buffer_array_dynamic_indexing = features.shaderUniformBufferArrayDynamicIndexing,
+		 .shader_sampled_image_array_dynamic_indexing = features.shaderSampledImageArrayDynamicIndexing,
+		 .shader_storage_buffer_array_dynamic_indexing = features.shaderStorageBufferArrayDynamicIndexing,
+		 .shader_storage_image_array_dynamic_indexing = features.shaderStorageImageArrayDynamicIndexing,
+		 .shader_clip_distance = features.shaderClipDistance,
+		 .shader_cull_distance = features.shaderCullDistance,
+		 .shader_float64 = features.shaderFloat64,
+		 .shader_int64 = features.shaderInt64,
+		 .shader_int16 = features.shaderInt16,
+		 .shader_resource_residency = features.shaderResourceResidency,
+		 .shader_resource_min_lod = features.shaderResourceMinLod,
+		 .sparse_binding = features.sparseBinding,
+		 .sparse_residency_buffer = features.sparseResidencyBuffer,
+		 .sparse_residency_image_2d = features.sparseResidencyImage2D,
+		 .sparse_residency_image_3d = features.sparseResidencyImage3D,
+		 .sparse_residency_2_samples = features.sparseResidency2Samples,
+		 .sparse_residency_4_samples = features.sparseResidency4Samples,
+		 .sparse_residency_8_samples = features.sparseResidency8Samples,
+		 .sparse_residency_16_samples = features.sparseResidency16Samples,
+		 .sparse_residency_aliased = features.sparseResidencyAliased,
+		 .variable_multisample_rate = features.variableMultisampleRate,
+		 .inherited_queries = features.inheritedQueries,
+		// clang-format on
+	};
+}
+
+[[nodiscard]] auto Gpu::get_supported_dynamic_rendering_features() const -> DynamicRenderingFeatures
+{
+	auto features = VkPhysicalDeviceDynamicRenderingFeatures {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+	};
+
+	auto features_2 = VkPhysicalDeviceFeatures2 {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+		.pNext = &features,
+	};
+
+	vk_get_physical_device_features(m_physical_device, &features_2);
+	return DynamicRenderingFeatures {
+		.enabled = !!features.dynamicRendering,
+	};
+}
+
+[[nodiscard]] auto Gpu::get_supported_descriptor_indexing_features() const
+    -> DescriptorIndexingFeatures
+{
+	auto features = VkPhysicalDeviceDescriptorIndexingFeatures {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
+	};
+
+	auto features_2 = VkPhysicalDeviceFeatures2 {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+		.pNext = &features,
+	};
+
+	vk_get_physical_device_features(m_physical_device, &features_2);
+	return DescriptorIndexingFeatures {
+		// clang-format off
+		.shader_input_attachment_array_dynamic_indexing = features.shaderInputAttachmentArrayDynamicIndexing,
+		.shader_uniform_texel_buffer_array_dynamic_indexing = features.shaderUniformTexelBufferArrayDynamicIndexing,
+		.shader_storage_texel_buffer_array_dynamic_indexing = features.shaderStorageTexelBufferArrayDynamicIndexing,
+		.shader_uniform_buffer_array_non_uniform_indexing = features.shaderUniformBufferArrayNonUniformIndexing,
+		.shader_sampled_image_array_non_uniform_indexing = features.shaderSampledImageArrayNonUniformIndexing,
+		.shader_storage_buffer_array_non_uniform_indexing = features.shaderStorageBufferArrayNonUniformIndexing,
+		.shader_storage_image_array_non_uniform_indexing = features.shaderStorageImageArrayNonUniformIndexing,
+		.shader_input_attachment_array_non_uniform_indexing = features.shaderInputAttachmentArrayNonUniformIndexing,
+		.shader_uniform_texel_buffer_array_non_uniform_indexing = features.shaderUniformTexelBufferArrayNonUniformIndexing,
+		.shader_storage_texel_buffer_array_non_uniform_indexing = features.shaderStorageTexelBufferArrayNonUniformIndexing,
+		.descriptor_binding_uniform_buffer_update_after_bind = features.descriptorBindingUniformBufferUpdateAfterBind,
+		.descriptor_binding_sampled_image_update_after_bind = features.descriptorBindingSampledImageUpdateAfterBind,
+		.descriptor_binding_storage_image_update_after_bind = features.descriptorBindingStorageImageUpdateAfterBind,
+		.descriptor_binding_storage_buffer_update_after_bind = features.descriptorBindingStorageBufferUpdateAfterBind,
+		.descriptor_binding_uniform_texel_buffer_update_after_bind = features.descriptorBindingUniformTexelBufferUpdateAfterBind,
+		.descriptor_binding_storage_texel_buffer_update_after_bind = features.descriptorBindingStorageTexelBufferUpdateAfterBind,
+		.descriptor_binding_update_unused_while_pending = features.descriptorBindingUpdateUnusedWhilePending,
+		.descriptor_binding_partially_bound = features.descriptorBindingPartiallyBound, 
+        .descriptor_binding_variable_descriptor_count = features.descriptorBindingVariableDescriptorCount,
+        .runtime_descriptor_array = features.runtimeDescriptorArray,
+		// clang-format on
+	};
+}
+
+[[nodiscard]] auto Gpu::get_properties() const -> Properties
+{
+	auto vk_properties = VkPhysicalDeviceProperties {};
+	vk_get_physical_device_properties(m_physical_device, &vk_properties);
+
+	auto properties = Gpu::Properties {
+		.api_version = vk_properties.apiVersion,
+		.driver_version = vk_properties.driverVersion,
+		.vendor_id = vk_properties.vendorID,
+		.device_id = vk_properties.deviceID,
+		.device_type = static_cast<Gpu::Type>(vk_properties.deviceType),
+		.device_name = {},
+		.pipeline_cache_uuid = {},
+		.limits = {},
+		.sparse_properties = {},
+	};
+
+	std::memcpy(
+	    properties.device_name.data(),
+	    static_cast<char *>(vk_properties.deviceName),
+	    constants::max_physical_device_name
+	);
+
+	std::memcpy(
+	    properties.pipeline_cache_uuid.data(),
+	    static_cast<std::uint8_t *>(vk_properties.pipelineCacheUUID),
+	    constants::uuid_size
+	);
+
+	const auto vk_limits = vk_properties.limits;
+	properties.limits = Gpu::Limits {
+		// clang-format off
+        .max_image_dimension_1d = vk_limits.maxImageDimension1D,
+        .max_image_dimension_2d = vk_limits.maxImageDimension2D,
+        .max_image_dimension_3d = vk_limits.maxImageDimension3D,
+        .max_image_dimension_cube = vk_limits.maxImageDimensionCube,
+        .max_image_array_layers = vk_limits.maxImageArrayLayers,
+        .max_texel_buffer_elements = vk_limits.maxTexelBufferElements,
+        .max_uniform_buffer_range = vk_limits.maxUniformBufferRange,
+        .max_storage_buffer_range = vk_limits.maxStorageBufferRange,
+        .max_push_constants_size = vk_limits.maxPushConstantsSize,
+        .max_memory_allocation_count = vk_limits.maxMemoryAllocationCount,
+        .max_sampler_allocation_count = vk_limits.maxSamplerAllocationCount,
+        .buffer_image_granularity = vk_limits.bufferImageGranularity,
+        .sparse_address_space_size = vk_limits.sparseAddressSpaceSize,
+        .max_bound_descriptor_sets = vk_limits.maxBoundDescriptorSets,
+        .max_per_stage_descriptor_samplers = vk_limits.maxPerStageDescriptorSamplers,
+        .max_per_stage_descriptor_uniform_buffers = vk_limits.maxPerStageDescriptorUniformBuffers,
+        .max_per_stage_descriptor_storage_buffers = vk_limits.maxPerStageDescriptorStorageBuffers,
+        .max_per_stage_descriptor_sampled_images = vk_limits.maxPerStageDescriptorSampledImages,
+        .max_per_stage_descriptor_storage_images = vk_limits.maxPerStageDescriptorStorageImages,
+        .max_per_stage_descriptor_input_attachments = vk_limits.maxPerStageDescriptorInputAttachments,
+        .max_per_stage_resources = vk_limits.maxPerStageResources,
+        .max_descriptor_set_samplers = vk_limits.maxDescriptorSetSamplers,
+        .max_descriptor_set_uniform_buffers = vk_limits.maxDescriptorSetUniformBuffers,
+        .max_descriptor_set_uniform_buffers_dynamic = vk_limits.maxDescriptorSetUniformBuffersDynamic,
+        .max_descriptor_set_storage_buffers = vk_limits.maxDescriptorSetStorageBuffers,
+        .max_descriptor_set_storage_buffers_dynamic = vk_limits.maxDescriptorSetStorageBuffersDynamic,
+        .max_descriptor_set_sampled_images = vk_limits.maxDescriptorSetSampledImages,
+        .max_descriptor_set_storage_images = vk_limits.maxDescriptorSetStorageImages,
+        .max_descriptor_set_input_attachments = vk_limits.maxDescriptorSetInputAttachments,
+        .max_vertex_input_attributes = vk_limits.maxVertexInputAttributes,
+        .max_vertex_input_bindings = vk_limits.maxVertexInputBindings,
+        .max_vertex_input_attribute_offset = vk_limits.maxVertexInputAttributeOffset,
+        .max_vertex_input_binding_stride = vk_limits.maxVertexInputBindingStride,
+        .max_vertex_output_components = vk_limits.maxVertexOutputComponents,
+        .max_tessellation_generation_level = vk_limits.maxTessellationGenerationLevel,
+        .max_tessellation_patch_size = vk_limits.maxTessellationPatchSize,
+        .max_tessellation_control_per_vertex_input_components = vk_limits.maxTessellationControlPerVertexInputComponents,
+        .max_tessellation_control_per_vertex_output_components = vk_limits.maxTessellationControlPerVertexOutputComponents,
+        .max_tessellation_control_per_patch_output_components = vk_limits.maxTessellationControlPerPatchOutputComponents,
+        .max_tessellation_control_total_output_components = vk_limits.maxTessellationControlTotalOutputComponents,
+        .max_tessellation_evaluation_input_components = vk_limits.maxTessellationEvaluationInputComponents,
+        .max_tessellation_evaluation_output_components = vk_limits.maxTessellationEvaluationOutputComponents,
+        .max_geometry_shader_invocations = vk_limits.maxGeometryShaderInvocations,
+        .max_geometry_input_components = vk_limits.maxGeometryInputComponents,
+        .max_geometry_output_components = vk_limits.maxGeometryOutputComponents,
+        .max_geometry_output_vertices = vk_limits.maxGeometryOutputVertices,
+        .max_geometry_total_output_components = vk_limits.maxGeometryTotalOutputComponents,
+        .max_fragment_input_components = vk_limits.maxFragmentInputComponents,
+        .max_fragment_output_attachments = vk_limits.maxFragmentOutputAttachments,
+        .max_fragment_dual_src_attachments = vk_limits.maxFragmentDualSrcAttachments,
+        .max_fragment_combined_output_resources = vk_limits.maxFragmentCombinedOutputResources,
+        .max_compute_shared_memory_size = vk_limits.maxComputeSharedMemorySize,
+        .max_compute_work_group_count = {vk_limits.maxComputeWorkGroupCount[3]},
+        .max_compute_work_group_invocations = vk_limits.maxComputeWorkGroupInvocations,
+        .max_compute_work_group_size = {vk_limits.maxComputeWorkGroupSize[3]},
+        .sub_pixel_precision_bits = vk_limits.subPixelPrecisionBits,
+        .sub_texel_precision_bits = vk_limits.subTexelPrecisionBits,
+        .mipmap_precision_bits = vk_limits.mipmapPrecisionBits,
+        .max_draw_indexed_index_value = vk_limits.maxDrawIndexedIndexValue,
+        .max_draw_indirect_count = vk_limits.maxDrawIndirectCount,
+        .max_sampler_lod_bias = vk_limits.maxSamplerLodBias,
+        .max_sampler_anisotropy = vk_limits.maxSamplerAnisotropy,
+        .max_viewports = vk_limits.maxViewports,
+        .max_viewport_dimensions = {vk_limits.maxViewportDimensions[2]},
+        .viewport_bounds_range = {vk_limits.viewportBoundsRange[2]},
+        .viewport_sub_pixel_bits = vk_limits.viewportSubPixelBits,
+        .min_memory_map_alignment = vk_limits.minMemoryMapAlignment,
+        .min_texel_buffer_offset_alignment = vk_limits.minTexelBufferOffsetAlignment,
+        .min_uniform_buffer_offset_alignment = vk_limits.minUniformBufferOffsetAlignment,
+        .min_storage_buffer_offset_alignment = vk_limits.minStorageBufferOffsetAlignment,
+        .min_texel_offset = vk_limits.minTexelOffset,
+        .max_texel_offset = vk_limits.maxTexelOffset,
+        .min_texel_gather_offset = vk_limits.minTexelGatherOffset,
+        .max_texel_gather_offset = vk_limits.maxTexelGatherOffset,
+        .min_interpolation_offset = vk_limits.minInterpolationOffset,
+        .max_interpolation_offset = vk_limits.maxInterpolationOffset,
+        .sub_pixel_interpolation_offset_bits = vk_limits.subPixelInterpolationOffsetBits,
+        .max_framebuffer_width = vk_limits.maxFramebufferWidth,
+        .max_framebuffer_height = vk_limits.maxFramebufferHeight,
+        .max_framebuffer_layers = vk_limits.maxFramebufferLayers,
+        .framebuffer_color_sample_counts = vk_limits.framebufferColorSampleCounts,
+        .framebuffer_depth_sample_counts = vk_limits.framebufferDepthSampleCounts,
+        .framebuffer_stencil_sample_counts = vk_limits.framebufferStencilSampleCounts,
+        .framebuffer_no_attachments_sample_counts = vk_limits.framebufferNoAttachmentsSampleCounts,
+        .max_color_attachments = vk_limits.maxColorAttachments,
+        .sampled_image_color_sample_counts = vk_limits.sampledImageColorSampleCounts,
+        .sampled_image_integer_sample_counts = vk_limits.sampledImageIntegerSampleCounts,
+        .sampled_image_depth_sample_counts = vk_limits.sampledImageDepthSampleCounts,
+        .sampled_image_stencil_sample_counts = vk_limits.sampledImageStencilSampleCounts,
+        .storage_image_sample_counts = vk_limits.storageImageSampleCounts,
+        .max_sample_mask_words = vk_limits.maxSampleMaskWords,
+        .timestamp_compute_and_graphics = vk_limits.timestampComputeAndGraphics,
+        .timestamp_period = vk_limits.timestampPeriod,
+        .max_clip_distances = vk_limits.maxClipDistances,
+        .max_cull_distances = vk_limits.maxCullDistances,
+        .max_combined_clip_and_cull_distances = vk_limits.maxCombinedClipAndCullDistances,
+        .discrete_queue_priorities = vk_limits.discreteQueuePriorities,
+        .point_size_range = {vk_limits.pointSizeRange[2]},
+        .line_width_range = {vk_limits.lineWidthRange[2]},
+        .point_size_granularity = vk_limits.pointSizeGranularity,
+        .line_width_granularity = vk_limits.lineWidthGranularity,
+        .strict_lines = vk_limits.strictLines,
+        .standard_sample_locations = vk_limits.standardSampleLocations,
+        .optimal_buffer_copy_offset_alignment = vk_limits.optimalBufferCopyOffsetAlignment,
+        .optimal_buffer_copy_row_pitch_alignment = vk_limits.optimalBufferCopyRowPitchAlignment,
+        .non_coherent_atom_size = vk_limits.nonCoherentAtomSize,
+		// clang-format on
+	};
+
+	const auto vk_sparse_properties = vk_properties.sparseProperties;
+	properties.sparse_properties = Gpu::SparseProperties {
+		// clang-format off
+		.residency_standard_2d_block_shape = vk_sparse_properties.residencyStandard2DBlockShape ,
+		.residency_standard_2d_multisample_block_shape = vk_sparse_properties.residencyStandard2DMultisampleBlockShape ,
+		.residency_standard_3d_block_shape = vk_sparse_properties.residencyStandard3DBlockShape ,
+		.residency_aligned_mip_size = vk_sparse_properties.residencyAlignedMipSize ,
+		.residency_non_resident_strict = vk_sparse_properties.residencyNonResidentStrict ,
+		// clang-format on
+	};
+
+	return properties;
+}
+
+[[nodiscard]] auto Gpu::get_memory_properties() const -> MemoryProperties
+{
+	auto vk_memory_properties = VkPhysicalDeviceMemoryProperties {};
+	vk_get_physical_device_memory_properties(m_physical_device, &vk_memory_properties);
+
+	auto memory_properties = MemoryProperties {};
+
+	std::memcpy(
+	    memory_properties.memory_heaps.data(),
+	    static_cast<VkMemoryHeap *>(vk_memory_properties.memoryHeaps),
+	    sizeof(VkMemoryHeap) * vk_memory_properties.memoryHeapCount
+	);
+
+	std::memcpy(
+	    memory_properties.memory_types.data(),
+	    static_cast<VkMemoryType *>(vk_memory_properties.memoryTypes),
+	    sizeof(VkMemoryType) * vk_memory_properties.memoryTypeCount
+	);
+
+	return memory_properties;
+}
+
+[[nodiscard]] auto Gpu::get_queue_family_properties() const -> std::vector<QueueFamilyProperties>
+{
+	auto count = std::uint32_t {};
+
+	vk_get_physical_device_queue_family_properties(m_physical_device, &count, {});
+
+	auto vk_properties = std::vector<VkQueueFamilyProperties>(count);
+	vk_get_physical_device_queue_family_properties(m_physical_device, &count, vk_properties.data());
+
+	auto properties = std::vector<QueueFamilyProperties>(count);
+
+	for (auto [property, vk_property] : std::views::zip(properties, vk_properties))
+	{
+		property = QueueFamilyProperties {
+			.queue_flags = static_cast<QueueFlags::T>(vk_property.queueFlags),
+			.queue_count = vk_property.queueCount,
+			.timestamp_valid_bits = vk_property.timestampValidBits,
+			.min_image_transfer_granularity = math::uvec3{
+                vk_property.minImageTransferGranularity.width,
+                vk_property.minImageTransferGranularity.height,
+                vk_property.minImageTransferGranularity.depth,
+            },
+		};
+	}
+
+	return properties;
+}
+
 [[nodiscard]] auto Gpu::queue_family_supports_surface(
     const Surface &surface,
     std::uint32_t queue_family_idx
@@ -925,8 +1653,165 @@ Surface::~Surface()
 	return supported;
 }
 
-Device::Device(CreateInfo info)
+Semaphore::~Semaphore()
 {
+	vk_destroy_semaphore(m_device, m_semaphore, nullptr);
+}
+
+Fence::~Fence()
+{
+	vk_destroy_fence(m_device, m_fence, nullptr);
+}
+
+Device::Device(const Gpu &gpu, CreateInfo info)
+{
+	const auto priorities = .0f;
+	auto vk_queue_infos = std::vector<VkDeviceQueueCreateInfo> {};
+	for (auto queue_family : info.queue_indices)
+	{
+		vk_queue_infos.emplace_back(
+		    VkDeviceQueueCreateInfo {
+		        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		        .queueFamilyIndex = queue_family,
+		        .queueCount = 1u,
+		        .pQueuePriorities = &priorities,
+		    }
+		);
+	}
+
+	auto vk_extension_names = std::vector<const char *>(info.extensions.size());
+	for (const auto &extension : info.extensions)
+	{
+		vk_extension_names.emplace_back(extension.c_str());
+	}
+
+	const auto vk_features = VkPhysicalDeviceFeatures {
+		// clang-format off
+		.robustBufferAccess = info.features.robust_buffer_access,
+		.fullDrawIndexUint32 = info.features.full_draw_index_uint32,
+		.imageCubeArray = info.features.image_cube_array,
+		.independentBlend = info.features.independent_blend,
+		.geometryShader = info.features.geometry_shader,
+		.tessellationShader = info.features.tessellation_shader,
+		.sampleRateShading = info.features.sample_rate_shading,
+		.dualSrcBlend = info.features.dual_src_blend,
+		.logicOp = info.features.logic_op,
+		.multiDrawIndirect = info.features.multi_draw_indirect,
+		.drawIndirectFirstInstance = info.features.draw_indirect_first_instance,
+		.depthClamp = info.features.depth_clamp,
+		.depthBiasClamp = info.features.depth_bias_clamp,
+		.fillModeNonSolid = info.features.fill_mode_non_solid,
+		.depthBounds = info.features.depth_bounds,
+		.wideLines = info.features.wide_lines,
+		.largePoints = info.features.large_points,
+		.alphaToOne = info.features.alpha_to_one,
+		.multiViewport = info.features.multi_viewport,
+		.samplerAnisotropy = info.features.sampler_anisotropy,
+		.textureCompressionETC2 = info.features.texture_compression_etc2,
+		.textureCompressionASTC_LDR = info.features.texture_compression_astc_ldr,
+		.textureCompressionBC = info.features.texture_compression_bc,
+		.occlusionQueryPrecise = info.features.occlusion_query_precise,
+		.pipelineStatisticsQuery = info.features.pipeline_statistics_query,
+		.vertexPipelineStoresAndAtomics = info.features.vertex_pipeline_stores_and_atomics,
+		.fragmentStoresAndAtomics = info.features.fragment_stores_and_atomics,
+		.shaderTessellationAndGeometryPointSize = info.features .shader_tessellation_and_geometry_point_size,
+		.shaderImageGatherExtended = info.features.shader_image_gather_extended,
+		.shaderStorageImageExtendedFormats = info.features.shader_storage_image_extended_formats,
+		.shaderStorageImageMultisample = info.features.shader_storage_image_multisample,
+		.shaderStorageImageReadWithoutFormat = info.features .shader_storage_image_read_without_format,
+		.shaderStorageImageWriteWithoutFormat = info.features .shader_storage_image_write_without_format,
+		.shaderUniformBufferArrayDynamicIndexing = info.features.shader_uniform_buffer_array_dynamic_indexing,
+		.shaderSampledImageArrayDynamicIndexing = info.features .shader_sampled_image_array_dynamic_indexing,
+		.shaderStorageBufferArrayDynamicIndexing = info.features.shader_storage_buffer_array_dynamic_indexing,
+		.shaderStorageImageArrayDynamicIndexing = info.features .shader_storage_image_array_dynamic_indexing,
+		.shaderClipDistance = info.features.shader_clip_distance,
+		.shaderCullDistance = info.features.shader_cull_distance,
+		.shaderFloat64 = info.features.shader_float64,
+		.shaderInt64 = info.features.shader_int64,
+		.shaderInt16 = info.features.shader_int16,
+		.shaderResourceResidency = info.features.shader_resource_residency,
+		.shaderResourceMinLod = info.features.shader_resource_min_lod,
+		.sparseBinding = info.features.sparse_binding,
+		.sparseResidencyBuffer = info.features.sparse_residency_buffer,
+		.sparseResidencyImage2D = info.features.sparse_residency_image_2d,
+		.sparseResidencyImage3D = info.features.sparse_residency_image_3d,
+		.sparseResidency2Samples = info.features.sparse_residency_2_samples,
+		.sparseResidency4Samples = info.features.sparse_residency_4_samples,
+		.sparseResidency8Samples = info.features.sparse_residency_8_samples,
+		.sparseResidency16Samples = info.features.sparse_residency_16_samples,
+		.sparseResidencyAliased = info.features.sparse_residency_aliased,
+		.variableMultisampleRate = info.features.variable_multisample_rate,
+		.inheritedQueries = info.features.inherited_queries,
+		// clang-format on
+	};
+
+	auto vk_features_2 = VkPhysicalDeviceFeatures2 {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+		.pNext = {},
+		.features = vk_features,
+	};
+
+	auto vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {};
+	auto vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {};
+	void **last_p_next = &vk_features_2.pNext;
+
+	if (info.dynamic_rendering_features)
+	{
+		vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+			.pNext = {},
+			.dynamicRendering = (*info.dynamic_rendering_features).enabled,
+		};
+
+		*last_p_next = &vk_descriptor_indexing_features;
+		last_p_next = &vk_descriptor_indexing_features.pNext;
+	}
+
+	if (info.descriptor_indexing_features)
+	{
+		const auto features = *info.descriptor_indexing_features;
+		vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
+			.pNext = {},
+			// clang-format off
+			.shaderInputAttachmentArrayDynamicIndexing = features.shader_input_attachment_array_dynamic_indexing,
+			.shaderUniformTexelBufferArrayDynamicIndexing = features.shader_uniform_texel_buffer_array_dynamic_indexing,
+			.shaderStorageTexelBufferArrayDynamicIndexing = features.shader_storage_texel_buffer_array_dynamic_indexing,
+			.shaderUniformBufferArrayNonUniformIndexing = features.shader_uniform_buffer_array_non_uniform_indexing,
+			.shaderSampledImageArrayNonUniformIndexing = features.shader_sampled_image_array_non_uniform_indexing,
+			.shaderStorageBufferArrayNonUniformIndexing = features.shader_storage_buffer_array_non_uniform_indexing,
+			.shaderStorageImageArrayNonUniformIndexing = features.shader_storage_image_array_non_uniform_indexing,
+			.shaderInputAttachmentArrayNonUniformIndexing = features.shader_input_attachment_array_non_uniform_indexing,
+			.shaderUniformTexelBufferArrayNonUniformIndexing = features.shader_uniform_texel_buffer_array_non_uniform_indexing,
+			.shaderStorageTexelBufferArrayNonUniformIndexing = features.shader_storage_texel_buffer_array_non_uniform_indexing,
+			.descriptorBindingUniformBufferUpdateAfterBind = features.descriptor_binding_uniform_buffer_update_after_bind,
+			.descriptorBindingSampledImageUpdateAfterBind = features.descriptor_binding_sampled_image_update_after_bind,
+			.descriptorBindingStorageImageUpdateAfterBind = features.descriptor_binding_storage_image_update_after_bind,
+			.descriptorBindingStorageBufferUpdateAfterBind = features.descriptor_binding_storage_buffer_update_after_bind,
+			.descriptorBindingUniformTexelBufferUpdateAfterBind = features.descriptor_binding_uniform_texel_buffer_update_after_bind,
+			.descriptorBindingStorageTexelBufferUpdateAfterBind = features.descriptor_binding_storage_texel_buffer_update_after_bind,
+			.descriptorBindingUpdateUnusedWhilePending = features.descriptor_binding_update_unused_while_pending,
+			.descriptorBindingPartiallyBound = features.descriptor_binding_partially_bound,
+			.descriptorBindingVariableDescriptorCount = features.descriptor_binding_variable_descriptor_count,
+			.runtimeDescriptorArray = features.runtime_descriptor_array,
+			// clang-format on
+		};
+
+		*last_p_next = &vk_descriptor_indexing_features;
+		last_p_next = &vk_descriptor_indexing_features.pNext;
+	}
+
+	auto vk_info = VkDeviceCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+		.pNext = &vk_features_2,
+		.queueCreateInfoCount = static_cast<uint32_t>(vk_queue_infos.size()),
+		.pQueueCreateInfos = vk_queue_infos.data(),
+		.enabledExtensionCount = static_cast<uint32_t>(vk_extension_names.size()),
+		.ppEnabledExtensionNames = vk_extension_names.data(),
+		.pEnabledFeatures = nullptr, // replaced with VkPhysicalDeviceFeatures2
+	};
+
+	vkc(vk_create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
 }
 
 Device::~Device()
@@ -935,6 +1820,412 @@ Device::~Device()
 	{
 		vk_destroy_device(m_device, nullptr);
 	}
+}
+
+void Device::wait_idle() const
+{
+	vkc(vk_device_wait_idle(m_device));
+}
+
+void Device::wait_for_fence(VkFence fence) const
+{
+	vkc(vk_wait_for_fences(m_device, 1u, &fence, true, std::numeric_limits<uint64_t>::max()));
+}
+
+void Device::reset_fence(VkFence fence) const
+{
+	vkc(vk_reset_fences(m_device, 1u, &fence));
+}
+
+void Device::reset_fences(std::span<VkFence> fences) const
+{
+	vkc(vk_reset_fences(m_device, fences.size(), fences.data()));
+}
+
+auto Device::acquire_image(VkSwapchainKHR swapchain, VkSemaphore semaphore, uint64_t timeout)
+    -> std::optional<uint32_t>
+{
+	auto image_idx = uint32_t {};
+	const auto result = vk_acquire_next_image_khr(
+	    m_device,
+	    swapchain,
+	    timeout,
+	    semaphore,
+	    VK_NULL_HANDLE,
+	    &image_idx
+	);
+
+	if (result == VK_SUCCESS)
+	{
+		return image_idx;
+	}
+
+	if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		return {};
+	}
+
+	vkc(result); // throws
+	return {};
+}
+
+void Device::wait_for_fences(std::span<VkFence> fences) const
+{
+	vkc(vk_wait_for_fences(
+	    m_device,
+	    fences.size(),
+	    fences.data(),
+	    true,
+	    std::numeric_limits<uint64_t>::max()
+	));
+}
+
+[[nodiscard]] auto Device::get_swapchain_images(VkSwapchainKHR swapchain) const
+    -> std::vector<VkImage>
+{
+	auto count = uint32_t { 0u };
+	vkc(vk_get_swapchain_images_khr(m_device, swapchain, &count, nullptr));
+	debug::ensure(count != 0u, "Failed to get swapchain images");
+
+	auto images = std::vector<VkImage>(count);
+	vkc(vk_get_swapchain_images_khr(m_device, swapchain, &count, images.data()));
+	return images;
+}
+
+[[nodiscard]] auto Device::get_memory_requirements(VkBuffer buffer) const -> VkMemoryRequirements
+{
+	auto requirements = VkMemoryRequirements {};
+	vk_get_buffer_memory_requirements(m_device, buffer, &requirements);
+	return requirements;
+}
+
+void Device::bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset /* = 0u */) const
+{
+	vkc(vk_bind_buffer_memory(m_device, buffer, memory, offset));
+}
+
+[[nodiscard]] auto Device::map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
+    -> std::span<std::byte>
+{
+	void *data = {};
+	vkc(vk_map_memory(m_device, memory, offset, size, {}, &data));
+	return { std::bit_cast<std::byte *>(data), size };
+}
+
+void Device::unmap_memory(VkDeviceMemory memory)
+{
+	vk_unmap_memory(m_device, memory);
+}
+
+[[nodiscard]] auto Device::create_swapchain(VkSwapchainCreateInfoKHR info) const -> VkSwapchainKHR
+{
+	auto *swapchain = VkSwapchainKHR {};
+	vkc(vk_create_swapchain_khr(m_device, &info, nullptr, &swapchain));
+	return swapchain;
+}
+
+[[nodiscard]] auto Device::create_framebuffer(VkFramebufferCreateInfo info) const -> VkFramebuffer
+{
+	auto *framebuffer = VkFramebuffer {};
+	vkc(vk_create_frame_buffer(m_device, &info, nullptr, &framebuffer));
+	return framebuffer;
+}
+
+[[nodiscard]] auto Device::create_image_view(VkImageViewCreateInfo info) const -> VkImageView
+{
+	auto *view = VkImageView {};
+	vkc(vk_create_image_view(m_device, &info, nullptr, &view));
+	return view;
+}
+
+[[nodiscard]] auto Device::create_graphics_pipeline(VkGraphicsPipelineCreateInfo info) const
+    -> VkPipeline
+{
+	auto *graphics_pipeline = VkPipeline {};
+	vkc(vk_create_graphics_pipelines(
+	    m_device,
+	    VK_NULL_HANDLE,
+	    1u,
+	    &info,
+	    nullptr,
+	    &graphics_pipeline
+
+	));
+	return graphics_pipeline;
+}
+
+[[nodiscard]] auto Device::create_pass(VkRenderPassCreateInfo info) const -> VkRenderPass
+{
+	auto *pass = VkRenderPass {};
+	vkc(vk_create_render_pass(m_device, &info, nullptr, &pass));
+	return pass;
+}
+
+[[nodiscard]] auto Device::create_pipeline_layout(
+    std::vector<VkDescriptorSetLayout> descriptor_set_layout,
+    std::vector<VkPushConstantRange> push_constant_ranges
+) const -> VkPipelineLayout
+{
+	auto info = VkPipelineLayoutCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.setLayoutCount = static_cast<uint32_t>(descriptor_set_layout.size()),
+		.pSetLayouts = descriptor_set_layout.data(),
+		.pushConstantRangeCount = static_cast<uint32_t>(push_constant_ranges.size()),
+		.pPushConstantRanges = push_constant_ranges.data(),
+	};
+
+	auto *pipeline_layout = VkPipelineLayout {};
+	vkc(vk_create_pipeline_layout(m_device, &info, nullptr, &pipeline_layout));
+	return pipeline_layout;
+}
+
+[[nodiscard]] auto Device::create_shader_module(VkShaderModuleCreateInfo info) const
+    -> VkShaderModule
+{
+	auto *module = VkShaderModule {};
+	vkc(vk_create_shader_module(m_device, &info, nullptr, &module));
+	return module;
+}
+
+[[nodiscard]] auto Device::create_command_pool(VkCommandPoolCreateInfo info) const -> VkCommandPool
+{
+	auto *command_pool = VkCommandPool {};
+	vkc(vk_create_command_pool(m_device, &info, nullptr, &command_pool));
+	return command_pool;
+}
+
+[[nodiscard]] auto Device::create_semaphores(uint32_t count) const -> std::vector<VkSemaphore>
+{
+	auto info = VkSemaphoreCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+	};
+
+	auto semaphores = std::vector<VkSemaphore>(count);
+	for (auto &semaphore : semaphores)
+	{
+		vk_create_semaphore(m_device, &info, nullptr, &semaphore);
+	}
+	return semaphores;
+}
+
+[[nodiscard]] auto Device::create_fences(VkFenceCreateInfo info, uint32_t count) const
+    -> std::vector<VkFence>
+{
+	auto fences = std::vector<VkFence>(count);
+	for (auto &fence : fences)
+	{
+		vk_create_fence(m_device, &info, nullptr, &fence);
+	}
+	return fences;
+}
+
+[[nodiscard]] auto Device::create_buffer(VkBufferCreateInfo info) const -> VkBuffer
+{
+	auto *buffer = VkBuffer {};
+	vkc(vk_create_buffer(m_device, &info, nullptr, &buffer));
+	return buffer;
+}
+[[nodiscard]] auto Device::create_desscriptor_pool(VkDescriptorPoolCreateInfo info) const
+    -> VkDescriptorPool
+{
+	auto *pool = VkDescriptorPool {};
+	vkc(vk_create_descriptor_pool(m_device, &info, nullptr, &pool));
+	return pool;
+}
+
+[[nodiscard]] auto Device::create_descriptor_set_layout(VkDescriptorSetLayoutCreateInfo info) const
+    -> VkDescriptorSetLayout
+{
+	auto *layout = VkDescriptorSetLayout {};
+	vkc(vk_create_descriptor_set_layout(m_device, &info, nullptr, &layout));
+	return layout;
+}
+
+[[nodiscard]] auto Device::allocate_command_buffers(VkCommandBufferAllocateInfo info) const
+    -> std::vector<VkCommandBuffer>
+{
+	auto command_buffers = std::vector<VkCommandBuffer>(info.commandBufferCount);
+	vkc(vk_allocate_command_buffers(m_device, &info, command_buffers.data()));
+	return command_buffers;
+}
+
+[[nodiscard]] auto Device::allocate_memory(VkMemoryAllocateInfo info) const -> VkDeviceMemory
+{
+	auto *memory = VkDeviceMemory {};
+	vkc(vk_allocate_memory(m_device, &info, nullptr, &memory));
+	return memory;
+}
+
+[[nodiscard]] auto Device::allocate_descriptor_set(VkDescriptorSetAllocateInfo info) const
+    -> VkDescriptorSet
+{
+	auto *descriptor_set = VkDescriptorSet {};
+	vkc(vk_allocate_descriptor_sets(m_device, &info, &descriptor_set));
+	return descriptor_set;
+}
+
+void Device::free_memory(VkDeviceMemory memory) const
+{
+	vk_free_memory(m_device, memory, nullptr);
+}
+
+void Device::free_descriptor_set(
+    VkDescriptorPool descriptor_pool,
+    VkDescriptorSet descriptor_set
+) const
+{
+	vkc(vk_free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
+}
+
+void Device::destroy_swapchain(VkSwapchainKHR swapchain) const
+{
+	vk_destroy_swapchain_khr(m_device, swapchain, nullptr);
+}
+
+void Device::destroy_framebuffer(VkFramebuffer framebuffer) const
+{
+	vk_destroy_frame_buffer(m_device, framebuffer, nullptr);
+}
+
+void Device::destroy_framebuffers(std::span<VkFramebuffer> framebuffers) const
+{
+	for (auto &framebuffer : framebuffers)
+	{
+		destroy_framebuffer(framebuffer);
+	}
+}
+
+void Device::destroy_image_view(VkImageView image_view) const
+{
+	vk_destroy_image_view(m_device, image_view, nullptr);
+}
+
+void Device::destroy_image_views(std::span<VkImageView> image_views) const
+{
+	for (auto &image_view : image_views)
+	{
+		destroy_image_view(image_view);
+	}
+}
+
+void Device::destroy_pipeline(VkPipeline pipeline) const
+{
+	vk_destroy_pipeline(m_device, pipeline, nullptr);
+}
+
+void Device::destroy_pass(VkRenderPass pass) const
+{
+	vk_destroy_render_pass(m_device, pass, nullptr);
+}
+
+void Device::destroy_pipeline_layout(VkPipelineLayout pipeline_layout) const
+{
+	vk_destroy_pipeline_layout(m_device, pipeline_layout, nullptr);
+}
+
+void Device::destroy_shader_module(VkShaderModule shader_module) const
+{
+	vk_destroy_shader_module(m_device, shader_module, nullptr);
+}
+
+void Device::destroy_command_pool(VkCommandPool command_pool) const
+{
+	vk_destroy_command_pool(m_device, command_pool, nullptr);
+}
+
+void Device::destroy_semaphore(VkSemaphore semaphore) const
+{
+	vk_destroy_semaphore(m_device, semaphore, nullptr);
+}
+
+void Device::destroy_semaphores(std::span<VkSemaphore> semaphores) const
+{
+	for (auto &semaphore : semaphores)
+	{
+		destroy_semaphore(semaphore);
+	}
+}
+
+void Device::destroy_fence(VkFence fence) const
+{
+	vk_destroy_fence(m_device, fence, nullptr);
+}
+
+void Device::destroy_fences(std::span<VkFence> fences) const
+{
+	for (auto &fence : fences)
+	{
+		destroy_fence(fence);
+	}
+}
+
+void Device::destroy_buffer(VkBuffer buffer) const
+{
+	vk_destroy_buffer(m_device, buffer, nullptr);
+}
+
+void Device::destroy_descriptor_set_layout(VkDescriptorSetLayout layout) const
+{
+	vk_destroy_descriptor_set_layout(m_device, layout, nullptr);
+}
+
+void Device::destroy_descriptor_pool(VkDescriptorPool pool) const
+{
+	vk_destroy_descriptor_pool(m_device, pool, nullptr);
+}
+
+[[nodiscard]] auto addressof_underlying(auto &enum_value)
+    -> std::underlying_type_t<std::decay_t<decltype(enum_value)>> *
+{
+	using underlying_type = std::underlying_type_t<std::decay_t<decltype(enum_value)>>;
+	return std::bit_cast<underlying_type *>(&enum_value);
+}
+
+Queue::Queue(Device &device, uint32_t queue_family_idx, uint32_t queue_idx)
+    : m_device(device.m_device.get())
+    , m_queue()
+{
+	vk_get_device_queue(m_device, queue_family_idx, queue_idx, &m_queue);
+}
+
+Queue::~Queue()
+{
+}
+
+void Queue::submit(SubmitInfo info) const
+{
+	const auto vk_info = VkSubmitInfo {
+
+		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+		.waitSemaphoreCount = 1u,
+		.pWaitSemaphores = &info.wait_semaphore,
+		.pWaitDstStageMask = addressof_underlying(info.wait_stages),
+
+		.commandBufferCount = 1u,
+		.pCommandBuffers = &info.command_buffer,
+		.signalSemaphoreCount = 1u,
+		.pSignalSemaphores = &info.signal_semaphore,
+	};
+
+	vkc(vk_queue_submit(m_queue, 1u, &vk_info, info.signal_fence));
+}
+
+void Queue::present(PresentInfo info) const
+{
+	auto result = VkResult {};
+
+	const auto vk_info = VkPresentInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+		.waitSemaphoreCount = 1u,
+		.pWaitSemaphores = &info.wait_semaphore,
+		.swapchainCount = 1u,
+		.pSwapchains = &info.swapchain,
+		.pImageIndices = &info.image_idx,
+		.pResults = &result,
+	};
+
+	vkc(vk_queue_present_khr(m_queue, &vk_info));
+	vkc(result);
 }
 
 [[nodiscard]]

@@ -5,9 +5,8 @@ import ecs.registry;
 import memory.null_on_move;
 import math.vec2;
 import surface.system;
-import renderer.frontend.instance;
+import renderer.frontend;
 import renderer.backend.vk.instance;
-import renderer.frontend.surface;
 import renderer.backend.vk.library_wrapper;
 
 namespace lt::renderer::vkb {

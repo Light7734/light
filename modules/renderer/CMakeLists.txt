@@ -4,9 +4,9 @@ add_library_module(
     INTERFACES
     # system.cppm Vulkan - backend
     api.cppm
-    # backends/vk/messenger.cppm
-    backends/factory.cppm
-    # backends/vk/library_loader.cppm
+    frontends.cppm
+    factory.cppm
+    # backends/vk/messenger.cppm backends/vk/library_loader.cppm
     backends/vk/library_wrapper.cppm
     backends/vk/context/device.cppm
     backends/vk/context/gpu.cppm
@@ -14,13 +14,11 @@ add_library_module(
     backends/vk/context/surface.cppm
     # backends/vk/context/swapchain.cppm backends/vk/data/buffer.cppm
     # backends/vk/renderer/pass.cppm backends/vk/renderer/renderer.cppm frontend
-    # frontend/messenger.cppm
-    frontend/context/device.cppm
-    frontend/context/gpu.cppm
-    frontend/context/instance.cppm
-    frontend/context/surface.cppm
-    # frontend/context/swapchain.cppm frontend/data/buffer.cppm
-    # frontend/renderer/renderer.cppm frontend/renderer/pass.cppm
+    # frontend/messenger.cppm frontend/context/device.cppm
+    # frontend/context/gpu.cppm frontend/context/instance.cppm
+    # frontend/context/surface.cppm frontend/context/swapchain.cppm
+    # frontend/data/buffer.cppm frontend/renderer/renderer.cppm
+    # frontend/renderer/pass.cppm
 )
 
 target_link_libraries(

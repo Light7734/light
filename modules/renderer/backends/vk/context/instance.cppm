@@ -1,6 +1,6 @@
 export module renderer.backend.vk.instance;
 import debug.assertions;
-import renderer.frontend.instance;
+import renderer.frontend;
 import renderer.backend.vk.library_wrapper;
 // import renderer.backend.vk.library_loader;
 import std;
