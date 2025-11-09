@@ -46,7 +46,7 @@ add_library_module(
     vec2.cppm
     vec3.cppm
     vec4.cppm
-    components/transform.cppm
+    components.cppm
 )
 
 add_library_module(
@@ -152,13 +152,14 @@ add_library_module(
     INTERFACES
     frontends.cppm
     factory.cppm
-    backends/vk/library_wrapper.cppm
-    backends/vk/context/device.cppm
-    backends/vk/context/gpu.cppm
-    backends/vk/context/instance.cppm
-    backends/vk/context/surface.cppm
-    backends/vk/context/swapchain.cppm
-    backends/vk/data/buffer.cppm
+    vk/api_wrapper.cppm
+    vk/device.cppm
+    vk/gpu.cppm
+    vk/instance.cppm
+    vk/surface.cppm
+    vk/swapchain.cppm
+    vk/buffer.cppm
+    vk/pass.cppm
     DEPENDENCIES
     app
     ecs

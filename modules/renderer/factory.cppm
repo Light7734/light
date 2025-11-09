@@ -1,6 +1,8 @@
 export module renderer.factory;
 import renderer.frontend;
+import assets.shader;
 import renderer.backend.vk.device;
+import renderer.vk.pass;
 import renderer.backend.vk.instance;
 import renderer.backend.vk.swapchain;
 import renderer.backend.vk.buffer;
@@ -25,6 +27,13 @@ export namespace lt::renderer {
 
 [[nodiscard]] auto create_swapchain(Api target_api, ISurface *surface, IGpu *gpu, IDevice *device)
     -> memory::Scope<ISwapchain>;
+
+[[nodiscard]] auto create_pass(
+    lt::renderer::Api target_api,
+    IDevice *device,
+    const lt::assets::ShaderAsset &vertex_shader,
+    const lt::assets::ShaderAsset &fragment_shader
+) -> memory::Scope<IPass>;
 
 } // namespace lt::renderer
 
@@ -117,3 +126,80 @@ using namespace lt::renderer;
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
 }
+
+
+[[nodiscard]] auto create_pass(
+    lt::renderer::Api target_api,
+    IDevice *device,
+    const lt::assets::ShaderAsset &vertex_shader,
+    const lt::assets::ShaderAsset &fragment_shader
+) -> memory::Scope<IPass>
+{
+	debug::ensure(device, "Failed to create renderer::IPass: null device");
+
+	switch (target_api)
+	{
+	case Api::vulkan:
+		return memory::create_scope<vkb::Pass>(device, vertex_shader, fragment_shader);
+	case Api::none:
+	case Api::metal:
+	case Api::direct_x: throw std::runtime_error { "Invalid API" };
+	}
+}
+
+// [[nodiscard]] /* static */ auto IRenderer::create(
+//     Api target_api,
+//     IGpu *gpu,
+//     IDevice *device,
+//     ISwapchain *swapchain,
+//     uint32_t max_frames_in_flight
+// ) -> memory::Scope<IRenderer>
+// {
+// 	ensure(gpu, "Failed to create renderer::IRenderer: null gpu");
+// 	ensure(device, "Failed to create renderer::IRenderer: null device");
+// 	ensure(swapchain, "Failed to create renderer::IRenderer: null swapchain");
+// 	ensure(
+// 	    std::clamp(max_frames_in_flight, frames_in_flight_lower_limit, frames_in_flight_upper_limit)
+// 	        == max_frames_in_flight,
+// 	    "Failed to initialize renderer::System: max_frames_in_flight ({}) not within bounds ({} -> "
+// 	    "{}) ",
+// 	    max_frames_in_flight,
+// 	    frames_in_flight_lower_limit,
+// 	    frames_in_flight_upper_limit
+// 	);
+//
+//
+// 	switch (target_api)
+// 	{
+// 	case Api::vulkan:
+// 		return memory::create_scope<vk::Renderer>(gpu, device, swapchain, max_frames_in_flight);
+// 	case Api::none:
+// 	case Api::metal:
+// 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
+// 	}
+// }
+
+
+// [[nodiscard]] /* static */ auto IDebugger::create(
+//     Api target_api,
+//     IInstance *instance,
+//     CreateInfo info
+// ) -> memory::Scope<IDebugger>
+// {
+// 	debug::ensure(
+// 	    info.severities != MessageSeverity::none,
+// 	    "Failed to create vk::Messenger: severities == none"
+// 	);
+//
+// 	debug::ensure(info.types != MessageType::none, "Failed to create vk::Messenger: types == none");
+//
+// 	debug::ensure(info.callback, "Failed to create vk::Messenger: null callback");
+//
+// 	switch (target_api)
+// 	{
+// 	case Api::vulkan: return memory::create_scope<vk::Messenger>(instance, std::move(info));
+// 	case Api::none:
+// 	case Api::metal:
+// 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
+// 	}
+// }

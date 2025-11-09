@@ -1,3 +1,51 @@
+#pragma once
+
+#include <filesystem>
+#include <memory/reference.hpp>
+#include <mirror/panels/panel.hpp>
+#include <renderer/texture.hpp>
+
+namespace lt {
+
+class Scene;
+
+class AssetBrowserPanel: public Panel
+{
+public:
+	AssetBrowserPanel(memory::Ref<Scene> active_scene);
+
+	void on_user_interface_update();
+
+private:
+	enum class AssetType
+	{
+		none = 0,
+		scene,
+		directory,
+		text,
+		image,
+	};
+
+	std::filesystem::path m_current_directory;
+
+	const std::filesystem::path m_assets_path;
+
+	float m_file_size = 128.0f;
+
+	float m_file_padding = 8.0f;
+
+	memory::Ref<Scene> m_active_scene;
+
+	memory::Ref<Texture> m_directory_texture;
+
+	memory::Ref<Texture> m_scene_texture;
+
+	memory::Ref<Texture> m_image_texture;
+
+	memory::Ref<Texture> m_text_texture;
+};
+
+} // namespace lt
 #include <asset_manager/asset_manager.hpp>
 #include <ecs/registry.hpp>
 #include <ecs/serializer.hpp>

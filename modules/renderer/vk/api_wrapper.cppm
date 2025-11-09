@@ -184,6 +184,29 @@ enum T : VkFlags // NOLINT
 };
 }
 
+namespace ColorComponentFlags {
+enum T : VkFlags // NOLINT
+{
+	r_bit = VK_COLOR_COMPONENT_R_BIT,
+	g_bit = VK_COLOR_COMPONENT_G_BIT,
+	b_bit = VK_COLOR_COMPONENT_B_BIT,
+	a_bit = VK_COLOR_COMPONENT_A_BIT,
+};
+};
+
+namespace SampleCountFlags {
+enum T : VkFlags // NOLINT
+{
+	_1_bit = VK_SAMPLE_COUNT_1_BIT,
+	_2_bit = VK_SAMPLE_COUNT_2_BIT,
+	_4_bit = VK_SAMPLE_COUNT_4_BIT,
+	_8_bit = VK_SAMPLE_COUNT_8_BIT,
+	_16_bit = VK_SAMPLE_COUNT_16_BIT,
+	_32_bit = VK_SAMPLE_COUNT_32_BIT,
+	_64_bit = VK_SAMPLE_COUNT_64_BIT,
+};
+}
+
 namespace CompositeAlpha {
 enum T : VkFlags // NOLINT
 {
@@ -194,10 +217,150 @@ enum T : VkFlags // NOLINT
 };
 }
 
+namespace CullModeFlags {
+enum T : VkFlags // NOLINT
+{
+	none = VK_CULL_MODE_NONE,
+	front_bit = VK_CULL_MODE_FRONT_BIT,
+	back_bit = VK_CULL_MODE_BACK_BIT,
+	front_and_back = VK_CULL_MODE_FRONT_AND_BACK,
+};
+}
+
+namespace ShaderStageFlags {
+enum T : VkFlags // NOLINT
+{
+	vertex_bit = VK_SHADER_STAGE_VERTEX_BIT,
+	tessellation_control_bit = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT,
+	tessellation_evaluation_bit = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT,
+	geometry_bit = VK_SHADER_STAGE_GEOMETRY_BIT,
+	fragment_bit = VK_SHADER_STAGE_FRAGMENT_BIT,
+	compute_bit = VK_SHADER_STAGE_COMPUTE_BIT,
+	all_graphics = VK_SHADER_STAGE_ALL_GRAPHICS,
+	all = VK_SHADER_STAGE_ALL,
+	raygen_bit_khr = VK_SHADER_STAGE_RAYGEN_BIT_KHR,
+	any_hit_bit_khr = VK_SHADER_STAGE_ANY_HIT_BIT_KHR,
+	closest_hit_bit_khr = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
+	miss_bit_khr = VK_SHADER_STAGE_MISS_BIT_KHR,
+	intersection_bit_khr = VK_SHADER_STAGE_INTERSECTION_BIT_KHR,
+	callable_bit_khr = VK_SHADER_STAGE_CALLABLE_BIT_KHR,
+	task_bit_ext = VK_SHADER_STAGE_TASK_BIT_EXT,
+	mesh_bit_ext = VK_SHADER_STAGE_MESH_BIT_EXT,
+};
+
+}
+
 enum class SharingMode : std::underlying_type_t<VkSharingMode>
 {
 	exclusive = VK_SHARING_MODE_EXCLUSIVE,
 	concurrent = VK_SHARING_MODE_CONCURRENT,
+};
+
+enum class PolygonMode
+{
+	fill = VK_POLYGON_MODE_FILL,
+	line = VK_POLYGON_MODE_LINE,
+	point = VK_POLYGON_MODE_POINT,
+};
+
+enum class FrontFace : std::underlying_type_t<VkFrontFace>
+{
+	counter_clockwise = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+	clockwise = VK_FRONT_FACE_CLOCKWISE,
+};
+
+enum class BlendFactor : std::underlying_type_t<VkBlendFactor>
+{
+	zero = VK_BLEND_FACTOR_ZERO,
+	one = VK_BLEND_FACTOR_ONE,
+	src_color = VK_BLEND_FACTOR_SRC_COLOR,
+	one_minus_src_color = VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR,
+	dst_color = VK_BLEND_FACTOR_DST_COLOR,
+	one_minus_dst_color = VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR,
+	src_alpha = VK_BLEND_FACTOR_SRC_ALPHA,
+	one_minus_src_alpha = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+	dst_alpha = VK_BLEND_FACTOR_DST_ALPHA,
+	one_minus_dst_alpha = VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
+	constant_color = VK_BLEND_FACTOR_CONSTANT_COLOR,
+	one_minus_constant_color = VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR,
+	constant_alpha = VK_BLEND_FACTOR_CONSTANT_ALPHA,
+	one_minus_constant_alpha = VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA,
+	src_alpha_saturate = VK_BLEND_FACTOR_SRC_ALPHA_SATURATE,
+	src1_color = VK_BLEND_FACTOR_SRC1_COLOR,
+	one_minus_src1_color = VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR,
+	src1_alpha = VK_BLEND_FACTOR_SRC1_ALPHA,
+	one_minus_src1_alpha = VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA,
+};
+
+enum class PrimitiveTopology : std::underlying_type_t<VkPrimitiveTopology>
+{
+	point_list = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+	line_list = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	line_strip = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+	triangle_list = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+	triangle_strip = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+	triangle_fan = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
+	line_list_with_adjacency = VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY,
+	line_strip_with_adjacency = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY,
+	triangle_list_with_adjacency = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY,
+	triangle_strip_with_adjacency = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY,
+	patch_list = VK_PRIMITIVE_TOPOLOGY_PATCH_LIST,
+
+};
+
+enum class BlendOperation : std::underlying_type_t<VkBlendOp>
+{
+	add = VK_BLEND_OP_ADD,
+	subtract = VK_BLEND_OP_SUBTRACT,
+	reverse_subtract = VK_BLEND_OP_REVERSE_SUBTRACT,
+	min = VK_BLEND_OP_MIN,
+	max = VK_BLEND_OP_MAX,
+	zero = VK_BLEND_OP_ZERO_EXT,
+	src = VK_BLEND_OP_SRC_EXT,
+	dst = VK_BLEND_OP_DST_EXT,
+	src_over = VK_BLEND_OP_SRC_OVER_EXT,
+	dst_over = VK_BLEND_OP_DST_OVER_EXT,
+	src_in = VK_BLEND_OP_SRC_IN_EXT,
+	dst_in = VK_BLEND_OP_DST_IN_EXT,
+	src_out = VK_BLEND_OP_SRC_OUT_EXT,
+	dst_out = VK_BLEND_OP_DST_OUT_EXT,
+	src_atop = VK_BLEND_OP_SRC_ATOP_EXT,
+	dst_atop = VK_BLEND_OP_DST_ATOP_EXT,
+	_xor = VK_BLEND_OP_XOR_EXT,
+	multiply = VK_BLEND_OP_MULTIPLY_EXT,
+	screen = VK_BLEND_OP_SCREEN_EXT,
+	overlay = VK_BLEND_OP_OVERLAY_EXT,
+	darken = VK_BLEND_OP_DARKEN_EXT,
+	lighten = VK_BLEND_OP_LIGHTEN_EXT,
+	colordodge = VK_BLEND_OP_COLORDODGE_EXT,
+	colorburn = VK_BLEND_OP_COLORBURN_EXT,
+	hardlight = VK_BLEND_OP_HARDLIGHT_EXT,
+	softlight = VK_BLEND_OP_SOFTLIGHT_EXT,
+	difference = VK_BLEND_OP_DIFFERENCE_EXT,
+	exclusion = VK_BLEND_OP_EXCLUSION_EXT,
+	invert = VK_BLEND_OP_INVERT_EXT,
+	invert_rgb = VK_BLEND_OP_INVERT_RGB_EXT,
+	lineardodge = VK_BLEND_OP_LINEARDODGE_EXT,
+	linearburn = VK_BLEND_OP_LINEARBURN_EXT,
+	vividlight = VK_BLEND_OP_VIVIDLIGHT_EXT,
+	linearlight = VK_BLEND_OP_LINEARLIGHT_EXT,
+	pinlight = VK_BLEND_OP_PINLIGHT_EXT,
+	hardmix = VK_BLEND_OP_HARDMIX_EXT,
+	hsl_hue = VK_BLEND_OP_HSL_HUE_EXT,
+	hsl_saturation = VK_BLEND_OP_HSL_SATURATION_EXT,
+	hsl_color = VK_BLEND_OP_HSL_COLOR_EXT,
+	hsl_luminosity = VK_BLEND_OP_HSL_LUMINOSITY_EXT,
+	plus = VK_BLEND_OP_PLUS_EXT,
+	plus_clamped = VK_BLEND_OP_PLUS_CLAMPED_EXT,
+	plus_clamped_alpha = VK_BLEND_OP_PLUS_CLAMPED_ALPHA_EXT,
+	plus_darker = VK_BLEND_OP_PLUS_DARKER_EXT,
+	minus = VK_BLEND_OP_MINUS_EXT,
+	minus_clamped = VK_BLEND_OP_MINUS_CLAMPED_EXT,
+	contrast = VK_BLEND_OP_CONTRAST_EXT,
+	invert_ovg = VK_BLEND_OP_INVERT_OVG_EXT,
+	red = VK_BLEND_OP_RED_EXT,
+	green = VK_BLEND_OP_GREEN_EXT,
+	blue = VK_BLEND_OP_BLUE_EXT,
 };
 
 enum class ColorSpace : std::underlying_type_t<VkColorSpaceKHR>
@@ -1036,6 +1199,7 @@ public:
 	friend class Swapchain;
 	friend class Image;
 	friend class ImageView;
+	friend class Pipeline;
 
 	struct CreateInfo
 	{
@@ -1625,6 +1789,212 @@ private:
 	memory::NullOnMove<VkDevice> m_device {};
 
 	VkDeviceMemory m_memory {};
+};
+
+class ShaderModule
+{
+public:
+	friend class Pipeline;
+
+	struct CreateInfo
+	{
+		std::vector<std::byte> code;
+	};
+
+	ShaderModule() = default;
+
+	ShaderModule(Device &device, CreateInfo info);
+
+	~ShaderModule();
+
+	ShaderModule(ShaderModule &&) = default;
+
+	ShaderModule(const ShaderModule &) = delete;
+
+	auto operator=(ShaderModule &&) -> ShaderModule & = default;
+
+	auto operator=(const Memory &) -> Memory & = delete;
+
+private:
+	[[nodiscard]] auto get_vk_handle()
+	{
+		return m_shader_module;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkShaderModule m_shader_module {};
+};
+
+class Pipeline
+{
+public:
+	static constexpr auto object_type = VK_OBJECT_TYPE_PIPELINE;
+
+	struct InputAssemblyState
+	{
+		PrimitiveTopology topology;
+
+		bool primitive_restart_enabled;
+	};
+
+	struct ViewportState
+	{
+		std::uint32_t viewport_count;
+
+		std::uint32_t scissor_count;
+	};
+
+	struct RasterizationState
+	{
+		bool depth_clamp_enabled;
+
+		bool discard_enabled;
+
+		PolygonMode polygon_mode;
+
+		CullModeFlags::T cull_mode;
+
+		FrontFace front_face;
+
+		bool depth_bias_enabled;
+
+		float depth_bias_constant_factor;
+
+		float depth_bias_clamp;
+
+		float depth_bias_slope_factor;
+
+		float line_width;
+	};
+
+	struct MultisamplingState
+	{
+		SampleCountFlags::T rasterizer_samples;
+
+		bool sample_shading_enabled;
+
+		float min_sample_shading;
+
+		bool alpha_to_coverage_enabled;
+
+		bool alpha_to_one_enabled;
+	};
+
+	struct AttachmentState
+	{
+		struct Color
+		{
+			vk::Format format;
+
+			bool blend_enabled;
+
+			BlendFactor src_color;
+
+			BlendFactor dst_color;
+
+			BlendFactor src_alpha;
+
+			BlendFactor dst_alpha;
+
+			BlendOperation color_op;
+
+			BlendOperation alpha_op;
+
+			ColorComponentFlags::T color_write_mask;
+		};
+
+		std::vector<Color> color_attachments;
+
+		std::optional<vk::Format> depth_attachment;
+
+		std::optional<vk::Format> stencil_attachment;
+	};
+
+	struct CreateInfo
+	{
+		std::vector<std::pair<ShaderModule, ShaderStageFlags::T>> shaders;
+
+		InputAssemblyState input_assembly_state;
+
+		ViewportState viewport_state;
+
+		RasterizationState rasterization_state;
+
+		MultisamplingState multisampling_state;
+
+		AttachmentState attachment_state;
+
+		std::string_view debug_name;
+	};
+
+	Pipeline() = default;
+
+	Pipeline(Device &device, class PipelineLayout &layout, CreateInfo info);
+
+	Pipeline(Pipeline &&) = default;
+
+	Pipeline(const Pipeline &) = delete;
+
+	auto operator=(Pipeline &&) -> Pipeline & = default;
+
+	auto operator=(const Pipeline &) -> Pipeline & = delete;
+
+	~Pipeline();
+
+private:
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkPipeline m_pipeline {};
+};
+
+class PipelineLayout
+{
+public:
+	friend class Pipeline;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
+
+	struct CreateInfo
+	{
+	};
+
+	PipelineLayout() = default;
+
+	PipelineLayout(Device &device, CreateInfo info);
+
+	PipelineLayout(PipelineLayout &&) = default;
+
+	PipelineLayout(const PipelineLayout &) = delete;
+
+	auto operator=(PipelineLayout &&) -> PipelineLayout & = default;
+
+	auto operator=(const PipelineLayout &) -> PipelineLayout & = delete;
+
+	~PipelineLayout();
+
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkPipelineLayout
+	{
+		return m_layout;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkPipelineLayout m_layout {};
+};
+
+class DescriptorPool
+{
+};
+
+class DescriptorSetLayout
+{
+};
+
+class DescriptorSet
+{
 };
 
 } // namespace lt::renderer::vk
@@ -3149,6 +3519,143 @@ Memory::~Memory()
 void Memory::unmap()
 {
 	api::unmap_memory(m_device, m_memory);
+}
+
+Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
+    : m_device(device.m_device.get())
+    , m_pipeline()
+
+{
+	auto shader_stages = std::vector<VkPipelineShaderStageCreateInfo> {};
+	for (auto &[shader, stage] : info.shaders)
+	{
+		shader_stages.emplace_back(
+		    VkPipelineShaderStageCreateInfo {
+		        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+		        .stage = static_cast<VkShaderStageFlagBits>(stage),
+		        .module = shader.get_vk_handle(),
+		        .pName = "main",
+		    }
+		);
+	}
+
+	auto dynamic_states = std::array<VkDynamicState, 2> {
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_SCISSOR,
+	};
+
+	auto dynamic_state = VkPipelineDynamicStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+		.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size()),
+		.pDynamicStates = dynamic_states.data(),
+	};
+
+	auto vertex_input = VkPipelineVertexInputStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+	};
+
+	auto input_assembly = VkPipelineInputAssemblyStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+		.topology = static_cast<VkPrimitiveTopology>(info.input_assembly_state.topology),
+		.primitiveRestartEnable = info.input_assembly_state.primitive_restart_enabled,
+	};
+
+	auto viewport_state = VkPipelineViewportStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+		.viewportCount = info.viewport_state.viewport_count,
+		.scissorCount = info.viewport_state.scissor_count,
+	};
+
+	auto rasterization = VkPipelineRasterizationStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+		.depthClampEnable = VK_FALSE,
+		.rasterizerDiscardEnable = VK_FALSE,
+		.polygonMode = VK_POLYGON_MODE_FILL,
+		.cullMode = VK_CULL_MODE_NONE,
+		.frontFace = VK_FRONT_FACE_CLOCKWISE,
+		.lineWidth = 1.0,
+	};
+
+	auto multisampling = VkPipelineMultisampleStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+		.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+		.sampleShadingEnable = VK_FALSE,
+		.minSampleShading = 1.0,
+		.pSampleMask = nullptr,
+		.alphaToCoverageEnable = VK_FALSE,
+		.alphaToOneEnable = VK_FALSE,
+	};
+
+	auto color_blend_attachment = VkPipelineColorBlendAttachmentState {
+		.blendEnable = VK_FALSE,
+		.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
+		.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
+		.colorBlendOp = VK_BLEND_OP_ADD,
+		.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+		.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+		.alphaBlendOp = VK_BLEND_OP_ADD,
+		.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
+		                  | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
+	};
+
+	auto color_blend = VkPipelineColorBlendStateCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+		.logicOpEnable = VK_FALSE,
+		.logicOp = VK_LOGIC_OP_COPY,
+		.attachmentCount = 1,
+		.pAttachments = &color_blend_attachment,
+		.blendConstants = { 0.0f, 0.0, 0.0, 0.0 },
+	};
+
+	auto color_attachment_formats = std::vector<vk::Format> {};
+
+	for (auto &color_attachment : info.attachment_state.color_attachments)
+	{
+	}
+
+
+	auto rendering_info = VkPipelineRenderingCreateInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
+		.colorAttachmentCount = static_cast<uint32_t>(color_attachment_formats.size()),
+		.pColorAttachmentFormats = std::bit_cast<VkFormat *>(color_attachment_formats.data()),
+		.depthAttachmentFormat = info.attachment_state.depth_attachment ?
+		                             static_cast<VkFormat>(
+		                                 *info.attachment_state.depth_attachment
+		                             ) :
+		                             VK_FORMAT_UNDEFINED,
+
+		.stencilAttachmentFormat = info.attachment_state.stencil_attachment ?
+		                               static_cast<VkFormat>(
+		                                   *info.attachment_state.stencil_attachment
+		                               ) :
+		                               VK_FORMAT_UNDEFINED,
+	};
+
+	auto vk_info = VkGraphicsPipelineCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+		.pNext = &rendering_info,
+		.stageCount = static_cast<uint32_t>(shader_stages.size()),
+		.pStages = shader_stages.data(),
+		.pVertexInputState = &vertex_input,
+		.pInputAssemblyState = &input_assembly,
+		.pViewportState = &viewport_state,
+		.pRasterizationState = &rasterization,
+		.pMultisampleState = &multisampling,
+		.pDepthStencilState = nullptr,
+		.pColorBlendState = &color_blend,
+		.pDynamicState = &dynamic_state,
+		.layout = layout.get_vk_handle(),
+		.renderPass = nullptr,
+		.subpass = {},
+		.basePipelineHandle = nullptr,
+		.basePipelineIndex = -1,
+	};
+
+	vkc(api::create_graphics_pipelines(m_device, nullptr, 1u, &vk_info, nullptr, &m_pipeline));
+}
+
+Pipeline::~Pipeline()
+{
 }
 
 [[nodiscard]]
