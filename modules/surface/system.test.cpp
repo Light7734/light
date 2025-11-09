@@ -12,7 +12,6 @@ import app.system;
 import std;
 
 
-using ::std::ignore;
 using ::lt::surface::SurfaceComponent;
 using ::lt::surface::System;
 using ::lt::test::Case;
@@ -21,6 +20,7 @@ using ::lt::test::expect_ne;
 using ::lt::test::expect_not_nullptr;
 using ::lt::test::expect_throw;
 using ::lt::test::Suite;
+using ::std::ignore;
 using ::lt::test::operator""_suite;
 
 [[nodiscard]] auto tick_info() -> lt::app::TickInfo
@@ -43,7 +43,6 @@ struct overloads: Ts...
 {
 	using Ts::operator()...;
 };
-
 
 class Fixture
 {

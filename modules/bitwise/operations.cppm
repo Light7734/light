@@ -4,7 +4,7 @@ import std;
 namespace lt::bitwise {
 
 /* bit-wise */
-constexpr auto bit(std::uint32_t x) -> std::uint32_t
+export constexpr auto bit(std::uint32_t x) -> std::uint32_t
 {
 	return 1u << x;
 }

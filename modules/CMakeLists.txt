@@ -1,37 +1,174 @@
-# engine add_subdirectory(./std)
+add_library_module(
+    NAME
+    test
+    INTERFACES
+    test.cppm
+    expects.cppm
+    PRIVATE_INTERFACES
+    registry.cppm
+    SOURCES
+    entrypoint.cpp
+    DEPENDENCIES
+    logger
+)
 
-add_subdirectory(test)
+add_library_module(NAME logger INTERFACES logger.cppm)
 
-add_subdirectory(./logger)
+add_library_module(NAME bitwise INTERFACES operations.cppm)
 
-add_subdirectory(./bitwise)
+add_library_module(NAME env INTERFACES constants.cppm)
 
-add_subdirectory(./env)
+add_library_module(
+    NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
+)
 
-add_subdirectory(./memory)
+add_library_module(NAME time INTERFACES timer.cppm)
 
-add_subdirectory(./time)
+add_library_module(
+    NAME
+    lt_debug
+    ROOT_DIR
+    ${CMAKE_CURRENT_SOURCE_DIR}/debug
+    INTERFACES
+    instrumentor.cppm
+    assertions.cppm
+    DEPENDENCIES
+    logger
+)
 
-add_subdirectory(./debug)
+add_library_module(
+    NAME
+    math
+    INTERFACES
+    algebra.cppm
+    mat4.cppm
+    trig.cppm
+    vec2.cppm
+    vec3.cppm
+    vec4.cppm
+    components/transform.cppm
+)
 
-add_subdirectory(./math)
+add_library_module(
+    NAME
+    assets
+    INTERFACES
+    shader.cppm
+    metadata.cppm
+    DEPENDENCIES
+    logger
+    lt_debug
+)
 
-add_subdirectory(./assets)
+add_library_module(
+    NAME
+    libasset_baker
+    ROOT_DIR
+    ${CMAKE_CURRENT_SOURCE_DIR}/asset_baker
+    INTERFACES
+    bakers.cppm
+    DEPENDENCIES
+    assets
+    logger
+    lt_debug
+)
 
-add_subdirectory(./asset_baker)
+# add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
+# PRIVATE libasset_baker)
 
-add_subdirectory(./camera)
+add_library_module(NAME camera INTERFACES components.cppm DEPENDENCIES math)
 
-add_subdirectory(./app)
-add_subdirectory(./ecs)
+add_library_module(
+    NAME
+    app
+    INTERFACES
+    application.cppm
+    system.cppm
+    SOURCES
+    entrypoint.cpp
+    DEPENDENCIES
+    memory
+    PRIVATE_DEPENDENCIES
+    lt_debug
+)
 
-add_subdirectory(./surface)
+add_library_module(
+    NAME
+    ecs
+    INTERFACES
+    sparse_set.cppm
+    registry.cppm
+    entity.cppm
+    DEPENDENCIES
+    logger
+    lt_debug
+    memory
+)
 
-add_subdirectory(./input)
+if(NOT WIN32)
+    add_library_module(
+        NAME
+        surface
+        INTERFACES
+        system.cppm
+        requests.cppm
+        events.cppm
+        components.cppm
+        SOURCES
+        platform_linux.cpp
+        DEPENDENCIES
+        ecs
+        app
+        math
+        memory
+        tbb
+        PRIVATE_DEPENDENCIES
+        X11
+        logger
+        lt_debug
+        time
+    )
+else()
 
-# add_subdirectory(./ui)
+endif()
 
-# add_subdirectory(./renderer)
+add_library_module(
+    NAME
+    input
+    INTERFACES
+    system.cppm
+    codes.cppm
+    components.cppm
+    events.cppm
+    DEPENDENCIES
+    surface
+    math
+    logger
+)
 
-#
+add_library_module(
+    NAME
+    renderer
+    INTERFACES
+    frontends.cppm
+    factory.cppm
+    backends/vk/library_wrapper.cppm
+    backends/vk/context/device.cppm
+    backends/vk/context/gpu.cppm
+    backends/vk/context/instance.cppm
+    backends/vk/context/surface.cppm
+    backends/vk/context/swapchain.cppm
+    backends/vk/data/buffer.cppm
+    DEPENDENCIES
+    app
+    ecs
+    memory
+    assets
+    time
+    bitwise
+    camera
+    PRIVATE_DEPENDENCIES
+    surface
+)
+
 # add_subdirectory(./mirror)

@@ -9,7 +9,7 @@ namespace lt::memory {
  * @note For avoiding the need to explicitly implement the move constructor for objects that hold
  * Vulkan objects. But may serve other purposes, hence why I kept the implementation generic.
  */
-template<typename Underlying_T, Underlying_T null_value = nullptr>
+export template<typename Underlying_T, Underlying_T null_value = nullptr>
 class NullOnMove
 {
 public:
@@ -84,7 +84,12 @@ public:
 		return (std::uint64_t)m_value;
 	}
 
-	[[nodiscard]] auto get() -> Underlying_T
+	[[nodiscard]] auto get() -> Underlying_T &
+	{
+		return m_value;
+	}
+
+	[[nodiscard]] auto get() const -> const Underlying_T &
 	{
 		return m_value;
 	}
