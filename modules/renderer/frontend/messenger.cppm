@@ -1,7 +1,6 @@
 export module renderer.frontend;
 import debug.assertions;
 import memory.scope;
-import renderer.api;
 import bitwise;
 import std;
 

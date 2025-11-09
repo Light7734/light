@@ -1,3 +1,12 @@
+/** For lack of a better word, the way things are implemented is pretty F'ed up...
+ * BUT... it works... and the exported interface simplifies everything for the consumer
+ *
+ *
+ * Why did I do this?
+ * To reduce as much complexity from the API,
+ * Which should make the Renderer code simpler.
+ * In the long run, it should pay off...
+ */
 module;
 #define VK_NO_PROTOTYPES
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -14,6 +23,7 @@ module;
 export module renderer.backend.vk.library_wrapper;
 import memory.null_on_move;
 import math.vec3;
+import math.vec2;
 import debug.assertions;
 import std;
 
@@ -174,6 +184,323 @@ enum T : VkFlags // NOLINT
 };
 }
 
+namespace CompositeAlpha {
+enum T : VkFlags // NOLINT
+{
+	opaque_bit = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+	pre_multiplied_bit = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR,
+	post_multiplied_bit = VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
+	inherit_bit = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
+};
+}
+
+enum class SharingMode : std::underlying_type_t<VkSharingMode>
+{
+	exclusive = VK_SHARING_MODE_EXCLUSIVE,
+	concurrent = VK_SHARING_MODE_CONCURRENT,
+};
+
+enum class ColorSpace : std::underlying_type_t<VkColorSpaceKHR>
+{
+	srgb_nonlinear = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+	display_p3_nonlinear = VK_COLOR_SPACE_DISPLAY_P3_NONLINEAR_EXT,
+	extended_srgb_linear = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT,
+	display_p3_linear = VK_COLOR_SPACE_DISPLAY_P3_LINEAR_EXT,
+	dci_p3_nonlinear = VK_COLOR_SPACE_DCI_P3_NONLINEAR_EXT,
+	bt709_linear = VK_COLOR_SPACE_BT709_LINEAR_EXT,
+	bt709_nonlinear = VK_COLOR_SPACE_BT709_NONLINEAR_EXT,
+	bt2020_linear = VK_COLOR_SPACE_BT2020_LINEAR_EXT,
+	hdr10_st2084 = VK_COLOR_SPACE_HDR10_ST2084_EXT,
+	hdr10_hlg = VK_COLOR_SPACE_HDR10_HLG_EXT,
+	adobe_rgb_linear = VK_COLOR_SPACE_ADOBERGB_LINEAR_EXT,
+	adobe_rgb_nonlinear = VK_COLOR_SPACE_ADOBERGB_NONLINEAR_EXT,
+	pass_through = VK_COLOR_SPACE_PASS_THROUGH_EXT,
+	extended_srgb_nonlinear = VK_COLOR_SPACE_EXTENDED_SRGB_NONLINEAR_EXT,
+	display_native = VK_COLOR_SPACE_DISPLAY_NATIVE_AMD,
+};
+
+enum class Format : std::underlying_type_t<VkFormat>
+{
+	undefined = VK_FORMAT_UNDEFINED,
+	r4g4_unorm_pack8 = VK_FORMAT_R4G4_UNORM_PACK8,
+	r4g4b4a4_unorm_pack16 = VK_FORMAT_R4G4B4A4_UNORM_PACK16,
+	b4g4r4a4_unorm_pack16 = VK_FORMAT_B4G4R4A4_UNORM_PACK16,
+	r5g6b5_unorm_pack16 = VK_FORMAT_R5G6B5_UNORM_PACK16,
+	b5g6r5_unorm_pack16 = VK_FORMAT_B5G6R5_UNORM_PACK16,
+	r5g5b5a1_unorm_pack16 = VK_FORMAT_R5G5B5A1_UNORM_PACK16,
+	b5g5r5a1_unorm_pack16 = VK_FORMAT_B5G5R5A1_UNORM_PACK16,
+	a1r5g5b5_unorm_pack16 = VK_FORMAT_A1R5G5B5_UNORM_PACK16,
+	r8_unorm = VK_FORMAT_R8_UNORM,
+	r8_snorm = VK_FORMAT_R8_SNORM,
+	r8_uscaled = VK_FORMAT_R8_USCALED,
+	r8_sscaled = VK_FORMAT_R8_SSCALED,
+	r8_uint = VK_FORMAT_R8_UINT,
+	r8_sint = VK_FORMAT_R8_SINT,
+	r8_srgb = VK_FORMAT_R8_SRGB,
+	r8g8_unorm = VK_FORMAT_R8G8_UNORM,
+	r8g8_snorm = VK_FORMAT_R8G8_SNORM,
+	r8g8_uscaled = VK_FORMAT_R8G8_USCALED,
+	r8g8_sscaled = VK_FORMAT_R8G8_SSCALED,
+	r8g8_uint = VK_FORMAT_R8G8_UINT,
+	r8g8_sint = VK_FORMAT_R8G8_SINT,
+	r8g8_srgb = VK_FORMAT_R8G8_SRGB,
+	r8g8b8_unorm = VK_FORMAT_R8G8B8_UNORM,
+	r8g8b8_snorm = VK_FORMAT_R8G8B8_SNORM,
+	r8g8b8_uscaled = VK_FORMAT_R8G8B8_USCALED,
+	r8g8b8_sscaled = VK_FORMAT_R8G8B8_SSCALED,
+	r8g8b8_uint = VK_FORMAT_R8G8B8_UINT,
+	r8g8b8_sint = VK_FORMAT_R8G8B8_SINT,
+	r8g8b8_srgb = VK_FORMAT_R8G8B8_SRGB,
+	b8g8r8_unorm = VK_FORMAT_B8G8R8_UNORM,
+	b8g8r8_snorm = VK_FORMAT_B8G8R8_SNORM,
+	b8g8r8_uscaled = VK_FORMAT_B8G8R8_USCALED,
+	b8g8r8_sscaled = VK_FORMAT_B8G8R8_SSCALED,
+	b8g8r8_uint = VK_FORMAT_B8G8R8_UINT,
+	b8g8r8_sint = VK_FORMAT_B8G8R8_SINT,
+	b8g8r8_srgb = VK_FORMAT_B8G8R8_SRGB,
+	r8g8b8a8_unorm = VK_FORMAT_R8G8B8A8_UNORM,
+	r8g8b8a8_snorm = VK_FORMAT_R8G8B8A8_SNORM,
+	r8g8b8a8_uscaled = VK_FORMAT_R8G8B8A8_USCALED,
+	r8g8b8a8_sscaled = VK_FORMAT_R8G8B8A8_SSCALED,
+	r8g8b8a8_uint = VK_FORMAT_R8G8B8A8_UINT,
+	r8g8b8a8_sint = VK_FORMAT_R8G8B8A8_SINT,
+	r8g8b8a8_srgb = VK_FORMAT_R8G8B8A8_SRGB,
+	b8g8r8a8_unorm = VK_FORMAT_B8G8R8A8_UNORM,
+	b8g8r8a8_snorm = VK_FORMAT_B8G8R8A8_SNORM,
+	b8g8r8a8_uscaled = VK_FORMAT_B8G8R8A8_USCALED,
+	b8g8r8a8_sscaled = VK_FORMAT_B8G8R8A8_SSCALED,
+	b8g8r8a8_uint = VK_FORMAT_B8G8R8A8_UINT,
+	b8g8r8a8_sint = VK_FORMAT_B8G8R8A8_SINT,
+	b8g8r8a8_srgb = VK_FORMAT_B8G8R8A8_SRGB,
+	a8b8g8r8_unorm_pack32 = VK_FORMAT_A8B8G8R8_UNORM_PACK32,
+	a8b8g8r8_snorm_pack32 = VK_FORMAT_A8B8G8R8_SNORM_PACK32,
+	a8b8g8r8_uscaled_pack32 = VK_FORMAT_A8B8G8R8_USCALED_PACK32,
+	a8b8g8r8_sscaled_pack32 = VK_FORMAT_A8B8G8R8_SSCALED_PACK32,
+	a8b8g8r8_uint_pack32 = VK_FORMAT_A8B8G8R8_UINT_PACK32,
+	a8b8g8r8_sint_pack32 = VK_FORMAT_A8B8G8R8_SINT_PACK32,
+	a8b8g8r8_srgb_pack32 = VK_FORMAT_A8B8G8R8_SRGB_PACK32,
+	a2r10g10b10_unorm_pack32 = VK_FORMAT_A2R10G10B10_UNORM_PACK32,
+	a2r10g10b10_snorm_pack32 = VK_FORMAT_A2R10G10B10_SNORM_PACK32,
+	a2r10g10b10_uscaled_pack32 = VK_FORMAT_A2R10G10B10_USCALED_PACK32,
+	a2r10g10b10_sscaled_pack32 = VK_FORMAT_A2R10G10B10_SSCALED_PACK32,
+	a2r10g10b10_uint_pack32 = VK_FORMAT_A2R10G10B10_UINT_PACK32,
+	a2r10g10b10_sint_pack32 = VK_FORMAT_A2R10G10B10_SINT_PACK32,
+	a2b10g10r10_unorm_pack32 = VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+	a2b10g10r10_snorm_pack32 = VK_FORMAT_A2B10G10R10_SNORM_PACK32,
+	a2b10g10r10_uscaled_pack32 = VK_FORMAT_A2B10G10R10_USCALED_PACK32,
+	a2b10g10r10_sscaled_pack32 = VK_FORMAT_A2B10G10R10_SSCALED_PACK32,
+	a2b10g10r10_uint_pack32 = VK_FORMAT_A2B10G10R10_UINT_PACK32,
+	a2b10g10r10_sint_pack32 = VK_FORMAT_A2B10G10R10_SINT_PACK32,
+	r16_unorm = VK_FORMAT_R16_UNORM,
+	r16_snorm = VK_FORMAT_R16_SNORM,
+	r16_uscaled = VK_FORMAT_R16_USCALED,
+	r16_sscaled = VK_FORMAT_R16_SSCALED,
+	r16_uint = VK_FORMAT_R16_UINT,
+	r16_sint = VK_FORMAT_R16_SINT,
+	r16_sfloat = VK_FORMAT_R16_SFLOAT,
+	r16g16_unorm = VK_FORMAT_R16G16_UNORM,
+	r16g16_snorm = VK_FORMAT_R16G16_SNORM,
+	r16g16_uscaled = VK_FORMAT_R16G16_USCALED,
+	r16g16_sscaled = VK_FORMAT_R16G16_SSCALED,
+	r16g16_uint = VK_FORMAT_R16G16_UINT,
+	r16g16_sint = VK_FORMAT_R16G16_SINT,
+	r16g16_sfloat = VK_FORMAT_R16G16_SFLOAT,
+	r16g16b16_unorm = VK_FORMAT_R16G16B16_UNORM,
+	r16g16b16_snorm = VK_FORMAT_R16G16B16_SNORM,
+	r16g16b16_uscaled = VK_FORMAT_R16G16B16_USCALED,
+	r16g16b16_sscaled = VK_FORMAT_R16G16B16_SSCALED,
+	r16g16b16_uint = VK_FORMAT_R16G16B16_UINT,
+	r16g16b16_sint = VK_FORMAT_R16G16B16_SINT,
+	r16g16b16_sfloat = VK_FORMAT_R16G16B16_SFLOAT,
+	r16g16b16a16_unorm = VK_FORMAT_R16G16B16A16_UNORM,
+	r16g16b16a16_snorm = VK_FORMAT_R16G16B16A16_SNORM,
+	r16g16b16a16_uscaled = VK_FORMAT_R16G16B16A16_USCALED,
+	r16g16b16a16_sscaled = VK_FORMAT_R16G16B16A16_SSCALED,
+	r16g16b16a16_uint = VK_FORMAT_R16G16B16A16_UINT,
+	r16g16b16a16_sint = VK_FORMAT_R16G16B16A16_SINT,
+	r16g16b16a16_sfloat = VK_FORMAT_R16G16B16A16_SFLOAT,
+	r32_uint = VK_FORMAT_R32_UINT,
+	r32_sint = VK_FORMAT_R32_SINT,
+	r32_sfloat = VK_FORMAT_R32_SFLOAT,
+	r32g32_uint = VK_FORMAT_R32G32_UINT,
+	r32g32_sint = VK_FORMAT_R32G32_SINT,
+	r32g32_sfloat = VK_FORMAT_R32G32_SFLOAT,
+	r32g32b32_uint = VK_FORMAT_R32G32B32_UINT,
+	r32g32b32_sint = VK_FORMAT_R32G32B32_SINT,
+	r32g32b32_sfloat = VK_FORMAT_R32G32B32_SFLOAT,
+	r32g32b32a32_uint = VK_FORMAT_R32G32B32A32_UINT,
+	r32g32b32a32_sint = VK_FORMAT_R32G32B32A32_SINT,
+	r32g32b32a32_sfloat = VK_FORMAT_R32G32B32A32_SFLOAT,
+	r64_uint = VK_FORMAT_R64_UINT,
+	r64_sint = VK_FORMAT_R64_SINT,
+	r64_sfloat = VK_FORMAT_R64_SFLOAT,
+	r64g64_uint = VK_FORMAT_R64G64_UINT,
+	r64g64_sint = VK_FORMAT_R64G64_SINT,
+	r64g64_sfloat = VK_FORMAT_R64G64_SFLOAT,
+	r64g64b64_uint = VK_FORMAT_R64G64B64_UINT,
+	r64g64b64_sint = VK_FORMAT_R64G64B64_SINT,
+	r64g64b64_sfloat = VK_FORMAT_R64G64B64_SFLOAT,
+	r64g64b64a64_uint = VK_FORMAT_R64G64B64A64_UINT,
+	r64g64b64a64_sint = VK_FORMAT_R64G64B64A64_SINT,
+	r64g64b64a64_sfloat = VK_FORMAT_R64G64B64A64_SFLOAT,
+	b10g11r11_ufloat_pack32 = VK_FORMAT_B10G11R11_UFLOAT_PACK32,
+	e5b9g9r9_ufloat_pack32 = VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
+	d16_unorm = VK_FORMAT_D16_UNORM,
+	x8_d24_unorm_pack32 = VK_FORMAT_X8_D24_UNORM_PACK32,
+	d32_sfloat = VK_FORMAT_D32_SFLOAT,
+	s8_uint = VK_FORMAT_S8_UINT,
+	d16_unorm_s8_uint = VK_FORMAT_D16_UNORM_S8_UINT,
+	d24_unorm_s8_uint = VK_FORMAT_D24_UNORM_S8_UINT,
+	d32_sfloat_s8_uint = VK_FORMAT_D32_SFLOAT_S8_UINT,
+	bc1_rgb_unorm_block = VK_FORMAT_BC1_RGB_UNORM_BLOCK,
+	bc1_rgb_srgb_block = VK_FORMAT_BC1_RGB_SRGB_BLOCK,
+	bc1_rgba_unorm_block = VK_FORMAT_BC1_RGBA_UNORM_BLOCK,
+	bc1_rgba_srgb_block = VK_FORMAT_BC1_RGBA_SRGB_BLOCK,
+	bc2_unorm_block = VK_FORMAT_BC2_UNORM_BLOCK,
+	bc2_srgb_block = VK_FORMAT_BC2_SRGB_BLOCK,
+	bc3_unorm_block = VK_FORMAT_BC3_UNORM_BLOCK,
+	bc3_srgb_block = VK_FORMAT_BC3_SRGB_BLOCK,
+	bc4_unorm_block = VK_FORMAT_BC4_UNORM_BLOCK,
+	bc4_snorm_block = VK_FORMAT_BC4_SNORM_BLOCK,
+	bc5_unorm_block = VK_FORMAT_BC5_UNORM_BLOCK,
+	bc5_snorm_block = VK_FORMAT_BC5_SNORM_BLOCK,
+	bc6h_ufloat_block = VK_FORMAT_BC6H_UFLOAT_BLOCK,
+	bc6h_sfloat_block = VK_FORMAT_BC6H_SFLOAT_BLOCK,
+	bc7_unorm_block = VK_FORMAT_BC7_UNORM_BLOCK,
+	bc7_srgb_block = VK_FORMAT_BC7_SRGB_BLOCK,
+	etc2_r8g8b8_unorm_block = VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK,
+	etc2_r8g8b8_srgb_block = VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK,
+	etc2_r8g8b8a1_unorm_block = VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK,
+	etc2_r8g8b8a1_srgb_block = VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK,
+	etc2_r8g8b8a8_unorm_block = VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK,
+	etc2_r8g8b8a8_srgb_block = VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK,
+	eac_r11_unorm_block = VK_FORMAT_EAC_R11_UNORM_BLOCK,
+	eac_r11_snorm_block = VK_FORMAT_EAC_R11_SNORM_BLOCK,
+	eac_r11g11_unorm_block = VK_FORMAT_EAC_R11G11_UNORM_BLOCK,
+	eac_r11g11_snorm_block = VK_FORMAT_EAC_R11G11_SNORM_BLOCK,
+	astc_4X4_unorm_block = VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
+	astc_4X4_srgb_block = VK_FORMAT_ASTC_4x4_SRGB_BLOCK,
+	astc_5X4_unorm_block = VK_FORMAT_ASTC_5x4_UNORM_BLOCK,
+	astc_5X4_srgb_block = VK_FORMAT_ASTC_5x4_SRGB_BLOCK,
+	astc_5X5_unorm_block = VK_FORMAT_ASTC_5x5_UNORM_BLOCK,
+	astc_5X5_srgb_block = VK_FORMAT_ASTC_5x5_SRGB_BLOCK,
+	astc_6X5_unorm_block = VK_FORMAT_ASTC_6x5_UNORM_BLOCK,
+	astc_6X5_srgb_block = VK_FORMAT_ASTC_6x5_SRGB_BLOCK,
+	astc_6X6_unorm_block = VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
+	astc_6X6_srgb_block = VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+	astc_8X5_unorm_block = VK_FORMAT_ASTC_8x5_UNORM_BLOCK,
+	astc_8X5_srgb_block = VK_FORMAT_ASTC_8x5_SRGB_BLOCK,
+	astc_8X6_unorm_block = VK_FORMAT_ASTC_8x6_UNORM_BLOCK,
+	astc_8X6_srgb_block = VK_FORMAT_ASTC_8x6_SRGB_BLOCK,
+	astc_8X8_unorm_block = VK_FORMAT_ASTC_8x8_UNORM_BLOCK,
+	astc_8X8_srgb_block = VK_FORMAT_ASTC_8x8_SRGB_BLOCK,
+	astc_10X5_unorm_block = VK_FORMAT_ASTC_10x5_UNORM_BLOCK,
+	astc_10X5_srgb_block = VK_FORMAT_ASTC_10x5_SRGB_BLOCK,
+	astc_10X6_unorm_block = VK_FORMAT_ASTC_10x6_UNORM_BLOCK,
+	astc_10X6_srgb_block = VK_FORMAT_ASTC_10x6_SRGB_BLOCK,
+	astc_10X8_unorm_block = VK_FORMAT_ASTC_10x8_UNORM_BLOCK,
+	astc_10X8_srgb_block = VK_FORMAT_ASTC_10x8_SRGB_BLOCK,
+	astc_10X10_unorm_block = VK_FORMAT_ASTC_10x10_UNORM_BLOCK,
+	astc_10X10_srgb_block = VK_FORMAT_ASTC_10x10_SRGB_BLOCK,
+	astc_12X10_unorm_block = VK_FORMAT_ASTC_12x10_UNORM_BLOCK,
+	astc_12X10_srgb_block = VK_FORMAT_ASTC_12x10_SRGB_BLOCK,
+	astc_12X12_unorm_block = VK_FORMAT_ASTC_12x12_UNORM_BLOCK,
+	astc_12X12_srgb_block = VK_FORMAT_ASTC_12x12_SRGB_BLOCK,
+	g8b8g8r8_422_unorm = VK_FORMAT_G8B8G8R8_422_UNORM,
+	b8g8r8g8_422_unorm = VK_FORMAT_B8G8R8G8_422_UNORM,
+	g8_b8_r8_3plane_420_unorm = VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM,
+	g8_b8r8_2plane_420_unorm = VK_FORMAT_G8_B8R8_2PLANE_420_UNORM,
+	g8_b8_r8_3plane_422_unorm = VK_FORMAT_G8_B8_R8_3PLANE_422_UNORM,
+	g8_b8r8_2plane_422_unorm = VK_FORMAT_G8_B8R8_2PLANE_422_UNORM,
+	g8_b8_r8_3plane_444_unorm = VK_FORMAT_G8_B8_R8_3PLANE_444_UNORM,
+	r10x6_unorm_pack16 = VK_FORMAT_R10X6_UNORM_PACK16,
+	r10x6g10x6_unorm_2pack16 = VK_FORMAT_R10X6G10X6_UNORM_2PACK16,
+	r10x6g10x6b10x6a10x6_unorm_4pack16 = VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16,
+	g10x6b10x6g10x6r10x6_422_unorm_4pack16 = VK_FORMAT_G10X6B10X6G10X6R10X6_422_UNORM_4PACK16,
+	b10x6g10x6r10x6g10x6_422_unorm_4pack16 = VK_FORMAT_B10X6G10X6R10X6G10X6_422_UNORM_4PACK16,
+	g10x6_b10x6_r10x6_3plane_420_unorm_3pack16
+	= VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_420_UNORM_3PACK16,
+	g10x6_b10x6r10x6_2plane_420_unorm_3pack16 = VK_FORMAT_G10X6_B10X6R10X6_2PLANE_420_UNORM_3PACK16,
+	g10x6_b10x6_r10x6_3plane_422_unorm_3pack16
+	= VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_422_UNORM_3PACK16,
+	g10x6_b10x6r10x6_2plane_422_unorm_3pack16 = VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16,
+	g10x6_b10x6_r10x6_3plane_444_unorm_3pack16
+	= VK_FORMAT_G10X6_B10X6_R10X6_3PLANE_444_UNORM_3PACK16,
+	r12x4_unorm_pack16 = VK_FORMAT_R12X4_UNORM_PACK16,
+	r12x4g12x4_unorm_2pack16 = VK_FORMAT_R12X4G12X4_UNORM_2PACK16,
+	r12x4g12x4b12x4a12x4_unorm_4pack16 = VK_FORMAT_R12X4G12X4B12X4A12X4_UNORM_4PACK16,
+	g12x4b12x4g12x4r12x4_422_unorm_4pack16 = VK_FORMAT_G12X4B12X4G12X4R12X4_422_UNORM_4PACK16,
+	b12x4g12x4r12x4g12x4_422_unorm_4pack16 = VK_FORMAT_B12X4G12X4R12X4G12X4_422_UNORM_4PACK16,
+	g12x4_b12x4_r12x4_3plane_420_unorm_3pack16
+	= VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_420_UNORM_3PACK16,
+	g12x4_b12x4r12x4_2plane_420_unorm_3pack16 = VK_FORMAT_G12X4_B12X4R12X4_2PLANE_420_UNORM_3PACK16,
+	g12x4_b12x4_r12x4_3plane_422_unorm_3pack16
+	= VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_422_UNORM_3PACK16,
+	g12x4_b12x4r12x4_2plane_422_unorm_3pack16 = VK_FORMAT_G12X4_B12X4R12X4_2PLANE_422_UNORM_3PACK16,
+	g12x4_b12x4_r12x4_3plane_444_unorm_3pack16
+	= VK_FORMAT_G12X4_B12X4_R12X4_3PLANE_444_UNORM_3PACK16,
+	g16b16g16r16_422_unorm = VK_FORMAT_G16B16G16R16_422_UNORM,
+	b16g16r16g16_422_unorm = VK_FORMAT_B16G16R16G16_422_UNORM,
+	g16_b16_r16_3plane_420_unorm = VK_FORMAT_G16_B16_R16_3PLANE_420_UNORM,
+	g16_b16r16_2plane_420_unorm = VK_FORMAT_G16_B16R16_2PLANE_420_UNORM,
+	g16_b16_r16_3plane_422_unorm = VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM,
+	g16_b16r16_2plane_422_unorm = VK_FORMAT_G16_B16R16_2PLANE_422_UNORM,
+	g16_b16_r16_3plane_444_unorm = VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM,
+	g8_b8r8_2plane_444_unorm = VK_FORMAT_G8_B8R8_2PLANE_444_UNORM,
+	g10x6_b10x6r10x6_2plane_444_unorm_3pack16 = VK_FORMAT_G10X6_B10X6R10X6_2PLANE_444_UNORM_3PACK16,
+	g12x4_b12x4r12x4_2plane_444_unorm_3pack16 = VK_FORMAT_G12X4_B12X4R12X4_2PLANE_444_UNORM_3PACK16,
+	g16_b16r16_2plane_444_unorm = VK_FORMAT_G16_B16R16_2PLANE_444_UNORM,
+	a4r4g4b4_unorm_pack16 = VK_FORMAT_A4R4G4B4_UNORM_PACK16,
+	a4b4g4r4_unorm_pack16 = VK_FORMAT_A4B4G4R4_UNORM_PACK16,
+	astc_4X4_sfloat_block = VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK,
+	astc_5X4_sfloat_block = VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK,
+	astc_5X5_sfloat_block = VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK,
+	astc_6X5_sfloat_block = VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK,
+	astc_6X6_sfloat_block = VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK,
+	astc_8X5_sfloat_block = VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK,
+	astc_8X6_sfloat_block = VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK,
+	astc_8X8_sfloat_block = VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK,
+	astc_10X5_sfloat_block = VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK,
+	astc_10X6_sfloat_block = VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK,
+	astc_10X8_sfloat_block = VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK,
+	astc_10X10_sfloat_block = VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK,
+	astc_12X10_sfloat_block = VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK,
+	astc_12X12_sfloat_block = VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK,
+	a1b5g5r5_unorm_pack16 = VK_FORMAT_A1B5G5R5_UNORM_PACK16,
+	a8_unorm = VK_FORMAT_A8_UNORM,
+	pvrtc1_2bpp_unorm_block_img = VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG,
+	pvrtc1_4bpp_unorm_block_img = VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG,
+	pvrtc2_2bpp_unorm_block_img = VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG,
+	pvrtc2_4bpp_unorm_block_img = VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG,
+	pvrtc1_2bpp_srgb_block_img = VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG,
+	pvrtc1_4bpp_srgb_block_img = VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG,
+	pvrtc2_2bpp_srgb_block_img = VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG,
+	pvrtc2_4bpp_srgb_block_img = VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG,
+	r8_bool_arm = VK_FORMAT_R8_BOOL_ARM,
+	r16g16_sfixed5_nv = VK_FORMAT_R16G16_SFIXED5_NV,
+	r10x6_uint_pack16_arm = VK_FORMAT_R10X6_UINT_PACK16_ARM,
+	r10x6g10x6_uint_2pack16_arm = VK_FORMAT_R10X6G10X6_UINT_2PACK16_ARM,
+	r10x6g10x6b10x6a10x6_uint_4pack16_arm = VK_FORMAT_R10X6G10X6B10X6A10X6_UINT_4PACK16_ARM,
+	r12x4_uint_pack16_arm = VK_FORMAT_R12X4_UINT_PACK16_ARM,
+	r12x4g12x4_uint_2pack16_arm = VK_FORMAT_R12X4G12X4_UINT_2PACK16_ARM,
+	r12x4g12x4b12x4a12x4_uint_4pack16_arm = VK_FORMAT_R12X4G12X4B12X4A12X4_UINT_4PACK16_ARM,
+	r14x2_uint_pack16_arm = VK_FORMAT_R14X2_UINT_PACK16_ARM,
+	r14x2g14x2_uint_2pack16_arm = VK_FORMAT_R14X2G14X2_UINT_2PACK16_ARM,
+	r14x2g14x2b14x2a14x2_uint_4pack16_arm = VK_FORMAT_R14X2G14X2B14X2A14X2_UINT_4PACK16_ARM,
+	r14x2_unorm_pack16_arm = VK_FORMAT_R14X2_UNORM_PACK16_ARM,
+	r14x2g14x2_unorm_2pack16_arm = VK_FORMAT_R14X2G14X2_UNORM_2PACK16_ARM,
+	r14x2g14x2b14x2a14x2_unorm_4pack16_arm = VK_FORMAT_R14X2G14X2B14X2A14X2_UNORM_4PACK16_ARM,
+	g14x2_b14x2r14x2_2plane_420_unorm_3pack16_arm
+	= VK_FORMAT_G14X2_B14X2R14X2_2PLANE_420_UNORM_3PACK16_ARM,
+	g14x2_b14x2r14x2_2plane_422_unorm_3pack16_arm
+	= VK_FORMAT_G14X2_B14X2R14X2_2PLANE_422_UNORM_3PACK16_ARM,
+
+};
+
+/** There is no global state in Vulkan and all per-application state is stored in a VkInstance
+ * object. Creating a VkInstance object initializes the Vulkan library and allows the application to
+ * pass information about itself to the implementation.
+ */
 class Instance
 {
 public:
@@ -234,11 +561,57 @@ class Surface
 public:
 	friend class Gpu;
 
+	friend class Swapchain;
+
+	enum Transform : VkFlags
+	{
+		identity_bit = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
+		rotate_90_bit = VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR,
+		rotate_180_bit = VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR,
+		rotate_270_bit = VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR,
+		horizontal_mirror_bit = VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR,
+		horizontal_mirror_rotate_90_bit = VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR,
+		horizontal_mirror_rotate_180_bit
+		= VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR,
+		horizontal_mirror_rotate_270_bit
+		= VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR,
+		inherit_bit = VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR,
+	};
+
+	struct Format
+	{
+		::lt::renderer::vk::Format format;
+		ColorSpace color_space;
+	};
+
 	struct XlibCreateInfo
 	{
 		Display *display;
 
 		Window window;
+	};
+
+	struct Capabilities
+	{
+		std::uint32_t min_image_count;
+
+		std::uint32_t max_image_count;
+
+		math::uvec2 current_extent;
+
+		math::uvec2 min_image_extent;
+
+		math::uvec2 max_image_extent;
+
+		std::uint32_t max_image_array_layers;
+
+		std::underlying_type_t<Transform> supported_transforms;
+
+		Transform current_transform;
+
+		CompositeAlpha::T supported_composite_alpha;
+
+		VkImageUsageFlags supported_usage_flags;
 	};
 
 	Surface() = default;
@@ -261,6 +634,11 @@ public:
 	}
 
 private:
+	[[nodiscard]] auto get_vk_handle() -> VkSurfaceKHR
+	{
+		return m_surface.get();
+	}
+
 	memory::NullOnMove<VkSurfaceKHR> m_surface {};
 
 	VkInstance m_instance {};
@@ -514,8 +892,8 @@ public:
 
 	struct MemoryProperties
 	{
-		std::array<MemoryType, constants::max_memory_types> memory_types;
-		std::array<MemoryHeap, constants::max_memory_heaps> memory_heaps;
+		std::vector<MemoryType> memory_types;
+		std::vector<MemoryHeap> memory_heaps;
 	};
 
 	struct QueueFamilyProperties
@@ -559,6 +937,10 @@ public:
 	    std::uint32_t queue_family_idx
 	) const -> bool;
 
+	[[nodiscard]] auto get_surface_capabilities(Surface &surface) const -> Surface::Capabilities;
+
+	[[nodiscard]] auto get_surface_formats(Surface &surface) const -> std::vector<Surface::Format>;
+
 	[[nodiscard]] operator bool() const
 	{
 		return m_physical_device != VK_NULL_HANDLE;
@@ -569,7 +951,6 @@ private:
 
 	VkInstance m_instance {};
 };
-
 
 class Semaphore
 {
@@ -634,25 +1015,6 @@ private:
 	VkFence m_fence;
 };
 
-class Swapchain
-{
-public:
-	friend class Device;
-
-	auto operator&() -> VkSwapchainKHR *
-	{
-		return &m_swapchain;
-	}
-
-	auto VkSwapchainKHR()
-	{
-		return m_swapchain;
-	}
-
-private:
-	::VkSwapchainKHR m_swapchain;
-};
-
 class CommandBuffer
 {
 public:
@@ -671,6 +1033,9 @@ class Device
 {
 public:
 	friend class Queue;
+	friend class Swapchain;
+	friend class Image;
+	friend class ImageView;
 
 	struct CreateInfo
 	{
@@ -829,6 +1194,11 @@ public:
 	void name(T &object, const char *name);
 
 private:
+	[[nodiscard]] auto get_vk_handle() -> VkDevice
+	{
+		return m_device.get();
+	}
+
 	memory::NullOnMove<VkDevice> m_device {};
 };
 
@@ -856,7 +1226,7 @@ public:
 	{
 		Semaphore wait_semaphore;
 
-		Swapchain swapchain;
+		class Swapchain *swapchain;
 
 		uint32_t image_idx;
 	};
@@ -890,13 +1260,385 @@ private:
 	VkQueue m_queue;
 };
 
+class Image
+{
+public:
+	friend class Device;
+
+	friend class Swapchain;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
+
+	enum AspectFlags : VkFlags
+	{
+		color_bit = VK_IMAGE_ASPECT_COLOR_BIT,
+		depth_bit = VK_IMAGE_ASPECT_DEPTH_BIT,
+		stencil_bit = VK_IMAGE_ASPECT_STENCIL_BIT,
+		metadata_bit = VK_IMAGE_ASPECT_METADATA_BIT,
+		plane_0_bit = VK_IMAGE_ASPECT_PLANE_0_BIT,
+		plane_1_bit = VK_IMAGE_ASPECT_PLANE_1_BIT,
+		plane_2_bit = VK_IMAGE_ASPECT_PLANE_2_BIT,
+		none = VK_IMAGE_ASPECT_NONE,
+		memory_plane_0_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT,
+		memory_plane_1_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT,
+		memory_plane_2_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT,
+		memory_plane_3_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT,
+	};
+
+	enum Usage : VkFlags
+	{
+		transfer_src_bit = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+		transfer_dst_bit = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+		sampled_bit = VK_IMAGE_USAGE_SAMPLED_BIT,
+		storage_bit = VK_IMAGE_USAGE_STORAGE_BIT,
+		color_attachment_bit = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		depth_stencil_attachment_bit = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+		transient_attachment_bit = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
+		input_attachment_bit = VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+		host_transfer_bit = VK_IMAGE_USAGE_HOST_TRANSFER_BIT,
+		video_decode_dst_bit = VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR,
+		video_decode_src_bit = VK_IMAGE_USAGE_VIDEO_DECODE_SRC_BIT_KHR,
+		video_decode_dpb_bit = VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR,
+		fragment_density_map_bit = VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
+		fragment_shading_rate_attachment_bit
+		= VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR,
+		video_encode_dst_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR,
+		video_encode_src_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR,
+		video_encode_dpb_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR,
+		attachment_feedback_loop_bit = VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT,
+		invocation_mask_bit_huawei = VK_IMAGE_USAGE_INVOCATION_MASK_BIT_HUAWEI,
+		sample_weight_bit_qcom = VK_IMAGE_USAGE_SAMPLE_WEIGHT_BIT_QCOM,
+		sample_block_match_bit_qcom = VK_IMAGE_USAGE_SAMPLE_BLOCK_MATCH_BIT_QCOM,
+		tensor_aliasing_bit_arm = VK_IMAGE_USAGE_TENSOR_ALIASING_BIT_ARM,
+		tile_memory_bit_qcom = VK_IMAGE_USAGE_TILE_MEMORY_BIT_QCOM,
+		video_encode_quantization_delta_map_bit
+		= VK_IMAGE_USAGE_VIDEO_ENCODE_QUANTIZATION_DELTA_MAP_BIT_KHR,
+		video_encode_emphasis_map_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_EMPHASIS_MAP_BIT_KHR,
+	};
+
+	struct CreateInfo
+	{
+	};
+
+	Image() = default;
+
+	Image(Device &device, CreateInfo info);
+
+	Image(Image &&) noexcept = default;
+
+	Image(const Image &) = delete;
+
+	auto operator=(Image &&) noexcept -> Image & = default;
+
+	auto operator=(const Image &) -> Image & = delete;
+
+	~Image();
+
+private:
+	Image(VkImage image) noexcept; // for swapchain images
+
+	[[nodiscard]] auto get_vk_handle() -> VkImage
+	{
+		return m_image;
+	}
+
+	VkDevice m_device;
+
+	VkImage m_image;
+};
+
+class ImageView
+{
+public:
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
+
+	enum class Type
+	{
+
+		_1d = VK_IMAGE_VIEW_TYPE_1D,
+		_2d = VK_IMAGE_VIEW_TYPE_2D,
+		_3d = VK_IMAGE_VIEW_TYPE_3D,
+		cube = VK_IMAGE_VIEW_TYPE_CUBE,
+		_1d_array = VK_IMAGE_VIEW_TYPE_1D_ARRAY,
+		_2d_array = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+		cube_array = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY,
+	};
+
+	enum class Swizzle
+	{
+		identity = VK_COMPONENT_SWIZZLE_IDENTITY,
+		zero = VK_COMPONENT_SWIZZLE_ZERO,
+		one = VK_COMPONENT_SWIZZLE_ONE,
+		r = VK_COMPONENT_SWIZZLE_R,
+		g = VK_COMPONENT_SWIZZLE_G,
+		b = VK_COMPONENT_SWIZZLE_B,
+		a = VK_COMPONENT_SWIZZLE_A,
+	};
+
+	struct Range
+	{
+		Image::AspectFlags aspect_flags;
+		std::uint32_t base_mip_level;
+		std::uint32_t level_count;
+		std::uint32_t base_array_layer;
+		std::uint32_t layer_count;
+	};
+
+	struct CreateInfo
+	{
+		Type type;
+
+		Format format;
+
+		std::array<Swizzle, 4> components;
+
+		Range range;
+
+		std::string_view debug_name;
+	};
+
+	ImageView() = default;
+
+	ImageView(Device &device, Image &image, CreateInfo info);
+
+	ImageView(ImageView &&) = default;
+
+	ImageView(const ImageView &) = delete;
+
+	auto operator=(ImageView &&) -> ImageView & = default;
+
+	auto operator=(const ImageView &) -> ImageView & = delete;
+
+	~ImageView();
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkImageView
+	{
+		return m_image_view;
+	}
+
+	VkDevice m_device;
+
+	VkImageView m_image_view;
+};
+
+class Swapchain
+{
+public:
+	friend class Queue;
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_SWAPCHAIN_KHR;
+
+	enum class PresentMode
+	{
+		immediate = VK_PRESENT_MODE_IMMEDIATE_KHR,
+		mailbox = VK_PRESENT_MODE_MAILBOX_KHR,
+		fifo = VK_PRESENT_MODE_FIFO_KHR,
+		fifo_relaxed = VK_PRESENT_MODE_FIFO_RELAXED_KHR,
+		shared_demand_refresh = VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR,
+		shared_continuous_refresh = VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR,
+		fifo_latest_ready = VK_PRESENT_MODE_FIFO_LATEST_READY_KHR,
+	};
+
+	struct CreateInfo
+	{
+		Format format;
+
+		ColorSpace color_space;
+
+		math::uvec2 extent;
+
+		std::uint32_t min_image_count;
+
+		std::vector<uint32_t> queue_family_indices;
+
+		VkCompositeAlphaFlagBitsKHR compositeAlpha;
+
+		PresentMode present_mode;
+
+		Surface::Transform pre_transform;
+	};
+
+	Swapchain() = default;
+
+	Swapchain(Device &device, Surface &surface, CreateInfo info);
+
+	Swapchain(Swapchain &&) = default;
+
+	Swapchain(const Swapchain &) = delete;
+
+	auto operator=(Swapchain &&) -> Swapchain & = default;
+
+	auto operator=(const Swapchain &) -> Swapchain & = delete;
+
+	~Swapchain();
+
+	[[nodiscard]] auto get_images() -> std::vector<Image>;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkSwapchainKHR
+	{
+		return m_swapchain;
+	}
+
+	[[nodiscard]] auto get_addressof_vk_handle() -> VkSwapchainKHR *
+	{
+		return &m_swapchain;
+	}
+
+	VkDevice m_device;
+
+	VkSwapchainKHR m_swapchain;
+};
+
+class Buffer
+{
+public:
+	enum UsageFlags : VkFlags
+	{
+		transfer_src_bit = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		transfer_dst_bit = VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+		uniform_texel_buffer_bit = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
+		storage_texel_buffer_bit = VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT,
+		uniform_buffer_bit = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		storage_buffer_bit = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		index_buffer_bit = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		vertex_buffer_bit = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		indirect_buffer_bit = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		shader_device_address_bit = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		video_decode_src_bit = VK_BUFFER_USAGE_VIDEO_DECODE_SRC_BIT_KHR,
+		video_decode_dst_bit = VK_BUFFER_USAGE_VIDEO_DECODE_DST_BIT_KHR,
+		transform_feedback_buffer_bit = VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_BUFFER_BIT_EXT,
+		transform_feedback_counter_buffer_bit
+		= VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_COUNTER_BUFFER_BIT_EXT,
+		conditional_rendering_bit = VK_BUFFER_USAGE_CONDITIONAL_RENDERING_BIT_EXT,
+		acceleration_structure_build_input_read_only_bit
+		= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+		acceleration_structure_storage_bit = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+		shader_binding_table_bit = VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR,
+		video_encode_dst_bit = VK_BUFFER_USAGE_VIDEO_ENCODE_DST_BIT_KHR,
+		video_encode_src_bit = VK_BUFFER_USAGE_VIDEO_ENCODE_SRC_BIT_KHR,
+		sampler_descriptor_buffer_bit = VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT,
+		resource_descriptor_buffer_bit = VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT,
+		push_descriptors_descriptor_buffer_bit
+		= VK_BUFFER_USAGE_PUSH_DESCRIPTORS_DESCRIPTOR_BUFFER_BIT_EXT,
+		micromap_build_input_read_only_bit = VK_BUFFER_USAGE_MICROMAP_BUILD_INPUT_READ_ONLY_BIT_EXT,
+		micromap_storage_bit = VK_BUFFER_USAGE_MICROMAP_STORAGE_BIT_EXT,
+		tile_memory_bit_qcom = VK_BUFFER_USAGE_TILE_MEMORY_BIT_QCOM,
+	};
+
+	struct MemoryRequirements
+	{
+		std::size_t size;
+		std::size_t alignment;
+		std::uint32_t memory_type_bits;
+	};
+
+	struct CreateInfo
+	{
+		std::size_t size;
+
+		UsageFlags usage;
+
+		SharingMode sharing_mode;
+
+		std::vector<uint32_t> queue_family_indices;
+	};
+
+	Buffer(Device &device, CreateInfo info);
+
+	~Buffer();
+
+	Buffer(Buffer &&) = default;
+
+	Buffer(const Buffer &) = delete;
+
+	auto operator=(Buffer &&) -> Buffer & = default;
+
+	auto operator=(const Buffer &) -> Buffer & = delete;
+
+	[[nodiscard]] auto get_memory_requirements() const -> MemoryRequirements;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkBuffer
+	{
+		return m_buffer;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkBuffer m_buffer {};
+};
+
+class Memory
+{
+public:
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_DEVICE_MEMORY;
+
+	enum PropertyFlags : VkFlags
+	{
+		device_local_bit = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		host_visible_bit = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+		host_coherent_bit = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		host_cached_bit = VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+		lazily_allocated_bit = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT,
+		protected_bit = VK_MEMORY_PROPERTY_PROTECTED_BIT,
+		device_coherent_bit_amd = VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD,
+		device_uncached_bit_amd = VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD,
+		rdma_capable_bit_nv = VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV,
+	};
+
+	struct AllocateInfo
+	{
+		std::size_t size;
+
+		std::uint32_t memory_type_idx;
+	};
+
+	Memory(Device &device, Buffer &buffer, AllocateInfo info);
+
+	~Memory();
+
+	Memory(Memory &&) = default;
+
+	Memory(const Memory &) = delete;
+
+	auto operator=(Memory &&) -> Memory & = default;
+
+	auto operator=(const Memory &) -> Memory & = delete;
+
+	[[nodiscard]] auto map(std::size_t size, std::size_t offset) -> std::span<std::byte>;
+
+	void unmap();
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkDeviceMemory
+	{
+		return m_memory;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkDeviceMemory m_memory {};
+};
+
 } // namespace lt::renderer::vk
 
 
 /** ================================ **/
 /** Private Template Implementations **/
 /** ================================ **/
-PFN_vkSetDebugUtilsObjectNameEXT vk_set_debug_object_name {}; // NOLINT
+using namespace lt::renderer::vk;
+
+namespace api {
+PFN_vkSetDebugUtilsObjectNameEXT set_debug_object_name {}; // NOLINT
+}
+
 namespace lt::renderer::vk {
 
 void vkc(VkResult result)
@@ -920,7 +1662,7 @@ void Device::name(T &object, std::format_string<Args...> fmt, Args &&...args)
 		.pObjectName = name.c_str(),
 	};
 
-	vkc(vk_set_debug_object_name(m_device, &info));
+	vkc(api::set_debug_object_name(m_device, &info));
 }
 
 template<typename T>
@@ -933,7 +1675,7 @@ void Device::name(T &object, const char *name)
 		.pObjectName = name,
 	};
 
-	vkc(vk_set_debug_object_name(m_device, &info));
+	vkc(api::set_debug_object_name(m_device, &info));
 }
 
 } // namespace lt::renderer::vk
@@ -941,115 +1683,115 @@ void Device::name(T &object, const char *name)
 module :private;
 using namespace lt::renderer::vk;
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+namespace api {
 // global functions
-PFN_vkGetInstanceProcAddr vk_get_instance_proc_address {};
-PFN_vkCreateInstance vk_create_instance {};
-PFN_vkEnumerateInstanceExtensionProperties vk_enumerate_instance_extension_properties {};
-PFN_vkEnumerateInstanceLayerProperties vk_enumerate_instance_layer_properties {};
+PFN_vkGetInstanceProcAddr get_instance_proc_address {};
+PFN_vkCreateInstance create_instance {};
+PFN_vkEnumerateInstanceExtensionProperties enumerate_instance_extension_properties {};
+PFN_vkEnumerateInstanceLayerProperties enumerate_instance_layer_properties {};
 
 // instance functions
-PFN_vkDestroyInstance vk_destroy_instance {};
-PFN_vkEnumeratePhysicalDevices vk_enumerate_physical_devices {};
+PFN_vkDestroyInstance destroy_instance {};
+PFN_vkEnumeratePhysicalDevices enumerate_physical_devices {};
 
-PFN_vkGetPhysicalDeviceProperties vk_get_physical_device_properties {};
-PFN_vkGetPhysicalDeviceQueueFamilyProperties vk_get_physical_device_queue_family_properties {};
-PFN_vkCreateDevice vk_create_device {};
-PFN_vkGetDeviceProcAddr vk_get_device_proc_address {};
-PFN_vkDestroyDevice vk_destroy_device {};
-PFN_vkGetPhysicalDeviceFeatures2 vk_get_physical_device_features {};
-PFN_vkEnumerateDeviceExtensionProperties vk_enumerate_device_extension_properties {};
-PFN_vkGetPhysicalDeviceMemoryProperties vk_get_physical_device_memory_properties {};
+PFN_vkGetPhysicalDeviceProperties get_physical_device_properties {};
+PFN_vkGetPhysicalDeviceQueueFamilyProperties get_physical_device_queue_family_properties {};
+PFN_vkCreateDevice create_device {};
+PFN_vkGetDeviceProcAddr get_device_proc_address {};
+PFN_vkDestroyDevice destroy_device {};
+PFN_vkGetPhysicalDeviceFeatures2 get_physical_device_features {};
+PFN_vkEnumerateDeviceExtensionProperties enumerate_device_extension_properties {};
+PFN_vkGetPhysicalDeviceMemoryProperties get_physical_device_memory_properties {};
 
 // extension instance functions
-PFN_vkCmdBeginDebugUtilsLabelEXT vk_cmd_begin_debug_label {};
-PFN_vkCmdEndDebugUtilsLabelEXT vk_cmd_end_debug_label {};
-PFN_vkCmdInsertDebugUtilsLabelEXT vk_cmd_insert_debug_label {};
-PFN_vkCreateDebugUtilsMessengerEXT vk_create_debug_messenger {};
-PFN_vkDestroyDebugUtilsMessengerEXT vk_destroy_debug_messenger {};
-PFN_vkQueueBeginDebugUtilsLabelEXT vk_queue_begin_debug_label {};
-PFN_vkQueueEndDebugUtilsLabelEXT vk_queue_end_debug_label {};
-PFN_vkQueueInsertDebugUtilsLabelEXT vk_queue_insert_debug_label {};
-PFN_vkSetDebugUtilsObjectTagEXT vk_set_debug_object_tag {};
-PFN_vkSubmitDebugUtilsMessageEXT vk_submit_debug_message {};
+PFN_vkCmdBeginDebugUtilsLabelEXT cmd_begin_debug_label {};
+PFN_vkCmdEndDebugUtilsLabelEXT cmd_end_debug_label {};
+PFN_vkCmdInsertDebugUtilsLabelEXT cmd_insert_debug_label {};
+PFN_vkCreateDebugUtilsMessengerEXT create_debug_messenger {};
+PFN_vkDestroyDebugUtilsMessengerEXT destroy_debug_messenger {};
+PFN_vkQueueBeginDebugUtilsLabelEXT queue_begin_debug_label {};
+PFN_vkQueueEndDebugUtilsLabelEXT queue_end_debug_label {};
+PFN_vkQueueInsertDebugUtilsLabelEXT queue_insert_debug_label {};
+PFN_vkSetDebugUtilsObjectTagEXT set_debug_object_tag {};
+PFN_vkSubmitDebugUtilsMessageEXT submit_debug_message {};
 
 // surface instance functions
-PFN_vkGetPhysicalDeviceSurfaceSupportKHR vk_get_physical_device_surface_support {};
-PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vk_get_physical_device_surface_capabilities {};
-PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vk_get_physical_device_surface_formats {};
+PFN_vkGetPhysicalDeviceSurfaceSupportKHR get_physical_device_surface_support {};
+PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR get_physical_device_surface_capabilities {};
+PFN_vkGetPhysicalDeviceSurfaceFormatsKHR get_physical_device_surface_formats {};
 
 // device functions
-PFN_vkGetDeviceQueue vk_get_device_queue {};
-PFN_vkCreateCommandPool vk_create_command_pool {};
-PFN_vkDestroyCommandPool vk_destroy_command_pool {};
-PFN_vkAllocateCommandBuffers vk_allocate_command_buffers {};
-PFN_vkFreeCommandBuffers vk_free_command_buffers {};
-PFN_vkBeginCommandBuffer vk_begin_command_buffer {};
-PFN_vkEndCommandBuffer vk_end_command_buffer {};
-PFN_vkCmdPipelineBarrier vk_cmd_pipeline_barrier {};
-PFN_vkQueueSubmit vk_queue_submit {};
-PFN_vkQueueWaitIdle vk_queue_wait_idle {};
-PFN_vkDeviceWaitIdle vk_device_wait_idle {};
-PFN_vkCreateFence vk_create_fence {};
-PFN_vkDestroyFence vk_destroy_fence {};
-PFN_vkWaitForFences vk_wait_for_fences {};
-PFN_vkResetFences vk_reset_fences {};
-PFN_vkCreateSemaphore vk_create_semaphore {};
-PFN_vkDestroySemaphore vk_destroy_semaphore {};
-PFN_vkCreateSwapchainKHR vk_create_swapchain_khr {};
-PFN_vkDestroySwapchainKHR vk_destroy_swapchain_khr {};
-PFN_vkGetSwapchainImagesKHR vk_get_swapchain_images_khr {};
-PFN_vkAcquireNextImageKHR vk_acquire_next_image_khr {};
-PFN_vkQueuePresentKHR vk_queue_present_khr {};
-PFN_vkCreateImageView vk_create_image_view {};
-PFN_vkDestroyImageView vk_destroy_image_view {};
-PFN_vkCreateRenderPass vk_create_render_pass {};
-PFN_vkDestroyRenderPass vk_destroy_render_pass {};
-PFN_vkCreateFramebuffer vk_create_frame_buffer {};
-PFN_vkDestroyFramebuffer vk_destroy_frame_buffer {};
-PFN_vkCreateShaderModule vk_create_shader_module {};
-PFN_vkDestroyShaderModule vk_destroy_shader_module {};
-PFN_vkCreatePipelineLayout vk_create_pipeline_layout {};
-PFN_vkDestroyPipelineLayout vk_destroy_pipeline_layout {};
-PFN_vkCreateGraphicsPipelines vk_create_graphics_pipelines {};
-PFN_vkDestroyPipeline vk_destroy_pipeline {};
-PFN_vkCmdBeginRenderPass vk_cmd_begin_render_pass {};
-PFN_vkCmdEndRenderPass vk_cmd_end_render_pass {};
-PFN_vkCmdBindPipeline vk_cmd_bind_pipeline {};
-PFN_vkCmdDraw vk_cmd_draw {};
-PFN_vkCmdSetViewport vk_cmd_set_viewport {};
-PFN_vkCmdSetScissor vk_cmd_set_scissors {};
-PFN_vkCmdPushConstants vk_cmd_push_constants {};
-PFN_vkCmdCopyBuffer vk_cmd_copy_buffer {};
+PFN_vkGetDeviceQueue get_device_queue {};
+PFN_vkCreateCommandPool create_command_pool {};
+PFN_vkDestroyCommandPool destroy_command_pool {};
+PFN_vkAllocateCommandBuffers allocate_command_buffers {};
+PFN_vkFreeCommandBuffers free_command_buffers {};
+PFN_vkBeginCommandBuffer begin_command_buffer {};
+PFN_vkEndCommandBuffer end_command_buffer {};
+PFN_vkCmdPipelineBarrier cmd_pipeline_barrier {};
+PFN_vkQueueSubmit queue_submit {};
+PFN_vkQueueWaitIdle queue_wait_idle {};
+PFN_vkDeviceWaitIdle device_wait_idle {};
+PFN_vkCreateFence create_fence {};
+PFN_vkDestroyFence destroy_fence {};
+PFN_vkWaitForFences wait_for_fences {};
+PFN_vkResetFences reset_fences {};
+PFN_vkCreateSemaphore create_semaphore {};
+PFN_vkDestroySemaphore destroy_semaphore {};
+PFN_vkCreateSwapchainKHR create_swapchain_khr {};
+PFN_vkDestroySwapchainKHR destroy_swapchain_khr {};
+PFN_vkGetSwapchainImagesKHR get_swapchain_images_khr {};
+PFN_vkAcquireNextImageKHR acquire_next_image_khr {};
+PFN_vkQueuePresentKHR queue_present_khr {};
+PFN_vkCreateImage create_image {};
+PFN_vkDestroyImage destroy_image {};
+PFN_vkCreateImageView create_image_view {};
+PFN_vkDestroyImageView destroy_image_view {};
+PFN_vkCreateRenderPass create_render_pass {};
+PFN_vkDestroyRenderPass destroy_render_pass {};
+PFN_vkCreateFramebuffer create_frame_buffer {};
+PFN_vkDestroyFramebuffer destroy_frame_buffer {};
+PFN_vkCreateShaderModule create_shader_module {};
+PFN_vkDestroyShaderModule destroy_shader_module {};
+PFN_vkCreatePipelineLayout create_pipeline_layout {};
+PFN_vkDestroyPipelineLayout destroy_pipeline_layout {};
+PFN_vkCreateGraphicsPipelines create_graphics_pipelines {};
+PFN_vkDestroyPipeline destroy_pipeline {};
+PFN_vkCmdBeginRenderPass cmd_begin_render_pass {};
+PFN_vkCmdEndRenderPass cmd_end_render_pass {};
+PFN_vkCmdBindPipeline cmd_bind_pipeline {};
+PFN_vkCmdDraw cmd_draw {};
+PFN_vkCmdSetViewport cmd_set_viewport {};
+PFN_vkCmdSetScissor cmd_set_scissors {};
+PFN_vkCmdPushConstants cmd_push_constants {};
+PFN_vkCmdCopyBuffer cmd_copy_buffer {};
 
-PFN_vkCreateDescriptorSetLayout vk_create_descriptor_set_layout {};
-PFN_vkDestroyDescriptorSetLayout vk_destroy_descriptor_set_layout {};
-PFN_vkCreateDescriptorPool vk_create_descriptor_pool {};
-PFN_vkDestroyDescriptorPool vk_destroy_descriptor_pool {};
-PFN_vkAllocateDescriptorSets vk_allocate_descriptor_sets {};
-PFN_vkFreeDescriptorSets vk_free_descriptor_sets {};
+PFN_vkCreateDescriptorSetLayout create_descriptor_set_layout {};
+PFN_vkDestroyDescriptorSetLayout destroy_descriptor_set_layout {};
+PFN_vkCreateDescriptorPool create_descriptor_pool {};
+PFN_vkDestroyDescriptorPool destroy_descriptor_pool {};
+PFN_vkAllocateDescriptorSets allocate_descriptor_sets {};
+PFN_vkFreeDescriptorSets free_descriptor_sets {};
 
-PFN_vkCreateBuffer vk_create_buffer {};
-PFN_vkDestroyBuffer vk_destroy_buffer {};
-PFN_vkGetBufferMemoryRequirements vk_get_buffer_memory_requirements {};
-PFN_vkAllocateMemory vk_allocate_memory {};
-PFN_vkBindBufferMemory vk_bind_buffer_memory {};
-PFN_vkMapMemory vk_map_memory {};
-PFN_vkUnmapMemory vk_unmap_memory {};
-PFN_vkFreeMemory vk_free_memory {};
+PFN_vkCreateBuffer create_buffer {};
+PFN_vkDestroyBuffer destroy_buffer {};
+PFN_vkGetBufferMemoryRequirements get_buffer_memory_requirements {};
+PFN_vkAllocateMemory allocate_memory {};
+PFN_vkBindBufferMemory bind_buffer_memory {};
+PFN_vkMapMemory map_memory {};
+PFN_vkUnmapMemory unmap_memory {};
+PFN_vkFreeMemory free_memory {};
 
-PFN_vkResetCommandBuffer vk_reset_command_buffer {};
+PFN_vkResetCommandBuffer reset_command_buffer {};
 
-PFN_vkCmdBeginRendering vk_cmd_begin_rendering {};
-PFN_vkCmdEndRendering vk_cmd_end_rendering {};
+PFN_vkCmdBeginRendering cmd_begin_rendering {};
+PFN_vkCmdEndRendering cmd_end_rendering {};
 
-PFN_vkCreateXlibSurfaceKHR vk_create_xlib_surface_khr {};
-PFN_vkDestroySurfaceKHR vk_destroy_surface_khr {};
-// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+PFN_vkCreateXlibSurfaceKHR create_xlib_surface_khr {};
+PFN_vkDestroySurfaceKHR destroy_surface_khr {};
+} // namespace api
 
-namespace {
 void *library = nullptr; // NOLINT
-}
 
 void load_library()
 {
@@ -1062,11 +1804,11 @@ void load_library()
 	lt::debug::ensure(library, "Failed to dlopen vulkan library");
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-	vk_get_instance_proc_address = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
+	api::get_instance_proc_address = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
 	    dlsym(library, "vkGetInstanceProcAddr")
 	);
 	lt::debug::ensure(
-	    vk_get_instance_proc_address,
+	    api::get_instance_proc_address,
 	    "Failed to load vulkan function: vkGetInstanceProcAddr"
 	);
 }
@@ -1091,126 +1833,127 @@ void load_global_functions()
 {
 	constexpr auto load_fn = []<typename T>(T &pfn, const char *fn_name) {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		pfn = reinterpret_cast<T>(vk_get_instance_proc_address(nullptr, fn_name));
+		pfn = reinterpret_cast<T>(api::get_instance_proc_address(nullptr, fn_name));
 		lt::debug::ensure(pfn, "Failed to load vulkan global function: {}", fn_name);
 		// log::trace("Loaded global function: {}", fn_name);
 	};
 
-	load_fn(vk_create_instance, "vkCreateInstance");
-	load_fn(vk_enumerate_instance_extension_properties, "vkEnumerateInstanceExtensionProperties");
-	load_fn(vk_enumerate_instance_layer_properties, "vkEnumerateInstanceLayerProperties");
+	load_fn(api::create_instance, "vkCreateInstance");
+	load_fn(api::enumerate_instance_extension_properties, "vkEnumerateInstanceExtensionProperties");
+	load_fn(api::enumerate_instance_layer_properties, "vkEnumerateInstanceLayerProperties");
 }
 
 void Instance::load_functions()
 {
 	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
-		pfn = std::bit_cast<T>(vk_get_instance_proc_address(m_instance, fn_name));
+		pfn = std::bit_cast<T>(api::get_instance_proc_address(m_instance, fn_name));
 		lt::debug::ensure(pfn, "Failed to load vulkan instance function: {}", fn_name);
 	};
 
-	load_fn(vk_destroy_instance, "vkDestroyInstance");
-	load_fn(vk_enumerate_physical_devices, "vkEnumeratePhysicalDevices");
-	load_fn(vk_get_physical_device_properties, "vkGetPhysicalDeviceProperties");
+	load_fn(api::destroy_instance, "vkDestroyInstance");
+	load_fn(api::enumerate_physical_devices, "vkEnumeratePhysicalDevices");
+	load_fn(api::get_physical_device_properties, "vkGetPhysicalDeviceProperties");
 	load_fn(
-	    vk_get_physical_device_queue_family_properties,
+	    api::get_physical_device_queue_family_properties,
 	    "vkGetPhysicalDeviceQueueFamilyProperties"
 	);
-	load_fn(vk_create_device, "vkCreateDevice");
-	load_fn(vk_get_device_proc_address, "vkGetDeviceProcAddr");
-	load_fn(vk_destroy_device, "vkDestroyDevice");
-	load_fn(vk_get_physical_device_features, "vkGetPhysicalDeviceFeatures");
-	load_fn(vk_enumerate_device_extension_properties, "vkEnumerateDeviceExtensionProperties");
-	load_fn(vk_get_physical_device_memory_properties, "vkGetPhysicalDeviceMemoryProperties");
+	load_fn(api::create_device, "vkCreateDevice");
+	load_fn(api::get_device_proc_address, "vkGetDeviceProcAddr");
+	load_fn(api::destroy_device, "vkDestroyDevice");
+	load_fn(api::get_physical_device_features, "vkGetPhysicalDeviceFeatures");
+	load_fn(api::enumerate_device_extension_properties, "vkEnumerateDeviceExtensionProperties");
+	load_fn(api::get_physical_device_memory_properties, "vkGetPhysicalDeviceMemoryProperties");
 
-	load_fn(vk_cmd_begin_debug_label, "vkCmdBeginDebugUtilsLabelEXT");
-	load_fn(vk_cmd_end_debug_label, "vkCmdEndDebugUtilsLabelEXT");
-	load_fn(vk_cmd_insert_debug_label, "vkCmdInsertDebugUtilsLabelEXT");
-	load_fn(vk_create_debug_messenger, "vkCreateDebugUtilsMessengerEXT");
-	load_fn(vk_destroy_debug_messenger, "vkDestroyDebugUtilsMessengerEXT");
-	load_fn(vk_queue_begin_debug_label, "vkQueueBeginDebugUtilsLabelEXT");
-	load_fn(vk_queue_end_debug_label, "vkQueueEndDebugUtilsLabelEXT");
-	load_fn(vk_queue_insert_debug_label, "vkQueueInsertDebugUtilsLabelEXT");
-	load_fn(vk_set_debug_object_name, "vkSetDebugUtilsObjectNameEXT");
-	load_fn(vk_set_debug_object_tag, "vkSetDebugUtilsObjectTagEXT");
-	load_fn(vk_submit_debug_message, "vkSubmitDebugUtilsMessageEXT");
+	load_fn(api::cmd_begin_debug_label, "vkCmdBeginDebugUtilsLabelEXT");
+	load_fn(api::cmd_end_debug_label, "vkCmdEndDebugUtilsLabelEXT");
+	load_fn(api::cmd_insert_debug_label, "vkCmdInsertDebugUtilsLabelEXT");
+	load_fn(api::create_debug_messenger, "vkCreateDebugUtilsMessengerEXT");
+	load_fn(api::destroy_debug_messenger, "vkDestroyDebugUtilsMessengerEXT");
+	load_fn(api::queue_begin_debug_label, "vkQueueBeginDebugUtilsLabelEXT");
+	load_fn(api::queue_end_debug_label, "vkQueueEndDebugUtilsLabelEXT");
+	load_fn(api::queue_insert_debug_label, "vkQueueInsertDebugUtilsLabelEXT");
+	load_fn(api::set_debug_object_name, "vkSetDebugUtilsObjectNameEXT");
+	load_fn(api::set_debug_object_tag, "vkSetDebugUtilsObjectTagEXT");
+	load_fn(api::submit_debug_message, "vkSubmitDebugUtilsMessageEXT");
 
-	load_fn(vk_get_physical_device_surface_support, "vkGetPhysicalDeviceSurfaceSupportKHR");
+	load_fn(api::get_physical_device_surface_support, "vkGetPhysicalDeviceSurfaceSupportKHR");
 	load_fn(
-	    vk_get_physical_device_surface_capabilities,
+	    api::get_physical_device_surface_capabilities,
 	    "vkGetPhysicalDeviceSurfaceCapabilitiesKHR"
 	);
-	load_fn(vk_get_physical_device_surface_formats, "vkGetPhysicalDeviceSurfaceFormatsKHR");
-	load_fn(vk_create_xlib_surface_khr, "vkCreateXlibSurfaceKHR");
-	load_fn(vk_destroy_surface_khr, "vkDestroySurfaceKHR");
+	load_fn(api::get_physical_device_surface_formats, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+	load_fn(api::create_xlib_surface_khr, "vkCreateXlibSurfaceKHR");
+	load_fn(api::destroy_surface_khr, "vkDestroySurfaceKHR");
 }
 
 void Device::load_functions()
 {
 	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
-		pfn = std::bit_cast<T>(vk_get_device_proc_address(m_device, fn_name));
+		pfn = std::bit_cast<T>(api::get_device_proc_address(m_device, fn_name));
 		lt::debug::ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
 	};
 
-	load_fn(vk_get_device_queue, "vkGetDeviceQueue");
-	load_fn(vk_create_command_pool, "vkCreateCommandPool");
-	load_fn(vk_destroy_command_pool, "vkDestroyCommandPool");
-	load_fn(vk_allocate_command_buffers, "vkAllocateCommandBuffers");
-	load_fn(vk_free_command_buffers, "vkFreeCommandBuffers");
-	load_fn(vk_begin_command_buffer, "vkBeginCommandBuffer");
-	load_fn(vk_end_command_buffer, "vkEndCommandBuffer");
-	load_fn(vk_cmd_pipeline_barrier, "vkCmdPipelineBarrier");
-	load_fn(vk_queue_submit, "vkQueueSubmit");
-	load_fn(vk_queue_wait_idle, "vkQueueWaitIdle");
-	load_fn(vk_device_wait_idle, "vkDeviceWaitIdle");
-	load_fn(vk_create_fence, "vkCreateFence");
-	load_fn(vk_destroy_fence, "vkDestroyFence");
-	load_fn(vk_wait_for_fences, "vkWaitForFences");
-	load_fn(vk_reset_fences, "vkResetFences");
-	load_fn(vk_create_semaphore, "vkCreateSemaphore");
-	load_fn(vk_destroy_semaphore, "vkDestroySemaphore");
-	load_fn(vk_create_swapchain_khr, "vkCreateSwapchainKHR");
-	load_fn(vk_destroy_swapchain_khr, "vkDestroySwapchainKHR");
-	load_fn(vk_get_swapchain_images_khr, "vkGetSwapchainImagesKHR");
-	load_fn(vk_acquire_next_image_khr, "vkAcquireNextImageKHR");
-	load_fn(vk_queue_present_khr, "vkQueuePresentKHR");
-	load_fn(vk_create_image_view, "vkCreateImageView");
-	load_fn(vk_destroy_image_view, "vkDestroyImageView");
-	load_fn(vk_create_render_pass, "vkCreateRenderPass");
-	load_fn(vk_destroy_render_pass, "vkDestroyRenderPass");
-	load_fn(vk_create_frame_buffer, "vkCreateFramebuffer");
-	load_fn(vk_destroy_frame_buffer, "vkDestroyFramebuffer");
-	load_fn(vk_create_shader_module, "vkCreateShaderModule");
-	load_fn(vk_destroy_shader_module, "vkDestroyShaderModule");
-	load_fn(vk_create_pipeline_layout, "vkCreatePipelineLayout");
-	load_fn(vk_destroy_pipeline_layout, "vkDestroyPipelineLayout");
-	load_fn(vk_create_graphics_pipelines, "vkCreateGraphicsPipelines");
-	load_fn(vk_destroy_pipeline, "vkDestroyPipeline");
-	load_fn(vk_cmd_begin_render_pass, "vkCmdBeginRenderPass");
-	load_fn(vk_cmd_end_render_pass, "vkCmdEndRenderPass");
-	load_fn(vk_cmd_bind_pipeline, "vkCmdBindPipeline");
-	load_fn(vk_cmd_draw, "vkCmdDraw");
-	load_fn(vk_cmd_set_viewport, "vkCmdSetViewport");
-	load_fn(vk_cmd_set_scissors, "vkCmdSetScissor");
-	load_fn(vk_cmd_push_constants, "vkCmdPushConstants");
-	load_fn(vk_cmd_copy_buffer, "vkCmdCopyBuffer");
-	load_fn(vk_create_descriptor_set_layout, "vkCreateDescriptorSetLayout");
-	load_fn(vk_destroy_descriptor_set_layout, "vkDestroyDescriptorSetLayout");
-	load_fn(vk_create_descriptor_pool, "vkCreateDescriptorPool");
-	load_fn(vk_destroy_descriptor_pool, "vkDestroyDescriptorPool");
-	load_fn(vk_allocate_descriptor_sets, "vkAllocateDescriptorSets");
-	load_fn(vk_free_descriptor_sets, "vkFreeDescriptorSets");
-	load_fn(vk_create_buffer, "vkCreateBuffer");
-	load_fn(vk_destroy_buffer, "vkDestroyBuffer");
-	load_fn(vk_allocate_memory, "vkAllocateMemory");
-	load_fn(vk_bind_buffer_memory, "vkBindBufferMemory");
-	load_fn(vk_map_memory, "vkMapMemory");
-	load_fn(vk_unmap_memory, "vkUnmapMemory");
-	load_fn(vk_free_memory, "vkFreeMemory");
-	load_fn(vk_get_buffer_memory_requirements, "vkGetBufferMemoryRequirements");
-	load_fn(vk_reset_command_buffer, "vkResetCommandBuffer");
-
-	load_fn(vk_cmd_begin_rendering, "vkCmdBeginRendering");
-	load_fn(vk_cmd_end_rendering, "vkCmdEndRendering");
+	load_fn(api::get_device_queue, "vkGetDeviceQueue");
+	load_fn(api::create_command_pool, "vkCreateCommandPool");
+	load_fn(api::destroy_command_pool, "vkDestroyCommandPool");
+	load_fn(api::allocate_command_buffers, "vkAllocateCommandBuffers");
+	load_fn(api::free_command_buffers, "vkFreeCommandBuffers");
+	load_fn(api::begin_command_buffer, "vkBeginCommandBuffer");
+	load_fn(api::end_command_buffer, "vkEndCommandBuffer");
+	load_fn(api::cmd_pipeline_barrier, "vkCmdPipelineBarrier");
+	load_fn(api::queue_submit, "vkQueueSubmit");
+	load_fn(api::queue_wait_idle, "vkQueueWaitIdle");
+	load_fn(api::device_wait_idle, "vkDeviceWaitIdle");
+	load_fn(api::create_fence, "vkCreateFence");
+	load_fn(api::destroy_fence, "vkDestroyFence");
+	load_fn(api::wait_for_fences, "vkWaitForFences");
+	load_fn(api::reset_fences, "vkResetFences");
+	load_fn(api::create_semaphore, "vkCreateSemaphore");
+	load_fn(api::destroy_semaphore, "vkDestroySemaphore");
+	load_fn(api::create_swapchain_khr, "vkCreateSwapchainKHR");
+	load_fn(api::destroy_swapchain_khr, "vkDestroySwapchainKHR");
+	load_fn(api::get_swapchain_images_khr, "vkGetSwapchainImagesKHR");
+	load_fn(api::acquire_next_image_khr, "vkAcquireNextImageKHR");
+	load_fn(api::queue_present_khr, "vkQueuePresentKHR");
+	load_fn(api::create_image, "vkCreateImage");
+	load_fn(api::destroy_image, "vkDestroyImage");
+	load_fn(api::create_image_view, "vkCreateImageView");
+	load_fn(api::destroy_image_view, "vkDestroyImageView");
+	load_fn(api::create_render_pass, "vkCreateRenderPass");
+	load_fn(api::destroy_render_pass, "vkDestroyRenderPass");
+	load_fn(api::create_frame_buffer, "vkCreateFramebuffer");
+	load_fn(api::destroy_frame_buffer, "vkDestroyFramebuffer");
+	load_fn(api::create_shader_module, "vkCreateShaderModule");
+	load_fn(api::destroy_shader_module, "vkDestroyShaderModule");
+	load_fn(api::create_pipeline_layout, "vkCreatePipelineLayout");
+	load_fn(api::destroy_pipeline_layout, "vkDestroyPipelineLayout");
+	load_fn(api::create_graphics_pipelines, "vkCreateGraphicsPipelines");
+	load_fn(api::destroy_pipeline, "vkDestroyPipeline");
+	load_fn(api::cmd_begin_render_pass, "vkCmdBeginRenderPass");
+	load_fn(api::cmd_end_render_pass, "vkCmdEndRenderPass");
+	load_fn(api::cmd_bind_pipeline, "vkCmdBindPipeline");
+	load_fn(api::cmd_draw, "vkCmdDraw");
+	load_fn(api::cmd_set_viewport, "vkCmdSetViewport");
+	load_fn(api::cmd_set_scissors, "vkCmdSetScissor");
+	load_fn(api::cmd_push_constants, "vkCmdPushConstants");
+	load_fn(api::cmd_copy_buffer, "vkCmdCopyBuffer");
+	load_fn(api::create_descriptor_set_layout, "vkCreateDescriptorSetLayout");
+	load_fn(api::destroy_descriptor_set_layout, "vkDestroyDescriptorSetLayout");
+	load_fn(api::create_descriptor_pool, "vkCreateDescriptorPool");
+	load_fn(api::destroy_descriptor_pool, "vkDestroyDescriptorPool");
+	load_fn(api::allocate_descriptor_sets, "vkAllocateDescriptorSets");
+	load_fn(api::free_descriptor_sets, "vkFreeDescriptorSets");
+	load_fn(api::create_buffer, "vkCreateBuffer");
+	load_fn(api::destroy_buffer, "vkDestroyBuffer");
+	load_fn(api::allocate_memory, "vkAllocateMemory");
+	load_fn(api::bind_buffer_memory, "vkBindBufferMemory");
+	load_fn(api::map_memory, "vkMapMemory");
+	load_fn(api::unmap_memory, "vkUnmapMemory");
+	load_fn(api::free_memory, "vkFreeMemory");
+	load_fn(api::get_buffer_memory_requirements, "vkGetBufferMemoryRequirements");
+	load_fn(api::reset_command_buffer, "vkResetCommandBuffer");
+	load_fn(api::cmd_begin_rendering, "vkCmdBeginRendering");
+	load_fn(api::cmd_end_rendering, "vkCmdEndRendering");
 }
 
 Instance::Instance(CreateInfo info)
@@ -1264,7 +2007,7 @@ Instance::Instance(CreateInfo info)
 		.ppEnabledExtensionNames = extension_names.data(),
 	};
 
-	vkc(vk_create_instance(&vk_info, nullptr, &m_instance));
+	vkc(api::create_instance(&vk_info, nullptr, &m_instance));
 	debug::ensure(m_instance, "Failed to create vulkan instance");
 }
 
@@ -1279,24 +2022,23 @@ Surface::Surface(const Instance &instance, const XlibCreateInfo &info)
 		.window = info.window,
 	};
 
-	vkc(vk_create_xlib_surface_khr(instance.m_instance, &vk_info, nullptr, &m_surface));
+	vkc(api::create_xlib_surface_khr(instance.m_instance, &vk_info, nullptr, &m_surface));
 }
 
 Surface::~Surface()
 {
-	vk_destroy_surface_khr(m_instance, m_surface, nullptr);
+	api::destroy_surface_khr(m_instance, m_surface, nullptr);
 }
-
 
 [[nodiscard]]
 /* static */ auto Gpu::enumerate(const Instance &instance) -> std::vector<Gpu>
 {
 	auto count = 0u;
-	vkc(vk_enumerate_physical_devices(instance.m_instance, &count, nullptr));
+	vkc(api::enumerate_physical_devices(instance.m_instance, &count, nullptr));
 	debug::ensure(count != 0u, "Failed to find any gpus with Vulkan support");
 
 	auto vk_gpus = std::vector<VkPhysicalDevice>(count);
-	vkc(vk_enumerate_physical_devices(instance.m_instance, &count, vk_gpus.data()));
+	vkc(api::enumerate_physical_devices(instance.m_instance, &count, vk_gpus.data()));
 
 	auto gpus = std::vector<Gpu>(count);
 	for (auto [vk_gpu, gpu] : std::views::zip(vk_gpus, gpus))
@@ -1313,7 +2055,7 @@ Surface::~Surface()
 	auto features_2 = VkPhysicalDeviceFeatures2 {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
 	};
-	vk_get_physical_device_features(m_physical_device, &features_2);
+	api::get_physical_device_features(m_physical_device, &features_2);
 	const auto features = features_2.features;
 
 	return Features {
@@ -1388,7 +2130,7 @@ Surface::~Surface()
 		.pNext = &features,
 	};
 
-	vk_get_physical_device_features(m_physical_device, &features_2);
+	api::get_physical_device_features(m_physical_device, &features_2);
 	return DynamicRenderingFeatures {
 		.enabled = !!features.dynamicRendering,
 	};
@@ -1406,7 +2148,7 @@ Surface::~Surface()
 		.pNext = &features,
 	};
 
-	vk_get_physical_device_features(m_physical_device, &features_2);
+	api::get_physical_device_features(m_physical_device, &features_2);
 	return DescriptorIndexingFeatures {
 		// clang-format off
 		.shader_input_attachment_array_dynamic_indexing = features.shaderInputAttachmentArrayDynamicIndexing,
@@ -1436,7 +2178,7 @@ Surface::~Surface()
 [[nodiscard]] auto Gpu::get_properties() const -> Properties
 {
 	auto vk_properties = VkPhysicalDeviceProperties {};
-	vk_get_physical_device_properties(m_physical_device, &vk_properties);
+	api::get_physical_device_properties(m_physical_device, &vk_properties);
 
 	auto properties = Gpu::Properties {
 		.api_version = vk_properties.apiVersion,
@@ -1591,16 +2333,18 @@ Surface::~Surface()
 [[nodiscard]] auto Gpu::get_memory_properties() const -> MemoryProperties
 {
 	auto vk_memory_properties = VkPhysicalDeviceMemoryProperties {};
-	vk_get_physical_device_memory_properties(m_physical_device, &vk_memory_properties);
+	api::get_physical_device_memory_properties(m_physical_device, &vk_memory_properties);
 
 	auto memory_properties = MemoryProperties {};
 
+	memory_properties.memory_heaps.resize(vk_memory_properties.memoryHeapCount);
 	std::memcpy(
 	    memory_properties.memory_heaps.data(),
 	    static_cast<VkMemoryHeap *>(vk_memory_properties.memoryHeaps),
 	    sizeof(VkMemoryHeap) * vk_memory_properties.memoryHeapCount
 	);
 
+	memory_properties.memory_types.resize(vk_memory_properties.memoryTypeCount);
 	std::memcpy(
 	    memory_properties.memory_types.data(),
 	    static_cast<VkMemoryType *>(vk_memory_properties.memoryTypes),
@@ -1614,10 +2358,14 @@ Surface::~Surface()
 {
 	auto count = std::uint32_t {};
 
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, {});
+	api::get_physical_device_queue_family_properties(m_physical_device, &count, {});
 
 	auto vk_properties = std::vector<VkQueueFamilyProperties>(count);
-	vk_get_physical_device_queue_family_properties(m_physical_device, &count, vk_properties.data());
+	api::get_physical_device_queue_family_properties(
+	    m_physical_device,
+	    &count,
+	    vk_properties.data()
+	);
 
 	auto properties = std::vector<QueueFamilyProperties>(count);
 
@@ -1644,7 +2392,7 @@ Surface::~Surface()
 ) const -> bool
 {
 	auto supported = VkBool32 { false };
-	vkc(vk_get_physical_device_surface_support(
+	vkc(api::get_physical_device_surface_support(
 	    m_physical_device,
 	    queue_family_idx,
 	    surface.m_surface,
@@ -1653,14 +2401,72 @@ Surface::~Surface()
 	return supported;
 }
 
+[[nodiscard]] auto Gpu::get_surface_capabilities(Surface &surface) const -> Surface::Capabilities
+{
+	auto vk_capabilities = VkSurfaceCapabilitiesKHR {};
+	vkc(api::get_physical_device_surface_capabilities(
+	    m_physical_device,
+	    surface.get_vk_handle(),
+	    &vk_capabilities
+	));
+
+	return Surface::Capabilities {
+        .min_image_count = vk_capabilities.minImageCount,
+            .max_image_count = vk_capabilities.maxImageCount,
+
+		.current_extent = { vk_capabilities.currentExtent.width,
+		                    vk_capabilities.currentExtent.height, },
+        .min_image_extent = {vk_capabilities.minImageExtent.width, vk_capabilities.minImageExtent.height,},
+        .max_image_extent = {vk_capabilities.maxImageExtent.width, vk_capabilities.maxImageExtent.height},
+		.supported_transforms = vk_capabilities.supportedTransforms,
+		.current_transform = static_cast<Surface::Transform>(vk_capabilities.currentTransform),
+		.supported_composite_alpha = static_cast<CompositeAlpha::T>(
+		    vk_capabilities.supportedCompositeAlpha
+		),
+        .supported_usage_flags = vk_capabilities.supportedUsageFlags,
+	};
+}
+
+[[nodiscard]] auto Gpu::get_surface_formats(Surface &surface) const -> std::vector<Surface::Format>
+{
+	auto count = uint32_t { 0u };
+	vkc(api::get_physical_device_surface_formats(
+	    m_physical_device,
+	    surface.get_vk_handle(),
+	    &count,
+	    nullptr
+	));
+
+	auto vk_formats = std::vector<VkSurfaceFormatKHR>(count);
+	vkc(api::get_physical_device_surface_formats(
+	    m_physical_device,
+	    surface.get_vk_handle(),
+	    &count,
+	    vk_formats.data()
+	));
+
+	auto formats = std::vector<Surface::Format> {};
+	for (auto &vk_format : vk_formats)
+	{
+		formats.emplace_back(
+		    Surface::Format {
+		        .format = static_cast<Format>(vk_format.format),
+		        .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
+		    }
+		);
+	}
+
+	return formats;
+}
+
 Semaphore::~Semaphore()
 {
-	vk_destroy_semaphore(m_device, m_semaphore, nullptr);
+	api::destroy_semaphore(m_device, m_semaphore, nullptr);
 }
 
 Fence::~Fence()
 {
-	vk_destroy_fence(m_device, m_fence, nullptr);
+	api::destroy_fence(m_device, m_fence, nullptr);
 }
 
 Device::Device(const Gpu &gpu, CreateInfo info)
@@ -1811,42 +2617,42 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 		.pEnabledFeatures = nullptr, // replaced with VkPhysicalDeviceFeatures2
 	};
 
-	vkc(vk_create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
+	vkc(api::create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
 }
 
 Device::~Device()
 {
 	if (m_device)
 	{
-		vk_destroy_device(m_device, nullptr);
+		api::destroy_device(m_device, nullptr);
 	}
 }
 
 void Device::wait_idle() const
 {
-	vkc(vk_device_wait_idle(m_device));
+	vkc(api::device_wait_idle(m_device));
 }
 
 void Device::wait_for_fence(VkFence fence) const
 {
-	vkc(vk_wait_for_fences(m_device, 1u, &fence, true, std::numeric_limits<uint64_t>::max()));
+	vkc(api::wait_for_fences(m_device, 1u, &fence, true, std::numeric_limits<uint64_t>::max()));
 }
 
 void Device::reset_fence(VkFence fence) const
 {
-	vkc(vk_reset_fences(m_device, 1u, &fence));
+	vkc(api::reset_fences(m_device, 1u, &fence));
 }
 
 void Device::reset_fences(std::span<VkFence> fences) const
 {
-	vkc(vk_reset_fences(m_device, fences.size(), fences.data()));
+	vkc(api::reset_fences(m_device, fences.size(), fences.data()));
 }
 
 auto Device::acquire_image(VkSwapchainKHR swapchain, VkSemaphore semaphore, uint64_t timeout)
     -> std::optional<uint32_t>
 {
 	auto image_idx = uint32_t {};
-	const auto result = vk_acquire_next_image_khr(
+	const auto result = api::acquire_next_image_khr(
 	    m_device,
 	    swapchain,
 	    timeout,
@@ -1871,7 +2677,7 @@ auto Device::acquire_image(VkSwapchainKHR swapchain, VkSemaphore semaphore, uint
 
 void Device::wait_for_fences(std::span<VkFence> fences) const
 {
-	vkc(vk_wait_for_fences(
+	vkc(api::wait_for_fences(
 	    m_device,
 	    fences.size(),
 	    fences.data(),
@@ -1884,57 +2690,57 @@ void Device::wait_for_fences(std::span<VkFence> fences) const
     -> std::vector<VkImage>
 {
 	auto count = uint32_t { 0u };
-	vkc(vk_get_swapchain_images_khr(m_device, swapchain, &count, nullptr));
+	vkc(api::get_swapchain_images_khr(m_device, swapchain, &count, nullptr));
 	debug::ensure(count != 0u, "Failed to get swapchain images");
 
 	auto images = std::vector<VkImage>(count);
-	vkc(vk_get_swapchain_images_khr(m_device, swapchain, &count, images.data()));
+	vkc(api::get_swapchain_images_khr(m_device, swapchain, &count, images.data()));
 	return images;
 }
 
 [[nodiscard]] auto Device::get_memory_requirements(VkBuffer buffer) const -> VkMemoryRequirements
 {
 	auto requirements = VkMemoryRequirements {};
-	vk_get_buffer_memory_requirements(m_device, buffer, &requirements);
+	api::get_buffer_memory_requirements(m_device, buffer, &requirements);
 	return requirements;
 }
 
 void Device::bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset /* = 0u */) const
 {
-	vkc(vk_bind_buffer_memory(m_device, buffer, memory, offset));
+	vkc(api::bind_buffer_memory(m_device, buffer, memory, offset));
 }
 
 [[nodiscard]] auto Device::map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
     -> std::span<std::byte>
 {
 	void *data = {};
-	vkc(vk_map_memory(m_device, memory, offset, size, {}, &data));
+	vkc(api::map_memory(m_device, memory, offset, size, {}, &data));
 	return { std::bit_cast<std::byte *>(data), size };
 }
 
 void Device::unmap_memory(VkDeviceMemory memory)
 {
-	vk_unmap_memory(m_device, memory);
+	api::unmap_memory(m_device, memory);
 }
 
 [[nodiscard]] auto Device::create_swapchain(VkSwapchainCreateInfoKHR info) const -> VkSwapchainKHR
 {
 	auto *swapchain = VkSwapchainKHR {};
-	vkc(vk_create_swapchain_khr(m_device, &info, nullptr, &swapchain));
+	vkc(api::create_swapchain_khr(m_device, &info, nullptr, &swapchain));
 	return swapchain;
 }
 
 [[nodiscard]] auto Device::create_framebuffer(VkFramebufferCreateInfo info) const -> VkFramebuffer
 {
 	auto *framebuffer = VkFramebuffer {};
-	vkc(vk_create_frame_buffer(m_device, &info, nullptr, &framebuffer));
+	vkc(api::create_frame_buffer(m_device, &info, nullptr, &framebuffer));
 	return framebuffer;
 }
 
 [[nodiscard]] auto Device::create_image_view(VkImageViewCreateInfo info) const -> VkImageView
 {
 	auto *view = VkImageView {};
-	vkc(vk_create_image_view(m_device, &info, nullptr, &view));
+	vkc(api::create_image_view(m_device, &info, nullptr, &view));
 	return view;
 }
 
@@ -1942,7 +2748,7 @@ void Device::unmap_memory(VkDeviceMemory memory)
     -> VkPipeline
 {
 	auto *graphics_pipeline = VkPipeline {};
-	vkc(vk_create_graphics_pipelines(
+	vkc(api::create_graphics_pipelines(
 	    m_device,
 	    VK_NULL_HANDLE,
 	    1u,
@@ -1957,7 +2763,7 @@ void Device::unmap_memory(VkDeviceMemory memory)
 [[nodiscard]] auto Device::create_pass(VkRenderPassCreateInfo info) const -> VkRenderPass
 {
 	auto *pass = VkRenderPass {};
-	vkc(vk_create_render_pass(m_device, &info, nullptr, &pass));
+	vkc(api::create_render_pass(m_device, &info, nullptr, &pass));
 	return pass;
 }
 
@@ -1975,7 +2781,7 @@ void Device::unmap_memory(VkDeviceMemory memory)
 	};
 
 	auto *pipeline_layout = VkPipelineLayout {};
-	vkc(vk_create_pipeline_layout(m_device, &info, nullptr, &pipeline_layout));
+	vkc(api::create_pipeline_layout(m_device, &info, nullptr, &pipeline_layout));
 	return pipeline_layout;
 }
 
@@ -1983,14 +2789,14 @@ void Device::unmap_memory(VkDeviceMemory memory)
     -> VkShaderModule
 {
 	auto *module = VkShaderModule {};
-	vkc(vk_create_shader_module(m_device, &info, nullptr, &module));
+	vkc(api::create_shader_module(m_device, &info, nullptr, &module));
 	return module;
 }
 
 [[nodiscard]] auto Device::create_command_pool(VkCommandPoolCreateInfo info) const -> VkCommandPool
 {
 	auto *command_pool = VkCommandPool {};
-	vkc(vk_create_command_pool(m_device, &info, nullptr, &command_pool));
+	vkc(api::create_command_pool(m_device, &info, nullptr, &command_pool));
 	return command_pool;
 }
 
@@ -2003,7 +2809,7 @@ void Device::unmap_memory(VkDeviceMemory memory)
 	auto semaphores = std::vector<VkSemaphore>(count);
 	for (auto &semaphore : semaphores)
 	{
-		vk_create_semaphore(m_device, &info, nullptr, &semaphore);
+		api::create_semaphore(m_device, &info, nullptr, &semaphore);
 	}
 	return semaphores;
 }
@@ -2014,7 +2820,7 @@ void Device::unmap_memory(VkDeviceMemory memory)
 	auto fences = std::vector<VkFence>(count);
 	for (auto &fence : fences)
 	{
-		vk_create_fence(m_device, &info, nullptr, &fence);
+		api::create_fence(m_device, &info, nullptr, &fence);
 	}
 	return fences;
 }
@@ -2022,14 +2828,14 @@ void Device::unmap_memory(VkDeviceMemory memory)
 [[nodiscard]] auto Device::create_buffer(VkBufferCreateInfo info) const -> VkBuffer
 {
 	auto *buffer = VkBuffer {};
-	vkc(vk_create_buffer(m_device, &info, nullptr, &buffer));
+	vkc(api::create_buffer(m_device, &info, nullptr, &buffer));
 	return buffer;
 }
 [[nodiscard]] auto Device::create_desscriptor_pool(VkDescriptorPoolCreateInfo info) const
     -> VkDescriptorPool
 {
 	auto *pool = VkDescriptorPool {};
-	vkc(vk_create_descriptor_pool(m_device, &info, nullptr, &pool));
+	vkc(api::create_descriptor_pool(m_device, &info, nullptr, &pool));
 	return pool;
 }
 
@@ -2037,7 +2843,7 @@ void Device::unmap_memory(VkDeviceMemory memory)
     -> VkDescriptorSetLayout
 {
 	auto *layout = VkDescriptorSetLayout {};
-	vkc(vk_create_descriptor_set_layout(m_device, &info, nullptr, &layout));
+	vkc(api::create_descriptor_set_layout(m_device, &info, nullptr, &layout));
 	return layout;
 }
 
@@ -2045,14 +2851,14 @@ void Device::unmap_memory(VkDeviceMemory memory)
     -> std::vector<VkCommandBuffer>
 {
 	auto command_buffers = std::vector<VkCommandBuffer>(info.commandBufferCount);
-	vkc(vk_allocate_command_buffers(m_device, &info, command_buffers.data()));
+	vkc(api::allocate_command_buffers(m_device, &info, command_buffers.data()));
 	return command_buffers;
 }
 
 [[nodiscard]] auto Device::allocate_memory(VkMemoryAllocateInfo info) const -> VkDeviceMemory
 {
 	auto *memory = VkDeviceMemory {};
-	vkc(vk_allocate_memory(m_device, &info, nullptr, &memory));
+	vkc(api::allocate_memory(m_device, &info, nullptr, &memory));
 	return memory;
 }
 
@@ -2060,13 +2866,13 @@ void Device::unmap_memory(VkDeviceMemory memory)
     -> VkDescriptorSet
 {
 	auto *descriptor_set = VkDescriptorSet {};
-	vkc(vk_allocate_descriptor_sets(m_device, &info, &descriptor_set));
+	vkc(api::allocate_descriptor_sets(m_device, &info, &descriptor_set));
 	return descriptor_set;
 }
 
 void Device::free_memory(VkDeviceMemory memory) const
 {
-	vk_free_memory(m_device, memory, nullptr);
+	api::free_memory(m_device, memory, nullptr);
 }
 
 void Device::free_descriptor_set(
@@ -2074,17 +2880,17 @@ void Device::free_descriptor_set(
     VkDescriptorSet descriptor_set
 ) const
 {
-	vkc(vk_free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
+	vkc(api::free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
 }
 
 void Device::destroy_swapchain(VkSwapchainKHR swapchain) const
 {
-	vk_destroy_swapchain_khr(m_device, swapchain, nullptr);
+	api::destroy_swapchain_khr(m_device, swapchain, nullptr);
 }
 
 void Device::destroy_framebuffer(VkFramebuffer framebuffer) const
 {
-	vk_destroy_frame_buffer(m_device, framebuffer, nullptr);
+	api::destroy_frame_buffer(m_device, framebuffer, nullptr);
 }
 
 void Device::destroy_framebuffers(std::span<VkFramebuffer> framebuffers) const
@@ -2097,7 +2903,7 @@ void Device::destroy_framebuffers(std::span<VkFramebuffer> framebuffers) const
 
 void Device::destroy_image_view(VkImageView image_view) const
 {
-	vk_destroy_image_view(m_device, image_view, nullptr);
+	api::destroy_image_view(m_device, image_view, nullptr);
 }
 
 void Device::destroy_image_views(std::span<VkImageView> image_views) const
@@ -2110,32 +2916,32 @@ void Device::destroy_image_views(std::span<VkImageView> image_views) const
 
 void Device::destroy_pipeline(VkPipeline pipeline) const
 {
-	vk_destroy_pipeline(m_device, pipeline, nullptr);
+	api::destroy_pipeline(m_device, pipeline, nullptr);
 }
 
 void Device::destroy_pass(VkRenderPass pass) const
 {
-	vk_destroy_render_pass(m_device, pass, nullptr);
+	api::destroy_render_pass(m_device, pass, nullptr);
 }
 
 void Device::destroy_pipeline_layout(VkPipelineLayout pipeline_layout) const
 {
-	vk_destroy_pipeline_layout(m_device, pipeline_layout, nullptr);
+	api::destroy_pipeline_layout(m_device, pipeline_layout, nullptr);
 }
 
 void Device::destroy_shader_module(VkShaderModule shader_module) const
 {
-	vk_destroy_shader_module(m_device, shader_module, nullptr);
+	api::destroy_shader_module(m_device, shader_module, nullptr);
 }
 
 void Device::destroy_command_pool(VkCommandPool command_pool) const
 {
-	vk_destroy_command_pool(m_device, command_pool, nullptr);
+	api::destroy_command_pool(m_device, command_pool, nullptr);
 }
 
 void Device::destroy_semaphore(VkSemaphore semaphore) const
 {
-	vk_destroy_semaphore(m_device, semaphore, nullptr);
+	api::destroy_semaphore(m_device, semaphore, nullptr);
 }
 
 void Device::destroy_semaphores(std::span<VkSemaphore> semaphores) const
@@ -2148,7 +2954,7 @@ void Device::destroy_semaphores(std::span<VkSemaphore> semaphores) const
 
 void Device::destroy_fence(VkFence fence) const
 {
-	vk_destroy_fence(m_device, fence, nullptr);
+	api::destroy_fence(m_device, fence, nullptr);
 }
 
 void Device::destroy_fences(std::span<VkFence> fences) const
@@ -2161,17 +2967,17 @@ void Device::destroy_fences(std::span<VkFence> fences) const
 
 void Device::destroy_buffer(VkBuffer buffer) const
 {
-	vk_destroy_buffer(m_device, buffer, nullptr);
+	api::destroy_buffer(m_device, buffer, nullptr);
 }
 
 void Device::destroy_descriptor_set_layout(VkDescriptorSetLayout layout) const
 {
-	vk_destroy_descriptor_set_layout(m_device, layout, nullptr);
+	api::destroy_descriptor_set_layout(m_device, layout, nullptr);
 }
 
 void Device::destroy_descriptor_pool(VkDescriptorPool pool) const
 {
-	vk_destroy_descriptor_pool(m_device, pool, nullptr);
+	api::destroy_descriptor_pool(m_device, pool, nullptr);
 }
 
 [[nodiscard]] auto addressof_underlying(auto &enum_value)
@@ -2185,7 +2991,7 @@ Queue::Queue(Device &device, uint32_t queue_family_idx, uint32_t queue_idx)
     : m_device(device.m_device.get())
     , m_queue()
 {
-	vk_get_device_queue(m_device, queue_family_idx, queue_idx, &m_queue);
+	api::get_device_queue(m_device, queue_family_idx, queue_idx, &m_queue);
 }
 
 Queue::~Queue()
@@ -2207,7 +3013,7 @@ void Queue::submit(SubmitInfo info) const
 		.pSignalSemaphores = &info.signal_semaphore,
 	};
 
-	vkc(vk_queue_submit(m_queue, 1u, &vk_info, info.signal_fence));
+	vkc(api::queue_submit(m_queue, 1u, &vk_info, info.signal_fence));
 }
 
 void Queue::present(PresentInfo info) const
@@ -2219,24 +3025,141 @@ void Queue::present(PresentInfo info) const
 		.waitSemaphoreCount = 1u,
 		.pWaitSemaphores = &info.wait_semaphore,
 		.swapchainCount = 1u,
-		.pSwapchains = &info.swapchain,
+		.pSwapchains = info.swapchain->get_addressof_vk_handle(),
 		.pImageIndices = &info.image_idx,
 		.pResults = &result,
 	};
 
-	vkc(vk_queue_present_khr(m_queue, &vk_info));
+	vkc(api::queue_present_khr(m_queue, &vk_info));
 	vkc(result);
+}
+
+Image::Image(Device &device, CreateInfo info): m_device(device.get_vk_handle()), m_image()
+{
+	auto vk_info = VkImageCreateInfo {};
+	vkc(api::create_image(m_device, &vk_info, nullptr, &m_image));
+}
+
+Image::Image(VkImage image) noexcept: m_device(), m_image(image)
+{
+}
+
+Image::~Image()
+{
+	if (m_device)
+	{
+		api::destroy_image(m_device, m_image, nullptr);
+	}
+}
+
+ImageView::ImageView(Device &device, Image &image, CreateInfo info)
+    : m_device(device.get_vk_handle())
+    , m_image_view()
+{
+	auto vk_info = VkImageViewCreateInfo {};
+	vkc(api::create_image_view(m_device, &vk_info, nullptr, &m_image_view));
+
+	if (info.debug_name.empty())
+	{
+		info.debug_name = "<unnamed>";
+	}
+
+	device.name(*this, "{}", info.debug_name);
+}
+
+Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
+    : m_device(device.m_device)
+    , m_swapchain()
+{
+	auto vk_info = VkSwapchainCreateInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+		.surface = surface.m_surface,
+		.minImageCount = info.min_image_count,
+		.imageFormat = static_cast<VkFormat>(info.format),
+		.imageColorSpace = static_cast<VkColorSpaceKHR>(info.color_space),
+		.imageExtent = VkExtent2D { .width = info.extent.x, .height = info.extent.y },
+		.imageArrayLayers = 1u,
+		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = static_cast<std::uint32_t>(info.queue_family_indices.size()),
+		.pQueueFamilyIndices = info.queue_family_indices.data(),
+		.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(info.pre_transform),
+		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+		.presentMode = static_cast<VkPresentModeKHR>(info.present_mode),
+		.clipped = VK_TRUE,
+		.oldSwapchain = nullptr,
+	};
+	vkc(api::create_swapchain_khr(m_device, &vk_info, nullptr, &m_swapchain));
+}
+
+Swapchain::~Swapchain()
+{
+	api::destroy_swapchain_khr(m_device, m_swapchain, nullptr);
+}
+
+[[nodiscard]] auto Swapchain::get_images() -> std::vector<Image>
+{
+	auto count = 0u;
+	api::get_swapchain_images_khr(m_device, m_swapchain, &count, nullptr);
+
+	auto vk_images = std::vector<VkImage>(count);
+	api::get_swapchain_images_khr(m_device, m_swapchain, &count, vk_images.data());
+
+	auto images = std::vector<Image>();
+	for (auto vk_image : vk_images)
+	{
+		images.emplace_back(Image { vk_image });
+	}
+
+	return images;
+}
+
+Buffer::Buffer(Device &device, CreateInfo info) {};
+
+Buffer::~Buffer()
+{
+}
+
+[[nodiscard]] auto Buffer::get_memory_requirements() const -> MemoryRequirements
+{
+	auto vk_requirements = VkMemoryRequirements {};
+	api::get_buffer_memory_requirements(m_device, m_buffer, &vk_requirements);
+	return {
+		.size = vk_requirements.size,
+		.alignment = vk_requirements.alignment,
+		.memory_type_bits = vk_requirements.memoryTypeBits,
+	};
+}
+
+Memory::Memory(Device &device, Buffer &buffer, AllocateInfo info)
+{
+}
+
+Memory::~Memory()
+{
+}
+
+[[nodiscard]] auto Memory::map(std::size_t size, std::size_t offset) -> std::span<std::byte>
+{
+	void *data = {};
+	vkc(api::map_memory(m_device, m_memory, offset, size, {}, &data));
+	return { std::bit_cast<std::byte *>(data), size };
+}
+
+void Memory::unmap()
+{
+	api::unmap_memory(m_device, m_memory);
 }
 
 [[nodiscard]]
 auto enumerate_instance_extension_properties() -> std::vector<VkExtensionProperties>
 {
 	auto count = 0u;
-	vkc(vk_enumerate_instance_extension_properties(nullptr, &count, nullptr));
+	vkc(api::enumerate_instance_extension_properties(nullptr, &count, nullptr));
 
 	auto extensions = std::vector<VkExtensionProperties>(count);
 	std::memset(extensions.data(), 0, extensions.size() * sizeof(VkExtensionProperties));
-	vkc(vk_enumerate_instance_extension_properties(nullptr, &count, extensions.data()));
+	vkc(api::enumerate_instance_extension_properties(nullptr, &count, extensions.data()));
 
 	return extensions;
 }

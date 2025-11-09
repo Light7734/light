@@ -37,46 +37,6 @@ private:
 	VkDebugUtilsMessengerEXT m_object;
 };
 
-class Buffer
-{
-public:
-	Buffer(Device *device, VkBufferCreateInfo info)
-	    : m_device(device)
-	    , m_object(m_device->create_buffer(info))
-	{
-	}
-
-	~Buffer()
-	{
-		if (m_device)
-		{
-			m_device->destroy_buffer(m_object);
-		}
-	}
-
-	Buffer(Buffer &&) = default;
-
-	Buffer(const Buffer &) = delete;
-
-	auto operator=(Buffer &&) -> Buffer & = default;
-
-	auto operator=(const Buffer &) -> Buffer & = delete;
-
-	[[nodiscard]] auto operator*() const -> VkBuffer
-	{
-		return m_object;
-	}
-
-	[[nodiscard]] operator VkBuffer() const
-	{
-		return m_object;
-	}
-
-private:
-	memory::NullOnMove<Device *> m_device {};
-
-	VkBuffer m_object;
-};
 
 class Memory
 {

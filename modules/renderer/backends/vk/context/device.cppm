@@ -22,7 +22,7 @@ public:
 		return m_device;
 	}
 
-	[[nodiscard]] auto get_family_indices() const -> std::array<std::uint32_t, 2>
+	[[nodiscard]] auto get_family_indices() const -> std::vector<std::uint32_t>
 	{
 		return { m_graphics_queue_family_index, m_present_queue_family_index };
 	}

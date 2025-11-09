@@ -1,103 +1,81 @@
-#pragma once
+export module renderer.backend.vk.swapchain;
+import renderer.backend.vk.library_wrapper;
+import renderer.backend.vk.surface;
+import renderer.backend.vk.device;
+import renderer.backend.vk.instance;
+import renderer.backend.vk.gpu;
+import renderer.frontend;
+import math.vec2;
+import memory.null_on_move;
+import logger;
+import std;
 
-#include <memory/pointer_types/null_on_move.hpp>
-#include <renderer/backend/vk/utils.hpp>
-#include <renderer/backend/vk/vulkan.hpp>
-#include <renderer/frontend/context/device.hpp>
-#include <renderer/frontend/context/gpu.hpp>
-#include <renderer/frontend/context/surface.hpp>
-#include <renderer/frontend/context/swapchain.hpp>
+namespace lt::renderer::vkb {
 
-namespace lt::renderer::vk {
-
-class Swapchain: public ISwapchain
+export class Swapchain: public ISwapchain
 {
 public:
 	Swapchain(ISurface *surface, IGpu *gpu, IDevice *device);
-	~Swapchain() override;
 
-	Swapchain(Swapchain &&) = default;
-
-	Swapchain(const Swapchain &) = delete;
-
-	auto operator=(Swapchain &&) -> Swapchain & = default;
-
-	auto operator=(const Swapchain &) const -> Swapchain & = delete;
-
-	[[nodiscard]] auto vk() const -> VkSwapchainKHR
+	[[nodiscard]] auto vk() -> vk::Swapchain &
 	{
 		return m_swapchain;
 	}
 
-	[[nodiscard]] auto vk_ptr() -> VkSwapchainKHR *
-	{
-		return &m_swapchain;
-	}
-
-	[[nodiscard]] auto get_resolution() const -> VkExtent2D
+	[[nodiscard]] auto get_resolution() const -> math::uvec2
 	{
 		return m_resolution;
 	}
 
-	[[nodiscard]] auto get_format() const -> VkFormat
+	[[nodiscard]] auto get_format() const -> vk::Format
 	{
 		return m_format;
 	}
 
-	[[nodiscard]] auto get_image_count() const -> size_t
+	[[nodiscard]] auto get_image_count() const -> std::size_t
 	{
 		return m_images.size();
 	}
 
-	[[nodiscard]] auto get_image_view(uint32_t idx) -> VkImageView
+	[[nodiscard]] auto get_image_view(std::uint32_t idx) -> vk::ImageView &
 	{
 		return m_image_views[idx];
 	}
 
-	[[nodiscard]] auto get_image(uint32_t idx) -> VkImage
+	[[nodiscard]] auto get_image(std::uint32_t idx) -> vk::Image &
 	{
 		return m_images[idx];
 	}
 
-
-	[[nodiscard]] auto create_framebuffers_for_pass(VkRenderPass pass) const
-	    -> std::vector<VkFramebuffer>;
-
 private:
 	[[nodiscard]] auto get_optimal_image_count(
-	    VkSurfaceCapabilitiesKHR capabilities,
-	    uint32_t desired_image_count
-	) const -> uint32_t;
+	    vk::Surface::Capabilities capabilities,
+	    std::uint32_t desired_image_count
+	) const -> std::uint32_t;
 
-	memory::NullOnMove<class Surface *> m_surface {};
+	Gpu *m_gpu;
 
-	class Gpu *m_gpu {};
+	Surface *m_surface {};
 
-	class Device *m_device {};
+	Device *m_device;
 
-	VkSwapchainKHR m_swapchain = VK_NULL_HANDLE;
+	vk::Swapchain m_swapchain;
 
-	std::vector<VkImage> m_images;
+	std::vector<vk::Image> m_images;
 
-	std::vector<VkImageView> m_image_views;
+	std::vector<vk::ImageView> m_image_views;
 
-	VkExtent2D m_resolution {};
+	math::uvec2 m_resolution {};
 
-	VkFormat m_format {};
+	vk::Format m_format {};
 };
 
-} // namespace lt::renderer::vk
+} // namespace lt::renderer::vkb
 
-#include <logger/logger.hpp>
-#include <ranges>
-#include <renderer/backend/vk/context/device.hpp>
-#include <renderer/backend/vk/context/gpu.hpp>
-#include <renderer/backend/vk/context/instance.hpp>
-#include <renderer/backend/vk/context/surface.hpp>
-#include <renderer/backend/vk/context/swapchain.hpp>
-#include <renderer/backend/vk/utils.hpp>
 
-namespace lt::renderer::vk {
+module :private;
+using namespace lt::renderer;
+using namespace lt::renderer::vkb;
 
 Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
     : m_surface(static_cast<Surface *>(surface))
@@ -106,122 +84,71 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 {
 	static auto idx = 0u;
 
-	const auto capabilities = m_gpu->get_surface_capabilities(m_surface->vk());
-	const auto formats = m_gpu->get_surface_formats(m_surface->vk());
+	const auto capabilities = m_gpu->vk().get_surface_capabilities(m_surface->vk());
+	const auto formats = m_gpu->vk().get_surface_formats(m_surface->vk());
 
 	// TODO(Light): parameterize
-	constexpr auto desired_image_count = uint32_t { 3 };
+	constexpr auto desired_image_count = std::uint32_t { 3u };
 	const auto surface_format = formats.front();
-	const auto queue_indices = m_device->get_family_indices();
 	m_format = surface_format.format;
 
-	m_swapchain = m_device->create_swapchain(
-	    VkSwapchainCreateInfoKHR {
-	        .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-	        .surface = m_surface->vk(),
-	        .minImageCount = get_optimal_image_count(capabilities, desired_image_count),
-	        .imageFormat = surface_format.format,
-	        .imageColorSpace = surface_format.colorSpace,
-	        .imageExtent = capabilities.currentExtent,
-	        .imageArrayLayers = 1u,
-	        .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-	        .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-	        .queueFamilyIndexCount = queue_indices.size(),
-	        .pQueueFamilyIndices = queue_indices.data(),
-	        .preTransform = capabilities.currentTransform,
-	        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-	        .presentMode = VK_PRESENT_MODE_FIFO_KHR, // TODO(Light): parameterize
-	        .clipped = VK_TRUE,
-	        .oldSwapchain = nullptr,
+	m_swapchain = vk::Swapchain(
+	    m_device->vk(),
+	    m_surface->vk(),
+	    vk::Swapchain::CreateInfo {
+
+	        .format = surface_format.format,
+	        .color_space = surface_format.color_space,
+	        .extent = capabilities.current_extent,
+	        .min_image_count = get_optimal_image_count(capabilities, desired_image_count),
+	        .queue_family_indices = m_device->get_family_indices(),
+	        .present_mode = vk::Swapchain::PresentMode::immediate,
+	        .pre_transform = capabilities.current_transform,
 	    }
 	);
-	m_resolution = capabilities.currentExtent;
-	m_device->name(m_swapchain, "swapchain {}", idx++);
-	m_device->wait_idle();
+	m_resolution = capabilities.current_extent;
+	m_device->vk().name(m_swapchain, "swapchain {}", idx++);
+	m_device->vk().wait_idle();
 
-
-	m_images = m_device->get_swapchain_images(m_swapchain);
-	m_image_views.resize(m_images.size());
-	for (auto idx = 0u; auto [image, view] : std::views::zip(m_images, m_image_views))
+	m_images = m_swapchain.get_images();
+	for (auto idx = 0u; auto &image : m_images)
 	{
-		view = m_device->create_image_view(VkImageViewCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			.image = image,
-			.viewType = VK_IMAGE_VIEW_TYPE_2D,
-			.format = surface_format.format,
-            .components = VkComponentMapping {
-                .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-                .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-                .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-                .a = VK_COMPONENT_SWIZZLE_IDENTITY,
-            },
-            .subresourceRange = VkImageSubresourceRange {
-                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                .baseMipLevel = 0u,
-                .levelCount = 1u,
-                .baseArrayLayer = 0u,
-                .layerCount = 1u,
-            }
-		});
+		m_image_views.emplace_back(
+		    vk::ImageView {
+		        m_device->vk(),
+		        image,
+		        vk::ImageView::CreateInfo {
+                .type = vk::ImageView::Type::_2d,
+                .format = surface_format.format,
+                .components = {
+                    vk::ImageView::Swizzle::identity,
+                    vk::ImageView::Swizzle::identity,
+                    vk::ImageView::Swizzle::identity,
+                    vk::ImageView::Swizzle::identity,
+                },
+                .range = {
+		            .aspect_flags = vk::Image::AspectFlags::color_bit,
+		            .base_mip_level = 0u,
+		            .level_count = 1u,
+		            .base_array_layer = 0u,
+		            .layer_count = 1u,
+                },
 
-		m_device->name(image, "swapchain image {}", idx++);
-		m_device->name(view, "swapchain image view {}", idx++);
-	}
-	m_device->wait_idle();
-}
-
-Swapchain::~Swapchain()
-{
-	if (!m_surface)
-	{
-		return;
-	}
-
-	try
-	{
-		m_device->wait_idle();
-		m_device->destroy_image_views(m_image_views);
-		m_device->destroy_swapchain(m_swapchain);
-		m_device->wait_idle();
-	}
-	catch (const std::exception &exp)
-	{
-		log::error("Failed to destroy swapchain:");
-		log::error("\twhat: {}", exp.what());
-	}
-}
-
-
-[[nodiscard]] auto Swapchain::create_framebuffers_for_pass(VkRenderPass pass) const
-    -> std::vector<VkFramebuffer>
-{
-	auto framebuffers = std::vector<VkFramebuffer>(m_image_views.size());
-
-	for (auto idx = 0u; auto &framebuffer : framebuffers)
-	{
-		framebuffer = m_device->create_framebuffer(
-		    VkFramebufferCreateInfo {
-		        .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-		        .renderPass = pass,
-		        .attachmentCount = 1u,
-		        .pAttachments = &m_image_views[idx++],
-		        .width = m_resolution.width,
-		        .height = m_resolution.height,
-		        .layers = 1u,
+                .debug_name = std::format("swapchain image {}", idx++),
+		        },
 		    }
 		);
 	}
-
-	return framebuffers;
+	m_device->vk().wait_idle();
 }
 
 [[nodiscard]] auto Swapchain::get_optimal_image_count(
-    VkSurfaceCapabilitiesKHR capabilities,
-    uint32_t desired_image_count
-) const -> uint32_t
+    vk::Surface::Capabilities capabilities,
+    std::uint32_t desired_image_count
+) const -> std::uint32_t
 {
-	const auto min_image_count = capabilities.minImageCount;
-	const auto max_image_count = capabilities.maxImageCount;
+	const auto min_image_count = capabilities.min_image_count;
+	const auto max_image_count = capabilities.max_image_count;
 
 	const auto has_max_limit = max_image_count != 0;
 
@@ -232,7 +159,7 @@ Swapchain::~Swapchain()
 		return desired_image_count;
 	}
 
-	// Fall-back to 2 if in ange
+	// Fall-back to 2 if in range
 	if (min_image_count <= 2 && max_image_count >= 2)
 	{
 		return 2;
@@ -241,6 +168,3 @@ Swapchain::~Swapchain()
 	// Fall-back to min_image_count
 	return min_image_count;
 }
-
-
-} // namespace lt::renderer::vk

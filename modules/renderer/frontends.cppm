@@ -2,41 +2,18 @@ export module renderer.frontend;
 
 import ecs.entity;
 import math.vec2;
-import renderer.api;
 import memory.scope;
+import std;
 
 export namespace lt::renderer {
 
-class IDevice
+enum class Api : std::uint8_t
 {
-public:
-	IDevice() = default;
+	none = 0u,
 
-	virtual ~IDevice() = default;
-
-	IDevice(IDevice &&) = default;
-
-	IDevice(const IDevice &) = delete;
-
-	auto operator=(IDevice &&) -> IDevice & = default;
-
-	auto operator=(const IDevice &) -> IDevice & = delete;
-};
-
-class IGpu
-{
-public:
-	IGpu() = default;
-
-	virtual ~IGpu() = default;
-
-	IGpu(IGpu &&) = default;
-
-	IGpu(const IGpu &) = delete;
-
-	auto operator=(IGpu &&) -> IGpu & = default;
-
-	auto operator=(const IGpu &) -> IGpu & = delete;
+	vulkan,
+	direct_x,
+	metal,
 };
 
 class IInstance
@@ -56,6 +33,38 @@ public:
 	auto operator=(const IInstance &) -> IInstance & = delete;
 };
 
+class IGpu
+{
+public:
+	IGpu() = default;
+
+	virtual ~IGpu() = default;
+
+	IGpu(IGpu &&) = default;
+
+	IGpu(const IGpu &) = delete;
+
+	auto operator=(IGpu &&) -> IGpu & = default;
+
+	auto operator=(const IGpu &) -> IGpu & = delete;
+};
+
+class IDevice
+{
+public:
+	IDevice() = default;
+
+	virtual ~IDevice() = default;
+
+	IDevice(IDevice &&) = default;
+
+	IDevice(const IDevice &) = delete;
+
+	auto operator=(IDevice &&) -> IDevice & = default;
+
+	auto operator=(const IDevice &) -> IDevice & = delete;
+};
+
 class ISurface
 {
 public:
@@ -72,6 +81,80 @@ public:
 	auto operator=(const ISurface &) -> ISurface & = delete;
 
 	[[nodiscard]] virtual auto get_framebuffer_size() const -> math::uvec2 = 0;
+};
+
+class ISwapchain
+{
+public:
+	ISwapchain() = default;
+
+	virtual ~ISwapchain() = default;
+
+	ISwapchain(ISwapchain &&) = default;
+
+	ISwapchain(const ISwapchain &) = delete;
+
+	auto operator=(ISwapchain &&) -> ISwapchain & = default;
+
+	auto operator=(const ISwapchain &) -> ISwapchain & = delete;
+};
+
+class IBuffer
+{
+public:
+	enum class Usage : std::uint8_t
+	{
+		vertex,
+
+		index,
+
+		storage,
+
+		staging,
+	};
+
+	struct CreateInfo
+	{
+		Usage usage;
+
+		std::size_t size;
+
+		std::string debug_name;
+	};
+
+	struct CopyInfo
+	{
+		std::size_t offset;
+
+		std::size_t size;
+	};
+
+	[[nodiscard]] static auto create(
+	    Api target_api,
+	    class IDevice *device,
+	    class IGpu *gpu,
+	    const CreateInfo &info
+	) -> memory::Scope<IBuffer>;
+
+	IBuffer() = default;
+
+	virtual ~IBuffer() = default;
+
+	IBuffer(IBuffer &&) = default;
+
+	IBuffer(const IBuffer &) = delete;
+
+	auto operator=(IBuffer &&) -> IBuffer & = default;
+
+	auto operator=(const IBuffer &) -> IBuffer & = delete;
+
+	[[nodiscard]] virtual auto map() -> std::span<std::byte> = 0;
+
+	virtual void unmap() = 0;
+
+	[[nodiscard]] virtual auto get_size() const -> std::size_t = 0;
+
+private:
 };
 
 } // namespace lt::renderer
