@@ -1,6 +1,7 @@
 export module renderer.data;
 
-#include <math/mat4.hpp>
+import math.mat4;
+
 
 namespace lt::renderer {
 

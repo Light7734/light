@@ -1,5 +1,6 @@
 export module renderer.vk.pass;
 
+import renderer.data;
 import renderer.backend.vk.library_wrapper;
 import renderer.backend.vk.device;
 import renderer.backend.vk.swapchain;
@@ -33,15 +34,15 @@ public:
 private:
 	Device *m_device {};
 
-	vk::PipelineLayout m_layout;
-
-	vk::Pipeline m_pipeline;
+	vk::DescriptorSetLayout m_descriptor_set_layout;
 
 	vk::DescriptorPool m_descriptor_pool;
 
-	vk::DescriptorSetLayout m_vertices_descriptor_set_layout;
-
 	vk::DescriptorSet m_vertices_descriptor_set;
+
+	vk::PipelineLayout m_layout;
+
+	vk::Pipeline m_pipeline;
 };
 
 } // namespace lt::renderer::vkb
@@ -57,41 +58,54 @@ Pass::Pass(
     const lt::assets::ShaderAsset &fragment_shader
 )
     : m_device(static_cast<Device *>(device))
+
 {
-	// auto binding = VkDescriptorSetLayoutBinding {
-	// 	.binding = 0,
-	// 	.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-	// 	.descriptorCount = 1'000,
-	// 	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-	// };
-	//
-	// const auto descriptor_binding_flags = VkDescriptorBindingFlagsEXT {
-	// 	VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT_EXT
-	// 	    | VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT
-	// 	    | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT
-	// 	    | VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT_EXT,
-	// };
-	//
-	// constexpr auto descriptor_count = uint32_t { 1'000 };
-	//
-	// auto descriptor_binding_flags_info = VkDescriptorSetLayoutBindingFlagsCreateInfoEXT {
-	// 	.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT,
-	// 	.bindingCount = 1,
-	// 	.pBindingFlags = &descriptor_binding_flags,
-	// };
-	//
-	//
-	// m_vertices_descriptor_set_layout = m_device->create_descriptor_set_layout(
-	//     {
-	//         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-	//         .pNext = &descriptor_binding_flags_info,
-	//         .flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT,
-	//         .bindingCount = 1u,
-	//         .pBindings = &binding,
-	//
-	//     }
-	// );
-	//
+	using enum vk::DescriptorSetLayout::Binding::FlagBits;
+	auto bindings = std::vector<vk::DescriptorSetLayout::Binding> {
+		{
+		    .flags = variable_descriptor_count | partially_bound | update_after_bind
+		             | update_unused_while_pending,
+		    .idx = 0u,
+		    .count = 1'000u,
+		    .type = vk::DescriptorSet::Type::storage_buffer,
+		    .shader_stages = vk::ShaderStageFlags::vertex_bit,
+		},
+	};
+
+	using enum vk::DescriptorSetLayout::CreateInfo::FlagBits;
+	m_descriptor_set_layout = vk::DescriptorSetLayout(
+	    m_device->vk(),
+	    vk::DescriptorSetLayout::CreateInfo {
+	        .flags = update_after_bind_pool,
+	        .bindings = { 
+                vk::DescriptorSetLayout::Binding {
+                    .flags = variable_descriptor_count | partially_bound | update_after_bind | update_unused_while_pending,
+                    .idx = 0u,
+                    .count = 1'000u,
+                    .type = vk::DescriptorSet::Type::storage_buffer,
+                    .shader_stages = vk::ShaderStageFlags::vertex_bit,
+                },
+            },
+	    }
+	);
+
+	auto push_constant_ranges = std::vector<vk::PipelineLayout::PushConstantRange> {
+		{
+		    .shader_stages = vk::ShaderStageFlags::vertex_bit,
+		    .offset = 0u,
+		    .size = sizeof(FrameConstants),
+		},
+	};
+	m_layout = vk::PipelineLayout(
+	    m_device->vk(),
+	    vk::PipelineLayout::CreateInfo {
+            .descriptor_set_layouts = {
+                &m_descriptor_set_layout,
+            },
+            .push_constant_ranges = push_constant_ranges,
+	    }
+	);
+
 	// auto pool_size = VkDescriptorPoolSize {
 	// 	.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 	// 	.descriptorCount = descriptor_count,
@@ -122,22 +136,6 @@ Pass::Pass(
 	//     }
 	// );
 
-	m_layout = vk::PipelineLayout(
-	    m_device->vk(),
-	    vk::PipelineLayout::CreateInfo {
-	        // std::vector<VkDescriptorSetLayout> {
-	        //     m_vertices_descriptor_set_layout,
-	        // },
-	        //
-	        // std::vector<VkPushConstantRange> {
-	        //     VkPushConstantRange {
-	        //         .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-	        //         .offset = 0u,
-	        //         .size = sizeof(FrameConstants),
-	        //     },
-	        // },
-	    }
-	);
 
 	auto shaders = std::vector<std::pair<vk::ShaderModule, vk::ShaderStageFlags::T>> {};
 	shaders.emplace_back(

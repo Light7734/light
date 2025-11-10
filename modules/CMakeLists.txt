@@ -150,6 +150,7 @@ add_library_module(
     NAME
     renderer
     INTERFACES
+    data.cppm
     frontends.cppm
     factory.cppm
     vk/api_wrapper.cppm

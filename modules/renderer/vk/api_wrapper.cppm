@@ -36,6 +36,7 @@ struct overloads: Ts...
 export namespace lt::renderer::vk {
 
 using Bool32 = VkBool32;
+using Flags = VkFlags;
 
 namespace constants {
 
@@ -1826,6 +1827,105 @@ private:
 	VkShaderModule m_shader_module {};
 };
 
+class DescriptorPool
+{
+};
+
+
+class DescriptorSet
+{
+public:
+	enum class Type : std::underlying_type_t<VkDescriptorType>
+	{
+		sampler = VK_DESCRIPTOR_TYPE_SAMPLER,
+		combined_image_sampler = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		sampled_image = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+		storage_image = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+		uniform_texel_buffer = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,
+		storage_texel_buffer = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,
+		uniform_buffer = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		storage_buffer = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		uniform_buffer_dynamic = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+		storage_buffer_dynamic = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
+		input_attachment = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
+		inline_uniform_block = VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK,
+		acceleration_structure = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
+		acceleration_structure_nv = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV,
+		sample_weight_image_qcom = VK_DESCRIPTOR_TYPE_SAMPLE_WEIGHT_IMAGE_QCOM,
+		block_match_image_qcom = VK_DESCRIPTOR_TYPE_BLOCK_MATCH_IMAGE_QCOM,
+		tensor_arm = VK_DESCRIPTOR_TYPE_TENSOR_ARM,
+		_mutable = VK_DESCRIPTOR_TYPE_MUTABLE_EXT,
+		partitioned_acceleration_structure_nv
+		= VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV,
+	};
+};
+
+class DescriptorSetLayout
+{
+public:
+	static constexpr auto object_type = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
+
+	struct Binding
+	{
+		enum FlagBits : std::underlying_type_t<VkDescriptorBindingFlagBits>
+		{
+			update_after_bind = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+			update_unused_while_pending = VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT,
+			partially_bound = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT,
+			variable_descriptor_count = VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT,
+		};
+
+		Flags flags;
+
+		std::uint32_t idx;
+
+		std::uint32_t count;
+
+		DescriptorSet::Type type;
+
+		ShaderStageFlags::T shader_stages;
+	};
+
+	struct CreateInfo
+	{
+		enum FlagBits : std::underlying_type_t<VkDescriptorSetLayoutCreateFlagBits>
+		{
+			update_after_bind_pool = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
+			push_descriptor = VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT,
+			descriptor_buffer = VK_DESCRIPTOR_SET_LAYOUT_CREATE_DESCRIPTOR_BUFFER_BIT_EXT,
+			embedded_immutable_samplers
+			= VK_DESCRIPTOR_SET_LAYOUT_CREATE_EMBEDDED_IMMUTABLE_SAMPLERS_BIT_EXT,
+			indirect_bindable_nv = VK_DESCRIPTOR_SET_LAYOUT_CREATE_INDIRECT_BINDABLE_BIT_NV,
+			host_only_pool = VK_DESCRIPTOR_SET_LAYOUT_CREATE_HOST_ONLY_POOL_BIT_EXT,
+			per_stage_nv = VK_DESCRIPTOR_SET_LAYOUT_CREATE_PER_STAGE_BIT_NV,
+		};
+
+		Flags flags;
+
+		std::vector<Binding> bindings;
+	};
+
+	DescriptorSetLayout() = default;
+
+	DescriptorSetLayout(Device &device, CreateInfo info);
+
+	DescriptorSetLayout(DescriptorSetLayout &&) = default;
+
+	DescriptorSetLayout(const DescriptorSetLayout &) = delete;
+
+	auto operator=(DescriptorSetLayout &&) -> DescriptorSetLayout & = default;
+
+	auto operator=(const DescriptorSetLayout &) -> DescriptorSetLayout & = delete;
+
+	~DescriptorSetLayout();
+
+
+private:
+	memory::NullOnMove<VkDevice> m_device;
+
+	VkDescriptorSetLayout m_layout;
+};
+
 class Pipeline
 {
 public:
@@ -1955,8 +2055,18 @@ public:
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 
+	struct PushConstantRange
+	{
+		ShaderStageFlags::T shader_stages;
+		std::uint32_t offset;
+		std::uint32_t size;
+	};
+
 	struct CreateInfo
 	{
+		std::vector<DescriptorSetLayout *> descriptor_set_layouts;
+
+		std::vector<PushConstantRange> push_constant_ranges;
 	};
 
 	PipelineLayout() = default;
@@ -1973,7 +2083,6 @@ public:
 
 	~PipelineLayout();
 
-
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkPipelineLayout
 	{
@@ -1985,17 +2094,6 @@ private:
 	VkPipelineLayout m_layout {};
 };
 
-class DescriptorPool
-{
-};
-
-class DescriptorSetLayout
-{
-};
-
-class DescriptorSet
-{
-};
 
 } // namespace lt::renderer::vk
 
@@ -3670,3 +3768,35 @@ auto enumerate_instance_extension_properties() -> std::vector<VkExtensionPropert
 
 	return extensions;
 }
+
+// auto binding = VkDescriptorSetLayoutBinding {
+// 	.binding = 0,
+// 	.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+// 	.descriptorCount = 1'000,
+// 	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+// };
+//
+// const auto descriptor_binding_flags = VkDescriptorBindingFlagsEXT {
+// 	VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT_EXT
+// 	    | VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT
+// 	    | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT
+// 	    | VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT_EXT,
+// };
+//
+// constexpr auto descriptor_count = uint32_t { 1'000 };
+//
+// auto descriptor_binding_flags_info = VkDescriptorSetLayoutBindingFlagsCreateInfoEXT {
+// 	.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT,
+// 	.bindingCount = 1,
+// 	.pBindingFlags = &descriptor_binding_flags,
+// };
+// m_vertices_descriptor_set_layout = m_device->create_descriptor_set_layout(
+//     {
+//         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+//         .pNext = &descriptor_binding_flags_info,
+//         .flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT,
+//         .bindingCount = 1u,
+//         .pBindings = &binding,
+//
+//     }
+// );
