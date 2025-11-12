@@ -4,21 +4,23 @@ import math.vec3;
 import memory.reference;
 import std;
 
-namespace lt::renderer::components {
+export namespace lt::renderer::components {
 
-export enum class VertexFormat: std::uint8_t {
+enum class VertexFormat : std::uint8_t
+{
 	r32_g32_b32_sfloat,
 
 	r32_g32_sfloat,
 };
 
-export enum class VertexInputRate: std::uint8_t {
+enum class VertexInputRate : std::uint8_t
+{
 	per_vertex,
 
 	per_instance,
 };
 
-export struct VertexInputAttributeDescriptipn
+struct VertexInputAttributeDescriptipn
 {
 	std::uint32_t location;
 
@@ -29,7 +31,7 @@ export struct VertexInputAttributeDescriptipn
 	VertexFormat format;
 };
 
-export struct VertexInputBindingDescription
+struct VertexInputBindingDescription
 {
 	std::uint32_t binding;
 
@@ -37,7 +39,7 @@ export struct VertexInputBindingDescription
 };
 
 /** Requires a math::components::Transform component on the same entity to be functional. */
-export struct Sprite
+struct Sprite
 {
 	struct Vertex
 	{
@@ -52,7 +54,7 @@ export struct Sprite
 				VertexInputAttributeDescriptipn {
 				    .location = 0u,
 				    .binding = 0u,
-				    .offset = offsetof(Sprite::Vertex, position),
+				    .offset = 0u,
 				    .format = VertexFormat::r32_g32_b32_sfloat,
 
 				},
@@ -60,7 +62,7 @@ export struct Sprite
 				VertexInputAttributeDescriptipn {
 				    .location = 1u,
 				    .binding = 0u,
-				    .offset = offsetof(Sprite::Vertex, color),
+				    .offset = sizeof(math::vec3),
 				    .format = VertexFormat::r32_g32_b32_sfloat,
 				},
 			};

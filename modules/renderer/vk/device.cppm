@@ -27,6 +27,16 @@ public:
 		return { m_graphics_queue_family_index, m_present_queue_family_index };
 	}
 
+	[[nodiscard]] auto graphics_queue() -> vk::Queue &
+	{
+		return m_graphics_queue;
+	}
+
+	[[nodiscard]] auto present_queue() -> vk::Queue &
+	{
+		return m_present_queue;
+	}
+
 private:
 	void initialize_physical_device();
 

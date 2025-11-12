@@ -21,6 +21,11 @@ public:
 		return m_size;
 	}
 
+	[[nodiscard]] auto vk() -> vk::Buffer &
+	{
+		return m_buffer;
+	}
+
 private:
 	[[nodiscard]] auto determine_allocation_info(Usage usage) const -> vk::Memory::AllocateInfo;
 

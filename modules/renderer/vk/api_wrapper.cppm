@@ -1116,83 +1116,6 @@ private:
 	VkInstance m_instance {};
 };
 
-class Semaphore
-{
-public:
-	friend class Device;
-	friend class Queue;
-
-	Semaphore() = default;
-
-	Semaphore(Semaphore &&) = default;
-
-	Semaphore(const Semaphore &) = delete;
-
-	auto operator=(Semaphore &&) -> Semaphore & = default;
-
-	auto operator=(const Semaphore &) -> Semaphore & = delete;
-
-	~Semaphore();
-
-	auto operator&() -> VkSemaphore *
-	{
-		return &m_semaphore;
-	}
-
-private:
-	VkDevice m_device;
-
-	VkSemaphore m_semaphore;
-};
-
-class Fence
-{
-public:
-	friend class Device;
-	friend class Queue;
-
-	Fence() = default;
-
-	Fence(Fence &&) = default;
-
-	Fence(const Fence &) = delete;
-
-	auto operator=(Fence &&) -> Fence & = default;
-
-	auto operator=(const Fence &) -> Fence & = delete;
-
-	~Fence();
-
-	auto operator&() -> VkFence *
-	{
-		return &m_fence;
-	}
-
-	operator VkFence()
-	{
-		return m_fence;
-	}
-
-private:
-	VkDevice m_device;
-
-	VkFence m_fence;
-};
-
-class CommandBuffer
-{
-public:
-	friend class Device;
-
-	auto operator&() -> VkCommandBuffer *
-	{
-		return &m_command_buffer;
-	}
-
-private:
-	VkCommandBuffer m_command_buffer;
-};
-
 class Device
 {
 public:
@@ -1201,6 +1124,8 @@ public:
 	friend class Image;
 	friend class ImageView;
 	friend class Pipeline;
+	friend class Semaphore;
+	friend class Fence;
 
 	struct CreateInfo
 	{
@@ -1367,296 +1292,94 @@ private:
 	memory::NullOnMove<VkDevice> m_device {};
 };
 
-class Queue
+class Semaphore
 {
 public:
 	friend class Device;
+	friend class Swapchain;
+	friend class Queue;
 
-	constexpr static auto object_type = VK_OBJECT_TYPE_QUEUE;
+	static constexpr auto object_type = VK_OBJECT_TYPE_SEMAPHORE;
 
-	struct SubmitInfo
-	{
-		CommandBuffer command_buffer;
+	Semaphore() = default;
 
-		PipelineStageFlags::T wait_stages;
+	Semaphore(Device &device);
 
-		Semaphore wait_semaphore;
+	Semaphore(Semaphore &&) = default;
 
-		Semaphore signal_semaphore;
+	Semaphore(const Semaphore &) = delete;
 
-		Fence signal_fence;
-	};
+	auto operator=(Semaphore &&) -> Semaphore & = default;
 
-	struct PresentInfo
-	{
-		Semaphore wait_semaphore;
+	auto operator=(const Semaphore &) -> Semaphore & = delete;
 
-		class Swapchain *swapchain;
-
-		uint32_t image_idx;
-	};
-
-	Queue() = default;
-
-	Queue(Device &device, uint32_t queue_family_idx, uint32_t queue_idx);
-
-	Queue(Queue &&) = default;
-
-	Queue(const Queue &) = delete;
-
-	auto operator=(Queue &&) -> Queue & = default;
-
-	auto operator=(const Queue &) -> Queue & = delete;
-
-	~Queue();
-
-	void submit(SubmitInfo info) const;
-
-	void present(PresentInfo info) const;
+	~Semaphore();
 
 private:
-	[[nodiscard]] auto get_vk_handle() -> VkQueue
+	[[nodiscard]] auto get_vk_handle() -> VkSemaphore
 	{
-		return m_queue;
+		return m_semaphore;
+	}
+
+	[[nodiscard]] auto get_addressof_vk_handle() -> VkSemaphore *
+	{
+		return &m_semaphore;
 	}
 
 	memory::NullOnMove<VkDevice> m_device;
 
-	VkQueue m_queue;
+	VkSemaphore m_semaphore;
 };
 
-class Image
-{
-public:
-	friend class Device;
-
-	friend class Swapchain;
-
-	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
-
-	enum AspectFlags : VkFlags
-	{
-		color_bit = VK_IMAGE_ASPECT_COLOR_BIT,
-		depth_bit = VK_IMAGE_ASPECT_DEPTH_BIT,
-		stencil_bit = VK_IMAGE_ASPECT_STENCIL_BIT,
-		metadata_bit = VK_IMAGE_ASPECT_METADATA_BIT,
-		plane_0_bit = VK_IMAGE_ASPECT_PLANE_0_BIT,
-		plane_1_bit = VK_IMAGE_ASPECT_PLANE_1_BIT,
-		plane_2_bit = VK_IMAGE_ASPECT_PLANE_2_BIT,
-		none = VK_IMAGE_ASPECT_NONE,
-		memory_plane_0_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT,
-		memory_plane_1_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT,
-		memory_plane_2_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT,
-		memory_plane_3_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT,
-	};
-
-	enum Usage : VkFlags
-	{
-		transfer_src_bit = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-		transfer_dst_bit = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-		sampled_bit = VK_IMAGE_USAGE_SAMPLED_BIT,
-		storage_bit = VK_IMAGE_USAGE_STORAGE_BIT,
-		color_attachment_bit = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-		depth_stencil_attachment_bit = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-		transient_attachment_bit = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
-		input_attachment_bit = VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
-		host_transfer_bit = VK_IMAGE_USAGE_HOST_TRANSFER_BIT,
-		video_decode_dst_bit = VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR,
-		video_decode_src_bit = VK_IMAGE_USAGE_VIDEO_DECODE_SRC_BIT_KHR,
-		video_decode_dpb_bit = VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR,
-		fragment_density_map_bit = VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
-		fragment_shading_rate_attachment_bit
-		= VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR,
-		video_encode_dst_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR,
-		video_encode_src_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR,
-		video_encode_dpb_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR,
-		attachment_feedback_loop_bit = VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT,
-		invocation_mask_bit_huawei = VK_IMAGE_USAGE_INVOCATION_MASK_BIT_HUAWEI,
-		sample_weight_bit_qcom = VK_IMAGE_USAGE_SAMPLE_WEIGHT_BIT_QCOM,
-		sample_block_match_bit_qcom = VK_IMAGE_USAGE_SAMPLE_BLOCK_MATCH_BIT_QCOM,
-		tensor_aliasing_bit_arm = VK_IMAGE_USAGE_TENSOR_ALIASING_BIT_ARM,
-		tile_memory_bit_qcom = VK_IMAGE_USAGE_TILE_MEMORY_BIT_QCOM,
-		video_encode_quantization_delta_map_bit
-		= VK_IMAGE_USAGE_VIDEO_ENCODE_QUANTIZATION_DELTA_MAP_BIT_KHR,
-		video_encode_emphasis_map_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_EMPHASIS_MAP_BIT_KHR,
-	};
-
-	struct CreateInfo
-	{
-	};
-
-	Image() = default;
-
-	Image(Device &device, CreateInfo info);
-
-	Image(Image &&) noexcept = default;
-
-	Image(const Image &) = delete;
-
-	auto operator=(Image &&) noexcept -> Image & = default;
-
-	auto operator=(const Image &) -> Image & = delete;
-
-	~Image();
-
-private:
-	Image(VkImage image) noexcept; // for swapchain images
-
-	[[nodiscard]] auto get_vk_handle() -> VkImage
-	{
-		return m_image;
-	}
-
-	VkDevice m_device;
-
-	VkImage m_image;
-};
-
-class ImageView
-{
-public:
-	friend class Device;
-
-	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
-
-	enum class Type
-	{
-
-		_1d = VK_IMAGE_VIEW_TYPE_1D,
-		_2d = VK_IMAGE_VIEW_TYPE_2D,
-		_3d = VK_IMAGE_VIEW_TYPE_3D,
-		cube = VK_IMAGE_VIEW_TYPE_CUBE,
-		_1d_array = VK_IMAGE_VIEW_TYPE_1D_ARRAY,
-		_2d_array = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
-		cube_array = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY,
-	};
-
-	enum class Swizzle
-	{
-		identity = VK_COMPONENT_SWIZZLE_IDENTITY,
-		zero = VK_COMPONENT_SWIZZLE_ZERO,
-		one = VK_COMPONENT_SWIZZLE_ONE,
-		r = VK_COMPONENT_SWIZZLE_R,
-		g = VK_COMPONENT_SWIZZLE_G,
-		b = VK_COMPONENT_SWIZZLE_B,
-		a = VK_COMPONENT_SWIZZLE_A,
-	};
-
-	struct Range
-	{
-		Image::AspectFlags aspect_flags;
-		std::uint32_t base_mip_level;
-		std::uint32_t level_count;
-		std::uint32_t base_array_layer;
-		std::uint32_t layer_count;
-	};
-
-	struct CreateInfo
-	{
-		Type type;
-
-		Format format;
-
-		std::array<Swizzle, 4> components;
-
-		Range range;
-
-		std::string_view debug_name;
-	};
-
-	ImageView() = default;
-
-	ImageView(Device &device, Image &image, CreateInfo info);
-
-	ImageView(ImageView &&) = default;
-
-	ImageView(const ImageView &) = delete;
-
-	auto operator=(ImageView &&) -> ImageView & = default;
-
-	auto operator=(const ImageView &) -> ImageView & = delete;
-
-	~ImageView();
-
-private:
-	[[nodiscard]] auto get_vk_handle() -> VkImageView
-	{
-		return m_image_view;
-	}
-
-	VkDevice m_device;
-
-	VkImageView m_image_view;
-};
-
-class Swapchain
+class Fence
 {
 public:
 	friend class Queue;
-	friend class Device;
 
-	static constexpr auto object_type = VK_OBJECT_TYPE_SWAPCHAIN_KHR;
-
-	enum class PresentMode
-	{
-		immediate = VK_PRESENT_MODE_IMMEDIATE_KHR,
-		mailbox = VK_PRESENT_MODE_MAILBOX_KHR,
-		fifo = VK_PRESENT_MODE_FIFO_KHR,
-		fifo_relaxed = VK_PRESENT_MODE_FIFO_RELAXED_KHR,
-		shared_demand_refresh = VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR,
-		shared_continuous_refresh = VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR,
-		fifo_latest_ready = VK_PRESENT_MODE_FIFO_LATEST_READY_KHR,
-	};
+	static constexpr auto object_type = VK_OBJECT_TYPE_FENCE;
 
 	struct CreateInfo
 	{
-		Format format;
-
-		ColorSpace color_space;
-
-		math::uvec2 extent;
-
-		std::uint32_t min_image_count;
-
-		std::vector<uint32_t> queue_family_indices;
-
-		VkCompositeAlphaFlagBitsKHR compositeAlpha;
-
-		PresentMode present_mode;
-
-		Surface::Transform pre_transform;
+		bool signaled;
 	};
 
-	Swapchain() = default;
+	Fence() = default;
 
-	Swapchain(Device &device, Surface &surface, CreateInfo info);
+	Fence(Device &device, CreateInfo info);
 
-	Swapchain(Swapchain &&) = default;
+	Fence(Fence &&) = default;
 
-	Swapchain(const Swapchain &) = delete;
+	Fence(const Fence &) = delete;
 
-	auto operator=(Swapchain &&) -> Swapchain & = default;
+	auto operator=(Fence &&) -> Fence & = default;
 
-	auto operator=(const Swapchain &) -> Swapchain & = delete;
+	auto operator=(const Fence &) -> Fence & = delete;
 
-	~Swapchain();
+	~Fence();
 
-	[[nodiscard]] auto get_images() -> std::vector<Image>;
+	operator VkFence()
+	{
+		return m_fence;
+	}
+
+	void wait();
+
+	void reset();
 
 private:
-	[[nodiscard]] auto get_vk_handle() -> VkSwapchainKHR
+	[[nodiscard]] auto get_vk_handle() -> VkFence
 	{
-		return m_swapchain;
+		return m_fence;
 	}
 
-	[[nodiscard]] auto get_addressof_vk_handle() -> VkSwapchainKHR *
+	[[nodiscard]] auto get_addressof_vk_handle() -> VkFence *
 	{
-		return &m_swapchain;
+		return &m_fence;
 	}
 
-	VkDevice m_device;
+	memory::NullOnMove<VkDevice> m_device;
 
-	VkSwapchainKHR m_swapchain;
+	VkFence m_fence;
 };
 
 class Buffer
@@ -1738,58 +1461,215 @@ private:
 	VkBuffer m_buffer {};
 };
 
-class Memory
+class Image
 {
 public:
 	friend class Device;
 
-	static constexpr auto object_type = VK_OBJECT_TYPE_DEVICE_MEMORY;
+	friend class Swapchain;
 
-	enum PropertyFlags : VkFlags
+	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
+
+	enum AspectFlags : VkFlags
 	{
-		device_local_bit = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-		host_visible_bit = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-		host_coherent_bit = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		host_cached_bit = VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
-		lazily_allocated_bit = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT,
-		protected_bit = VK_MEMORY_PROPERTY_PROTECTED_BIT,
-		device_coherent_bit_amd = VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD,
-		device_uncached_bit_amd = VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD,
-		rdma_capable_bit_nv = VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV,
+		color_bit = VK_IMAGE_ASPECT_COLOR_BIT,
+		depth_bit = VK_IMAGE_ASPECT_DEPTH_BIT,
+		stencil_bit = VK_IMAGE_ASPECT_STENCIL_BIT,
+		metadata_bit = VK_IMAGE_ASPECT_METADATA_BIT,
+		plane_0_bit = VK_IMAGE_ASPECT_PLANE_0_BIT,
+		plane_1_bit = VK_IMAGE_ASPECT_PLANE_1_BIT,
+		plane_2_bit = VK_IMAGE_ASPECT_PLANE_2_BIT,
+		none = VK_IMAGE_ASPECT_NONE,
+		memory_plane_0_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT,
+		memory_plane_1_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT,
+		memory_plane_2_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT,
+		memory_plane_3_bit = VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT,
 	};
 
-	struct AllocateInfo
+	enum class Layout : std::underlying_type_t<VkImageLayout>
 	{
-		std::size_t size;
-
-		std::uint32_t memory_type_idx;
+		undefined = VK_IMAGE_LAYOUT_UNDEFINED,
+		general = VK_IMAGE_LAYOUT_GENERAL,
+		color_attachment_optimal = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		depth_stencil_attachment_optimal = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+		depth_stencil_read_only_optimal = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		shader_read_only_optimal = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		transfer_src_optimal = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+		transfer_dst_optimal = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		preinitialized = VK_IMAGE_LAYOUT_PREINITIALIZED,
+		depth_read_only_stencil_attachment_optimal
+		= VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL,
+		depth_attachment_stencil_read_only_optimal
+		= VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
+		depth_attachment_optimal = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+		depth_read_only_optimal = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL,
+		stencil_attachment_optimal = VK_IMAGE_LAYOUT_STENCIL_ATTACHMENT_OPTIMAL,
+		stencil_read_only_optimal = VK_IMAGE_LAYOUT_STENCIL_READ_ONLY_OPTIMAL,
+		read_only_optimal = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
+		attachment_optimal = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
+		rendering_local_read = VK_IMAGE_LAYOUT_RENDERING_LOCAL_READ,
+		present_src = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+		video_decode_dst = VK_IMAGE_LAYOUT_VIDEO_DECODE_DST_KHR,
+		video_decode_src = VK_IMAGE_LAYOUT_VIDEO_DECODE_SRC_KHR,
+		video_decode_dpb = VK_IMAGE_LAYOUT_VIDEO_DECODE_DPB_KHR,
+		shared_present = VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR,
+		fragment_density_map_optimal = VK_IMAGE_LAYOUT_FRAGMENT_DENSITY_MAP_OPTIMAL_EXT,
+		fragment_shading_rate_attachment_optimal
+		= VK_IMAGE_LAYOUT_FRAGMENT_SHADING_RATE_ATTACHMENT_OPTIMAL_KHR,
+		video_encode_dst = VK_IMAGE_LAYOUT_VIDEO_ENCODE_DST_KHR,
+		video_encode_src = VK_IMAGE_LAYOUT_VIDEO_ENCODE_SRC_KHR,
+		video_encode_dpb = VK_IMAGE_LAYOUT_VIDEO_ENCODE_DPB_KHR,
+		attachment_feedback_loop_optimal = VK_IMAGE_LAYOUT_ATTACHMENT_FEEDBACK_LOOP_OPTIMAL_EXT,
+		tensor_aliasing_arm = VK_IMAGE_LAYOUT_TENSOR_ALIASING_ARM,
+		video_encode_quantization_map = VK_IMAGE_LAYOUT_VIDEO_ENCODE_QUANTIZATION_MAP_KHR,
+		zero_initialized = VK_IMAGE_LAYOUT_ZERO_INITIALIZED_EXT,
 	};
 
-	Memory(Device &device, Buffer &buffer, AllocateInfo info);
+	enum Usage : VkFlags
+	{
+		transfer_src_bit = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+		transfer_dst_bit = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+		sampled_bit = VK_IMAGE_USAGE_SAMPLED_BIT,
+		storage_bit = VK_IMAGE_USAGE_STORAGE_BIT,
+		color_attachment_bit = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		depth_stencil_attachment_bit = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+		transient_attachment_bit = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
+		input_attachment_bit = VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+		host_transfer_bit = VK_IMAGE_USAGE_HOST_TRANSFER_BIT,
+		video_decode_dst_bit = VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR,
+		video_decode_src_bit = VK_IMAGE_USAGE_VIDEO_DECODE_SRC_BIT_KHR,
+		video_decode_dpb_bit = VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR,
+		fragment_density_map_bit = VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
+		fragment_shading_rate_attachment_bit
+		= VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR,
+		video_encode_dst_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR,
+		video_encode_src_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR,
+		video_encode_dpb_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR,
+		attachment_feedback_loop_bit = VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT,
+		invocation_mask_bit_huawei = VK_IMAGE_USAGE_INVOCATION_MASK_BIT_HUAWEI,
+		sample_weight_bit_qcom = VK_IMAGE_USAGE_SAMPLE_WEIGHT_BIT_QCOM,
+		sample_block_match_bit_qcom = VK_IMAGE_USAGE_SAMPLE_BLOCK_MATCH_BIT_QCOM,
+		tensor_aliasing_bit_arm = VK_IMAGE_USAGE_TENSOR_ALIASING_BIT_ARM,
+		tile_memory_bit_qcom = VK_IMAGE_USAGE_TILE_MEMORY_BIT_QCOM,
+		video_encode_quantization_delta_map_bit
+		= VK_IMAGE_USAGE_VIDEO_ENCODE_QUANTIZATION_DELTA_MAP_BIT_KHR,
+		video_encode_emphasis_map_bit = VK_IMAGE_USAGE_VIDEO_ENCODE_EMPHASIS_MAP_BIT_KHR,
+	};
 
-	~Memory();
+	struct Range
+	{
+		Image::AspectFlags aspect_flags;
+		std::uint32_t base_mip_level;
+		std::uint32_t level_count;
+		std::uint32_t base_array_layer;
+		std::uint32_t layer_count;
+	};
 
-	Memory(Memory &&) = default;
+	static constexpr auto full_color_range = Range {
+		.aspect_flags = AspectFlags::color_bit,
+		.base_mip_level = 0u,
+		.level_count = VK_REMAINING_MIP_LEVELS,
+		.base_array_layer = 0u,
+		.layer_count = VK_REMAINING_ARRAY_LAYERS,
+	};
 
-	Memory(const Memory &) = delete;
+	struct CreateInfo
+	{
+	};
 
-	auto operator=(Memory &&) -> Memory & = default;
+	Image() = default;
 
-	auto operator=(const Memory &) -> Memory & = delete;
+	Image(Device &device, CreateInfo info);
 
-	[[nodiscard]] auto map(std::size_t size, std::size_t offset) -> std::span<std::byte>;
+	Image(Image &&) noexcept = default;
 
-	void unmap();
+	Image(const Image &) = delete;
+
+	auto operator=(Image &&) noexcept -> Image & = default;
+
+	auto operator=(const Image &) -> Image & = delete;
+
+	~Image();
 
 private:
-	[[nodiscard]] auto get_vk_handle() -> VkDeviceMemory
+	Image(VkImage image) noexcept; // for swapchain images
+
+	[[nodiscard]] auto get_vk_handle() -> VkImage
 	{
-		return m_memory;
+		return m_image;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	VkDevice m_device;
 
-	VkDeviceMemory m_memory {};
+	VkImage m_image;
+};
+
+class ImageView
+{
+public:
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
+
+	enum class Type
+	{
+
+		_1d = VK_IMAGE_VIEW_TYPE_1D,
+		_2d = VK_IMAGE_VIEW_TYPE_2D,
+		_3d = VK_IMAGE_VIEW_TYPE_3D,
+		cube = VK_IMAGE_VIEW_TYPE_CUBE,
+		_1d_array = VK_IMAGE_VIEW_TYPE_1D_ARRAY,
+		_2d_array = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+		cube_array = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY,
+	};
+
+	enum class Swizzle
+	{
+		identity = VK_COMPONENT_SWIZZLE_IDENTITY,
+		zero = VK_COMPONENT_SWIZZLE_ZERO,
+		one = VK_COMPONENT_SWIZZLE_ONE,
+		r = VK_COMPONENT_SWIZZLE_R,
+		g = VK_COMPONENT_SWIZZLE_G,
+		b = VK_COMPONENT_SWIZZLE_B,
+		a = VK_COMPONENT_SWIZZLE_A,
+	};
+
+	struct CreateInfo
+	{
+		Type type;
+
+		Format format;
+
+		std::array<Swizzle, 4> components;
+
+		Image::Range range;
+
+		std::string_view debug_name;
+	};
+
+	ImageView() = default;
+
+	ImageView(Device &device, Image &image, CreateInfo info);
+
+	ImageView(ImageView &&) = default;
+
+	ImageView(const ImageView &) = delete;
+
+	auto operator=(ImageView &&) -> ImageView & = default;
+
+	auto operator=(const ImageView &) -> ImageView & = delete;
+
+	~ImageView();
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkImageView
+	{
+		return m_image_view;
+	}
+
+	VkDevice m_device;
+
+	VkImageView m_image_view;
 };
 
 class ShaderModule
@@ -1814,7 +1694,7 @@ public:
 
 	auto operator=(ShaderModule &&) -> ShaderModule & = default;
 
-	auto operator=(const Memory &) -> Memory & = delete;
+	auto operator=(const ShaderModule &) -> ShaderModule & = delete;
 
 private:
 	[[nodiscard]] auto get_vk_handle()
@@ -1830,7 +1710,6 @@ private:
 class DescriptorPool
 {
 };
-
 
 class DescriptorSet
 {
@@ -1930,6 +1809,14 @@ class Pipeline
 {
 public:
 	static constexpr auto object_type = VK_OBJECT_TYPE_PIPELINE;
+
+	enum class BindPoint : std::underlying_type_t<VkPipelineBindPoint>
+	{
+		graphics = VK_PIPELINE_BIND_POINT_GRAPHICS,
+		compute = VK_PIPELINE_BIND_POINT_COMPUTE,
+		ray_tracing = VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
+		data_graph = VK_PIPELINE_BIND_POINT_DATA_GRAPH_ARM,
+	};
 
 	struct InputAssemblyState
 	{
@@ -2094,6 +1981,417 @@ private:
 	VkPipelineLayout m_layout {};
 };
 
+class CommandBuffer
+{
+public:
+	friend class Device;
+	friend class Queue;
+
+	struct BeginInfo
+	{
+	};
+
+	struct BufferCopyInfo
+	{
+		Buffer *src_buffer;
+
+		Buffer *dst_buffer;
+
+		std::size_t src_offset;
+
+		std::size_t dst_offset;
+
+		std::size_t size;
+	};
+
+	struct PushConstantsInfo
+	{
+		class PipelineLayout *layout;
+
+		vk::ShaderStageFlags::T shader_stages;
+
+		std::uint32_t offset;
+
+		std::uint32_t size;
+
+		void *data;
+	};
+
+	struct ImageBarrierInfo
+	{
+		enum AccessFlagBits : std::underlying_type_t<VkAccessFlagBits>
+		{
+			indirect_command_read = VK_ACCESS_INDIRECT_COMMAND_READ_BIT,
+			index_read = VK_ACCESS_INDEX_READ_BIT,
+			vertex_attribute_read = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
+			uniform_read = VK_ACCESS_UNIFORM_READ_BIT,
+			input_attachment_read = VK_ACCESS_INPUT_ATTACHMENT_READ_BIT,
+			shader_read = VK_ACCESS_SHADER_READ_BIT,
+			shader_write = VK_ACCESS_SHADER_WRITE_BIT,
+			color_attachment_read = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
+			color_attachment_write = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+			depth_stencil_attachment_read = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+			depth_stencil_attachment_write = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+			transfer_read = VK_ACCESS_TRANSFER_READ_BIT,
+			transfer_write = VK_ACCESS_TRANSFER_WRITE_BIT,
+			host_read = VK_ACCESS_HOST_READ_BIT,
+			host_write = VK_ACCESS_HOST_WRITE_BIT,
+			memory_read = VK_ACCESS_MEMORY_READ_BIT,
+			memory_write = VK_ACCESS_MEMORY_WRITE_BIT,
+			none = VK_ACCESS_NONE,
+			transform_feedback_write = VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT,
+			transform_feedback_counter_read = VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT,
+			transform_feedback_counter_write = VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT,
+			conditional_rendering_read = VK_ACCESS_CONDITIONAL_RENDERING_READ_BIT_EXT,
+			color_attachment_read_noncoherent = VK_ACCESS_COLOR_ATTACHMENT_READ_NONCOHERENT_BIT_EXT,
+			acceleration_structure_read_khr = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR,
+			acceleration_structure_write_khr = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR,
+			fragment_density_map_read = VK_ACCESS_FRAGMENT_DENSITY_MAP_READ_BIT_EXT,
+			fragment_shading_rate_attachment_read_khr
+			= VK_ACCESS_FRAGMENT_SHADING_RATE_ATTACHMENT_READ_BIT_KHR,
+			command_preprocess_read = VK_ACCESS_COMMAND_PREPROCESS_READ_BIT_EXT,
+			command_preprocess_write = VK_ACCESS_COMMAND_PREPROCESS_WRITE_BIT_EXT,
+		};
+
+		class Image *image;
+
+		Image::Range range;
+
+		vk::PipelineStageFlags::T src_stages;
+
+		vk::PipelineStageFlags::T dst_stages;
+
+		Flags src_accesses;
+
+		Flags dst_accesses;
+
+		Image::Layout src_layout;
+
+		Image::Layout dst_layout;
+	};
+
+	struct RenderingInfo
+	{
+		struct AttachmentInfo
+		{
+			enum class ResolveModeBits : std::underlying_type_t<VkResolveModeFlagBits>
+			{
+				none = VK_RESOLVE_MODE_NONE,
+				sample_zero = VK_RESOLVE_MODE_SAMPLE_ZERO_BIT,
+				average = VK_RESOLVE_MODE_AVERAGE_BIT,
+				min = VK_RESOLVE_MODE_MIN_BIT,
+				max = VK_RESOLVE_MODE_MAX_BIT,
+			};
+
+			enum class LoadOperation : std::underlying_type_t<VkAttachmentLoadOp>
+			{
+				load = VK_ATTACHMENT_LOAD_OP_LOAD,
+				clear = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				dont_care = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+				none = VK_ATTACHMENT_LOAD_OP_NONE,
+			};
+
+			enum class StoreOperation : std::underlying_type_t<VkAttachmentStoreOp>
+			{
+				store = VK_ATTACHMENT_STORE_OP_STORE,
+				dont_care = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				none = VK_ATTACHMENT_STORE_OP_NONE,
+			};
+
+			ImageView *view;
+
+			Image::Layout layout;
+
+			LoadOperation load_operation;
+
+			StoreOperation store_operation;
+
+			std::array<float, 4> color_clear_values;
+
+			float depth_clear_value;
+
+			std::uint32_t stencil_clear_value;
+
+			Flags resolve_mode_flags;
+		};
+
+		math::uvec2 area_offset;
+
+		math::uvec2 area_extent;
+
+		std::vector<AttachmentInfo> color_attachments;
+	};
+
+	struct DrawInfo
+	{
+		std::uint32_t vertex_count;
+
+		std::uint32_t instance_count;
+
+		std::uint32_t first_vertex;
+
+		std::uint32_t first_instance;
+	};
+
+	void begin(BeginInfo info = {});
+
+	void end();
+
+	void copy(BufferCopyInfo info);
+
+	void push_constants(PushConstantsInfo info);
+
+	void image_barrier(ImageBarrierInfo info);
+
+	void begin_rendering(RenderingInfo info);
+
+	void end_rendering();
+
+	void bind_pipeline(Pipeline &pipeline, Pipeline::BindPoint bind_point);
+
+	void draw(DrawInfo info);
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkCommandBuffer
+	{
+		return m_buffer;
+	}
+
+	[[nodiscard]] auto get_addressof_vk_handle() -> VkCommandBuffer *
+	{
+		return &m_buffer;
+	}
+
+	VkCommandBuffer m_buffer;
+};
+
+class CommandPool
+{
+public:
+	struct CreateInfo
+	{
+		enum FlagBits : std::underlying_type_t<VkCommandPoolCreateFlagBits>
+		{
+			transient = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
+			reset_command_buffer = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+			_protected = VK_COMMAND_POOL_CREATE_PROTECTED_BIT,
+		};
+
+		Flags flags;
+	};
+
+	enum class BufferLevel
+	{
+		secondary = VK_COMMAND_BUFFER_LEVEL_SECONDARY,
+		primary = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+	};
+
+	CommandPool() = default;
+
+	CommandPool(Device &device, CreateInfo info);
+
+	~CommandPool();
+
+	CommandPool(CommandPool &&) = default;
+
+	CommandPool(const CommandPool &) = delete;
+
+	auto operator=(CommandPool &&) -> CommandPool & = default;
+
+	auto operator=(const CommandPool &) -> CommandPool & = delete;
+
+	[[nodiscard]] auto allocate(uint32_t count, BufferLevel level) -> std::vector<CommandBuffer>;
+
+private:
+	VkDevice m_device {};
+
+	VkCommandPool m_pool {};
+};
+
+class Swapchain
+{
+public:
+	friend class Queue;
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_SWAPCHAIN_KHR;
+
+	enum class PresentMode
+	{
+		immediate = VK_PRESENT_MODE_IMMEDIATE_KHR,
+		mailbox = VK_PRESENT_MODE_MAILBOX_KHR,
+		fifo = VK_PRESENT_MODE_FIFO_KHR,
+		fifo_relaxed = VK_PRESENT_MODE_FIFO_RELAXED_KHR,
+		shared_demand_refresh = VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR,
+		shared_continuous_refresh = VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR,
+		fifo_latest_ready = VK_PRESENT_MODE_FIFO_LATEST_READY_KHR,
+	};
+
+	struct CreateInfo
+	{
+		Format format;
+
+		ColorSpace color_space;
+
+		math::uvec2 extent;
+
+		std::uint32_t min_image_count;
+
+		std::vector<uint32_t> queue_family_indices;
+
+		VkCompositeAlphaFlagBitsKHR compositeAlpha;
+
+		PresentMode present_mode;
+
+		Surface::Transform pre_transform;
+	};
+
+	Swapchain() = default;
+
+	Swapchain(Device &device, Surface &surface, CreateInfo info);
+
+	Swapchain(Swapchain &&) = default;
+
+	Swapchain(const Swapchain &) = delete;
+
+	auto operator=(Swapchain &&) -> Swapchain & = default;
+
+	auto operator=(const Swapchain &) -> Swapchain & = delete;
+
+	~Swapchain();
+
+	[[nodiscard]] auto get_images() -> std::vector<Image>;
+
+	[[nodiscard]] auto acquire_image(Semaphore &semaphore, std::uint64_t timeout = 100'000'000)
+	    -> std::uint32_t;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkSwapchainKHR
+	{
+		return m_swapchain;
+	}
+
+	[[nodiscard]] auto get_addressof_vk_handle() -> VkSwapchainKHR *
+	{
+		return &m_swapchain;
+	}
+
+	VkDevice m_device;
+
+	VkSwapchainKHR m_swapchain;
+};
+
+class Queue
+{
+public:
+	friend class Device;
+
+	constexpr static auto object_type = VK_OBJECT_TYPE_QUEUE;
+
+	struct SubmitInfo
+	{
+		CommandBuffer *command_buffer;
+
+		PipelineStageFlags::T wait_stages;
+
+		Semaphore *wait_semaphore;
+
+		Semaphore *signal_semaphore;
+
+		Fence *signal_fence;
+	};
+
+	struct PresentInfo
+	{
+		Semaphore *wait_semaphore;
+
+		Swapchain *swapchain;
+
+		uint32_t image_idx;
+	};
+
+	Queue() = default;
+
+	Queue(Device &device, uint32_t queue_family_idx, uint32_t queue_idx);
+
+	Queue(Queue &&) = default;
+
+	Queue(const Queue &) = delete;
+
+	auto operator=(Queue &&) -> Queue & = default;
+
+	auto operator=(const Queue &) -> Queue & = delete;
+
+	~Queue();
+
+	void submit(SubmitInfo info) const;
+
+	void present(PresentInfo info) const;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkQueue
+	{
+		return m_queue;
+	}
+
+	memory::NullOnMove<VkDevice> m_device;
+
+	VkQueue m_queue;
+};
+
+class Memory
+{
+public:
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_DEVICE_MEMORY;
+
+	enum PropertyFlags : VkFlags
+	{
+		device_local_bit = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		host_visible_bit = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+		host_coherent_bit = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		host_cached_bit = VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+		lazily_allocated_bit = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT,
+		protected_bit = VK_MEMORY_PROPERTY_PROTECTED_BIT,
+		device_coherent_bit_amd = VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD,
+		device_uncached_bit_amd = VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD,
+		rdma_capable_bit_nv = VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV,
+	};
+
+	struct AllocateInfo
+	{
+		std::size_t size;
+
+		std::uint32_t memory_type_idx;
+	};
+
+	Memory(Device &device, Buffer &buffer, AllocateInfo info);
+
+	~Memory();
+
+	Memory(Memory &&) = default;
+
+	Memory(const Memory &) = delete;
+
+	auto operator=(Memory &&) -> Memory & = default;
+
+	auto operator=(const Memory &) -> Memory & = delete;
+
+	[[nodiscard]] auto map(std::size_t size, std::size_t offset) -> std::span<std::byte>;
+
+	void unmap();
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkDeviceMemory
+	{
+		return m_memory;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkDeviceMemory m_memory {};
+};
 
 } // namespace lt::renderer::vk
 
@@ -2927,14 +3225,49 @@ Surface::~Surface()
 	return formats;
 }
 
+Semaphore::Semaphore(Device &device): m_device(device.get_vk_handle())
+{
+	auto vk_info = VkSemaphoreCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+	};
+
+	vkc(api::create_semaphore(m_device, &vk_info, nullptr, &m_semaphore));
+}
+
 Semaphore::~Semaphore()
 {
-	api::destroy_semaphore(m_device, m_semaphore, nullptr);
+	if (m_device)
+	{
+		api::destroy_semaphore(m_device, m_semaphore, nullptr);
+	}
+}
+
+Fence::Fence(Device &device, CreateInfo info): m_device(device.get_vk_handle())
+{
+	auto vk_info = VkFenceCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+		.flags = info.signaled ? VK_FENCE_CREATE_SIGNALED_BIT : VkFlags {},
+	};
+
+	vkc(api::create_fence(m_device, &vk_info, nullptr, &m_fence));
 }
 
 Fence::~Fence()
 {
-	api::destroy_fence(m_device, m_fence, nullptr);
+	if (m_device)
+	{
+		api::destroy_fence(m_device, m_fence, nullptr);
+	}
+}
+
+void Fence::wait()
+{
+	vkc(api::wait_for_fences(m_device, 1u, &m_fence, true, std::numeric_limits<uint64_t>::max()));
+}
+
+void Fence::reset()
+{
+	vkc(api::reset_fences(m_device, 1u, &m_fence));
 }
 
 Device::Device(const Gpu &gpu, CreateInfo info)
@@ -3472,16 +3805,16 @@ void Queue::submit(SubmitInfo info) const
 
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.waitSemaphoreCount = 1u,
-		.pWaitSemaphores = &info.wait_semaphore,
+		.pWaitSemaphores = info.wait_semaphore->get_addressof_vk_handle(),
 		.pWaitDstStageMask = addressof_underlying(info.wait_stages),
 
 		.commandBufferCount = 1u,
-		.pCommandBuffers = &info.command_buffer,
+		.pCommandBuffers = info.command_buffer->get_addressof_vk_handle(),
 		.signalSemaphoreCount = 1u,
-		.pSignalSemaphores = &info.signal_semaphore,
+		.pSignalSemaphores = info.signal_semaphore->get_addressof_vk_handle(),
 	};
 
-	vkc(api::queue_submit(m_queue, 1u, &vk_info, info.signal_fence));
+	vkc(api::queue_submit(m_queue, 1u, &vk_info, info.signal_fence->get_vk_handle()));
 }
 
 void Queue::present(PresentInfo info) const
@@ -3491,7 +3824,7 @@ void Queue::present(PresentInfo info) const
 	const auto vk_info = VkPresentInfoKHR {
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.waitSemaphoreCount = 1u,
-		.pWaitSemaphores = &info.wait_semaphore,
+		.pWaitSemaphores = info.wait_semaphore->get_addressof_vk_handle(),
 		.swapchainCount = 1u,
 		.pSwapchains = info.swapchain->get_addressof_vk_handle(),
 		.pImageIndices = &info.image_idx,
@@ -3581,6 +3914,23 @@ Swapchain::~Swapchain()
 
 	return images;
 }
+
+[[nodiscard]] auto Swapchain::acquire_image(Semaphore &semaphore, std::uint64_t timeout)
+    -> std::uint32_t
+{
+	auto idx = std::uint32_t {};
+	vkc(api::acquire_next_image_khr(
+	    m_device,
+	    m_swapchain,
+	    timeout,
+	    semaphore.get_vk_handle(),
+	    VK_NULL_HANDLE,
+	    &idx
+	));
+
+	return idx;
+}
+
 
 Buffer::Buffer(Device &device, CreateInfo info) {};
 

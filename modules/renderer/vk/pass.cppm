@@ -1,5 +1,4 @@
 export module renderer.vk.pass;
-
 import renderer.data;
 import renderer.backend.vk.library_wrapper;
 import renderer.backend.vk.device;

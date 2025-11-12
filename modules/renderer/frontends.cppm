@@ -1,4 +1,7 @@
 export module renderer.frontend;
+import renderer.data;
+import renderer.components;
+import math.components;
 import assets.shader;
 import ecs.entity;
 import math.vec2;
@@ -129,13 +132,6 @@ public:
 		std::size_t size;
 	};
 
-	[[nodiscard]] static auto create(
-	    Api target_api,
-	    class IDevice *device,
-	    class IGpu *gpu,
-	    const CreateInfo &info
-	) -> memory::Scope<IBuffer>;
-
 	IBuffer() = default;
 
 	virtual ~IBuffer() = default;
@@ -160,13 +156,6 @@ private:
 class IPass
 {
 public:
-	[[nodiscard]] static auto create(
-	    lt::renderer::Api target_api,
-	    class IDevice *device,
-	    const class lt::assets::ShaderAsset &vertex_shader,
-	    const class lt::assets::ShaderAsset &fragment_shader
-	) -> memory::Scope<IPass>;
-
 	IPass() = default;
 
 	virtual ~IPass() = default;
@@ -180,52 +169,43 @@ public:
 	auto operator=(const IPass &) -> IPass & = delete;
 };
 
-// class IRenderer
-// {
-// public:
-// 	static constexpr auto frames_in_flight_upper_limit = 5u;
-//
-// 	static constexpr auto frames_in_flight_lower_limit = 1u;
-//
-// 	enum class Result : uint8_t
-// 	{
-// 		success = 0,
-// 		invalid_swapchain,
-// 		error,
-// 	};
-//
-// 	[[nodiscard]] static auto create(
-// 	    Api target_api,
-// 	    class IGpu *gpu,
-// 	    class IDevice *device,
-// 	    class ISwapchain *swapchain,
-// 	    uint32_t max_frames_in_flight
-// 	) -> memory::Scope<IRenderer>;
-//
-// 	IRenderer() = default;
-//
-// 	virtual ~IRenderer() = default;
-//
-// 	IRenderer(IRenderer &&) = default;
-//
-// 	IRenderer(const IRenderer &) = delete;
-//
-// 	auto operator=(IRenderer &&) -> IRenderer & = default;
-//
-// 	auto operator=(const IRenderer &) -> IRenderer & = delete;
-//
-// 	virtual auto frame(uint32_t frame_idx, std::function<void()> submit_scene) -> Result = 0;
-//
-// 	virtual void replace_swapchain(class ISwapchain *swapchain) = 0;
-//
-// 	virtual void set_frame_constants(FrameConstants constants) = 0;
-//
-// 	virtual void submit_sprite(
-// 	    const components::Sprite &sprite,
-// 	    const math::components::Transform &transform
-// 	) = 0;
-// };
+class IRenderer
+{
+public:
+	static constexpr auto frames_in_flight_upper_limit = 5u;
 
+	static constexpr auto frames_in_flight_lower_limit = 1u;
+
+	enum class Result : std::uint8_t
+	{
+		success = 0,
+		invalid_swapchain,
+		error,
+	};
+
+	IRenderer() = default;
+
+	virtual ~IRenderer() = default;
+
+	IRenderer(IRenderer &&) = default;
+
+	IRenderer(const IRenderer &) = delete;
+
+	auto operator=(IRenderer &&) -> IRenderer & = default;
+
+	auto operator=(const IRenderer &) -> IRenderer & = delete;
+
+	virtual auto frame(std::uint32_t frame_idx, std::function<void()> submit_scene) -> Result = 0;
+
+	virtual void replace_swapchain(class ISwapchain *swapchain) = 0;
+
+	virtual void set_frame_constants(FrameConstants constants) = 0;
+
+	virtual void submit_sprite(
+	    const components::Sprite &sprite,
+	    const math::components::Transform &transform
+	) = 0;
+};
 
 // class IDebugger
 // {
