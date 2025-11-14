@@ -1,3 +1,11 @@
+add_library_module(NAME logger INTERFACES logger.cppm)
+add_library_module(NAME bitwise INTERFACES operations.cppm)
+add_library_module(NAME env INTERFACES constants.cppm)
+add_library_module(
+    NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
+)
+add_library_module(NAME time INTERFACES timer.cppm)
+
 add_library_module(
     NAME
     test
@@ -10,18 +18,6 @@ add_library_module(
     DEPENDENCIES
     logger
 )
-
-add_library_module(NAME logger INTERFACES logger.cppm)
-
-add_library_module(NAME bitwise INTERFACES operations.cppm)
-
-add_library_module(NAME env INTERFACES constants.cppm)
-
-add_library_module(
-    NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
-)
-
-add_library_module(NAME time INTERFACES timer.cppm)
 
 add_library_module(
     NAME
@@ -104,11 +100,36 @@ add_library_module(
     memory
 )
 
-if(NOT WIN32)
+if(WIN32)
     add_library_module(
         NAME
         surface
         INTERFACES
+        constants.cppm
+        system.cppm
+        requests.cppm
+        events.cppm
+        components.cppm
+        SOURCES
+        platform_windows.cpp
+        DEPENDENCIES
+        ecs
+        app
+        math
+        memory
+        tbb
+        PRIVATE_DEPENDENCIES
+        logger
+        lt_debug
+        time
+    )
+
+elseif(UNIX)
+    add_library_module(
+        NAME
+        surface
+        INTERFACES
+        constants.cppm
         system.cppm
         requests.cppm
         events.cppm
@@ -127,7 +148,9 @@ if(NOT WIN32)
         lt_debug
         time
     )
+
 else()
+    message(FATAL "Failed to generate cmake: unsupported platform")
 
 endif()
 
@@ -175,6 +198,8 @@ add_library_module(
     PRIVATE_DEPENDENCIES
     surface
 )
+
+return()
 
 add_library_module(
     NAME

@@ -11,7 +11,6 @@ import math.vec2;
 import app.system;
 import std;
 
-
 using ::lt::surface::SurfaceComponent;
 using ::lt::surface::System;
 using ::lt::test::Case;

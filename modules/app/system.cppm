@@ -69,9 +69,9 @@ export class SystemStats
 public:
 	void push_diagnosis(SystemDiagnosis &&diagnosis)
 	{
-		auto diag = m_diagnosis.emplace_back(std::move(diagnosis));
+		auto &diag = m_diagnosis.emplace_back(std::move(diagnosis));
 
-		log::debug("message: {}", diag.message);
+		log::info("message: {}", std::string { diag.message });
 	}
 
 	[[nodiscard]] auto empty_diagnosis() const -> bool

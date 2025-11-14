@@ -52,7 +52,7 @@ struct [[maybe_unused]] print
 			// clang-format off
 			switch (level)
 			{
-			using enum Level;
+			using enum ::lt::log::Level;
 			case trace   : return "\033[1;37m| trc |\033[0m";
 			case debug   : return "\033[1;36m| dbg |\033[0m";
 			case info    : return "\033[1;32m| inf |\033[0m";
@@ -71,7 +71,7 @@ struct [[maybe_unused]] print
 		std::println(
 		    "{} {} ==> {}",
 		    to_string(level, location),
-		    std::format("{}:{}", path.filename().c_str(), location.line()),
+		    std::format("{}:{}", path.filename().string(), location.line()),
 		    std::format(format, std::forward<Args>(arguments)...)
 		);
 	}

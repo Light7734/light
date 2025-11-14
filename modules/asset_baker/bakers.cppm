@@ -15,26 +15,24 @@ export void bake_shader(
 	using lt::assets::ShaderAsset;
 	using enum lt::assets::ShaderAsset::Type;
 
-	auto glsl_path = in_path.string();
+	auto glsl_path = std::string { in_path.string() };
 	auto spv_path = std::format("{}.spv", glsl_path);
 	lt::log::trace(
 	    "Compiling {} shader {} -> {}",
 	    type == vertex ? "vertex" : "fragment",
-	    glsl_path,
-	    spv_path
+	    std::string { glsl_path },
+	    std::string { spv_path }
 	);
 
 	// Don't bother linking to shaderc, just invoke the command with a system call.
 	// NOLINTNEXTLINE(concurrency-mt-unsafe)
-	std::system(
-	    std::format(
-	        "glslc --target-env=vulkan1.4 -std=450core -fshader-stage={} {} -o {}",
-	        type == vertex ? "vert" : "frag",
-	        glsl_path,
-	        spv_path
-	    )
-	        .c_str()
-	);
+	std::system(std::format(
+	                "glslc --target-env=vulkan1.4 -std=450core -fshader-stage={} {} -o {}",
+	                type == vertex ? "vert" : "frag",
+	                glsl_path,
+	                spv_path
+	)
+	                .c_str());
 
 	auto stream = std::ifstream(spv_path, std::ios::binary);
 	lt::debug::ensure(

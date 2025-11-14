@@ -75,7 +75,7 @@ System::~System()
 
 	try
 	{
-		// TODO(Light): make registry.remove not validate iterators
+		// TODO(Light): make registry.remove not invalidate iterators
 		auto entities_to_remove = std::vector<ecs::EntityId> {};
 		for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
 		{

@@ -1,6 +1,8 @@
 module;
-#ifdef LIGHT_PLATFORM_LINUX
+#if defined(LIGHT_PLATFORM_LINUX)
 typedef struct _XDisplay Display;
+#else defined(LIGHT_PLATFORM_WINDOWS)
+	#include <Windows.h>
 #endif
 
 export module surface.system:components;
@@ -38,12 +40,17 @@ public:
 	    ModifyPositionRequest,
 	    ModifyVisibilityRequest>;
 
-#ifdef LIGHT_PLATFORM_LINUX
+#if defined(LIGHT_PLATFORM_LINUX)
 	struct NativeData
 	{
 		Display *display;
 		std::uint32_t window;
 		unsigned long wm_delete_message;
+	};
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	struct NativeData
+	{
+		HWND window;
 	};
 #endif
 

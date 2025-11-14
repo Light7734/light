@@ -251,11 +251,16 @@ private:
 
 	TypeId m_entity_count;
 
-	std::flat_map<TypeId, memory::Scope<UnderlyingSparseSet_T>> m_sparsed_sets;
+	/** MSVC DOES NOT SUPPORT FLAT MAP!!
+	 * IT"S YEAR ~2026, great...
+	 * using ::std::map for the time being.
+	 */
 
-	std::flat_map<TypeId, Callback_T> m_on_construct_hooks;
+	std::map<TypeId, memory::Scope<UnderlyingSparseSet_T>> m_sparsed_sets;
 
-	std::flat_map<TypeId, Callback_T> m_on_destruct_hooks;
+	std::map<TypeId, Callback_T> m_on_construct_hooks;
+
+	std::map<TypeId, Callback_T> m_on_destruct_hooks;
 };
 
 } // namespace lt::ecs
