@@ -1,12 +1,12 @@
-export module renderer.backend.vk.device;
+export module renderer.vk.device;
 import memory.null_on_move;
 import logger;
 import debug.assertions;
-import renderer.backend.vk.instance;
+import renderer.vk.instance;
 import renderer.frontend;
-import renderer.backend.vk.library_wrapper;
-import renderer.backend.vk.gpu;
-import renderer.backend.vk.surface;
+import renderer.vk.api_wrapper;
+import renderer.vk.gpu;
+import renderer.vk.surface;
 import std;
 
 

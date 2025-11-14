@@ -1,9 +1,9 @@
-export module renderer.backend.vk.swapchain;
-import renderer.backend.vk.library_wrapper;
-import renderer.backend.vk.surface;
-import renderer.backend.vk.device;
-import renderer.backend.vk.instance;
-import renderer.backend.vk.gpu;
+export module renderer.vk.swapchain;
+import renderer.vk.api_wrapper;
+import renderer.vk.surface;
+import renderer.vk.device;
+import renderer.vk.instance;
+import renderer.vk.gpu;
 import renderer.frontend;
 import math.vec2;
 import memory.null_on_move;

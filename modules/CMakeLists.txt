@@ -4,7 +4,6 @@ add_library_module(
     INTERFACES
     test.cppm
     expects.cppm
-    PRIVATE_INTERFACES
     registry.cppm
     SOURCES
     entrypoint.cpp
@@ -151,7 +150,9 @@ add_library_module(
     renderer
     INTERFACES
     data.cppm
+    system.cppm
     frontends.cppm
+    components.cppm
     factory.cppm
     vk/api_wrapper.cppm
     vk/device.cppm
@@ -161,6 +162,8 @@ add_library_module(
     vk/swapchain.cppm
     vk/buffer.cppm
     vk/pass.cppm
+    vk/renderer.cppm
+    vk/debugger.cppm
     DEPENDENCIES
     app
     ecs
@@ -173,4 +176,21 @@ add_library_module(
     surface
 )
 
-# add_subdirectory(./mirror)
+add_library_module(
+    NAME
+    libmirror
+    ROOT_DIR
+    ${CMAKE_CURRENT_SOURCE_DIR}/mirror
+    INTERFACES
+    system.cppm
+    DEPENDENCIES
+    app
+    time
+    input
+    surface
+    renderer
+    camera
+)
+
+# add_executable_module(mirror entrypoint/mirror.cpp)
+# target_link_libraries(mirror PRIVATE libmirror input)

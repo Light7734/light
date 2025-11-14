@@ -1,7 +1,7 @@
 #version 450 core
 
 layout(push_constant ) uniform pc {
- mat4 view_projection;
+mat4 view_projection;
 };
 
 vec3 positions[3] = vec3[](
@@ -23,4 +23,3 @@ void main()
     gl_Position = view_projection * vec4(positions[gl_VertexIndex], 1.0);
     out_frag_color = colors[gl_VertexIndex];
 }
-

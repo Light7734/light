@@ -1,7 +1,7 @@
-export module renderer.backend.vk.buffer;
-import renderer.backend.vk.device;
-import renderer.backend.vk.gpu;
-import renderer.backend.vk.library_wrapper;
+export module renderer.vk.buffer;
+import renderer.vk.device;
+import renderer.vk.gpu;
+import renderer.vk.api_wrapper;
 import renderer.frontend;
 import std;
 

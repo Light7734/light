@@ -1,15 +1,15 @@
 export module renderer.factory;
 import renderer.frontend;
 import assets.shader;
-import renderer.backend.vk.device;
+import renderer.vk.device;
 import renderer.vk.pass;
-import renderer.backend.vk.instance;
-import renderer.backend.vk.swapchain;
+import renderer.vk.instance;
+import renderer.vk.swapchain;
 import renderer.vk.renderer;
-import renderer.backend.vk.buffer;
-import renderer.backend.vk.gpu;
-import renderer.backend.vk.surface;
-import renderer.vk.renderer;
+import renderer.vk.buffer;
+import renderer.vk.gpu;
+import renderer.vk.debugger;
+import renderer.vk.surface;
 import memory.scope;
 import debug.assertions;
 import ecs.entity;
@@ -19,13 +19,19 @@ export namespace lt::renderer {
 
 [[nodiscard]] auto get_instance(Api target_api) -> IInstance *;
 
+[[nodiscard]] auto create_debugger(Api target_api, IInstance *instance, IDebugger::CreateInfo info)
+    -> memory::Scope<IDebugger>;
+
 [[nodiscard]] auto create_surface(
     Api target_api,
     IInstance *instance,
     const ecs::Entity &surface_entity
-);
+) -> memory::Scope<ISurface>;
 
 [[nodiscard]] auto create_gpu(Api target_api, IInstance *instance) -> memory::Scope<IGpu>;
+
+[[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface)
+    -> memory::Scope<IDevice>;
 
 [[nodiscard]] auto create_swapchain(Api target_api, ISurface *surface, IGpu *gpu, IDevice *device)
     -> memory::Scope<ISwapchain>;
@@ -43,7 +49,7 @@ export namespace lt::renderer {
     IDevice *device,
     ISwapchain *swapchain,
     std::uint32_t max_frames_in_flight
-) -> memory::Scope<IRenderer>
+) -> memory::Scope<IRenderer>;
 
 } // namespace lt::renderer
 
@@ -192,25 +198,24 @@ using namespace lt::renderer;
 	}
 }
 
-
-[[nodiscard]] /* static */ auto IDebugger::create(
-    Api target_api,
-    IInstance *instance,
-    CreateInfo info
-) -> memory::Scope<IDebugger>
+[[nodiscard]] auto create_debugger(Api target_api, IInstance *instance, IDebugger::CreateInfo info)
+    -> memory::Scope<IDebugger>
 {
 	debug::ensure(
-	    info.severities != MessageSeverity::none,
-	    "Failed to create vk::Messenger: severities == none"
+	    info.severities != IDebugger::MessageSeverity::none,
+	    "Failed to create renderer::IDebugger: severities == none"
 	);
 
-	debug::ensure(info.types != MessageType::none, "Failed to create vk::Messenger: types == none");
+	debug::ensure(
+	    info.types != IDebugger::MessageType::none,
+	    "Failed to create renderer::IDebugger: types == none"
+	);
 
 	debug::ensure(info.callback, "Failed to create vk::Messenger: null callback");
 
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vk::Messenger>(instance, std::move(info));
+	case Api::vulkan: return memory::create_scope<vkb::Debugger>(instance, std::move(info));
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };

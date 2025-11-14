@@ -23,7 +23,7 @@ private:
 	Timepoint m_start;
 };
 
-} // namespace lt
+} // namespace lt::time
 
 module :private;
 using namespace lt::time;

@@ -1,12 +1,22 @@
-#pragma once
-
-#include <app/system.hpp>
-#include <ecs/entity.hpp>
-#include <ecs/registry.hpp>
-#include <memory/reference.hpp>
-#include <memory/scope.hpp>
-#include <renderer/api.hpp>
-#include <renderer/frontend/messenger.hpp>
+export module renderer.system;
+import logger;
+import debug.assertions;
+import math.mat4;
+import renderer.factory;
+import app.system;
+import surface.events;
+import ecs.entity;
+import ecs.registry;
+import memory.reference;
+import memory.scope;
+import renderer.frontend;
+import camera.components;
+import surface.system;
+import renderer.components;
+import math.components;
+import math.algebra;
+import math.trig;
+import std;
 
 namespace lt::renderer {
 
@@ -16,11 +26,8 @@ namespace lt::renderer {
  * - Creating a rendering backend context (vk/dx/mt)
  * - Connecting the context to the physical devices (select gpu, create surface, logical device)
  * - Rendering the scene represented in registry via lt::renderer::components.
- *
- * @todo(Light): Add DirectX12 support
- * @todo(Light): Add Metal support
  */
-class System: public app::ISystem
+export class System: public app::ISystem
 {
 public:
 	/** config.max_frames_in_flight should not be higher than this value. */
@@ -33,7 +40,7 @@ public:
 	{
 		Api target_api;
 
-		uint32_t max_frames_in_flight;
+		std::uint32_t max_frames_in_flight;
 	};
 
 	struct CreateInfo
@@ -44,7 +51,7 @@ public:
 
 		ecs::Entity surface_entity;
 
-		IMessenger::CreateInfo debug_callback_info;
+		IDebugger::CreateInfo debug_callback_info;
 	};
 
 	System(CreateInfo info);
@@ -83,25 +90,25 @@ private:
 
 	ecs::Entity m_surface_entity;
 
-	memory::Scope<class IMessenger> m_messenger;
+	memory::Scope<IDebugger> m_messenger;
 
-	class IInstance *m_instance;
+	IInstance *m_instance;
 
-	memory::Scope<class ISurface> m_surface;
+	memory::Scope<ISurface> m_surface;
 
-	memory::Scope<class IGpu> m_gpu;
+	memory::Scope<IGpu> m_gpu;
 
-	memory::Scope<class IDevice> m_device;
+	memory::Scope<IDevice> m_device;
 
-	memory::Scope<class ISwapchain> m_swapchain;
+	memory::Scope<ISwapchain> m_swapchain;
 
-	memory::Scope<class IRenderer> m_renderer;
+	memory::Scope<IRenderer> m_renderer;
 
 	app::TickResult m_last_tick_result {};
 
-	uint32_t m_frame_idx {};
+	std::uint32_t m_frame_idx {};
 
-	uint32_t m_max_frames_in_flight {};
+	std::uint32_t m_max_frames_in_flight {};
 };
 
 } // namespace lt::renderer
@@ -109,31 +116,15 @@ private:
 module :private;
 using namespace lt::renderer;
 
-#include <camera/components.hpp>
-#include <math/algebra.hpp>
-#include <math/components/transform.hpp>
-#include <renderer/components/messenger.hpp>
-#include <renderer/components/sprite.hpp>
-#include <renderer/frontend/context/device.hpp>
-#include <renderer/frontend/context/gpu.hpp>
-#include <renderer/frontend/context/instance.hpp>
-#include <renderer/frontend/context/surface.hpp>
-#include <renderer/frontend/context/swapchain.hpp>
-#include <renderer/frontend/messenger.hpp>
-#include <renderer/frontend/renderer/pass.hpp>
-#include <renderer/frontend/renderer/renderer.hpp>
-#include <renderer/system.hpp>
-#include <surface/components.hpp>
-
 System::System(CreateInfo info)
     : m_surface_entity(info.surface_entity)
     , m_api(info.config.target_api)
     , m_registry(std::move(info.registry))
-    , m_instance(IInstance::get(m_api))
+    , m_instance(get_instance(m_api))
     , m_max_frames_in_flight(info.config.max_frames_in_flight)
 {
-	ensure(m_registry, "Failed to initialize renderer::System: null registry");
-	ensure(
+	debug::ensure(m_registry, "Failed to initialize renderer::System: null registry");
+	debug::ensure(
 	    std::clamp(
 	        info.config.max_frames_in_flight,
 	        frames_in_flight_lower_limit,
@@ -146,12 +137,13 @@ System::System(CreateInfo info)
 	    frames_in_flight_upper_limit
 	);
 
-	m_messenger = IMessenger::create(m_api, m_instance, info.debug_callback_info);
-	m_surface = ISurface::create(m_api, m_instance, m_surface_entity);
-	m_gpu = IGpu::create(m_api, m_instance);
-	m_device = IDevice::create(m_api, m_gpu.get(), m_surface.get());
-	m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
-	m_renderer = { IRenderer::create(
+	m_messenger = create_debugger(m_api, m_instance, info.debug_callback_info);
+	m_surface = create_surface(m_api, m_instance, m_surface_entity);
+	m_gpu = create_gpu(m_api, m_instance);
+
+	m_device = create_device(m_api, m_gpu.get(), m_surface.get());
+	m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
+	m_renderer = { create_renderer(
 		m_api,
 		m_gpu.get(),
 		m_device.get(),
@@ -191,7 +183,7 @@ void System::handle_surface_resized_events()
 		if (std::holds_alternative<surface::ResizedEvent>(event))
 		{
 			m_swapchain.reset();
-			m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
+			m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
 			m_renderer->replace_swapchain(m_swapchain.get());
 
 			// No need to process multiple resize events
@@ -230,6 +222,6 @@ void System::recreate_swapchain()
 {
 	log::trace("Re-creating swapchaain");
 	m_swapchain.reset();
-	m_swapchain = ISwapchain::create(m_api, m_surface.get(), m_gpu.get(), m_device.get());
+	m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
 	m_renderer->replace_swapchain(m_swapchain.get());
 }

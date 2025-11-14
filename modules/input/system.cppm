@@ -12,7 +12,7 @@ import std;
 
 namespace lt::input {
 
-class System: public app::ISystem
+export class System: public app::ISystem
 {
 public:
 	System(memory::Ref<ecs::Registry> registry);

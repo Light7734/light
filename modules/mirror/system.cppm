@@ -1,30 +1,35 @@
-#include <X11/keysym.h>
-#include <app/application.hpp>
-#include <app/entrypoint.hpp>
-#include <app/system.hpp>
-#include <camera/components.hpp>
-#include <ecs/entity.hpp>
-#include <input/components.hpp>
-#include <input/system.hpp>
-#include <math/components/transform.hpp>
-#include <math/trig.hpp>
-#include <math/vec2.hpp>
-#include <memory/reference.hpp>
-#include <memory/scope.hpp>
-#include <renderer/components/messenger.hpp>
-#include <renderer/components/sprite.hpp>
-#include <renderer/system.hpp>
-#include <surface/events/keyboard.hpp>
-#include <surface/events/surface.hpp>
-#include <surface/system.hpp>
-#include <time/timer.hpp>
+export module mirror.system;
+import math.vec3;
+import camera.components;
+import surface.requests;
+import logger;
+import surface.system;
+import math.vec2;
+import math.vec4;
+import math.trig;
+import input.codes;
+import input.events;
+import input.system;
+import math.components;
+import memory.reference;
+import memory.scope;
+import renderer.components;
+import renderer.system;
+import renderer.frontend;
+import surface.events;
+import time;
+import app;
+import app.system;
+import ecs.entity;
+import ecs.registry;
+import std;
 
 namespace lt {
 
 void renderer_callback(
-    renderer::IMessenger::MessageSeverity message_severity,
-    renderer::IMessenger::MessageType message_type,
-    renderer::IMessenger::MessageData data,
+    renderer::IDebugger::MessageSeverity message_severity,
+    renderer::IDebugger::MessageType message_type,
+    renderer::IDebugger::MessageData data,
     std::any &user_data
 )
 {
@@ -40,8 +45,8 @@ class MirrorSystem: public lt::app::ISystem
 public:
 	MirrorSystem(
 	    memory::Ref<ecs::Registry> registry,
-	    lt::input::InputAction::Key quit_action_key,
-	    std::array<lt::input::InputAction::Key, 4> debug_action_keys
+	    std::size_t quit_action_key,
+	    std::array<std::size_t, 4ul> debug_action_keys
 	)
 	    : m_registry(std::move(registry))
 	    , m_quit_action_key(quit_action_key)
@@ -69,7 +74,6 @@ public:
 			using State = lt::input::InputAction::State;
 			const auto &[x, y] = surface.get_position();
 			const auto &[width, height] = surface.get_resolution();
-
 
 			if (input.get_action(m_quit_action_key).state == State::active)
 			{
@@ -124,10 +128,9 @@ public:
 private:
 	memory::Ref<ecs::Registry> m_registry;
 
+	std::size_t m_quit_action_key;
 
-	lt::input::InputAction::Key m_quit_action_key;
-
-	std::array<lt::input::InputAction::Key, 4> m_debug_action_keys {};
+	std::array<std::size_t, 4ul> m_debug_action_keys {};
 
 	app::TickResult m_last_tick_result {};
 };
@@ -176,36 +179,36 @@ public:
 		auto quit_action_key = input.add_action(
 		    input::InputAction {
 		        .name = "quit",
-		        .trigger = input::Trigger { .mapped_keycode = XK_q },
+		        .trigger = input::Trigger { .mapped_keycode = Key::Q },
 		    }
 		);
 
-		auto debug_action_keys = std::array<lt::input::InputAction::Key, 4> {};
+		auto debug_action_keys = std::array<std::size_t, 4ul> {};
 		debug_action_keys[0] = input.add_action(
 		    input::InputAction {
 		        .name = "debug_1",
-		        .trigger = input::Trigger { .mapped_keycode = XK_1 },
+		        .trigger = input::Trigger { .mapped_keycode = Key::D1 },
 		    }
 		);
 
 		debug_action_keys[1] = input.add_action(
 		    input::InputAction {
 		        .name = "debug_2",
-		        .trigger = input::Trigger { .mapped_keycode = XK_2 },
+		        .trigger = input::Trigger { .mapped_keycode = Key::D2 },
 		    }
 		);
 
 		debug_action_keys[2] = input.add_action(
 		    input::InputAction {
 		        .name = "debug_3",
-		        .trigger = input::Trigger { .mapped_keycode = XK_3 },
+		        .trigger = input::Trigger { .mapped_keycode = Key::D3 },
 		    }
 		);
 
 		debug_action_keys[3] = input.add_action(
 		    input::InputAction {
 		        .name = "debug_4",
-		        .trigger = input::Trigger { .mapped_keycode = XK_4 },
+		        .trigger = input::Trigger { .mapped_keycode = Key::D4 },
 		    }
 		);
 
@@ -222,9 +225,9 @@ public:
 		    .config = { .target_api = renderer::Api::vulkan, .max_frames_in_flight = 3u },
 		    .registry = m_editor_registry,
 		    .surface_entity = entity,
-		    .debug_callback_info = renderer::IMessenger::CreateInfo {
-		        .severities = renderer::IMessenger::MessageSeverity::all,
-		        .types = renderer::IMessenger::MessageType::all,
+		    .debug_callback_info = renderer::IDebugger::CreateInfo {
+		        .severities = renderer::IDebugger::MessageSeverity::all,
+		        .types = renderer::IDebugger::MessageType::all,
 		        .callback = &renderer_callback,
 		        .user_data = this,
 		    } });
@@ -233,7 +236,9 @@ public:
 
 		m_editor_registry->add(
 		    m_sprite_id,
-		    renderer::components::Sprite { .color = lt::math::vec3 { 1.0f, 0.0f, 0.0f } }
+		    renderer::components::Sprite {
+		        .color = lt::math::vec3 { 1.0f, 0.0f, 0.0f },
+		    }
 		);
 		m_editor_registry->add(
 		    m_sprite_id,

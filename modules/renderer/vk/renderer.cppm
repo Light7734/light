@@ -1,15 +1,15 @@
 export module renderer.vk.renderer;
 import assets.shader;
 import debug.assertions;
-import renderer.backend.vk.library_wrapper;
+import renderer.vk.api_wrapper;
 import memory.reference;
 import memory.null_on_move;
-import renderer.backend.vk.device;
+import renderer.vk.device;
 import math.vec2;
 import math.components;
-import renderer.backend.vk.swapchain;
+import renderer.vk.swapchain;
 import renderer.components;
-import renderer.backend.vk.buffer;
+import renderer.vk.buffer;
 import renderer.vk.pass;
 import renderer.data;
 import renderer.frontend;
@@ -49,7 +49,7 @@ private:
 
 	std::uint32_t m_max_frames_in_flight {};
 
-	memory::NullOnMove<Device *> m_device {};
+	Device * m_device {};
 
 	Swapchain *m_swapchain {};
 

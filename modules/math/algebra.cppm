@@ -2,7 +2,7 @@ export module math.algebra;
 import math.mat4;
 import std;
 
-namespace lt::math {
+export namespace lt::math {
 
 /**
  * let...

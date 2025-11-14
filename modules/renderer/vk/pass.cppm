@@ -1,8 +1,8 @@
 export module renderer.vk.pass;
 import renderer.data;
-import renderer.backend.vk.library_wrapper;
-import renderer.backend.vk.device;
-import renderer.backend.vk.swapchain;
+import renderer.vk.api_wrapper;
+import renderer.vk.device;
+import renderer.vk.swapchain;
 import assets.shader;
 import assets.metadata;
 import memory.null_on_move;

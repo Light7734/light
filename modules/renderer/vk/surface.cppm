@@ -1,4 +1,4 @@
-export module renderer.backend.vk.surface;
+export module renderer.vk.surface;
 import debug.assertions;
 import ecs.entity;
 import ecs.registry;
@@ -6,8 +6,8 @@ import memory.null_on_move;
 import math.vec2;
 import surface.system;
 import renderer.frontend;
-import renderer.backend.vk.instance;
-import renderer.backend.vk.library_wrapper;
+import renderer.vk.instance;
+import renderer.vk.api_wrapper;
 
 namespace lt::renderer::vkb {
 

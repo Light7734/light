@@ -310,6 +310,14 @@ export CXXFLAGS="\
     -D CMAKE_INSTALL_PREFIX=/opt/llvm-msan \
 && ninja -C $build_path install
 
+
+# Cache debuginfo symbols downloaded when running valgrind
+RUN \
+git clone https://git.light7734.com/light7734/light.git --depth=1 \
+&& cd ./light/tools/ci/amd64/gcc/ \
+&& ./valgrind.sh
+
+
 # && cmake \
 #     -G Ninja \
 #     -S $llvm/llvm \
@@ -335,52 +343,52 @@ export CXXFLAGS="\
 # \
 # && ninja -C $build_clang
 
-RUN \
-cd /mesa \
-&& export CXX='clang++' \
-&& export CC='clang' \
-&& export CFLAGS="-fsanitize=memory  -fsanitize-memory-track-origins  -fno-omit-frame-pointer  -g" \
-&& export CXXFLAGS="-fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -g -nostdinc++ -isystem /libcxx_msan/include/c++/v1/" \
-&& export LDFLAGS="-fsanitize=memory -fsanitize-memory-track-origins -g -L/libcxx_msan/lib -Wl,-rpath,/libcxx_msan/lib -L/msan/lib -Wl,-rpath,/msan/lib -lc++ -lc++abi"  \
-&& export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH" \
-&& meson setup ./ _build \
-    -D build-tests=false  \
-    -D enable-glcpp-tests=false  \
-    -D build-radv-tests=false  \
-    -D build-aco-tests=false  \
-    -D install-intel-gpu-tests=false  \
-    -D gallium-mediafoundation-test=false  \
-    -D android-libbacktrace=disabled  \
-    -D split-debug=disabled  \
-    -D b_ndebug=true  \
-    -D b_lto=false  \
-    -D egl=enabled  \
-    -D gallium-drivers=r300,r600,radeonsi,nouveau,virgl,svga,softpipe,llvmpipe,i915,iris,crocus,zink  \
-    -D gallium-extra-hud=true  \
-    -D gallium-rusticl=true  \
-    -D gallium-va=enabled  \
-    -D gbm=enabled  \
-    -D gles1=disabled  \
-    -D gles2=enabled  \
-    -D glvnd=enabled  \
-    -D glx=dri  \
-    -D libunwind=enabled  \
-    -D llvm=enabled  \
-    -D lmsensors=disabled  \
-    -D microsoft-clc=disabled  \
-    -D platforms=x11,wayland  \
-    -D valgrind=disabled  \
-    -D video-codecs=all  \
-    -D vulkan-drivers=amd,intel,intel_hasvk,swrast,virtio,nouveau  \
-    -D vulkan-layers=device-select,intel-nullhw,overlay  \
-    -D tools=''  \
-    -D zstd=enabled  \
-    -D buildtype=plain  \
-    -D prefix=/usr  \
-    -D sysconfdir=/etc  \
-    --wrap-mode=nofallback  \
-    --force-fallback-for=syn,paste,rustc-hash  \
-&& ninja -C _build
+# RUN \
+# cd /mesa \
+# && export CXX='clang++' \
+# && export CC='clang' \
+# && export CFLAGS="-fsanitize=memory  -fsanitize-memory-track-origins  -fno-omit-frame-pointer  -g" \
+# && export CXXFLAGS="-fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -g -nostdinc++ -isystem /libcxx_msan/include/c++/v1/" \
+# && export LDFLAGS="-fsanitize=memory -fsanitize-memory-track-origins -g -L/libcxx_msan/lib -Wl,-rpath,/libcxx_msan/lib -L/msan/lib -Wl,-rpath,/msan/lib -lc++ -lc++abi"  \
+# && export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH" \
+# && meson setup ./ _build \
+#     -D build-tests=false  \
+#     -D enable-glcpp-tests=false  \
+#     -D build-radv-tests=false  \
+#     -D build-aco-tests=false  \
+#     -D install-intel-gpu-tests=false  \
+#     -D gallium-mediafoundation-test=false  \
+#     -D android-libbacktrace=disabled  \
+#     -D split-debug=disabled  \
+#     -D b_ndebug=true  \
+#     -D b_lto=false  \
+#     -D egl=enabled  \
+#     -D gallium-drivers=r300,r600,radeonsi,nouveau,virgl,svga,softpipe,llvmpipe,i915,iris,crocus,zink  \
+#     -D gallium-extra-hud=true  \
+#     -D gallium-rusticl=true  \
+#     -D gallium-va=enabled  \
+#     -D gbm=enabled  \
+#     -D gles1=disabled  \
+#     -D gles2=enabled  \
+#     -D glvnd=enabled  \
+#     -D glx=dri  \
+#     -D libunwind=enabled  \
+#     -D llvm=enabled  \
+#     -D lmsensors=disabled  \
+#     -D microsoft-clc=disabled  \
+#     -D platforms=x11,wayland  \
+#     -D valgrind=disabled  \
+#     -D video-codecs=all  \
+#     -D vulkan-drivers=amd,intel,intel_hasvk,swrast,virtio,nouveau  \
+#     -D vulkan-layers=device-select,intel-nullhw,overlay  \
+#     -D tools=''  \
+#     -D zstd=enabled  \
+#     -D buildtype=plain  \
+#     -D prefix=/usr  \
+#     -D sysconfdir=/etc  \
+#     --wrap-mode=nofallback  \
+#     --force-fallback-for=syn,paste,rustc-hash  \
+# && ninja -C _build
 
 # RUN cd mesa/ \
 # && source '/1.4.328.1/setup-env.sh' \

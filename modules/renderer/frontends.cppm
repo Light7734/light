@@ -1,6 +1,7 @@
 export module renderer.frontend;
 import renderer.data;
 import renderer.components;
+import bitwise;
 import math.components;
 import assets.shader;
 import ecs.entity;
@@ -22,18 +23,9 @@ enum class Api : std::uint8_t
 class IInstance
 {
 public:
-	// [[nodiscard]] static auto get(Api target_api) -> IInstance *;
 	IInstance() = default;
 
 	virtual ~IInstance() = default;
-
-	IInstance(IInstance &&) = default;
-
-	IInstance(const IInstance &) = delete;
-
-	auto operator=(IInstance &&) -> IInstance & = default;
-
-	auto operator=(const IInstance &) -> IInstance & = delete;
 };
 
 class IGpu
@@ -42,14 +34,6 @@ public:
 	IGpu() = default;
 
 	virtual ~IGpu() = default;
-
-	IGpu(IGpu &&) = default;
-
-	IGpu(const IGpu &) = delete;
-
-	auto operator=(IGpu &&) -> IGpu & = default;
-
-	auto operator=(const IGpu &) -> IGpu & = delete;
 };
 
 class IDevice
@@ -58,14 +42,6 @@ public:
 	IDevice() = default;
 
 	virtual ~IDevice() = default;
-
-	IDevice(IDevice &&) = default;
-
-	IDevice(const IDevice &) = delete;
-
-	auto operator=(IDevice &&) -> IDevice & = default;
-
-	auto operator=(const IDevice &) -> IDevice & = delete;
 };
 
 class ISurface
@@ -74,14 +50,6 @@ public:
 	ISurface() = default;
 
 	virtual ~ISurface() = default;
-
-	ISurface(ISurface &&) = default;
-
-	ISurface(const ISurface &) = delete;
-
-	auto operator=(ISurface &&) -> ISurface & = default;
-
-	auto operator=(const ISurface &) -> ISurface & = delete;
 
 	[[nodiscard]] virtual auto get_framebuffer_size() const -> math::uvec2 = 0;
 };
@@ -92,14 +60,6 @@ public:
 	ISwapchain() = default;
 
 	virtual ~ISwapchain() = default;
-
-	ISwapchain(ISwapchain &&) = default;
-
-	ISwapchain(const ISwapchain &) = delete;
-
-	auto operator=(ISwapchain &&) -> ISwapchain & = default;
-
-	auto operator=(const ISwapchain &) -> ISwapchain & = delete;
 };
 
 class IBuffer
@@ -136,14 +96,6 @@ public:
 
 	virtual ~IBuffer() = default;
 
-	IBuffer(IBuffer &&) = default;
-
-	IBuffer(const IBuffer &) = delete;
-
-	auto operator=(IBuffer &&) -> IBuffer & = default;
-
-	auto operator=(const IBuffer &) -> IBuffer & = delete;
-
 	[[nodiscard]] virtual auto map() -> std::span<std::byte> = 0;
 
 	virtual void unmap() = 0;
@@ -159,14 +111,6 @@ public:
 	IPass() = default;
 
 	virtual ~IPass() = default;
-
-	IPass(IPass &&) = default;
-
-	IPass(const IPass &) = delete;
-
-	auto operator=(IPass &&) -> IPass & = default;
-
-	auto operator=(const IPass &) -> IPass & = delete;
 };
 
 class IRenderer
@@ -187,14 +131,6 @@ public:
 
 	virtual ~IRenderer() = default;
 
-	IRenderer(IRenderer &&) = default;
-
-	IRenderer(const IRenderer &) = delete;
-
-	auto operator=(IRenderer &&) -> IRenderer & = default;
-
-	auto operator=(const IRenderer &) -> IRenderer & = delete;
-
 	virtual auto frame(std::uint32_t frame_idx, std::function<void()> submit_scene) -> Result = 0;
 
 	virtual void replace_swapchain(class ISwapchain *swapchain) = 0;
@@ -207,68 +143,57 @@ public:
 	) = 0;
 };
 
-// class IDebugger
-// {
-// public:
-// 	enum class MessageSeverity : std::uint8_t
-// 	{
-// 		none = 0u,
-//
-// 		verbose = bitwise::bit(0u),
-// 		info = bitwise::bit(1u),
-// 		warning = bitwise::bit(2u),
-// 		error = bitwise::bit(3u),
-//
-// 		all = verbose | info | warning | error,
-// 	};
-//
-// 	enum class MessageType : std::uint8_t
-// 	{
-// 		none = 0u,
-// 		general = bitwise::bit(0u),
-// 		validation = bitwise::bit(1u),
-// 		performance = bitwise::bit(2u),
-//
-// 		all = general | validation | performance,
-// 	};
-//
-// 	struct MessageData
-// 	{
-// 		std::string message;
-// 	};
-//
-// 	using Callback_T = std::function<void(
-// 	    MessageSeverity message_severity,
-// 	    MessageType message_type,
-// 	    const MessageData &data,
-// 	    std::any &user_data
-// 	)>;
-//
-// 	struct CreateInfo
-// 	{
-// 		MessageSeverity severities;
-//
-// 		MessageType types;
-//
-// 		Callback_T callback;
-//
-// 		std::any user_data;
-// 	};
-//
-// 	[[nodiscard]] static auto create(Api target_api, class IInstance *instance, CreateInfo info)
-// 	    -> memory::Scope<IDebugger>;
-//
-// 	IDebugger() = default;
-//
-// 	virtual ~IDebugger() = default;
-//
-// 	IDebugger(IDebugger &&) = default;
-//
-// 	IDebugger(const IDebugger &) = delete;
-//
-// 	auto operator=(IDebugger &&) -> IDebugger & = default;
-//
-// 	auto operator=(const IDebugger &) -> IDebugger & = delete;
-// };
+class IDebugger
+{
+public:
+	enum class MessageSeverity : std::uint8_t
+	{
+		none = 0u,
+
+		verbose = bitwise::bit(0u),
+		info = bitwise::bit(1u),
+		warning = bitwise::bit(2u),
+		error = bitwise::bit(3u),
+
+		all = verbose | info | warning | error,
+	};
+
+	enum class MessageType : std::uint8_t
+	{
+		none = 0u,
+		general = bitwise::bit(0u),
+		validation = bitwise::bit(1u),
+		performance = bitwise::bit(2u),
+
+		all = general | validation | performance,
+	};
+
+	struct MessageData
+	{
+		std::string message;
+	};
+
+	using Callback_T = std::function<void(
+	    MessageSeverity message_severity,
+	    MessageType message_type,
+	    const MessageData &data,
+	    std::any &user_data
+	)>;
+
+	struct CreateInfo
+	{
+		MessageSeverity severities;
+
+		MessageType types;
+
+		Callback_T callback;
+
+		std::any user_data;
+	};
+
+	IDebugger() = default;
+
+	virtual ~IDebugger() = default;
+};
 
 } // namespace lt::renderer

@@ -1,40 +1,29 @@
-export module renderer.backends.vk.messenger;
-
+export module renderer.vk.debugger;
+import renderer.vk.instance;
+import renderer.frontend;
+import renderer.vk.api_wrapper;
 import memory.null_on_move;
-import renderer.backends.vk.instance;
-import renderer.backends.vk.raii;
-import renderer.backends.vk.library;
+import debug.assertions;
+import logger;
 import std;
 
+namespace lt::renderer::vkb {
 
-namespace lt::renderer::vk {
-
-class Messenger: public IMessenger
+export class Debugger: public IDebugger
 {
 public:
-	Messenger(IInstance *instance, CreateInfo info);
+	Debugger(IInstance *instance, CreateInfo info);
+
 
 private:
-	static auto native_callback(
-	    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-	    VkDebugUtilsMessageTypeFlagsEXT type,
-	    const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
-	    void *vulkan_user_data
-	) -> VkBool32;
+	static void native_callback(
+	    vk::Flags severity,
+	    vk::Flags types,
+	    vk::Messenger::MessageData data,
+	    void *user_data
+	);
 
-	[[nodiscard]] static auto to_native_severity(MessageSeverity severity)
-	    -> VkDebugUtilsMessageSeverityFlagsEXT;
-
-	[[nodiscard]] static auto from_native_severity(VkDebugUtilsMessageSeverityFlagsEXT severity)
-	    -> MessageSeverity;
-
-	[[nodiscard]] static auto to_native_type(MessageType type) -> VkDebugUtilsMessageTypeFlagsEXT;
-
-	[[nodiscard]] static auto from_native_type(VkDebugUtilsMessageTypeFlagsEXT type) -> MessageType;
-
-	class Instance *m_instance {};
-
-	raii::DebugMessenger m_debug_messenger;
+	vk::Messenger m_messenger;
 
 	MessageSeverity m_severities {};
 
@@ -45,48 +34,137 @@ private:
 	std::any m_user_data;
 };
 
-} // namespace lt::renderer::vk
-
+} // namespace lt::renderer::vkb
 
 module :private;
-using namespace lt::renderer::vk;
+using namespace lt::renderer;
+using namespace lt::renderer::vkb;
 
-import logger;
-
-Messenger::Messenger(IInstance *instance, CreateInfo info)
-    : m_instance(static_cast<Instance *>(instance))
-    , m_user_data(std::move(info.user_data))
-    , m_user_callback(std::move(info.callback))
-    , m_debug_messenger(
-          m_instance,
-          VkDebugUtilsMessengerCreateInfoEXT {
-              .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-              .messageSeverity = to_native_severity(info.severities),
-              .messageType = to_native_type(info.types),
-              .pfnUserCallback = &native_callback,
-              .pUserData = this,
-          }
-      )
+[[nodiscard]] auto to_native_severity(IDebugger::MessageSeverity severity) -> vk::Flags
 {
+	const auto value = std::to_underlying(severity);
+	auto flags = vk::Flags {};
+
+	using enum IDebugger::MessageSeverity;
+	using NativeSeverity = vk::Messenger::SeverityFlagBits;
+	if (value & std::to_underlying(error))
+	{
+		flags |= NativeSeverity::error;
+	}
+
+	if (value & std::to_underlying(warning))
+	{
+		flags |= NativeSeverity::warning;
+	}
+
+	if (value & std::to_underlying(info))
+	{
+		flags |= NativeSeverity::info;
+	}
+
+	if (value & std::to_underlying(verbose))
+	{
+		flags |= NativeSeverity::verbose;
+	}
+
+	return flags;
 }
 
-/*static*/ auto Messenger::native_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    VkDebugUtilsMessageTypeFlagsEXT type,
-    const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
-    void *vulkan_user_data
-) -> VkBool32
+[[nodiscard]] /* static */ auto to_native_type(IDebugger::MessageType type) -> vk::Flags
+{
+	const auto value = std::to_underlying(type);
+	auto flags = vk::Flags {};
+
+	using enum IDebugger::MessageType;
+	using NativeType = vk::Messenger::TypeFlagBits;
+	if (value & std::to_underlying(general))
+	{
+		flags |= NativeType::general;
+	}
+
+	if (value & std::to_underlying(validation))
+	{
+		flags |= NativeType::validation;
+	}
+
+	if (value & std::to_underlying(performance))
+	{
+		flags |= NativeType::performance;
+	}
+
+	return flags;
+}
+
+[[nodiscard]] auto from_native_type(vk::Flags type) -> IDebugger::MessageType
+{
+	auto flags = std::underlying_type_t<IDebugger::MessageType> {};
+
+	using enum IDebugger::MessageType;
+	using NativeType = vk::Messenger::TypeFlagBits;
+	if (type & NativeType::general)
+	{
+		flags |= std::to_underlying(general);
+	}
+
+	if (type & NativeType::validation)
+	{
+		flags |= std::to_underlying(validation);
+	}
+
+	if (type & NativeType::performance)
+	{
+		flags |= std::to_underlying(performance);
+	}
+
+	return static_cast<IDebugger::MessageType>(flags);
+}
+
+[[nodiscard]] auto from_native_severity(vk::Flags severity) -> IDebugger::MessageSeverity
+{
+	auto flags = std::underlying_type_t<IDebugger::MessageSeverity> {};
+
+	using enum IDebugger::MessageSeverity;
+	using NativeSeverity = vk::Messenger::SeverityFlagBits;
+	if (severity & NativeSeverity::error)
+	{
+		flags |= std::to_underlying(error);
+	}
+
+	if (severity & NativeSeverity::warning)
+	{
+		flags |= std::to_underlying(warning);
+	}
+
+	if (severity & NativeSeverity::info)
+	{
+		flags |= std::to_underlying(info);
+	}
+
+	if (severity & NativeSeverity::verbose)
+	{
+		flags |= std::to_underlying(verbose);
+	}
+
+	return static_cast<IDebugger::MessageSeverity>(flags);
+}
+
+void Debugger::native_callback(
+    vk::Flags severity,
+    vk::Flags types,
+    vk::Messenger::MessageData data,
+    void *user_data
+)
 {
 	try
 	{
-		ensure(vulkan_user_data, "Null vulkan_user_data received in messenger callback");
+		debug::ensure(user_data, "Null vulkan_user_data received in messenger callback");
 
-		auto *messenger = std::bit_cast<vk::Messenger *>(vulkan_user_data);
+		auto *messenger = std::bit_cast<Debugger *>(user_data);
 		messenger->m_user_callback(
 		    from_native_severity(severity),
-		    from_native_type(type),
+		    from_native_type(types),
 		    {
-		        .message = callback_data->pMessage,
+		        .message = data.message,
 		    },
 		    messenger->m_user_data
 		);
@@ -96,119 +174,19 @@ Messenger::Messenger(IInstance *instance, CreateInfo info)
 		log::error("Uncaught exception in messenger callback:");
 		log::error("\twhat: {}", exp.what());
 	}
-
-	return VK_FALSE;
 }
 
-[[nodiscard]] /*static*/ auto Messenger::to_native_severity(MessageSeverity severity)
-    -> VkDebugUtilsMessageSeverityFlagsEXT
+Debugger::Debugger(IInstance *instance, CreateInfo info)
+    : m_user_data(std::move(info.user_data))
+    , m_user_callback(std::move(info.callback))
+    , m_messenger(
+          static_cast<Instance *>(instance)->vk(),
+          vk::Messenger::CreateInfo {
+              .user_callback = &native_callback,
+              .user_data = this,
+              .enabled_types = to_native_type(info.types),
+              .enabled_severities = to_native_severity(info.severities),
+          }
+      )
 {
-	using enum MessageSeverity;
-
-	const auto value = std::to_underlying(severity);
-	auto flags = VkDebugUtilsMessageSeverityFlagsEXT {};
-
-	if (value & std::to_underlying(error))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	}
-
-	if (value & std::to_underlying(warning))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-	}
-
-	if (value & std::to_underlying(info))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
-	}
-
-	if (value & std::to_underlying(verbose))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
-	}
-
-	return flags;
-}
-
-[[nodiscard]] /*static*/ auto Messenger::from_native_severity(
-    VkDebugUtilsMessageSeverityFlagsEXT severity
-) -> MessageSeverity
-{
-	using enum MessageSeverity;
-
-	auto flags = std::underlying_type_t<MessageSeverity> {};
-
-	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
-	{
-		flags |= std::to_underlying(error);
-	}
-
-	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-	{
-		flags |= std::to_underlying(warning);
-	}
-
-	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
-	{
-		flags |= std::to_underlying(info);
-	}
-
-	if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
-	{
-		flags |= std::to_underlying(verbose);
-	}
-
-	return static_cast<MessageSeverity>(flags);
-}
-
-[[nodiscard]] /*static*/ auto Messenger::to_native_type(MessageType type)
-    -> VkDebugUtilsMessageTypeFlagsEXT
-{
-	using enum MessageType;
-
-	const auto value = std::to_underlying(type);
-	auto flags = VkDebugUtilsMessageTypeFlagsEXT {};
-
-	if (value & std::to_underlying(general))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
-	}
-
-	if (value & std::to_underlying(validation))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
-	}
-
-	if (value & std::to_underlying(performance))
-	{
-		flags |= VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	}
-
-	return flags;
-}
-
-[[nodiscard]] /* static */ auto Messenger::from_native_type(VkDebugUtilsMessageTypeFlagsEXT type)
-    -> MessageType
-{
-	using enum MessageType;
-
-	auto flags = std::underlying_type_t<MessageType> {};
-
-	if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
-	{
-		flags |= std::to_underlying(general);
-	}
-
-	if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
-	{
-		flags |= std::to_underlying(validation);
-	}
-
-	if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
-	{
-		flags |= std::to_underlying(general);
-	}
-
-	return static_cast<MessageType>(flags);
 }

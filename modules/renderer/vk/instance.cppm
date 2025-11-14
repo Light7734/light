@@ -1,8 +1,7 @@
-export module renderer.backend.vk.instance;
+export module renderer.vk.instance;
 import debug.assertions;
 import renderer.frontend;
-import renderer.backend.vk.library_wrapper;
-// import renderer.backend.vk.library_loader;
+import renderer.vk.api_wrapper;
 import std;
 
 namespace lt::renderer::vkb {

@@ -20,7 +20,7 @@ module;
 	#include <dlfcn.h>
 #endif
 
-export module renderer.backend.vk.library_wrapper;
+export module renderer.vk.api_wrapper;
 import memory.null_on_move;
 import math.vec3;
 import math.vec2;
@@ -670,6 +670,7 @@ class Instance
 public:
 	friend class Surface;
 	friend class Gpu;
+	friend class Messenger;
 
 	struct Layer
 	{
@@ -717,6 +718,11 @@ public:
 	}
 
 private:
+	[[nodiscard]] auto get_vk_handle() -> VkInstance
+	{
+		return m_instance;
+	}
+
 	memory::NullOnMove<VkInstance> m_instance {};
 };
 
@@ -2391,6 +2397,60 @@ private:
 	memory::NullOnMove<VkDevice> m_device {};
 
 	VkDeviceMemory m_memory {};
+};
+
+class Messenger
+{
+public:
+	enum SeverityFlagBits : std::underlying_type_t<VkDebugUtilsMessageSeverityFlagBitsEXT>
+	{
+		verbose = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+		info = VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
+		warning = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
+		error = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+	};
+
+	enum TypeFlagBits : std::underlying_type_t<VkDebugUtilsMessageTypeFlagBitsEXT>
+	{
+		general = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
+		validation = VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
+		performance = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+		binding = VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+	};
+
+	struct MessageData
+	{
+		std::string message;
+	};
+
+	using Callback = std::function<void(Flags, Flags, MessageData, void *)>;
+
+	struct CreateInfo
+	{
+		Callback user_callback;
+		void *user_data;
+		Flags enabled_types;
+		Flags enabled_severities;
+	};
+
+	Messenger() = default;
+
+	Messenger(Instance &instance, CreateInfo info);
+
+	~Messenger();
+
+	Messenger(Messenger &&) = default;
+
+	Messenger(const Messenger &) = delete;
+
+	auto operator=(Messenger &&) -> Messenger & = default;
+
+	auto operator=(const Messenger &) -> Messenger & = delete;
+
+private:
+	memory::NullOnMove<VkInstance> m_instance {};
+
+	VkDebugUtilsMessengerEXT m_messenger {};
 };
 
 } // namespace lt::renderer::vk
@@ -4104,6 +4164,20 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 
 Pipeline::~Pipeline()
 {
+}
+
+Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.get_vk_handle())
+{
+	auto vk_info = VkDebugUtilsMessengerCreateInfoEXT {
+
+	};
+
+	vkc(api::create_debug_messenger(m_instance, &vk_info, nullptr, &m_messenger));
+}
+
+Messenger::~Messenger()
+{
+	api::destroy_debug_messenger(m_instance, m_messenger, nullptr);
 }
 
 [[nodiscard]]

@@ -1,6 +1,6 @@
 export module math.trig;
 
-namespace lt::math {
+export namespace lt::math {
 
 [[nodiscard]] constexpr auto radians(float degrees) -> float
 {

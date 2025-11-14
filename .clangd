@@ -1,5 +1,0 @@
-CompileFlags:
-  DriverMode: cl
-  Add:
-    - /EHsc
-    - /std:c++latest
