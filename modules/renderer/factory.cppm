@@ -1,19 +1,19 @@
 export module renderer.factory;
-import renderer.frontend;
-import assets.shader;
-import renderer.vk.device;
-import renderer.vk.pass;
-import renderer.vk.instance;
-import renderer.vk.swapchain;
-import renderer.vk.renderer;
-import renderer.vk.buffer;
-import renderer.vk.gpu;
-import renderer.vk.debugger;
-import renderer.vk.surface;
-import memory.scope;
-import debug.assertions;
-import ecs.entity;
-import std;
+export import renderer.frontend;
+export import assets.shader;
+export import renderer.vk.device;
+export import renderer.vk.pass;
+export import renderer.vk.instance;
+export import renderer.vk.swapchain;
+export import renderer.vk.renderer;
+export import renderer.vk.buffer;
+export import renderer.vk.gpu;
+export import renderer.vk.debugger;
+export import renderer.vk.surface;
+export import memory.scope;
+export import debug.assertions;
+export import ecs.entity;
+export import std;
 
 export namespace lt::renderer {
 
@@ -66,6 +66,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_surface(
@@ -83,6 +85,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_gpu(Api target_api, IInstance *instance) -> memory::Scope<IGpu>
@@ -94,6 +98,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface)
@@ -109,6 +115,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_swapchain(Api target_api, ISurface *surface, IGpu *gpu, IDevice *device)
@@ -121,6 +129,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_buffer(
@@ -141,6 +151,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 
@@ -161,6 +173,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_renderer(
@@ -196,6 +210,8 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto create_debugger(Api target_api, IInstance *instance, IDebugger::CreateInfo info)
@@ -220,4 +236,6 @@ using namespace lt::renderer;
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
 	}
+
+	std::unreachable();
 }

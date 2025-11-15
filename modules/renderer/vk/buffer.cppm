@@ -34,10 +34,8 @@ private:
 	[[nodiscard]] auto to_native_memory_properties(Usage usage) const -> vk::Memory::PropertyFlags;
 
 
-	[[nodiscard]] auto has_correct_memory_type_bit(
-	    std::uint32_t type_bits,
-	    std::uint32_t type_idx
-	) const -> bool;
+	[[nodiscard]] auto has_correct_memory_type_bit(std::uint32_t type_bits, std::uint32_t type_idx)
+	    const -> bool;
 
 	[[nodiscard]] auto has_required_memory_properties(
 	    std::uint32_t required_properties,
@@ -123,13 +121,12 @@ void Buffer::unmap() /* override */
 	switch (usage)
 	{
 	case Usage::vertex: return static_cast<Flags>(vertex_buffer_bit | transfer_dst_bit);
-
 	case Usage::index: return static_cast<Flags>(index_buffer_bit | transfer_dst_bit);
-
 	case Usage::storage: return static_cast<Flags>(transfer_dst_bit | storage_buffer_bit);
-
 	case Usage::staging: return transfer_src_bit;
 	}
+
+	std::unreachable();
 }
 
 [[nodiscard]] auto Buffer::to_native_memory_properties(Usage usage) const
@@ -142,7 +139,6 @@ void Buffer::unmap() /* override */
 	case Usage::vertex:
 	case Usage::index:
 	case Usage::storage: return device_local_bit;
-
 	case Usage::staging: return static_cast<Flags>(host_visible_bit | host_coherent_bit);
 	}
 

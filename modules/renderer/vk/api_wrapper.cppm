@@ -8,16 +8,33 @@
  * In the long run, it should pay off...
  */
 module;
+
 #define VK_NO_PROTOTYPES
-#define VK_USE_PLATFORM_XLIB_KHR
+#if defined(LIGHT_PLATFORM_LINUX)
+	#define VK_USE_PLATFORM_XLIB_KHR
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	#define VK_USE_PLATFORM_WIN32_KHR
+#else
+	#error "Unsupported platform"
+#endif
+
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
-#include <vulkan/vulkan_xlib.h>
 
-#if defined(_WIN32)
-	#error "Unsupported platform"
-#elif defined(__unix__)
+
+#if defined(LIGHT_PLATFORM_LINUX)
+	#include <vulkan/vulkan_xlib.h>
+#endif
+#if defined(LIGHT_PLATFORM_WINDOWS)
+	#include <Windows.h>
+	#undef max
+	#undef min
+	#undef MIN
+	#undef MAX
+#elif defined(LIGHT_PLATFORM_LINUX)
 	#include <dlfcn.h>
+#else
+	#error "Unsupported platform"
 #endif
 
 export module renderer.vk.api_wrapper;
@@ -65,7 +82,14 @@ namespace instance_extension_names {
 
 constexpr auto debug_utils = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 constexpr auto surface = VK_KHR_SURFACE_EXTENSION_NAME;
-constexpr auto xlib_surface = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+#if defined(LIGHT_PLATFORM_LINUX)
+constexpr auto platform_surface = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+constexpr auto platform_surface = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+
+#else
+	#error "Unsupported platform"
+#endif
 constexpr auto physical_device_properties_2
     = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
 
@@ -718,7 +742,7 @@ public:
 	}
 
 private:
-	[[nodiscard]] auto get_vk_handle() -> VkInstance
+	[[nodiscard]] auto get_vk_handle() const -> VkInstance
 	{
 		return m_instance;
 	}
@@ -754,13 +778,6 @@ public:
 		ColorSpace color_space;
 	};
 
-	struct XlibCreateInfo
-	{
-		Display *display;
-
-		Window window;
-	};
-
 	struct Capabilities
 	{
 		std::uint32_t min_image_count;
@@ -784,9 +801,22 @@ public:
 		VkImageUsageFlags supported_usage_flags;
 	};
 
+	struct CreateInfo
+	{
+#if defined(LIGHT_PLATFORM_LINUX)
+		Display *display;
+
+		Window window;
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+		HWND window;
+#else
+	#error "Unsupported platform"
+#endif
+	};
+
 	Surface() = default;
 
-	Surface(const Instance &instance, const XlibCreateInfo &info);
+	Surface(const Instance &instance, const CreateInfo &info);
 
 	Surface(Surface &&) = default;
 
@@ -1242,10 +1272,8 @@ public:
 	/** de-allocation functions */
 	void free_memory(VkDeviceMemory memory) const;
 
-	void free_descriptor_set(
-	    VkDescriptorPool descriptor_pool,
-	    VkDescriptorSet descriptor_set
-	) const;
+	void free_descriptor_set(VkDescriptorPool descriptor_pool, VkDescriptorSet descriptor_set)
+	    const;
 
 	/** destroy functions */
 	void destroy_swapchain(VkSwapchainKHR swapchain) const;
@@ -2613,7 +2641,14 @@ PFN_vkResetCommandBuffer reset_command_buffer {};
 PFN_vkCmdBeginRendering cmd_begin_rendering {};
 PFN_vkCmdEndRendering cmd_end_rendering {};
 
+#if defined(LIGHT_PLATFORM_LINUX)
 PFN_vkCreateXlibSurfaceKHR create_xlib_surface_khr {};
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+PFN_vkCreateWin32SurfaceKHR create_win32_surface_khr {};
+#else
+	#error "Unsupported platform"
+#endif
+
 PFN_vkDestroySurfaceKHR destroy_surface_khr {};
 } // namespace api
 
@@ -2621,13 +2656,14 @@ void *library = nullptr; // NOLINT
 
 void load_library()
 {
+#if defined(LIGHT_PLATFORM_LINUX)
 	constexpr auto runtime_loader_flags = RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE;
 	library = dlopen("libvulkan.so.1", runtime_loader_flags);
 	if (!library)
 	{
 		library = dlopen("libvulkan.so", runtime_loader_flags);
 	}
-	lt::debug::ensure(library, "Failed to dlopen vulkan library");
+	lt::debug::ensure(library, "Failed to dlopen the libvulkan.so");
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	api::get_instance_proc_address = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
@@ -2637,6 +2673,21 @@ void load_library()
 	    api::get_instance_proc_address,
 	    "Failed to load vulkan function: vkGetInstanceProcAddr"
 	);
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	auto library = LoadLibraryA("vulkan-1.dll");
+	lt::debug::ensure(library, "Failed to LoadLibraryA the vulkan-1.dll");
+
+	api::get_instance_proc_address = std::bit_cast<PFN_vkGetInstanceProcAddr>(
+	    GetProcAddress(library, "vkGetInstanceProcAddr")
+	);
+	lt::debug::ensure(
+	    api::get_instance_proc_address,
+	    "Failed to get vkGetInstanceProcAddr function pointer from vulkan-1.dll"
+	);
+
+#else
+	#error "Unsupported platform"
+#endif
 }
 
 
@@ -2708,7 +2759,14 @@ void Instance::load_functions()
 	    "vkGetPhysicalDeviceSurfaceCapabilitiesKHR"
 	);
 	load_fn(api::get_physical_device_surface_formats, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+
+#if defined(LIGHT_PLATFORM_LINUX)
 	load_fn(api::create_xlib_surface_khr, "vkCreateXlibSurfaceKHR");
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	load_fn(api::create_win32_surface_khr, "vkCreateWin32SurfaceKHR");
+#else
+	#error "Unsupported platform"
+#endif
 	load_fn(api::destroy_surface_khr, "vkDestroySurfaceKHR");
 }
 
@@ -2805,15 +2863,13 @@ Instance::Instance(CreateInfo info)
 		layer_names.emplace_back(layer.name.c_str());
 		for (const auto &setting : layer.settings)
 		{
-			layer_settings.emplace_back(
-			    VkLayerSettingEXT {
-			        .pLayerName = layer.name.c_str(),
-			        .pSettingName = setting.name.c_str(),
-			        .type = std::visit(layer_setting_type_visitor, setting.values),
-			        .valueCount = 1u,
-			        .pValues = std::visit(layer_setting_value_visitor, setting.values),
-			    }
-			);
+			layer_settings.emplace_back(VkLayerSettingEXT {
+			    .pLayerName = layer.name.c_str(),
+			    .pSettingName = setting.name.c_str(),
+			    .type = std::visit(layer_setting_type_visitor, setting.values),
+			    .valueCount = 1u,
+			    .pValues = std::visit(layer_setting_value_visitor, setting.values),
+			});
 		}
 	}
 
@@ -2837,9 +2893,9 @@ Instance::Instance(CreateInfo info)
 	debug::ensure(m_instance, "Failed to create vulkan instance");
 }
 
-Surface::Surface(const Instance &instance, const XlibCreateInfo &info)
-    : m_instance(instance.m_instance)
+Surface::Surface(const Instance &instance, const CreateInfo &info): m_instance(instance.m_instance)
 {
+#if defined(LIGHT_PLATFORM_LINUX)
 	const auto vk_info = VkXlibSurfaceCreateInfoKHR {
 		.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
 		.pNext = {},
@@ -2848,7 +2904,22 @@ Surface::Surface(const Instance &instance, const XlibCreateInfo &info)
 		.window = info.window,
 	};
 
-	vkc(api::create_xlib_surface_khr(instance.m_instance, &vk_info, nullptr, &m_surface));
+	vkc(api::create_xlib_surface_khr(instance.get_vk_handle(), &vk_info, nullptr, &m_surface));
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+
+	const auto vk_info = VkWin32SurfaceCreateInfoKHR {
+		.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+		.pNext = {},
+		.flags = {},
+		.hinstance = GetModuleHandle(nullptr),
+		.hwnd = info.window,
+	};
+
+	vkc(api::create_win32_surface_khr(instance.get_vk_handle(), &vk_info, nullptr, &m_surface));
+#else
+	#error "Unsupported platform"
+
+#endif
 }
 
 Surface::~Surface()
@@ -3274,12 +3345,10 @@ Surface::~Surface()
 	auto formats = std::vector<Surface::Format> {};
 	for (auto &vk_format : vk_formats)
 	{
-		formats.emplace_back(
-		    Surface::Format {
-		        .format = static_cast<Format>(vk_format.format),
-		        .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
-		    }
-		);
+		formats.emplace_back(Surface::Format {
+		    .format = static_cast<Format>(vk_format.format),
+		    .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
+		});
 	}
 
 	return formats;
@@ -3336,14 +3405,12 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 	auto vk_queue_infos = std::vector<VkDeviceQueueCreateInfo> {};
 	for (auto queue_family : info.queue_indices)
 	{
-		vk_queue_infos.emplace_back(
-		    VkDeviceQueueCreateInfo {
-		        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-		        .queueFamilyIndex = queue_family,
-		        .queueCount = 1u,
-		        .pQueuePriorities = &priorities,
-		    }
-		);
+		vk_queue_infos.emplace_back(VkDeviceQueueCreateInfo {
+		    .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		    .queueFamilyIndex = queue_family,
+		    .queueCount = 1u,
+		    .pQueuePriorities = &priorities,
+		});
 	}
 
 	auto vk_extension_names = std::vector<const char *>(info.extensions.size());
@@ -3736,10 +3803,8 @@ void Device::free_memory(VkDeviceMemory memory) const
 	api::free_memory(m_device, memory, nullptr);
 }
 
-void Device::free_descriptor_set(
-    VkDescriptorPool descriptor_pool,
-    VkDescriptorSet descriptor_set
-) const
+void Device::free_descriptor_set(VkDescriptorPool descriptor_pool, VkDescriptorSet descriptor_set)
+    const
 {
 	vkc(api::free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
 }
@@ -4037,14 +4102,12 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 	auto shader_stages = std::vector<VkPipelineShaderStageCreateInfo> {};
 	for (auto &[shader, stage] : info.shaders)
 	{
-		shader_stages.emplace_back(
-		    VkPipelineShaderStageCreateInfo {
-		        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-		        .stage = static_cast<VkShaderStageFlagBits>(stage),
-		        .module = shader.get_vk_handle(),
-		        .pName = "main",
-		    }
-		);
+		shader_stages.emplace_back(VkPipelineShaderStageCreateInfo {
+		    .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+		    .stage = static_cast<VkShaderStageFlagBits>(stage),
+		    .module = shader.get_vk_handle(),
+		    .pName = "main",
+		});
 	}
 
 	auto dynamic_states = std::array<VkDynamicState, 2> {
@@ -4127,8 +4190,7 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 		.colorAttachmentCount = static_cast<uint32_t>(color_attachment_formats.size()),
 		.pColorAttachmentFormats = std::bit_cast<VkFormat *>(color_attachment_formats.data()),
 		.depthAttachmentFormat = info.attachment_state.depth_attachment ?
-		                             static_cast<VkFormat>(
-		                                 *info.attachment_state.depth_attachment
+		                             static_cast<VkFormat>(*info.attachment_state.depth_attachment
 		                             ) :
 		                             VK_FORMAT_UNDEFINED,
 

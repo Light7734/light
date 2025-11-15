@@ -40,8 +40,6 @@ private:
 	std::vector<memory::Ref<app::ISystem>> m_systems_to_be_registered;
 };
 
-export extern memory::Scope<class Application> create_application();
-
 } // namespace lt::app
 
 module :private;
@@ -56,13 +54,11 @@ void Application::game_loop()
 			const auto &last_tick = system->get_last_tick_result();
 			const auto now = std::chrono::steady_clock::now();
 
-			system->tick(
-			    TickInfo {
-			        .delta_time = now - last_tick.end_time,
-			        .budget = std::chrono::milliseconds { 10 },
-			        .start_time = now,
-			    }
-			);
+			system->tick(TickInfo {
+			    .delta_time = now - last_tick.end_time,
+			    .budget = std::chrono::milliseconds { 10 },
+			    .start_time = now,
+			});
 		}
 
 		for (auto &system : m_systems_to_be_registered)

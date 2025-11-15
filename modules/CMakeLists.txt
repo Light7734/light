@@ -1,12 +1,14 @@
-add_library_module(NAME logger INTERFACES logger.cppm)
-add_library_module(NAME bitwise INTERFACES operations.cppm)
-add_library_module(NAME env INTERFACES constants.cppm)
-add_library_module(
+add_module(
+    NAME logger INTERFACES logger.cppm TESTS logger.test.cpp
+)
+add_module(NAME bitwise INTERFACES operations.cppm)
+add_module(NAME env INTERFACES constants.cppm)
+add_module(
     NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
 )
-add_library_module(NAME time INTERFACES timer.cppm)
+add_module(NAME time INTERFACES timer.cppm)
 
-add_library_module(
+add_module(
     NAME
     test
     INTERFACES
@@ -19,7 +21,7 @@ add_library_module(
     logger
 )
 
-add_library_module(
+add_module(
     NAME
     lt_debug
     ROOT_DIR
@@ -31,7 +33,7 @@ add_library_module(
     logger
 )
 
-add_library_module(
+add_module(
     NAME
     math
     INTERFACES
@@ -44,7 +46,7 @@ add_library_module(
     components.cppm
 )
 
-add_library_module(
+add_module(
     NAME
     assets
     INTERFACES
@@ -55,7 +57,7 @@ add_library_module(
     lt_debug
 )
 
-add_library_module(
+add_module(
     NAME
     libasset_baker
     ROOT_DIR
@@ -71,23 +73,21 @@ add_library_module(
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
 # PRIVATE libasset_baker)
 
-add_library_module(NAME camera INTERFACES components.cppm DEPENDENCIES math)
+add_module(NAME camera INTERFACES components.cppm DEPENDENCIES math)
 
-add_library_module(
+add_module(
     NAME
     app
     INTERFACES
     application.cppm
     system.cppm
-    SOURCES
-    entrypoint.cpp
     DEPENDENCIES
     memory
     PRIVATE_DEPENDENCIES
     lt_debug
 )
 
-add_library_module(
+add_module(
     NAME
     ecs
     INTERFACES
@@ -101,7 +101,7 @@ add_library_module(
 )
 
 if(WIN32)
-    add_library_module(
+    add_module(
         NAME
         surface
         INTERFACES
@@ -117,7 +117,6 @@ if(WIN32)
         app
         math
         memory
-        tbb
         PRIVATE_DEPENDENCIES
         logger
         lt_debug
@@ -125,7 +124,7 @@ if(WIN32)
     )
 
 elseif(UNIX)
-    add_library_module(
+    add_module(
         NAME
         surface
         INTERFACES
@@ -141,7 +140,6 @@ elseif(UNIX)
         app
         math
         memory
-        tbb
         PRIVATE_DEPENDENCIES
         X11
         logger
@@ -154,7 +152,7 @@ else()
 
 endif()
 
-add_library_module(
+add_module(
     NAME
     input
     INTERFACES
@@ -168,7 +166,9 @@ add_library_module(
     logger
 )
 
-add_library_module(
+find_package(Vulkan REQUIRED)
+message("Vulkan Libraries are: ${Vulkan_LIBRARIES}")
+add_module(
     NAME
     renderer
     INTERFACES
@@ -195,20 +195,36 @@ add_library_module(
     time
     bitwise
     camera
+    ${Vulkan_LIBRARIES}
+    Vulkan::Vulkan
     PRIVATE_DEPENDENCIES
     surface
 )
 
-return()
-
-add_library_module(
+add_module(
     NAME
-    libmirror
+    mirror
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/mirror
     INTERFACES
     system.cppm
     DEPENDENCIES
+    app
+    time
+    input
+    surface
+    renderer
+    camera
+    # TESTS
+    # system.test.cpp
+)
+
+add_executable(exectest ${CMAKE_CURRENT_SOURCE_DIR}/mirror/entrypoint.cpp
+)
+
+target_link_libraries(exectest PRIVATE
+
+    mirror
     app
     time
     input

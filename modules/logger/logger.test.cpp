@@ -1,5 +1,5 @@
 import logger;
-import test;
+import test.test;
 
 using ::lt::test::Case;
 using ::lt::test::Suite;

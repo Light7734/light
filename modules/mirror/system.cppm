@@ -37,7 +37,7 @@ void renderer_callback(
 	std::ignore = message_type;
 	std::ignore = user_data;
 
-	log::debug("RENDERER CALLBACK: {}", data.message);
+	log::debug("RENDERER CALLBACK: {}", std::string { data.message });
 }
 
 class MirrorSystem: public lt::app::ISystem
@@ -135,7 +135,7 @@ private:
 	app::TickResult m_last_tick_result {};
 };
 
-class Mirror: public app::Application
+export class Mirror: public app::Application
 {
 public:
 	Mirror()
@@ -176,41 +176,31 @@ public:
 		);
 
 		auto &input = m_editor_registry->add<InputComponent>(m_window, {});
-		auto quit_action_key = input.add_action(
-		    input::InputAction {
-		        .name = "quit",
-		        .trigger = input::Trigger { .mapped_keycode = Key::Q },
-		    }
-		);
+		auto quit_action_key = input.add_action(input::InputAction {
+		    .name = "quit",
+		    .trigger = input::Trigger { .mapped_keycode = Key::Q },
+		});
 
 		auto debug_action_keys = std::array<std::size_t, 4ul> {};
-		debug_action_keys[0] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_1",
-		        .trigger = input::Trigger { .mapped_keycode = Key::D1 },
-		    }
-		);
+		debug_action_keys[0] = input.add_action(input::InputAction {
+		    .name = "debug_1",
+		    .trigger = input::Trigger { .mapped_keycode = Key::D1 },
+		});
 
-		debug_action_keys[1] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_2",
-		        .trigger = input::Trigger { .mapped_keycode = Key::D2 },
-		    }
-		);
+		debug_action_keys[1] = input.add_action(input::InputAction {
+		    .name = "debug_2",
+		    .trigger = input::Trigger { .mapped_keycode = Key::D2 },
+		});
 
-		debug_action_keys[2] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_3",
-		        .trigger = input::Trigger { .mapped_keycode = Key::D3 },
-		    }
-		);
+		debug_action_keys[2] = input.add_action(input::InputAction {
+		    .name = "debug_3",
+		    .trigger = input::Trigger { .mapped_keycode = Key::D3 },
+		});
 
-		debug_action_keys[3] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_4",
-		        .trigger = input::Trigger { .mapped_keycode = Key::D4 },
-		    }
-		);
+		debug_action_keys[3] = input.add_action(input::InputAction {
+		    .name = "debug_4",
+		    .trigger = input::Trigger { .mapped_keycode = Key::D4 },
+		});
 
 		m_input_system = memory::create_ref<input::System>(m_editor_registry);
 		m_mirror_system = memory::create_ref<MirrorSystem>(
@@ -293,10 +283,5 @@ private:
 
 	lt::ecs::EntityId m_sprite_id = lt::ecs::null_entity;
 };
-
-auto app::create_application() -> memory::Scope<app::Application>
-{
-	return memory::create_scope<Mirror>();
-}
 
 } // namespace lt

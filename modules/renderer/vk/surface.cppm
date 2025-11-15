@@ -39,6 +39,8 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 {
 	const auto &component = surface_entity.get<surface::SurfaceComponent>();
 
+
+#if defined(LIGHT_PLATFORM_LINUX)
 	debug::ensure(
 	    component.get_native_data().display,
 	    "Failed to initialize vk::Surface: null x-display"
@@ -50,11 +52,29 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 
 	m_surface = vk::Surface(
 	    static_cast<Instance *>(instance)->vk(),
-	    vk::Surface::XlibCreateInfo {
+	    vk::Surface::CreateInfo {
 	        .display = component.get_native_data().display,
 	        .window = component.get_native_data().window,
 	    }
 	);
+
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	debug::ensure(
+	    component.get_native_data().window,
+	    "Failed to initialize vk::Surface: null win32 window handle"
+	);
+
+	m_surface = vk::Surface(
+	    static_cast<Instance *>(instance)->vk(),
+	    vk::Surface::CreateInfo {
+	        .window = component.get_native_data().window,
+	    }
+	);
+
+#else
+	#error "Unsupported platform"
+
+#endif
 }
 
 [[nodiscard]] auto Surface::get_framebuffer_size() const -> math::uvec2

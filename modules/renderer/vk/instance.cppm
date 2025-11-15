@@ -101,7 +101,7 @@ Instance::Instance()
             .extensions = {
                 vk::instance_extension_names::debug_utils,
                 vk::instance_extension_names::surface,
-                vk::instance_extension_names::xlib_surface,
+                vk::instance_extension_names::platform_surface,
                 vk::instance_extension_names::physical_device_properties_2,
             },
 	    }

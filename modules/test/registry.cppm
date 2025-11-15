@@ -290,6 +290,8 @@ auto Registry::run_all_impl() -> std::int32_t
 		return 0;
 	}
 	}
+
+	std::unreachable();
 }
 
 void Registry::print_options()
