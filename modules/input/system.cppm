@@ -59,7 +59,7 @@ private:
 
 
 module :private;
-using namespace lt::input;
+namespace lt::input {
 
 template<class... Ts>
 struct overloads: Ts...
@@ -158,10 +158,8 @@ void System::on_key_press(const lt::surface::KeyPressedEvent &event)
 {
 	if (event.get_key() > m_keys.size())
 	{
-		log::debug(
-		    "Key code larger than key container size, implement platform-dependant "
-		    "key-code-mapping!"
-		);
+		log::debug("Key code larger than key container size, implement platform-dependant "
+		           "key-code-mapping!");
 
 		return;
 	}
@@ -173,10 +171,8 @@ void System::on_key_release(const lt::surface::KeyReleasedEvent &event)
 {
 	if (event.get_key() > m_keys.size())
 	{
-		log::debug(
-		    "Key code larger than key container size, implement platform-dependant "
-		    "key-code-mapping!"
-		);
+		log::debug("Key code larger than key container size, implement platform-dependant "
+		           "key-code-mapping!");
 
 		return;
 	}
@@ -198,3 +194,5 @@ void System::on_button_release(const lt::surface::ButtonReleasedEvent &event)
 {
 	m_buttons[event.get_button()] = false;
 }
+
+} // namespace lt::input

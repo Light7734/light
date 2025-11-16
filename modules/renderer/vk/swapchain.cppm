@@ -74,8 +74,7 @@ private:
 
 
 module :private;
-using namespace lt::renderer;
-using namespace lt::renderer::vkb;
+namespace lt::renderer::vkb {
 
 Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
     : m_surface(static_cast<Surface *>(surface))
@@ -168,3 +167,5 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	// Fall-back to min_image_count
 	return min_image_count;
 }
+
+} // namespace lt::renderer::vkb

@@ -26,7 +26,7 @@ private:
 } // namespace lt::time
 
 module :private;
-using namespace lt::time;
+namespace lt::time {
 
 Timer::Timer(Timepoint start): m_start(start)
 {
@@ -41,3 +41,5 @@ void Timer::reset(Timepoint start)
 {
 	return { std::chrono::steady_clock::now() - m_start };
 }
+
+} // namespace lt::time

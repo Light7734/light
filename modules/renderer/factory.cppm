@@ -54,8 +54,7 @@ export namespace lt::renderer {
 } // namespace lt::renderer
 
 module :private;
-using namespace lt;
-using namespace lt::renderer;
+namespace lt::renderer {
 
 [[nodiscard]] auto get_instance(Api target_api) -> IInstance *
 {
@@ -239,3 +238,5 @@ using namespace lt::renderer;
 
 	std::unreachable();
 }
+
+} // namespace lt::renderer

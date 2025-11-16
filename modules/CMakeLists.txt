@@ -209,6 +209,7 @@ add_module(
     INTERFACES
     system.cppm
     DEPENDENCIES
+    memory
     app
     time
     input

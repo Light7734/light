@@ -64,7 +64,7 @@ private:
 
 
 module :private;
-using namespace lt::renderer::vkb;
+namespace lt::renderer::vkb {
 
 Gpu::Gpu(IInstance *instance)
 {
@@ -129,3 +129,5 @@ Gpu::Gpu(IInstance *instance)
 // 	vkc(vk_create_device(m_gpu, &info, nullptr, &device));
 // 	return device;
 // }
+
+} // namespace lt::renderer::vkb

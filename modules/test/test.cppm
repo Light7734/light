@@ -118,8 +118,10 @@ auto operator""_suite(const char *name, std::size_t size) -> TestSuite
 // -------* IMPLEMENTATION *------- //
 /////////////////////////////////////
 module :private;
-using namespace lt::test;
+namespace lt::test {
 
 TestCase::TestCase(std::string_view name): m_name(name)
 {
 }
+
+} // namespace lt::test

@@ -732,7 +732,10 @@ public:
 
 	auto operator=(const Instance &) = delete;
 
-	~Instance();
+	~Instance()
+	{
+		// WIP;
+	}
 
 	void load_functions();
 
@@ -1117,7 +1120,10 @@ public:
 
 	auto operator=(const Gpu &) -> Gpu & = default;
 
-	~Gpu();
+	~Gpu()
+	{
+		// WIP;
+	}
 
 	[[nodiscard]] auto get_features() const -> Features;
 
@@ -1693,7 +1699,10 @@ public:
 
 	auto operator=(const ImageView &) -> ImageView & = delete;
 
-	~ImageView();
+	~ImageView()
+	{
+		// WIP;
+	}
 
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkImageView
@@ -1718,9 +1727,15 @@ public:
 
 	ShaderModule() = default;
 
-	ShaderModule(Device &device, CreateInfo info);
+	ShaderModule(Device &device, CreateInfo info)
+	{
+		// WIP
+	}
 
-	~ShaderModule();
+	~ShaderModule()
+	{
+		// WIP
+	}
 
 	ShaderModule(ShaderModule &&) = default;
 
@@ -1820,7 +1835,10 @@ public:
 
 	DescriptorSetLayout() = default;
 
-	DescriptorSetLayout(Device &device, CreateInfo info);
+	DescriptorSetLayout(Device &device, CreateInfo info)
+	{
+		// WIP
+	}
 
 	DescriptorSetLayout(DescriptorSetLayout &&) = default;
 
@@ -1830,8 +1848,10 @@ public:
 
 	auto operator=(const DescriptorSetLayout &) -> DescriptorSetLayout & = delete;
 
-	~DescriptorSetLayout();
-
+	~DescriptorSetLayout()
+	{
+		// WIP
+	}
 
 private:
 	memory::NullOnMove<VkDevice> m_device;
@@ -1992,7 +2012,10 @@ public:
 
 	PipelineLayout() = default;
 
-	PipelineLayout(Device &device, CreateInfo info);
+	PipelineLayout(Device &device, CreateInfo info)
+	{
+		// WIP
+	}
 
 	PipelineLayout(PipelineLayout &&) = default;
 
@@ -2002,7 +2025,10 @@ public:
 
 	auto operator=(const PipelineLayout &) -> PipelineLayout & = delete;
 
-	~PipelineLayout();
+	~PipelineLayout()
+	{
+		// WIP
+	}
 
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkPipelineLayout
@@ -2167,23 +2193,51 @@ public:
 		std::uint32_t first_instance;
 	};
 
-	void begin(BeginInfo info = {});
+	CommandBuffer() = default; // WIP
 
-	void end();
+	CommandBuffer(CommandBuffer &&) = default;
 
-	void copy(BufferCopyInfo info);
+	CommandBuffer(const CommandBuffer &) = delete;
 
-	void push_constants(PushConstantsInfo info);
+	auto operator=(CommandBuffer &&) -> CommandBuffer & = default;
 
-	void image_barrier(ImageBarrierInfo info);
+	auto operator=(const CommandBuffer &) -> CommandBuffer & = delete;
 
-	void begin_rendering(RenderingInfo info);
+	void begin(BeginInfo info = {})
+	{
+	}
 
-	void end_rendering();
+	void end()
+	{
+	}
 
-	void bind_pipeline(Pipeline &pipeline, Pipeline::BindPoint bind_point);
+	void copy(BufferCopyInfo info)
+	{
+	}
 
-	void draw(DrawInfo info);
+	void push_constants(PushConstantsInfo info)
+	{
+	}
+
+	void image_barrier(ImageBarrierInfo info)
+	{
+	}
+
+	void begin_rendering(RenderingInfo info)
+	{
+	}
+
+	void end_rendering()
+	{
+	}
+
+	void bind_pipeline(Pipeline &pipeline, Pipeline::BindPoint bind_point)
+	{
+	}
+
+	void draw(DrawInfo info)
+	{
+	}
 
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkCommandBuffer
@@ -2222,9 +2276,15 @@ public:
 
 	CommandPool() = default;
 
-	CommandPool(Device &device, CreateInfo info);
+	CommandPool(Device &device, CreateInfo info)
+	{
+		// WIP
+	}
 
-	~CommandPool();
+	~CommandPool()
+	{
+		// WIP
+	}
 
 	CommandPool(CommandPool &&) = default;
 
@@ -2234,7 +2294,11 @@ public:
 
 	auto operator=(const CommandPool &) -> CommandPool & = delete;
 
-	[[nodiscard]] auto allocate(uint32_t count, BufferLevel level) -> std::vector<CommandBuffer>;
+	[[nodiscard]] auto allocate(uint32_t count, BufferLevel level) -> std::vector<CommandBuffer>
+	{
+		// WIP
+		return {};
+	}
 
 private:
 	VkDevice m_device {};
@@ -2487,13 +2551,16 @@ private:
 /** ================================ **/
 /** Private Template Implementations **/
 /** ================================ **/
-using namespace lt::renderer::vk;
+namespace lt::renderer::vk {
 
+// This is the only api function that needs to be inside the "header" part of the module,
+// since it's used in a template that does std::format magic.
+//
+// ...And the template implementation needs to be visible by the compiler on the calling site to
+// generate the templated code
 namespace api {
 PFN_vkSetDebugUtilsObjectNameEXT set_debug_object_name {}; // NOLINT
 }
-
-namespace lt::renderer::vk {
 
 void vkc(VkResult result)
 {
@@ -2534,8 +2601,9 @@ void Device::name(T &object, const char *name)
 
 } // namespace lt::renderer::vk
 
+
 module :private;
-using namespace lt::renderer::vk;
+namespace lt::renderer::vk {
 
 namespace api {
 // global functions
@@ -4286,3 +4354,5 @@ auto enumerate_instance_extension_properties() -> std::vector<VkExtensionPropert
 //
 //     }
 // );
+
+} // namespace lt::renderer::vk

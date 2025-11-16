@@ -114,7 +114,7 @@ private:
 } // namespace lt::renderer
 
 module :private;
-using namespace lt::renderer;
+namespace lt::renderer {
 
 System::System(CreateInfo info)
     : m_surface_entity(info.surface_entity)
@@ -225,3 +225,5 @@ void System::recreate_swapchain()
 	m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
 	m_renderer->replace_swapchain(m_swapchain.get());
 }
+
+} // namespace lt::renderer

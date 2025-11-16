@@ -112,7 +112,7 @@ private:
 // -------* IMPLEMENTATION *------- //
 /////////////////////////////////////
 module :private;
-using namespace lt::test;
+namespace lt::test {
 
 /* static */ void Registry::register_suite(SuiteFunction suite)
 {
@@ -309,3 +309,5 @@ Registry::Registry()
 	static auto registry = Registry {};
 	return registry;
 }
+
+} // namespace lt::test

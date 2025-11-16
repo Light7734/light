@@ -9,7 +9,6 @@ import renderer.vk.gpu;
 import renderer.vk.surface;
 import std;
 
-
 namespace lt::renderer::vkb {
 
 export class Device: public IDevice
@@ -65,9 +64,7 @@ private:
 
 
 module :private;
-using namespace lt::renderer;
-using namespace lt::renderer::vkb;
-
+namespace lt::renderer::vkb {
 
 Device::Device(IGpu *gpu, ISurface *surface)
     : m_gpu(static_cast<Gpu *>(gpu))
@@ -153,3 +150,5 @@ void Device::initialize_queue_indices()
 	    "Failed to find presentation queue family"
 	);
 }
+
+} // namespace lt::renderer::vkb

@@ -37,8 +37,7 @@ private:
 } // namespace lt::renderer::vkb
 
 module :private;
-using namespace lt::renderer;
-using namespace lt::renderer::vkb;
+namespace lt::renderer::vkb {
 
 [[nodiscard]] auto to_native_severity(IDebugger::MessageSeverity severity) -> vk::Flags
 {
@@ -190,3 +189,5 @@ Debugger::Debugger(IInstance *instance, CreateInfo info)
       )
 {
 }
+
+} // namespace lt::renderer::vkb

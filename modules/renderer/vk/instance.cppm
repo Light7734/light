@@ -57,7 +57,7 @@ private:
 } // namespace lt::renderer::vkb
 
 module :private;
-using namespace lt::renderer::vkb;
+namespace lt::renderer::vkb {
 
 Instance::Instance()
 {
@@ -146,3 +146,5 @@ Instance::Instance()
 // {
 // 	vk_destroy_debug_messenger(m_instance, messenger, m_allocator);
 // }
+
+} // namespace lt::renderer::vkb

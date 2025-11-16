@@ -32,7 +32,7 @@ private:
 } // namespace lt::renderer::vkb
 
 module :private;
-using namespace lt::renderer::vkb;
+namespace lt::renderer::vkb {
 
 Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
     : m_surface_entity(surface_entity)
@@ -81,3 +81,5 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 {
 	return m_surface_entity.get<surface::SurfaceComponent>().get_resolution();
 }
+
+} // namespace lt::renderer::vkb

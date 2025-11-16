@@ -77,7 +77,7 @@ private:
 #define lt_profile_end_session()             ::lt::Instrumentor::end_session()
 
 module :private;
-using namespace lt::debug;
+namespace lt::debug {
 
 void Instrumentor::begin_session_impl(const std::string &outputPath)
 {
@@ -143,3 +143,4 @@ InstrumentorTimer::~InstrumentorTimer()
 
 	Instrumentor::submit_scope_profile(m_result);
 }
+} // namespace lt::debug
