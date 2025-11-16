@@ -1,11 +1,25 @@
 add_module(
-    NAME logger INTERFACES logger.cppm TESTS logger.test.cpp
+    NAME
+    lsd
+    INTERFACES
+    lsd.cppm
+    ref.cppm
+    vec.cppm
+    arr.cppm
+    str.cppm
+    set.cppm
+    hash.cppm
+    scope.cppm
+    bitwise.cppm
+    thread.cppm
+    primitives.cppm
+    src_location.cppm
 )
+add_module(NAME logger INTERFACES logger.cppm DEPENDENCIES lsd)
+return()
 add_module(NAME bitwise INTERFACES operations.cppm)
 add_module(NAME env INTERFACES constants.cppm)
-add_module(
-    NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
-)
+add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm)
 add_module(NAME time INTERFACES timer.cppm)
 
 add_module(
@@ -206,6 +220,8 @@ add_module(
     mirror
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/mirror
+    ENTRYPOINT
+    entrypoint.cpp
     INTERFACES
     system.cppm
     DEPENDENCIES
@@ -216,23 +232,6 @@ add_module(
     surface
     renderer
     camera
-    # TESTS
-    # system.test.cpp
+    TESTS
+    system.test.cpp
 )
-
-add_executable(exectest ${CMAKE_CURRENT_SOURCE_DIR}/mirror/entrypoint.cpp
-)
-
-target_link_libraries(exectest PRIVATE
-
-    mirror
-    app
-    time
-    input
-    surface
-    renderer
-    camera
-)
-
-# add_executable_module(mirror entrypoint/mirror.cpp)
-# target_link_libraries(mirror PRIVATE libmirror input)

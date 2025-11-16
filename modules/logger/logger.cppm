@@ -1,50 +1,51 @@
 export module logger;
 
 import std;
+import lsd;
 
 namespace lt::log {
 
-/** Severity of a log message. */
-enum class Level : std::uint8_t
+auto thread_hash_id() noexcept -> u64
 {
-	/** Lowest and most vebose log level, for tracing execution paths and events */
-	trace = 0,
-
-	/** Vebose log level, for enabling temporarily to debug */
-	debug = 1,
-
-	/** General information */
-	info = 2,
-
-	/** Things we should to be aware of and edge cases */
-	warn = 3,
-
-	/** Defects, bugs and undesired behaviour */
-	error = 4,
-
-	/** Unrecoverable errors */
-	critical = 5,
-
-	/** No logging */
-	off = 6,
-};
-
-namespace details {
-
-inline auto thread_hash_id() noexcept -> std::uint64_t
-{
-	return static_cast<std::uint64_t>(std::hash<std::thread::id> {}(std::this_thread::get_id()));
+	return static_cast<u64>(lsd::hash<lsd::thread_id> {}(lsd::this_thread_id()));
 }
 
-} // namespace details
+} // namespace lt::log
+
+export namespace lt::log {
+
+/** Severity of a log message. */
+enum class Level : u8
+{
+	/** Lowest and most vebose log level, for tracing execution paths and events */
+	trace = 0u,
+
+	/** Vebose log level, for enabling temporarily to debug */
+	debug = 1u,
+
+	/** General information */
+	info = 2u,
+
+	/** Things we should to be aware of and edge cases */
+	warn = 3u,
+
+	/** Defects, bugs and undesired behaviour */
+	error = 4u,
+
+	/** Unrecoverable errors */
+	critical = 5u,
+
+	/** No logging */
+	off = 6u,
+};
 
 template<typename... Args>
 struct [[maybe_unused]] print
 {
 	[[maybe_unused]] print(
 	    Level level,
-	    const std::source_location &location,
-	    std::format_string<Args...> format,
+	    const lsd::src_location &location,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments
 	) noexcept
 	{
@@ -78,103 +79,103 @@ struct [[maybe_unused]] print
 };
 
 template<typename... Args>
-print(Level, const std::source_location &, std::format_string<Args...>, Args &&...) noexcept
+print(Level, const lsd::src_location &, lsd::format_str<Args...>, Args &&...) noexcept
     -> print<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] trace
 {
 	[[maybe_unused]] trace(
-	    std::format_string<Args...> format,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
 		print(Level::trace, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-export template<typename... Args>
-trace(std::format_string<Args...>, Args &&...) noexcept -> trace<Args...>;
+template<typename... Args>
+trace(lsd::format_str<Args...>, Args &&...) noexcept -> trace<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] debug
 {
 	[[maybe_unused]] debug(
-	    std::format_string<Args...> format,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
 		print(Level::debug, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-export template<typename... Args>
-debug(std::format_string<Args...>, Args &&...) noexcept -> debug<Args...>;
+template<typename... Args>
+debug(lsd::format_str<Args...>, Args &&...) noexcept -> debug<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] info
 {
 	[[maybe_unused]] info(
-	    std::format_string<Args...> format,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
 		print(Level::info, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-export template<typename... Args>
-info(std::format_string<Args...>, Args &&...) noexcept -> info<Args...>;
+template<typename... Args>
+info(lsd::format_str<Args...>, Args &&...) noexcept -> info<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] warn
 {
 	[[maybe_unused]] warn(
-	    std::format_string<Args...> format,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
 		print(Level::warn, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-export template<typename... Args>
-warn(std::format_string<Args...>, Args &&...) noexcept -> warn<Args...>;
+template<typename... Args>
+warn(lsd::format_str<Args...>, Args &&...) noexcept -> warn<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] error
 {
 	[[maybe_unused]] error(
-	    std::format_string<Args...> format,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
 		print(Level::error, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-export template<typename... Args>
-error(std::format_string<Args...>, Args &&...) noexcept -> error<Args...>;
+template<typename... Args>
+error(lsd::format_str<Args...>, Args &&...) noexcept -> error<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] critical
 {
 	[[maybe_unused]] critical(
-	    std::format_string<Args...> format,
+	    lsd::format_str<Args...> format,
 	    Args &&...arguments,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
 		print(Level::critical, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-export template<typename... Args>
-critical(std::format_string<Args...>, Args &&...) noexcept -> critical<Args...>;
+template<typename... Args>
+critical(lsd::format_str<Args...>, Args &&...) noexcept -> critical<Args...>;
 
 } // namespace lt::log

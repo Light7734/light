@@ -50,6 +50,96 @@ struct overloads: Ts...
 	using Ts::operator()...;
 };
 
+template<typename Underlying_T, Underlying_T null_value = nullptr>
+class NullOnMove
+{
+public:
+	NullOnMove() = default;
+
+	NullOnMove(Underlying_T value): m_value(value)
+	{
+	}
+
+	~NullOnMove() = default;
+
+	NullOnMove(const NullOnMove &) = delete;
+
+	auto operator=(const NullOnMove &) -> NullOnMove & = delete;
+
+	NullOnMove(NullOnMove &&other) noexcept
+	{
+		*this = std::move(other);
+	}
+
+	auto operator=(NullOnMove &&other) noexcept -> NullOnMove &
+	{
+		if (this == std::addressof(other))
+		{
+			return *this;
+		}
+
+		m_value = other.m_value;
+		other.m_value = null_value;
+
+		return *this;
+	}
+
+	auto operator->() -> Underlying_T
+	{
+		return m_value;
+	}
+
+	// NOLINTNEXTLINE
+	auto operator->() const -> const Underlying_T
+	{
+		return m_value;
+	}
+
+	auto operator&() const -> const Underlying_T *
+	{
+		return &m_value;
+	}
+
+	auto operator&() -> Underlying_T *
+	{
+		return &m_value;
+	}
+
+	operator bool() const
+	{
+		return m_value != null_value;
+	}
+
+	operator Underlying_T() const
+	{
+		return m_value;
+	}
+
+	operator Underlying_T()
+	{
+		return m_value;
+	}
+
+	operator std::uint64_t() const
+	{
+		return (std::uint64_t)m_value;
+	}
+
+	[[nodiscard]] auto get() -> Underlying_T &
+	{
+		return m_value;
+	}
+
+	[[nodiscard]] auto get() const -> const Underlying_T &
+	{
+		return m_value;
+	}
+
+private:
+	Underlying_T m_value;
+};
+
+
 export namespace lt::renderer::vk {
 
 using Bool32 = VkBool32;
@@ -750,7 +840,7 @@ private:
 		return m_instance;
 	}
 
-	memory::NullOnMove<VkInstance> m_instance {};
+	NullOnMove<VkInstance> m_instance {};
 };
 
 class Surface
@@ -842,7 +932,7 @@ private:
 		return m_surface.get();
 	}
 
-	memory::NullOnMove<VkSurfaceKHR> m_surface {};
+	NullOnMove<VkSurfaceKHR> m_surface {};
 
 	VkInstance m_instance {};
 };
@@ -1329,7 +1419,7 @@ private:
 		return m_device.get();
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	NullOnMove<VkDevice> m_device {};
 };
 
 class Semaphore
@@ -1366,7 +1456,7 @@ private:
 		return &m_semaphore;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	NullOnMove<VkDevice> m_device;
 
 	VkSemaphore m_semaphore;
 };
@@ -1417,7 +1507,7 @@ private:
 		return &m_fence;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	NullOnMove<VkDevice> m_device;
 
 	VkFence m_fence;
 };
@@ -1496,7 +1586,7 @@ private:
 		return m_buffer;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	NullOnMove<VkDevice> m_device {};
 
 	VkBuffer m_buffer {};
 };
@@ -1751,7 +1841,7 @@ private:
 		return m_shader_module;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	NullOnMove<VkDevice> m_device {};
 
 	VkShaderModule m_shader_module {};
 };
@@ -1854,7 +1944,7 @@ public:
 	}
 
 private:
-	memory::NullOnMove<VkDevice> m_device;
+	NullOnMove<VkDevice> m_device;
 
 	VkDescriptorSetLayout m_layout;
 };
@@ -1984,7 +2074,7 @@ public:
 	~Pipeline();
 
 private:
-	memory::NullOnMove<VkDevice> m_device {};
+	NullOnMove<VkDevice> m_device {};
 
 	VkPipeline m_pipeline {};
 };
@@ -2036,7 +2126,7 @@ private:
 		return m_layout;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	NullOnMove<VkDevice> m_device {};
 
 	VkPipelineLayout m_layout {};
 };
@@ -2432,7 +2522,7 @@ private:
 		return m_queue;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	NullOnMove<VkDevice> m_device;
 
 	VkQueue m_queue;
 };
@@ -2486,7 +2576,7 @@ private:
 		return m_memory;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	NullOnMove<VkDevice> m_device {};
 
 	VkDeviceMemory m_memory {};
 };
@@ -2540,7 +2630,7 @@ public:
 	auto operator=(const Messenger &) -> Messenger & = delete;
 
 private:
-	memory::NullOnMove<VkInstance> m_instance {};
+	NullOnMove<VkInstance> m_instance {};
 
 	VkDebugUtilsMessengerEXT m_messenger {};
 };
