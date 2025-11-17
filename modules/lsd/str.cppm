@@ -9,7 +9,6 @@ using str = std::string;
 
 using str_view = std::string_view;
 
-
 template<typename... T>
 using format_str = std::format_string<T...>;
 

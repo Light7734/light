@@ -8,7 +8,9 @@ add_module(
     arr.cppm
     str.cppm
     set.cppm
+    span.cppm
     hash.cppm
+    utils.cppm
     scope.cppm
     bitwise.cppm
     thread.cppm
@@ -16,12 +18,6 @@ add_module(
     src_location.cppm
 )
 add_module(NAME logger INTERFACES logger.cppm DEPENDENCIES lsd)
-return()
-add_module(NAME bitwise INTERFACES operations.cppm)
-add_module(NAME env INTERFACES constants.cppm)
-add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm)
-add_module(NAME time INTERFACES timer.cppm)
-
 add_module(
     NAME
     test
@@ -32,8 +28,13 @@ add_module(
     SOURCES
     entrypoint.cpp
     DEPENDENCIES
+    lsd
     logger
 )
+return()
+add_module(NAME env INTERFACES constants.cppm)
+add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm)
+add_module(NAME time INTERFACES timer.cppm)
 
 add_module(
     NAME

@@ -1,6 +1,4 @@
 export module logger;
-
-import std;
 import lsd;
 
 namespace lt::log {
@@ -64,16 +62,16 @@ struct [[maybe_unused]] print
 			}
 			// clang-format on
 
-			std::unreachable();
+			lsd::unreachable();
 		};
 
-		const auto path = std::filesystem::path { location.file_name() };
+		const auto path = lsd::filesystem::path { location.file_name() };
 
-		std::println(
+		lsd::println(
 		    "{} {} ==> {}",
 		    to_string(level, location),
-		    std::format("{}:{}", path.filename().string(), location.line()),
-		    std::format(format, std::forward<Args>(arguments)...)
+		    lsd::format("{}:{}", path.filename().string(), location.line()),
+		    lsd::format(format, lsd::forward<Args>(arguments)...)
 		);
 	}
 };
@@ -91,7 +89,7 @@ struct [[maybe_unused]] trace
 	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
-		print(Level::trace, location, format, std::forward<Args>(arguments)...);
+		print(Level::trace, location, format, lsd::forward<Args>(arguments)...);
 	}
 };
 
@@ -107,7 +105,7 @@ struct [[maybe_unused]] debug
 	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
-		print(Level::debug, location, format, std::forward<Args>(arguments)...);
+		print(Level::debug, location, format, lsd::forward<Args>(arguments)...);
 	}
 };
 
@@ -123,7 +121,7 @@ struct [[maybe_unused]] info
 	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
-		print(Level::info, location, format, std::forward<Args>(arguments)...);
+		print(Level::info, location, format, lsd::forward<Args>(arguments)...);
 	}
 };
 
@@ -139,7 +137,7 @@ struct [[maybe_unused]] warn
 	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
-		print(Level::warn, location, format, std::forward<Args>(arguments)...);
+		print(Level::warn, location, format, lsd::forward<Args>(arguments)...);
 	}
 };
 
@@ -155,7 +153,7 @@ struct [[maybe_unused]] error
 	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
-		print(Level::error, location, format, std::forward<Args>(arguments)...);
+		print(Level::error, location, format, lsd::forward<Args>(arguments)...);
 	}
 };
 
@@ -171,7 +169,7 @@ struct [[maybe_unused]] critical
 	    const lsd::src_location &location = lsd::src_location::current()
 	) noexcept
 	{
-		print(Level::critical, location, format, std::forward<Args>(arguments)...);
+		print(Level::critical, location, format, lsd::forward<Args>(arguments)...);
 	}
 };
 

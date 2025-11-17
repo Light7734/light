@@ -1,4 +1,5 @@
 export module lsd.arr;
+import lsd.primitives;
 import std;
 
 export namespace lt::lsd {

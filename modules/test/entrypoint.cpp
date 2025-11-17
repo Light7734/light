@@ -2,22 +2,28 @@ import logger;
 import test.test;
 import test.registry;
 
-import std;
+import lsd;
 
+using namespace ::lt;
 using namespace ::lt::test;
 
-void parse_option(std::string_view argument, Registry::Options &options)
+constexpr lsd::str_view operator""_sv(const char *str, unsigned long len) noexcept
 {
-	constexpr auto case_str = std::string_view { "--case=" };
-	constexpr auto suite_str = std::string_view { "--suite=" };
+	return lsd::str_view { str, len };
+}
 
-	if (argument == "--stop-on-fail")
+void parse_option(lsd::str_view argument, Registry::Options &options)
+{
+	constexpr auto case_str = lsd::str_view { "--case=" };
+	constexpr auto suite_str = lsd::str_view { "--suite=" };
+
+	if (argument == "--stop-on-fail"_sv)
 	{
 		options.stop_on_fail = true;
 		return;
 	}
 
-	if (argument.starts_with("--mode=") && argument.substr(7ul) == "stats")
+	if (argument.starts_with("--mode="_sv) && argument.substr(7ul) == "stats")
 	{
 		options.execution_policy = Registry::ExecutionPolicy::stats;
 		return;
@@ -26,14 +32,14 @@ void parse_option(std::string_view argument, Registry::Options &options)
 	if (argument.starts_with(suite_str) && argument.length() > suite_str.size())
 	{
 		options.suite_regex = argument.substr(suite_str.length());
-		std::println("SUITE REGEX: {}", options.suite_regex);
+		lsd::println("SUITE REGEX: {}", options.suite_regex);
 		return;
 	}
 
 	if (argument.starts_with(case_str) && argument.length() > case_str.size())
 	{
 		options.case_regex = argument.substr(case_str.length());
-		std::println("CASE REGEX: {}", options.case_regex);
+		lsd::println("CASE REGEX: {}", options.case_regex);
 		return;
 	}
 
@@ -42,19 +48,19 @@ void parse_option(std::string_view argument, Registry::Options &options)
 
 void print_help()
 {
-	std::println("Options: ");
-	std::println("--stop-on-fail --> Stops executing the remaining tests on first failure");
-	std::println("--suite        --> Regex for running specific suite(s)");
-	std::println("--case         --> Regex for running specific test(s)");
-	std::println("--mode=stats   --> Executes tests with an alternative policy");
-	std::println("\t---> stats: Print statistics about the tests without running any");
-	std::println("--help | -h    --> ~You just used it! :D");
+	lsd::println("Options: ");
+	lsd::println("--stop-on-fail --> Stops executing the remaining tests on first failure");
+	lsd::println("--suite        --> Regex for running specific suite(s)");
+	lsd::println("--case         --> Regex for running specific test(s)");
+	lsd::println("--mode=stats   --> Executes tests with an alternative policy");
+	lsd::println("\t---> stats: Print statistics about the tests without running any");
+	lsd::println("--help | -h    --> ~You just used it! :D");
 }
 
-auto main(std::int32_t argc, char **argv) -> std::int32_t
+auto main(i32 argc, char **argv) -> i32
 try
 {
-	auto raw_arguments = std::span<char *>(argv, argc);
+	auto raw_arguments = lsd::span<char *>(argv, argc);
 
 	auto options = Registry::Options {};
 	for (auto idx = 0; auto &raw_argument : raw_arguments)
@@ -65,7 +71,7 @@ try
 			continue;
 		}
 
-		auto argument = std::string_view(raw_argument);
+		auto argument = lsd::str_view(raw_argument);
 
 		if (argument == "-h" || argument == "--help")
 		{
@@ -83,7 +89,7 @@ try
 		}
 	}
 
-	return static_cast<std::int32_t>(Registry::run_all(options));
+	return static_cast<i32>(Registry::run_all(options));
 }
 catch (const std::exception &exp)
 {
