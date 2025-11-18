@@ -1,8 +1,8 @@
-export module math.algebra;
-import math.mat4;
-import std;
+export module lsd.math.algebra;
+import lsd.math.mat4;
+import lsd.math.trig;
 
-export namespace lt::math {
+export namespace lt::lsd {
 
 /**
  * let...
@@ -37,19 +37,19 @@ export namespace lt::math {
 template<typename T>
 constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far)
 {
-	const T half_fov_tan = std::tan(field_of_view / static_cast<T>(2));
+	const T half_fov_tan = tan(field_of_view / static_cast<T>(2u));
 
 	auto result = mat4_impl<T>::identity();
 
-	result[0][0] = T { 1 } / (aspect_ratio * half_fov_tan);
+	result[0][0] = T { 1u } / (aspect_ratio * half_fov_tan);
 	//
-	result[1][1] = T { 1 } / (half_fov_tan);
+	result[1][1] = T { 1u } / (half_fov_tan);
 	//
 	//	result[2][2] = -(z_far + z_near) / (z_far - z_near);
 	//
 	result[2][2] = z_far / (z_far - z_near);
 	//
-	result[2][3] = -T { 1 };
+	result[2][3] = -T { 1u };
 	//
 	// result[3][2] = -(T { 2 } * z_far * z_near) / (z_far - z_near);
 	result[3][2] = -(z_far * z_near) / (z_far - z_near);
@@ -57,4 +57,4 @@ constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far)
 	return result;
 }
 
-} // namespace lt::math
+} // namespace lt::lsd

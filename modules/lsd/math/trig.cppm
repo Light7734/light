@@ -1,6 +1,11 @@
-export module math.trig;
+export module lsd.math.trig;
+import std;
 
-export namespace lt::math {
+export namespace lt::lsd {
+
+using ::std::cos;
+using ::std::sin;
+using ::std::tan;
 
 [[nodiscard]] constexpr auto radians(float degrees) -> float
 {
@@ -23,4 +28,4 @@ export namespace lt::math {
 }
 
 
-} // namespace lt::math
+} // namespace lt::lsd

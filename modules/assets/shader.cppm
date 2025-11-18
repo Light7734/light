@@ -2,7 +2,7 @@ export module assets.shader;
 import assets.metadata;
 import debug.assertions;
 
-import std;
+import lsd;
 
 export namespace lt::assets {
 
@@ -16,7 +16,7 @@ public:
 		code,
 	};
 
-	enum class Type : std::uint8_t
+	enum class Type : u8
 	{
 		vertex,
 		fragment,
@@ -30,15 +30,15 @@ public:
 	};
 
 	static void pack(
-	    const std::filesystem::path &destination,
+	    const lsd::file::path &destination,
 	    AssetMetadata asset_metadata,
 	    Metadata metadata,
 	    Blob code_blob
 	);
 
-	ShaderAsset(const std::filesystem::path &path);
+	ShaderAsset(const lsd::file::path &path);
 
-	void unpack_to(BlobTag tag, std::span<std::byte> destination) const;
+	void unpack_to(BlobTag tag, lsd::span<byte> destination) const;
 
 	[[nodiscard]] auto unpack(BlobTag tag) const -> Blob;
 
@@ -57,7 +57,7 @@ public:
 		debug::ensure(
 		    tag == BlobTag::code,
 		    "Invalid blob tag for shader asset: {}",
-		    std::to_underlying(tag)
+		    lsd::to_underlying(tag)
 		);
 
 		return m_code_blob_metadata;
@@ -88,15 +88,15 @@ constexpr auto total_metadata_size =         //
     + sizeof(BlobMetadata::compressed_size)  //
     + sizeof(BlobMetadata::uncompressed_size);
 
-ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
+ShaderAsset::ShaderAsset(const lsd::file::path &path): m_stream(path)
 {
 	debug::ensure(m_stream.is_open(), "Failed to open shader asset at: {}", path.string());
 	const auto read = [this](auto &field) {
-		m_stream.read(std::bit_cast<char *>(&field), sizeof(field));
+		m_stream.read(bit_cast<char *>(&field), sizeof(field));
 	};
 
 	m_stream.seekg(0, std::ifstream::end);
-	const auto file_size = static_cast<std::size_t>(m_stream.tellg());
+	const auto file_size = static_cast<size_t>(m_stream.tellg());
 	debug::ensure(
 	    file_size > total_metadata_size,
 	    "Failed to open shader asset at: {}, file smaller than metadata: {} < {}",
@@ -132,14 +132,14 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 	);
 
 	debug::ensure(
-	    std::to_underlying(m_metadata.type) <= std::to_underlying(Type::compute),
+	    lsd::to_underlying(m_metadata.type) <= std::to_underlying(Type::compute),
 	    "Failed to open shader asset at: {}, invalid shader type: {}",
 	    path.string(),
-	    std::to_underlying(m_metadata.type)
+	    lsd::to_underlying(m_metadata.type)
 	);
 
 	debug::ensure(
-	    m_code_blob_metadata.tag == std::to_underlying(BlobTag::code),
+	    m_code_blob_metadata.tag == lsd::to_underlying(BlobTag::code),
 	    "Failed to open shader asset at: {}, invalid blob tag: {}",
 	    path.string(),
 	    m_code_blob_metadata.tag
@@ -156,7 +156,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 }
 
 /* static */ void ShaderAsset::pack(
-    const std::filesystem::path &destination,
+    const lsd::file::path &destination,
     AssetMetadata asset_metadata,
     Metadata metadata,
     Blob code_blob
@@ -168,7 +168,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 	};
 
 	const auto code_blob_metadata = BlobMetadata {
-		.tag = std::to_underlying(BlobTag::code),
+		.tag = lsd::to_underlying(BlobTag::code),
 		.offset = total_metadata_size,
 		.compression_type = CompressionType::none,
 		.compressed_size = code_blob.size(),
@@ -177,7 +177,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 
 	debug::ensure(stream.is_open(), "Failed to pack shader asset to {}", destination.string());
 	const auto write = [&stream](auto &field) {
-		stream.write(std::bit_cast<char *>(&field), sizeof(field));
+		stream.write(bit_cast<char *>(&field), sizeof(field));
 	};
 	write(asset_metadata.type);
 	write(asset_metadata.version);
@@ -187,31 +187,31 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 	write(code_blob_metadata.compression_type);
 	write(code_blob_metadata.compressed_size);
 	write(code_blob_metadata.uncompressed_size);
-	stream.write(std::bit_cast<char *>(code_blob.data()), static_cast<long long>(code_blob.size()));
+	stream.write(bit_cast<char *>(code_blob.data()), static_cast<stream_size>(code_blob.size()));
 }
 
-void ShaderAsset::unpack_to(BlobTag tag, std::span<std::byte> destination) const
+void ShaderAsset::unpack_to(BlobTag tag, lsd::span<byte> destination) const
 {
 	debug::ensure(
 	    tag == BlobTag::code,
 	    "Invalid blob tag for shader asset: {}",
-	    std::to_underlying(tag)
+	    lsd::to_underlying(tag)
 	);
 
 	debug::ensure(
 	    destination.size() >= m_code_blob_metadata.uncompressed_size,
 	    "Failed to unpack shader blob {} to destination ({}) of size {} since it's smaller "
 	    "than the blobl's uncompressed size: {}",
-	    std::to_underlying(tag),
-	    std::bit_cast<std::size_t>(destination.data()),
+	    lsd::to_underlying(tag),
+	    bit_cast<size_t>(destination.data()),
 	    destination.size(),
 	    m_code_blob_metadata.uncompressed_size
 	);
 
-	m_stream.seekg(static_cast<long long>(m_code_blob_metadata.offset));
+	m_stream.seekg(static_cast<stream_size>(m_code_blob_metadata.offset));
 	m_stream.read(
-	    std::bit_cast<char *>(destination.data()),
-	    static_cast<long long>(m_code_blob_metadata.uncompressed_size)
+	    bit_cast<char *>(destination.data()),
+	    static_cast<stream_size>(m_code_blob_metadata.uncompressed_size)
 	);
 }
 
@@ -220,7 +220,7 @@ void ShaderAsset::unpack_to(BlobTag tag, std::span<std::byte> destination) const
 	debug::ensure(
 	    tag == BlobTag::code,
 	    "Invalid blob tag for shader asset: {}",
-	    std::to_underlying(tag)
+	    lsd::to_underlying(tag)
 	);
 
 	auto blob = Blob(m_code_blob_metadata.uncompressed_size);

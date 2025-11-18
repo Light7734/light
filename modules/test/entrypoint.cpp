@@ -7,23 +7,18 @@ import lsd;
 using namespace ::lt;
 using namespace ::lt::test;
 
-constexpr lsd::str_view operator""_sv(const char *str, unsigned long len) noexcept
-{
-	return lsd::str_view { str, len };
-}
-
 void parse_option(lsd::str_view argument, Registry::Options &options)
 {
 	constexpr auto case_str = lsd::str_view { "--case=" };
 	constexpr auto suite_str = lsd::str_view { "--suite=" };
 
-	if (argument == "--stop-on-fail"_sv)
+	if (argument == "--stop-on-fail")
 	{
 		options.stop_on_fail = true;
 		return;
 	}
 
-	if (argument.starts_with("--mode="_sv) && argument.substr(7ul) == "stats")
+	if (argument.starts_with("--mode=") && argument.substr(7ul) == "stats")
 	{
 		options.execution_policy = Registry::ExecutionPolicy::stats;
 		return;
@@ -91,7 +86,7 @@ try
 
 	return static_cast<i32>(Registry::run_all(options));
 }
-catch (const std::exception &exp)
+catch (const lsd::exception &exp)
 {
 	lt::log::critical("Terminated due to uncaught exception:");
 	lt::log::critical("\twhat: {}", exp.what());

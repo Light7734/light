@@ -1,24 +1,27 @@
-export module math.mat4;
-import math.vec3;
-import math.vec4;
-import std;
+export module lsd.math.mat4;
+import lsd.math.vec2;
+import lsd.math.vec3;
+import lsd.math.vec4;
+import lsd.primitives;
+import lsd.arr;
+import lsd.str;
 
-namespace lt::math {
+export namespace lt::lsd {
 
-export template<typename T = float>
+template<typename T>
 struct mat4_impl
 {
 	using Column_T = vec4_impl<T>;
 
+	constexpr mat4_impl() = default;
+
 	constexpr explicit mat4_impl(T scalar = 0)
-	    : values(
-	          {
-	              Column_T { scalar },
-	              Column_T { scalar },
-	              Column_T { scalar },
-	              Column_T { scalar },
-	          }
-	      )
+	    : values({
+	          Column_T { scalar },
+	          Column_T { scalar },
+	          Column_T { scalar },
+	          Column_T { scalar },
+	      })
 	{
 	}
 
@@ -54,12 +57,12 @@ struct mat4_impl
 		};
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::size_t idx) -> Column_T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) -> Column_T &
 	{
 		return values[idx];
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::size_t idx) const -> const Column_T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) const -> const Column_T &
 	{
 		return values[idx];
 	}
@@ -74,37 +77,37 @@ struct mat4_impl
 		return vec4_impl<T> {};
 	}
 
-	std::array<Column_T, 4> values; // NOLINT
+	lsd::arr<Column_T, 4uz> values; // NOLINT
 };
 
-export template<typename T>
+template<typename T>
 [[nodiscard]] auto translate(const vec3_impl<T> &value) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export template<typename T>
-[[nodiscard]] auto rotate(float value, const vec3_impl<T> &xyz) -> mat4_impl<T>
+template<typename T>
+[[nodiscard]] auto rotate(f32 value, const vec3_impl<T> &xyz) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export template<typename T>
+template<typename T>
 [[nodiscard]] auto scale(const vec3_impl<T> &value) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export template<typename T>
+template<typename T>
 [[nodiscard]] auto inverse(const mat4_impl<T> &value) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export using mat4 = mat4_impl<float>;
+using mat4 = mat4_impl<f32>;
 
-export using imat4 = mat4_impl<std::int32_t>;
+using imat4 = mat4_impl<i32>;
 
-export using umat4 = mat4_impl<std::uint32_t>;
+using umat4 = mat4_impl<u32>;
 
-} // namespace lt::math
+} // namespace lt::lsd

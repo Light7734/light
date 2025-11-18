@@ -1,8 +1,9 @@
 export module test.test;
 
-import std;
 import test.expects;
 import test.registry;
+import std;
+import lsd;
 
 ///////////////////////////////////////
 // ----------* INTERFACE *--------- //
@@ -12,16 +13,16 @@ namespace lt::test {
 class TestCase
 {
 public:
-	TestCase(std::string_view name);
+	TestCase(lsd::str_view name);
 
 	// NOLINTNEXTLINE(misc-unconventional-assign-operator)
-	auto operator=(std::invocable auto test) const -> void;
+	auto operator=(lsd::invocable auto test) const -> void;
 
 private:
-	void run_normal(std::invocable auto test) const;
+	void run_normal(lsd::invocable auto test) const;
 
 private:
-	std::string_view m_name;
+	lsd::str_view m_name;
 };
 
 struct TestSuite
@@ -38,25 +39,25 @@ struct TestFuzzHarness
 export using Case = const TestCase;
 export using Suite = const TestSuite;
 export using FuzzHarness = const TestFuzzHarness;
-export auto operator""_suite(const char *name, std::size_t size) -> TestSuite;
+export auto operator""_suite(const char *name, size_t size) -> TestSuite;
 
 ///////////////////////////////////////
 // * IMPLEMENTATION -- TEMPLATES *  //
 /////////////////////////////////////
 
 // NOLINTNEXTLINE(misc-unconventional-assign-operator)
-auto TestCase::operator=(std::invocable auto test) const -> void
+auto TestCase::operator=(lsd::invocable auto test) const -> void
 {
 	using enum Registry::ExecutionPolicy;
 
 	switch (Registry::get_options().execution_policy)
 	{
-	case normal: run_normal(std::move(test)); break;
+	case normal: run_normal(lsd::move(test)); break;
 	case stats: Registry::increment_total_case_count(); break;
 	}
 }
 
-void TestCase::run_normal(std::invocable auto test) const
+void TestCase::run_normal(lsd::invocable auto test) const
 {
 	Registry::increment_total_case_count();
 
@@ -68,16 +69,16 @@ void TestCase::run_normal(std::invocable auto test) const
 	}
 	Registry::increment_matched_case_count();
 
-	std::println("[Running-----------] --> ");
-	std::println("{}", m_name);
+	lsd::println("[Running-----------] --> ");
+	lsd::println("{}", m_name);
 	try
 	{
 		test();
 	}
 	catch (const std::exception &exp)
 	{
-		std::println("{}", exp.what());
-		std::println("[-----------FAIL !!]");
+		lsd::println("{}", exp.what());
+		lsd::println("[-----------FAIL !!]");
 		Registry::increment_failed_case_count();
 
 		if (Registry::should_return_on_failure())
@@ -89,7 +90,7 @@ void TestCase::run_normal(std::invocable auto test) const
 	}
 
 	Registry::increment_passed_case_count();
-	std::println("[--------SUCCESS :D]");
+	lsd::println("[--------SUCCESS :D]");
 }
 
 TestSuite::TestSuite(auto body)
@@ -106,7 +107,7 @@ constexpr TestFuzzHarness::TestFuzzHarness(auto body)
 #endif
 };
 
-auto operator""_suite(const char *name, std::size_t size) -> TestSuite
+auto operator""_suite(const char *name, size_t size) -> TestSuite
 {
 	Registry::set_last_suite_name(name);
 	return {};
@@ -120,7 +121,7 @@ auto operator""_suite(const char *name, std::size_t size) -> TestSuite
 module :private;
 namespace lt::test {
 
-TestCase::TestCase(std::string_view name): m_name(name)
+TestCase::TestCase(lsd::str_view name): m_name(name)
 {
 }
 

@@ -12,12 +12,25 @@ add_module(
     hash.cppm
     utils.cppm
     scope.cppm
-    bitwise.cppm
+    chrono.cppm
     thread.cppm
+    bitwise.cppm
+    concepts.cppm
+    algorithm.cppm
+    filesystem.cppm
     primitives.cppm
+    exceptions.cppm
     src_location.cppm
+    math/algebra.cppm
+    math/trig.cppm
+    math/vec2.cppm
+    math/vec3.cppm
+    math/vec4.cppm
+    math/mat4.cppm
 )
+
 add_module(NAME logger INTERFACES logger.cppm DEPENDENCIES lsd)
+
 add_module(
     NAME
     test
@@ -31,10 +44,9 @@ add_module(
     lsd
     logger
 )
-return()
-add_module(NAME env INTERFACES constants.cppm)
-add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm)
-add_module(NAME time INTERFACES timer.cppm)
+add_module(NAME env INTERFACES constants.cppm DEPENDENCIES lsd)
+# add_module(NAME memory INTERFACES reference.cppm scope.cppm)
+add_module(NAME time INTERFACES timer.cppm DEPENDENCIES lsd)
 
 add_module(
     NAME
@@ -42,23 +54,10 @@ add_module(
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/debug
     INTERFACES
-    instrumentor.cppm
     assertions.cppm
     DEPENDENCIES
     logger
-)
-
-add_module(
-    NAME
-    math
-    INTERFACES
-    algebra.cppm
-    mat4.cppm
-    trig.cppm
-    vec2.cppm
-    vec3.cppm
-    vec4.cppm
-    components.cppm
+    lsd
 )
 
 add_module(
@@ -80,6 +79,7 @@ add_module(
     INTERFACES
     bakers.cppm
     DEPENDENCIES
+    lsd
     assets
     logger
     lt_debug
@@ -88,7 +88,15 @@ add_module(
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
 # PRIVATE libasset_baker)
 
-add_module(NAME camera INTERFACES components.cppm DEPENDENCIES math)
+add_module(
+    NAME
+    camera
+    INTERFACES
+    components.cppm
+    DEPENDENCIES
+    math
+    lsd
+)
 
 add_module(
     NAME
@@ -96,10 +104,9 @@ add_module(
     INTERFACES
     application.cppm
     system.cppm
-    DEPENDENCIES
-    memory
     PRIVATE_DEPENDENCIES
     lt_debug
+    lsd
 )
 
 add_module(
@@ -112,8 +119,10 @@ add_module(
     DEPENDENCIES
     logger
     lt_debug
-    memory
+    lsd
 )
+
+return()
 
 if(WIN32)
     add_module(

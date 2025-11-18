@@ -1,43 +1,36 @@
 export module debug.assertions;
 
-import std;
+import lsd;
 
-namespace lt::debug {
+export namespace lt::debug {
 
-///////////////////////////////////////
-// ----------* INTERFACE *--------- //
-/////////////////////////////////////
-export template<typename Expression_T, typename... Args_T>
+template<typename Expression_T, typename... Args_T>
 struct ensure
 {
 	ensure(
 	    const Expression_T &expression,
-	    std::format_string<Args_T...> fmt,
+	    lsd::format_str<Args_T...> fmt,
 	    Args_T &&...args,
-	    const std::source_location &location = std::source_location::current()
+	    const lsd::src_location &location = lsd::src_location::current()
 	);
 };
 
-export template<typename Expression_T, typename... Args_T>
-ensure(Expression_T, std::format_string<Args_T...>, Args_T &&...)
-    -> ensure<Expression_T, Args_T...>;
+template<typename Expression_T, typename... Args_T>
+ensure(Expression_T, lsd::format_str<Args_T...>, Args_T &&...) -> ensure<Expression_T, Args_T...>;
 
-///////////////////////////////////////
-// * IMPLEMENTATION -- TEMPLATES *  //
-/////////////////////////////////////
 template<typename Expression_T, typename... Args_T>
 ensure<Expression_T, Args_T...>::ensure(
     const Expression_T &expression,
-    std::format_string<Args_T...> fmt,
+    lsd::format_str<Args_T...> fmt,
     Args_T &&...args,
-    const std::source_location &location
+    const lsd::src_location &location
 )
 {
 	if (!static_cast<bool>(expression))
 	{
-		throw std::runtime_error { std::format(
+		throw lsd::runtime_error { lsd::format(
 			"exception: {}\nlocation: {}:{}",
-			std::format(fmt, std::forward<Args_T>(args)...),
+			lsd::format(fmt, lsd::forward<Args_T>(args)...),
 			location.file_name(),
 			location.line()
 		) };

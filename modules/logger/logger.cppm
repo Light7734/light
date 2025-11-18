@@ -65,7 +65,7 @@ struct [[maybe_unused]] print
 			lsd::unreachable();
 		};
 
-		const auto path = lsd::filesystem::path { location.file_name() };
+		const auto path = lsd::file::path { location.file_name() };
 
 		lsd::println(
 		    "{} {} ==> {}",

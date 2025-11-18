@@ -1,32 +1,33 @@
 export module bakers;
-
 import debug.assertions;
 import assets.metadata;
 import assets.shader;
 import logger;
-import std;
+import lsd;
+
+namespace lt {
 
 export void bake_shader(
-    const std::filesystem::path &in_path,
-    const std::filesystem::path &out_path,
-    lt::assets::ShaderAsset::Type type
+    const lsd::file::path &in_path,
+    const lsd::file::path &out_path,
+    assets::ShaderAsset::Type type
 )
 {
-	using lt::assets::ShaderAsset;
-	using enum lt::assets::ShaderAsset::Type;
+	using assets::ShaderAsset;
+	using enum assets::ShaderAsset::Type;
 
-	auto glsl_path = std::string { in_path.string() };
-	auto spv_path = std::format("{}.spv", glsl_path);
-	lt::log::trace(
+	auto glsl_path = lsd::str { in_path.string() };
+	auto spv_path = lsd::format("{}.spv", glsl_path);
+	log::trace(
 	    "Compiling {} shader {} -> {}",
 	    type == vertex ? "vertex" : "fragment",
-	    std::string { glsl_path },
-	    std::string { spv_path }
+	    lsd::str { glsl_path },
+	    lsd::str { spv_path }
 	);
 
 	// Don't bother linking to shaderc, just invoke the command with a system call.
 	// NOLINTNEXTLINE(concurrency-mt-unsafe)
-	std::system(std::format(
+	lsd::system(lsd::format(
 	                "glslc --target-env=vulkan1.4 -std=450core -fshader-stage={} {} -o {}",
 	                type == vertex ? "vert" : "frag",
 	                glsl_path,
@@ -34,33 +35,35 @@ export void bake_shader(
 	)
 	                .c_str());
 
-	auto stream = std::ifstream(spv_path, std::ios::binary);
-	lt::debug::ensure(
+	auto stream = lsd::file::in_stream(spv_path, lsd::file::ios_binary);
+	debug::ensure(
 	    stream.is_open(),
 	    "Failed to open compiled {} shader at: {}",
 	    type == vertex ? "vert" : "frag",
 	    spv_path
 	);
 
-	stream.seekg(0, std::ios::end);
+	stream.seekg(0, lsd::file::ios_end);
 	const auto size = stream.tellg();
 
-	auto bytes = std::vector<std::byte>(size);
-	stream.seekg(0, std::ios::beg);
+	auto bytes = lsd::vec<byte>(size);
+	stream.seekg(0, lsd::file::ios_beg);
 	stream.read((char *)bytes.data(), size); // NOLINT
-	lt::log::debug("BYTES: {}", bytes.size());
+	log::debug("BYTES: {}", bytes.size());
 	stream.close();
-	std::filesystem::remove(spv_path);
+	lsd::file::remove(spv_path);
 
 	ShaderAsset::pack(
 	    out_path,
-	    lt::assets::AssetMetadata {
-	        .version = lt::assets::current_version,
+	    assets::AssetMetadata {
+	        .version = assets::current_version,
 	        .type = ShaderAsset::asset_type_identifier,
 	    },
 	    ShaderAsset::Metadata {
 	        .type = type,
 	    },
-	    std::move(bytes)
+	    lsd::move(bytes)
 	);
 }
+
+} // namespace lt
