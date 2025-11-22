@@ -1,49 +1,46 @@
 .. guidelines/development
 
-Development
+Development Strategy
 ===================================================================================================
-As a solo-project, I am not only the **developer**, but also the **manager**. 
-Therefore there is a need, if this project is to succeed, to have a development plan. 
+Defines:
 
-Such a plan should:
+- A **unit of work**.
+- A **pipeline** for making changes ---should **minimize ambiguity**.
+- A way for **distributing work** and **tracking productivity**.
 
-- Define a way to **distribute work** (across time, since there's only 1 developer).
-- Define what is a **unit of work** (cycles).
-- Provide a way to **track productivity**, which helps projecting the future and **detecting patterns** early on.
-- Provide a **pipeline** for the work to go through and **minimize ambiguity**.
+An **unpragmatic strategy** is utterly useless. It should pull our minds out from the **engineering dreamland**, and make us focus on the **product delivery**.
 
-These are the **management** aspects of the project, which help the development goals to be more **pragmatic**
----by pulling my mind out of its **engineering dreamland**, and make it focus on the **broader picture**.
+.. note::
+   **Forgejo issues** is used as the project-management tool.
+   No need for fancy boards or 3rd party apps. Simple tags, titles, milestones, etc... should suffice.
 
 Cycle
 ---------------------------------------------------------------------------------------------------
-A cycle is one **step** in development, one cycle = one ticket, and it consists of 4 stages:
+A cycle is one **step** in development, 1 cycle == 1 issue, and it consists of 4 stages:
 
 1 - Make it known
-    - Write the commit message.
+    - Write the commit title.
         - This limits the **scope of changes** and gives you a very specific **goal** to work towards.
-        - If something outside of this scope really bothers you, fix and stash for a future cycle.
-        - Make a ticket if stash-fix is implausible ---**DO NOT** write **todo** comments.
         - The message should follow the project's **commit message specifications**.
 
-    - Make a ticket.
-        - Version control (git) is a **development-tool**, not a **management-tool**.
-        - Provide a very brief description ---This may be used in the commit message's body.
+    - Make an issue.
+        - Git is a **version-control** tool, not a **project-management** tool.
+        - Preferably, provide a very brief description ---This may be used in the commit message's body.
 
 2 - Make it work
     - Write high-level tests that confirms the cycle's requirements are met.
         - That is, specify requirements in a programming language instead of English.
         - You're done when all the tests pass.
         - Preferably write the tests first, but it's okay to start with the interface.
-        - Tests may not be necessary depending on the requirements and commit type.
+        - Tests **may** not be necessary depending on the requirements and commit type.
 
-    - "Make it work" doesn't mean liberally producing substandard code, you should:
+    - **Make it work** doesn't mean liberally producing substandard code, you should:
         - Follow project's **conventions**.
         - Follow **best practices** and **proven swe principles**.
         - Enable **warnings as errors**.
         - Enable **static analysis**.
-        - Don't break any pre-existing-tests.
-        - Have the over-all picture in mind.
+        - Don't break existing tests.
+        - Have the overall picture in mind.
 
 3 - Make it right
     - Test driven refactoring
@@ -55,12 +52,14 @@ A cycle is one **step** in development, one cycle = one ticket, and it consists 
     - Get a performance and/or memory profile and try to alleviate the bottlenecks.
     - Avoid premature optimizations, be certain what you change has performance benefits.
 
-
 Sprint
 ---------------------------------------------------------------------------------------------------
-A sprint is the collection of all the finished cycles in one week.
-It's meant to provide insight on development speed and help projecting the future.
+A sprint is the collection of all the finished cycles in **one week**.
+They start from **Monday mornings**, and end on **Sunday nights**,
+where we'll do a **12hr coding marathon** (streamed on Discord) to wrap everything up.
 
+Sprints begin by **defining** what cycles/issues are expected to be done.
+And end by **reflecting** on the results, which may **affect** our future approach.
 
 Commit Message Specification
 ---------------------------------------------------------------------------------------------------
@@ -116,6 +115,10 @@ With the following commit types:
     - For changes to the documentations.
     - Does not affect the version.
 
+.. note::
+
+    Since we're in beta, any commit might change the api, no need for ! (breaking) tags.
+
 Semantic Versioning
 ---------------------------------------------------------------------------------------------------
 Coupled with conventional commit style messages, we can automajically version the project following
@@ -139,9 +142,3 @@ Using the following format:
 
 The shortened hexsha of a commit is obtained by:
 ``git rev-parse --short=5 <commit_hexsha>``
-
-
-
-
-
-
