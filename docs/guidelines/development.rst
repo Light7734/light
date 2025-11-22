@@ -37,7 +37,7 @@ A cycle is one **step** in development, one cycle = one ticket, and it consists 
         - Preferably write the tests first, but it's okay to start with the interface.
         - Tests may not be necessary depending on the requirements and commit type.
 
-    - "Make it work" doesn't mean liberally producing shit code, you should:
+    - "Make it work" doesn't mean liberally producing substandard code, you should:
         - Follow project's **conventions**.
         - Follow **best practices** and **proven swe principles**.
         - Enable **warnings as errors**.
