@@ -1,19 +1,19 @@
 export module camera.components;
-import lsd;
+import math.vec4;
 
-export namespace lt::camera::components {
+namespace lt::camera::components {
 
-struct PerspectiveCamera
+export struct PerspectiveCamera
 {
-	f32 vertical_fov {};
+	float vertical_fov {};
 
-	f32 near_plane {};
+	float near_plane {};
 
-	f32 far_plane {};
+	float far_plane {};
 
-	f32 aspect_ratio {};
+	float aspect_ratio {};
 
-	lsd::vec4 background_color;
+	math::vec4 background_color;
 
 	bool is_primary {};
 };

@@ -1,35 +1,12 @@
 add_module(
-    NAME
-    lsd
-    INTERFACES
-    lsd.cppm
-    ref.cppm
-    vec.cppm
-    arr.cppm
-    str.cppm
-    set.cppm
-    span.cppm
-    hash.cppm
-    utils.cppm
-    scope.cppm
-    chrono.cppm
-    thread.cppm
-    bitwise.cppm
-    concepts.cppm
-    algorithm.cppm
-    filesystem.cppm
-    primitives.cppm
-    exceptions.cppm
-    src_location.cppm
-    math/algebra.cppm
-    math/trig.cppm
-    math/vec2.cppm
-    math/vec3.cppm
-    math/vec4.cppm
-    math/mat4.cppm
+    NAME logger INTERFACES logger.cppm TESTS logger.test.cpp
 )
-
-add_module(NAME logger INTERFACES logger.cppm DEPENDENCIES lsd)
+add_module(NAME bitwise INTERFACES operations.cppm)
+add_module(NAME env INTERFACES constants.cppm)
+add_module(
+    NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
+)
+add_module(NAME time INTERFACES timer.cppm)
 
 add_module(
     NAME
@@ -41,12 +18,8 @@ add_module(
     SOURCES
     entrypoint.cpp
     DEPENDENCIES
-    lsd
     logger
 )
-add_module(NAME env INTERFACES constants.cppm DEPENDENCIES lsd)
-# add_module(NAME memory INTERFACES reference.cppm scope.cppm)
-add_module(NAME time INTERFACES timer.cppm DEPENDENCIES lsd)
 
 add_module(
     NAME
@@ -54,10 +27,23 @@ add_module(
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/debug
     INTERFACES
+    instrumentor.cppm
     assertions.cppm
     DEPENDENCIES
     logger
-    lsd
+)
+
+add_module(
+    NAME
+    math
+    INTERFACES
+    algebra.cppm
+    mat4.cppm
+    trig.cppm
+    vec2.cppm
+    vec3.cppm
+    vec4.cppm
+    components.cppm
 )
 
 add_module(
@@ -79,7 +65,6 @@ add_module(
     INTERFACES
     bakers.cppm
     DEPENDENCIES
-    lsd
     assets
     logger
     lt_debug
@@ -88,15 +73,7 @@ add_module(
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
 # PRIVATE libasset_baker)
 
-add_module(
-    NAME
-    camera
-    INTERFACES
-    components.cppm
-    DEPENDENCIES
-    math
-    lsd
-)
+add_module(NAME camera INTERFACES components.cppm DEPENDENCIES math)
 
 add_module(
     NAME
@@ -104,9 +81,10 @@ add_module(
     INTERFACES
     application.cppm
     system.cppm
+    DEPENDENCIES
+    memory
     PRIVATE_DEPENDENCIES
     lt_debug
-    lsd
 )
 
 add_module(
@@ -119,10 +97,8 @@ add_module(
     DEPENDENCIES
     logger
     lt_debug
-    lsd
+    memory
 )
-
-return()
 
 if(WIN32)
     add_module(
@@ -230,8 +206,6 @@ add_module(
     mirror
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/mirror
-    ENTRYPOINT
-    entrypoint.cpp
     INTERFACES
     system.cppm
     DEPENDENCIES
@@ -242,6 +216,23 @@ add_module(
     surface
     renderer
     camera
-    TESTS
-    system.test.cpp
+    # TESTS
+    # system.test.cpp
 )
+
+add_executable(exectest ${CMAKE_CURRENT_SOURCE_DIR}/mirror/entrypoint.cpp
+)
+
+target_link_libraries(exectest PRIVATE
+
+    mirror
+    app
+    time
+    input
+    surface
+    renderer
+    camera
+)
+
+# add_executable_module(mirror entrypoint/mirror.cpp)
+# target_link_libraries(mirror PRIVATE libmirror input)

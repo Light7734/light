@@ -1,9 +1,10 @@
 export module env;
-import lsd;
 
-export namespace lt {
+import std;
 
-enum class Platform : u8
+namespace lt {
+
+enum class Platform : std::uint8_t
 {
 	/** The GNU/Linux platform.
 	 * Tested on the following distros: arch-x86_64
@@ -25,7 +26,7 @@ enum class Platform : u8
 };
 
 /** The compiler that was used for compiling the project. */
-enum class Compiler : u8
+enum class Compiler : std::uint8_t
 {
 	clang,
 	gcc,
@@ -35,25 +36,19 @@ enum class Compiler : u8
 
 namespace constants {
 
-#define lt_windows_only(x)
-#define lt_linux_only(x)
-#define lt_mac_only(x)
-
 #if defined(LIGHT_PLATFORM_WINDOWS)
-    // NOLINTNEXTLINE
-	#define lt_windows_only(x) x
+	#define lt_win(x)
 constexpr auto platform = Platform::windows;
 constexpr auto platform_name = "windows";
 
+	#undef LIGHT_PLATFORM_WINDOWS
+
 #elif defined(LIGHT_PLATFORM_LINUX)
-    // NOLINTNEXTLINE
-	#define lt_linux_only(x) x
 constexpr auto platform = Platform::gnu_linux;
 constexpr auto platform_name = "gnu_linux";
 
 #elif defined(LIGHT_PLATFORM_MAC)
-    // NOLINTNEXTLINE
-	#define lt_mac_only(x) x
+	#define lt_mac(x) x
 constexpr auto platform = Platform::mac;
 constexpr auto platform_name = "mac";
 

@@ -1,13 +1,13 @@
 export module ecs.sparse_set;
 import debug.assertions;
-import lsd;
+import std;
 
-export namespace lt::ecs {
+namespace lt::ecs {
 
 /**
  * @ref https://programmingpraxis.com/2012/03/09/sparse-sets/
  */
-template<typename Identifier_T = u32>
+export template<typename Identifier_T = std::uint32_t>
 class TypeErasedSparseSet
 {
 public:
@@ -26,17 +26,17 @@ public:
 	virtual void remove(Identifier_T identifier) = 0;
 };
 
-template<typename Value_T, typename Identifier_T = u32>
+export template<typename Value_T, typename Identifier_T = std::uint32_t>
 class SparseSet: public TypeErasedSparseSet<Identifier_T>
 {
 public:
 	using Dense_T = std::pair<Identifier_T, Value_T>;
 
-	static constexpr auto max_capacity = size_t { 1'000'000 };
+	static constexpr auto max_capacity = std::size_t { 1'000'000 };
 
-	static constexpr auto null_identifier = lsd::numeric_limits<Identifier_T>().max();
+	static constexpr auto null_identifier = std::numeric_limits<Identifier_T>().max();
 
-	explicit SparseSet(size_t initial_capacity = 1)
+	explicit SparseSet(std::size_t initial_capacity = 1)
 	{
 		debug::ensure(
 		    initial_capacity <= max_capacity,
@@ -53,7 +53,10 @@ public:
 	{
 		if (m_sparse.size() < identifier + 1)
 		{
-			auto new_capacity = std::max(static_cast<size_t>(identifier + 1), m_sparse.size() * 2);
+			auto new_capacity = std::max(
+			    static_cast<std::size_t>(identifier + 1),
+			    m_sparse.size() * 2
+			);
 			new_capacity = std::min(new_capacity, max_capacity);
 
 			// log::debug("Increasing sparse vector size:", m_dead_count);
@@ -119,12 +122,12 @@ public:
 		       && m_dense[m_sparse[identifier]].first == identifier;
 	}
 
-	auto begin() -> lsd::vector<Dense_T>::iterator
+	auto begin() -> std::vector<Dense_T>::iterator
 	{
 		return m_dense.begin();
 	}
 
-	auto end() -> lsd::vector<Dense_T>::iterator
+	auto end() -> std::vector<Dense_T>::iterator
 	{
 		return m_dense.end();
 	}
@@ -143,15 +146,15 @@ public:
 	[[nodiscard]] auto &&operator[](this auto &&self, Identifier_T identifier)
 	{
 		using Self_T = decltype(self);
-		return lsd::forward<Self_T>(self).m_dense[lsd::forward<Self_T>(self).m_sparse[identifier]];
+		return std::forward<Self_T>(self).m_dense[std::forward<Self_T>(self).m_sparse[identifier]];
 	}
 
-	[[nodiscard]] auto get_size() const noexcept -> size_t
+	[[nodiscard]] auto get_size() const noexcept -> std::size_t
 	{
 		return m_alive_count;
 	}
 
-	[[nodiscard]] auto get_capacity() const noexcept -> size_t
+	[[nodiscard]] auto get_capacity() const noexcept -> std::size_t
 	{
 		return m_sparse.capacity();
 	}
@@ -162,13 +165,13 @@ public:
 	}
 
 private:
-	lsd::vector<Dense_T> m_dense;
+	std::vector<Dense_T> m_dense;
 
-	lsd::vector<Identifier_T> m_sparse;
+	std::vector<Identifier_T> m_sparse;
 
-	size_t m_alive_count {};
+	std::size_t m_alive_count {};
 
-	size_t m_dead_count {};
+	std::size_t m_dead_count {};
 };
 
 } // namespace lt::ecs

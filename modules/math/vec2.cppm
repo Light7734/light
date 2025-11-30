@@ -1,14 +1,15 @@
-export module lsd.math.vec2;
-import lsd.primitives;
-import lsd.str;
+export module math.vec2;
 
-export namespace lt::lsd {
+import std;
 
-template<typename T>
+namespace lt::math {
+
+export template<typename T = float>
 struct vec2_impl
 {
-	constexpr vec2_impl() = default;
-
+	constexpr vec2_impl(): x(), y()
+	{
+	}
 
 	constexpr explicit vec2_impl(T scalar): x(scalar), y(scalar)
 	{
@@ -44,7 +45,7 @@ struct vec2_impl
 		};
 	}
 
-	[[nodiscard]] auto operator*(f32 scalar) const -> vec2_impl
+	[[nodiscard]] auto operator*(float scalar) const -> vec2_impl
 	{
 		return {
 			x * scalar,
@@ -58,26 +59,24 @@ struct vec2_impl
 };
 
 
-using vec2 = vec2_impl<f32>;
+export using vec2 = vec2_impl<float>;
 
-using dvec2 = vec2_impl<f64>;
+export using ivec2 = vec2_impl<std::int32_t>;
 
-using ivec2 = vec2_impl<i32>;
+export using uvec2 = vec2_impl<std::uint32_t>;
 
-using uvec2 = vec2_impl<u32>;
-
-} // namespace lt::lsd
+} // namespace lt::math
 
 export template<typename T>
-struct lt::lsd::formatter<lt::lsd::vec2_impl<T>>
+struct std::formatter<lt::math::vec2_impl<T>>
 {
-	constexpr auto parse(lt::lsd::format_parse_context &context)
+	constexpr auto parse(std::format_parse_context &context)
 	{
 		return context.begin();
 	}
 
-	auto format(const lt::lsd::vec2_impl<T> &val, lt::lsd::format_context &context) const
+	auto format(const lt::math::vec2_impl<T> &val, std::format_context &context) const
 	{
-		return lt::lsd::format_to(context.out(), "{}, {}", val.x, val.y);
+		return std::format_to(context.out(), "{}, {}", val.x, val.y);
 	}
 };

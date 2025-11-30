@@ -1,5 +1,5 @@
 export module time;
-import lsd;
+import std;
 
 namespace lt::time {
 
@@ -7,11 +7,11 @@ namespace lt::time {
 export class Timer
 {
 public:
-	using Clock = lsd::chrono::steady_clock;
+	using Clock = std::chrono::steady_clock;
 
-	using Duration = lsd::chrono::duration<f64>;
+	using Duration = std::chrono::duration<double>;
 
-	using Timepoint = lsd::chrono::time_point<lsd::chrono::steady_clock>;
+	using Timepoint = std::chrono::time_point<std::chrono::steady_clock>;
 
 	Timer(Timepoint start = Clock::now());
 
@@ -39,7 +39,7 @@ void Timer::reset(Timepoint start)
 
 [[nodiscard]] auto Timer::elapsed_time() const -> Duration
 {
-	return { lsd::chrono::steady_clock::now() - m_start };
+	return { std::chrono::steady_clock::now() - m_start };
 }
 
 } // namespace lt::time

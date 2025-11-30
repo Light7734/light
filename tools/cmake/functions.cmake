@@ -19,22 +19,14 @@ function(add_module)
         set(module_directory "${ARGS_ROOT_DIR}")
     endif()
 
-    # In this case, the module is an executable, so we prepend "lib" to the
-    # target name. And set the "executable_target" name to ARGS_NAME.
-    #
-    # The rationale here is to easily be able to write tests for an executable
-    # modules's interfaces... by splitting it into two targets:
-    # lib"executable_name" for the interface and "executable_name" for the "int
-    # main()" defining file (the entrypoint).
-
-    # The lib"executable_name" should not be disruptive since an executable
-    # module's library will not be dependent upon (except by the tests within
-    # the same module)
+    # In this case, the module is an executable, so we prepend "lib" to the target name.
+     # And set the "executable_target" name to ARGS_NAME.
+     # The rationale here is to easily be able to write tests for an executable modules's interfaces...
+     # by splitting it into two targets: lib"executable_name" for the interface and "executable_name" for the "int main()" defining file (the entrypoint).
+     # the lib"executable_name" should not be disruptive since an executable module's library will not be dependent upon (except by the tests within the same module)
     if(ARGS_ENTRYPOINT)
         set(target_library_name "lib_${ARGS_NAME}")
-        add_executable(
-            ${target_executable_name} ${module_directory}/${ARGS_ENTRYPOINT}
-        )
+        add_executable(${target_executable_name} ${module_directory}/${ARGS_ENTRYPOINT})
     endif()
     add_library(${target_library_name})
 
@@ -61,15 +53,13 @@ function(add_module)
             list(APPEND files "${module_directory}/${file}")
         endforeach()
         target_sources(
-            ${target_library_name} PUBLIC FILE_SET public_cxx_modules TYPE
-                                          CXX_MODULES FILES ${files}
+            ${target_library_name} PUBLIC FILE_SET public_cxx_modules TYPE CXX_MODULES
+                                FILES ${files}
         )
     endif()
 
     target_link_libraries(${target_library_name} PUBLIC ${ARGS_DEPENDENCIES})
-    target_link_libraries(
-        ${target_library_name} PRIVATE ${ARGS_PRIVATE_DEPENDENCIES}
-    )
+    target_link_libraries(${target_library_name} PRIVATE ${ARGS_PRIVATE_DEPENDENCIES})
 
     if(ARGS_TESTS)
         message("ADDING TESTS!!!")
@@ -88,9 +78,7 @@ function(add_module)
     endif()
 
     if(ARGS_ENTRYPOINT)
-        target_link_libraries(
-            ${target_executable_name} PRIVATE ${target_library_name}
-        )
+    target_link_libraries(${target_executable_name} PRIVATE ${target_library_name})
     endif()
 endfunction()
 

@@ -1,16 +1,16 @@
-export module lsd.math.vec3;
+export module math.vec3;
 
-import lsd.math.vec2;
-import lsd.primitives;
-import lsd.str;
+import math.vec2;
+import std;
 
-export namespace lt::lsd {
+namespace lt::math {
 
-template<typename T>
+export template<typename T = float>
 struct vec3_impl
 {
-	constexpr vec3_impl() = default;
-
+	constexpr vec3_impl(): x(), y(), z()
+	{
+	}
 
 	constexpr explicit vec3_impl(T scalar): x(scalar), y(scalar), z(scalar)
 	{
@@ -48,11 +48,11 @@ struct vec3_impl
 		};
 	}
 
-	// friend auto operator<<(std::ostream &stream, vec3_impl<T> value) -> std::ostream &
-	// {
-	// 	stream << value.x << ", " << value.y << ", " << value.z;
-	// 	return stream;
-	// }
+	friend auto operator<<(std::ostream &stream, vec3_impl<T> value) -> std::ostream &
+	{
+		stream << value.x << ", " << value.y << ", " << value.z;
+		return stream;
+	}
 
 	T x; // NOLINT
 
@@ -61,26 +61,24 @@ struct vec3_impl
 	T z; // NOLINT
 };
 
-using vec3 = vec3_impl<f32>;
+export using vec3 = vec3_impl<float>;
 
-using dvec3 = vec3_impl<f32>;
+export using ivec3 = vec3_impl<std::int32_t>;
 
-using ivec3 = vec3_impl<i32>;
+export using uvec3 = vec3_impl<std::uint32_t>;
 
-using uvec3 = vec3_impl<u32>;
-
-} // namespace lt::lsd
+} // namespace lt::math
 
 template<typename T>
-struct lt::lsd::formatter<lt::lsd::vec3_impl<T>>
+struct std::formatter<lt::math::vec3_impl<T>>
 {
-	constexpr auto parse(lt::lsd::format_parse_context &context)
+	constexpr auto parse(std::format_parse_context &context)
 	{
 		return context.begin();
 	}
 
-	auto format(const lt::lsd::vec3_impl<T> &val, lt::lsd::format_context &context) const
+	auto format(const lt::math::vec3_impl<T> &val, std::format_context &context) const
 	{
-		return lt::lsd::format_to(context.out(), "{}, {}, {}", val.x, val.y, val.z);
+		return std::format_to(context.out(), "{}, {}, {}", val.x, val.y, val.z);
 	}
 };

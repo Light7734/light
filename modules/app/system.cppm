@@ -1,6 +1,6 @@
 export module app.system;
 import logger;
-import lsd;
+import std;
 
 namespace lt::app {
 
@@ -9,9 +9,9 @@ namespace lt::app {
  */
 export struct TickInfo
 {
-	using Timepoint_T = lsd::chrono::time_point<lsd::chrono::steady_clock>;
+	using Timepoint_T = std::chrono::time_point<std::chrono::steady_clock>;
 
-	using Duration_T = lsd::chrono::duration<f64>;
+	using Duration_T = std::chrono::duration<double>;
 
 	/** Duration since previous tick's end_time to current tick's start_time. */
 	Duration_T delta_time {};
@@ -32,9 +32,9 @@ export struct TickInfo
 /** Information about how a system's tick performed */
 export struct TickResult
 {
-	using Timepoint_T = lsd::chrono::time_point<lsd::chrono::steady_clock>;
+	using Timepoint_T = std::chrono::time_point<std::chrono::steady_clock>;
 
-	using Duration_T = lsd::chrono::duration<f64>;
+	using Duration_T = std::chrono::duration<double>;
 
 	/** The info supplied to the system for ticking. */
 	TickInfo info;
@@ -48,7 +48,7 @@ export struct TickResult
 
 export struct SystemDiagnosis
 {
-	enum class Severity : u8
+	enum class Severity : std::uint8_t
 	{
 		verbose,
 		info,
@@ -57,9 +57,9 @@ export struct SystemDiagnosis
 		fatal,
 	};
 
-	lsd::str message;
+	std::string message;
 
-	lsd::str code;
+	std::string code;
 
 	Severity severity;
 };
@@ -69,9 +69,9 @@ export class SystemStats
 public:
 	void push_diagnosis(SystemDiagnosis &&diagnosis)
 	{
-		auto &diag = m_diagnosis.emplace_back(lsd::move(diagnosis));
+		auto &diag = m_diagnosis.emplace_back(std::move(diagnosis));
 
-		log::info("message: {}", lsd::str { diag.message });
+		log::info("message: {}", std::string { diag.message });
 	}
 
 	[[nodiscard]] auto empty_diagnosis() const -> bool
@@ -80,7 +80,7 @@ public:
 	}
 
 private:
-	lsd::vec<SystemDiagnosis> m_diagnosis;
+	std::vector<SystemDiagnosis> m_diagnosis;
 };
 
 export class ISystem

@@ -1,49 +1,50 @@
 export module logger;
-import lsd;
+
+import std;
 
 namespace lt::log {
 
-auto thread_hash_id() noexcept -> u64
-{
-	return static_cast<u64>(lsd::hash<lsd::thread_id> {}(lsd::this_thread_id()));
-}
-
-} // namespace lt::log
-
-export namespace lt::log {
-
 /** Severity of a log message. */
-enum class Level : u8
+enum class Level : std::uint8_t
 {
 	/** Lowest and most vebose log level, for tracing execution paths and events */
-	trace = 0u,
+	trace = 0,
 
 	/** Vebose log level, for enabling temporarily to debug */
-	debug = 1u,
+	debug = 1,
 
 	/** General information */
-	info = 2u,
+	info = 2,
 
 	/** Things we should to be aware of and edge cases */
-	warn = 3u,
+	warn = 3,
 
 	/** Defects, bugs and undesired behaviour */
-	error = 4u,
+	error = 4,
 
 	/** Unrecoverable errors */
-	critical = 5u,
+	critical = 5,
 
 	/** No logging */
-	off = 6u,
+	off = 6,
 };
+
+namespace details {
+
+inline auto thread_hash_id() noexcept -> std::uint64_t
+{
+	return static_cast<std::uint64_t>(std::hash<std::thread::id> {}(std::this_thread::get_id()));
+}
+
+} // namespace details
 
 template<typename... Args>
 struct [[maybe_unused]] print
 {
 	[[maybe_unused]] print(
 	    Level level,
-	    const lsd::src_location &location,
-	    lsd::format_str<Args...> format,
+	    const std::source_location &location,
+	    std::format_string<Args...> format,
 	    Args &&...arguments
 	) noexcept
 	{
@@ -62,118 +63,118 @@ struct [[maybe_unused]] print
 			}
 			// clang-format on
 
-			lsd::unreachable();
+			std::unreachable();
 		};
 
-		const auto path = lsd::file::path { location.file_name() };
+		const auto path = std::filesystem::path { location.file_name() };
 
-		lsd::println(
+		std::println(
 		    "{} {} ==> {}",
 		    to_string(level, location),
-		    lsd::format("{}:{}", path.filename().string(), location.line()),
-		    lsd::format(format, lsd::forward<Args>(arguments)...)
+		    std::format("{}:{}", path.filename().string(), location.line()),
+		    std::format(format, std::forward<Args>(arguments)...)
 		);
 	}
 };
 
 template<typename... Args>
-print(Level, const lsd::src_location &, lsd::format_str<Args...>, Args &&...) noexcept
+print(Level, const std::source_location &, std::format_string<Args...>, Args &&...) noexcept
     -> print<Args...>;
 
-template<typename... Args>
+export template<typename... Args>
 struct [[maybe_unused]] trace
 {
 	[[maybe_unused]] trace(
-	    lsd::format_str<Args...> format,
+	    std::format_string<Args...> format,
 	    Args &&...arguments,
-	    const lsd::src_location &location = lsd::src_location::current()
+	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::trace, location, format, lsd::forward<Args>(arguments)...);
+		print(Level::trace, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-template<typename... Args>
-trace(lsd::format_str<Args...>, Args &&...) noexcept -> trace<Args...>;
+export template<typename... Args>
+trace(std::format_string<Args...>, Args &&...) noexcept -> trace<Args...>;
 
-template<typename... Args>
+export template<typename... Args>
 struct [[maybe_unused]] debug
 {
 	[[maybe_unused]] debug(
-	    lsd::format_str<Args...> format,
+	    std::format_string<Args...> format,
 	    Args &&...arguments,
-	    const lsd::src_location &location = lsd::src_location::current()
+	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::debug, location, format, lsd::forward<Args>(arguments)...);
+		print(Level::debug, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-template<typename... Args>
-debug(lsd::format_str<Args...>, Args &&...) noexcept -> debug<Args...>;
+export template<typename... Args>
+debug(std::format_string<Args...>, Args &&...) noexcept -> debug<Args...>;
 
-template<typename... Args>
+export template<typename... Args>
 struct [[maybe_unused]] info
 {
 	[[maybe_unused]] info(
-	    lsd::format_str<Args...> format,
+	    std::format_string<Args...> format,
 	    Args &&...arguments,
-	    const lsd::src_location &location = lsd::src_location::current()
+	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::info, location, format, lsd::forward<Args>(arguments)...);
+		print(Level::info, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-template<typename... Args>
-info(lsd::format_str<Args...>, Args &&...) noexcept -> info<Args...>;
+export template<typename... Args>
+info(std::format_string<Args...>, Args &&...) noexcept -> info<Args...>;
 
-template<typename... Args>
+export template<typename... Args>
 struct [[maybe_unused]] warn
 {
 	[[maybe_unused]] warn(
-	    lsd::format_str<Args...> format,
+	    std::format_string<Args...> format,
 	    Args &&...arguments,
-	    const lsd::src_location &location = lsd::src_location::current()
+	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::warn, location, format, lsd::forward<Args>(arguments)...);
+		print(Level::warn, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-template<typename... Args>
-warn(lsd::format_str<Args...>, Args &&...) noexcept -> warn<Args...>;
+export template<typename... Args>
+warn(std::format_string<Args...>, Args &&...) noexcept -> warn<Args...>;
 
-template<typename... Args>
+export template<typename... Args>
 struct [[maybe_unused]] error
 {
 	[[maybe_unused]] error(
-	    lsd::format_str<Args...> format,
+	    std::format_string<Args...> format,
 	    Args &&...arguments,
-	    const lsd::src_location &location = lsd::src_location::current()
+	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::error, location, format, lsd::forward<Args>(arguments)...);
+		print(Level::error, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-template<typename... Args>
-error(lsd::format_str<Args...>, Args &&...) noexcept -> error<Args...>;
+export template<typename... Args>
+error(std::format_string<Args...>, Args &&...) noexcept -> error<Args...>;
 
-template<typename... Args>
+export template<typename... Args>
 struct [[maybe_unused]] critical
 {
 	[[maybe_unused]] critical(
-	    lsd::format_str<Args...> format,
+	    std::format_string<Args...> format,
 	    Args &&...arguments,
-	    const lsd::src_location &location = lsd::src_location::current()
+	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::critical, location, format, lsd::forward<Args>(arguments)...);
+		print(Level::critical, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
-template<typename... Args>
-critical(lsd::format_str<Args...>, Args &&...) noexcept -> critical<Args...>;
+export template<typename... Args>
+critical(std::format_string<Args...>, Args &&...) noexcept -> critical<Args...>;
 
 } // namespace lt::log
