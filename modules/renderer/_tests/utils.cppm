@@ -2,16 +2,25 @@ export module renderer.test_utils;
 
 export import logger;
 export import surface.system;
+export import ecs.registry;
+export import renderer.factory;
 export import test.test;
 export import test.expects;
 export import memory.reference;
 export import renderer.frontend;
+export import renderer.system;
+export import math.vec2;
+export import math.vec3;
+export import math.vec4;
+export import math.mat4;
+export import std;
 
 export using ::lt::test::Case;
 export using ::lt::test::expect_eq;
 export using ::lt::test::expect_false;
 export using ::lt::test::expect_not_nullptr;
 export using ::lt::test::expect_throw;
+export using ::lt::test::operator""_suite;
 export using ::lt::test::expect_true;
 export using ::lt::test::Suite;
 export using ::std::ignore;
@@ -20,15 +29,15 @@ export namespace constants {
 
 constexpr auto api = lt::renderer::Api::vulkan;
 constexpr auto resolution = lt::math::uvec2 { 800u, 600u };
-constexpr auto frames_in_flight = uint32_t { 3u };
+constexpr auto frames_in_flight = std::uint32_t { 3u };
 
 } // namespace constants
 
 
 void noop_messenger_callback(
-    lt::renderer::IMessenger::MessageSeverity severity,
-    lt::renderer::IMessenger::MessageType type,
-    const lt::renderer::IMessenger::MessageData &data,
+    lt::renderer::IDebugger::MessageSeverity severity,
+    lt::renderer::IDebugger::MessageType type,
+    const lt::renderer::IDebugger::MessageData &data,
     std::any &user_data
 )
 {
@@ -58,8 +67,8 @@ public:
                 .registry = registry(),
 		        .surface_entity = surface_entity(),
                 .debug_callback_info = {
-                    .severities = lt::renderer::IMessenger::MessageSeverity::all,
-                    .types= lt::renderer::IMessenger::MessageType::all,
+                    .severities = lt::renderer::IDebugger::MessageSeverity::all,
+                    .types= lt::renderer::IDebugger::MessageType::all,
                     .callback = noop_messenger_callback,
                     .user_data = {},
                 }
@@ -105,14 +114,14 @@ public:
 	}
 
 private:
-	lt::memory::Scope<lt::renderer::ISurface> m_surface { lt::renderer::ISurface::create(
+	lt::memory::Scope<lt::renderer::ISurface> m_surface { lt::renderer::create_surface(
 		constants::api,
-		lt::renderer::IInstance::get(constants::api),
+		lt::renderer::get_instance(constants::api),
 		surface_entity()
 	) };
 
 	lt::memory::Scope<lt::renderer::IGpu> m_gpu {
-		lt::renderer::IGpu::create(constants::api, lt::renderer::IInstance::get(constants::api))
+		lt::renderer::create_gpu(constants::api, lt::renderer::get_instance(constants::api))
 	};
 };
 
@@ -134,7 +143,7 @@ public:
 	void recreate_swapchain()
 	{
 		m_swapchain.reset();
-		m_swapchain = lt::renderer::ISwapchain::create(
+		m_swapchain = lt::renderer::create_swapchain(
 		    constants::api,
 		    surface(),
 		    gpu(),
@@ -147,24 +156,23 @@ public:
 		return m_user_data->m_has_any_messages;
 	}
 
-	[[nodiscard]] auto has_any_messages_of(
-	    lt::renderer::IMessenger ::MessageSeverity severity
-	) const -> uint32_t
+	[[nodiscard]] auto has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity severity) const
+	    -> std::uint32_t
 	{
 		return m_user_data->m_severity_counter.contains(severity);
 	}
 
 private:
 	static void messenger_callback(
-	    lt::renderer::IMessenger::MessageSeverity severity,
-	    lt::renderer::IMessenger::MessageType type,
-	    const lt::renderer::IMessenger::MessageData &data,
+	    lt::renderer::IDebugger::MessageSeverity severity,
+	    lt::renderer::IDebugger::MessageType type,
+	    const lt::renderer::IDebugger::MessageData &data,
 	    std::any &user_data
 	)
 	{
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
-		lt::log::trace("vulkan: {}", data.message);
+		lt::log::error("vulkan: {}", data.message);
 		std::ignore = data;
 		std::ignore = type;
 
@@ -175,30 +183,31 @@ private:
 
 	struct UserData
 	{
-		std::unordered_map<lt::renderer::IMessenger::MessageSeverity, uint32_t> m_severity_counter;
+		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, std::uint32_t>
+		    m_severity_counter;
 
 		bool m_has_any_messages {};
 	};
 
 	lt::memory::Scope<UserData> m_user_data = lt::memory::create_scope<UserData>();
 
-	lt::memory::Scope<lt::renderer::IMessenger> m_messenger = lt::renderer::IMessenger::create(
+	lt::memory::Scope<lt::renderer::IDebugger> m_messenger = lt::renderer::create_debugger(
 	    constants::api,
-	    lt::renderer::IInstance::get(constants::api),
-	    lt::renderer::IMessenger ::CreateInfo {
-	        .severities = lt::renderer::IMessenger ::MessageSeverity::all,
-	        .types = lt::renderer::IMessenger ::MessageType::all,
+	    lt::renderer::get_instance(constants::api),
+	    lt::renderer::IDebugger ::CreateInfo {
+	        .severities = lt::renderer::IDebugger::MessageSeverity::all,
+	        .types = lt::renderer::IDebugger::MessageType::all,
 	        .callback = &messenger_callback,
 	        .user_data = m_user_data.get(),
 	    }
 	);
 
 	lt::memory::Scope<lt::renderer::IDevice> m_device {
-		lt::renderer::IDevice::create(constants::api, gpu(), surface())
+		lt::renderer::create_device(constants::api, gpu(), surface())
 	};
 
 	lt::memory::Scope<lt::renderer::ISwapchain> m_swapchain {
-		lt::renderer::ISwapchain::create(constants::api, surface(), gpu(), m_device.get())
+		lt::renderer::create_swapchain(constants::api, surface(), gpu(), m_device.get())
 	};
 };
 
@@ -217,18 +226,17 @@ public:
 		return m_user_data->m_has_any_messages;
 	}
 
-	[[nodiscard]] auto has_any_messages_of(
-	    lt::renderer::IMessenger ::MessageSeverity severity
-	) const -> uint32_t
+	[[nodiscard]] auto has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity severity) const
+	    -> std::uint32_t
 	{
 		return m_user_data->m_severity_counter.contains(severity);
 	}
 
 private:
 	static void messenger_callback(
-	    lt::renderer::IMessenger::MessageSeverity severity,
-	    lt::renderer::IMessenger::MessageType type,
-	    const lt::renderer::IMessenger::MessageData &data,
+	    lt::renderer::IDebugger::MessageSeverity severity,
+	    lt::renderer::IDebugger::MessageType type,
+	    const lt::renderer::IDebugger::MessageData &data,
 	    std::any &user_data
 	)
 	{
@@ -246,7 +254,8 @@ private:
 
 	struct UserData
 	{
-		std::unordered_map<lt::renderer::IMessenger::MessageSeverity, uint32_t> m_severity_counter;
+		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, std::uint32_t>
+		    m_severity_counter;
 
 		bool m_has_any_messages {};
 	};
@@ -260,9 +269,9 @@ private:
         },
 		.registry = registry(),
 		.surface_entity = surface_entity(),
-        .debug_callback_info = lt::renderer::IMessenger ::CreateInfo {
-		        .severities = lt::renderer::IMessenger ::MessageSeverity::all,
-		        .types = lt::renderer::IMessenger ::MessageType::all,
+        .debug_callback_info = lt::renderer::IDebugger ::CreateInfo {
+		        .severities = lt::renderer::IDebugger ::MessageSeverity::all,
+		        .types = lt::renderer::IDebugger ::MessageType::all,
 		        .callback = &messenger_callback,
 		        .user_data = m_user_data.get(),
         }

@@ -14,7 +14,6 @@ export class Debugger: public IDebugger
 public:
 	Debugger(IInstance *instance, CreateInfo info);
 
-
 private:
 	static void native_callback(
 	    vk::Flags severity,

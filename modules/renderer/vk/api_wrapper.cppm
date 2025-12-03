@@ -43,6 +43,7 @@ import math.vec3;
 import math.vec2;
 import debug.assertions;
 import std;
+import logger;
 
 template<class... Ts>
 struct overloads: Ts...
@@ -81,6 +82,9 @@ constexpr auto validation = "VK_LAYER_KHRONOS_validation";
 namespace instance_extension_names {
 
 constexpr auto debug_utils = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+constexpr auto physical_device_properties_2
+    = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
+
 constexpr auto surface = VK_KHR_SURFACE_EXTENSION_NAME;
 #if defined(LIGHT_PLATFORM_LINUX)
 constexpr auto platform_surface = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
@@ -90,8 +94,6 @@ constexpr auto platform_surface = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 #else
 	#error "Unsupported platform"
 #endif
-constexpr auto physical_device_properties_2
-    = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
 
 } // namespace instance_extension_names
 
@@ -100,6 +102,10 @@ namespace device_extension_names {
 constexpr auto swapchain = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 constexpr auto dynamic_rendering = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
 constexpr auto descriptor_indexing = VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME;
+constexpr auto depth_stencil_resolve = VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME;
+constexpr auto maintenance_3 = VK_KHR_MAINTENANCE3_EXTENSION_NAME;
+constexpr auto create_renderpass2=  VK_KHR_CREATE_RENDERPASS2_EXTENSION_NAME
+
 
 }; // namespace device_extension_names
 
@@ -1278,8 +1284,10 @@ public:
 	/** de-allocation functions */
 	void free_memory(VkDeviceMemory memory) const;
 
-	void free_descriptor_set(VkDescriptorPool descriptor_pool, VkDescriptorSet descriptor_set)
-	    const;
+	void free_descriptor_set(
+	    VkDescriptorPool descriptor_pool,
+	    VkDescriptorSet descriptor_set
+	) const;
 
 	/** destroy functions */
 	void destroy_swapchain(VkSwapchainKHR swapchain) const;
@@ -2542,6 +2550,10 @@ public:
 private:
 	memory::NullOnMove<VkInstance> m_instance {};
 
+	Callback m_user_callback;
+
+	void *m_user_data {};
+
 	VkDebugUtilsMessengerEXT m_messenger {};
 };
 
@@ -2925,22 +2937,55 @@ Instance::Instance(CreateInfo info)
 	auto layer_settings = std::vector<VkLayerSettingEXT> {};
 	auto layer_names = std::vector<const char *> {};
 	auto extension_names = std::vector<const char *> {};
+	for (auto &extension : info.extensions)
+	{
+		extension_names.emplace_back(extension.c_str());
+	}
 
 	for (const auto &layer : info.layers)
 	{
 		layer_names.emplace_back(layer.name.c_str());
 		for (const auto &setting : layer.settings)
 		{
-			layer_settings.emplace_back(VkLayerSettingEXT {
-			    .pLayerName = layer.name.c_str(),
-			    .pSettingName = setting.name.c_str(),
-			    .type = std::visit(layer_setting_type_visitor, setting.values),
-			    .valueCount = 1u,
-			    .pValues = std::visit(layer_setting_value_visitor, setting.values),
-			});
+			const auto *values = (void *) { nullptr };
+
+			if (setting.values.index() == 0)
+			{
+				values = std::bit_cast<const void *>(std::get<0>(setting.values).data());
+			}
+			else if (setting.values.index() == 1)
+			{
+				values = std::bit_cast<const void *>(&std::get<1>(setting.values));
+			}
+			else if (setting.values.index() == 2)
+			{
+				values = std::bit_cast<const void *>(&std::get<2>(setting.values));
+			}
+
+			debug::ensure(values, "Failed to get variant from setting.values");
+
+			layer_settings.emplace_back(
+			    VkLayerSettingEXT {
+			        .pLayerName = layer.name.c_str(),
+			        .pSettingName = setting.name.c_str(),
+			        .type = std::visit(layer_setting_type_visitor, setting.values),
+			        .valueCount = 1u,
+			        .pValues = values,
+			    }
+			);
 		}
 	}
 
+	log::debug("Settings size: {}", layer_settings.size());
+	log::debug("Settings:");
+	for (auto &setting : layer_settings)
+	{
+		log::debug("\tpValues: {}", (std::size_t)setting.pValues);
+		log::debug("\tname: {}", setting.pSettingName);
+		log::debug("\tlayer name: {}", setting.pLayerName);
+		log::debug("\ttype: {}", std::to_underlying(setting.type));
+		log::debug("\tvalue count: {}", setting.valueCount);
+	}
 	const auto layer_settings_create_info = VkLayerSettingsCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT,
 		.settingCount = static_cast<uint32_t>(layer_settings.size()),
@@ -2953,10 +2998,17 @@ Instance::Instance(CreateInfo info)
 		.flags = {},
 		.enabledLayerCount = static_cast<uint32_t>(info.layers.size()),
 		.ppEnabledLayerNames = layer_names.data(),
-		.enabledExtensionCount = static_cast<uint32_t>(info.extensions.size()),
+		.enabledExtensionCount = static_cast<uint32_t>(extension_names.size()),
 		.ppEnabledExtensionNames = extension_names.data(),
 	};
 
+	log::debug("Extension names:");
+	for (auto &extension_name : extension_names)
+	{
+		log::debug("\t{}", extension_name);
+	}
+
+	log::debug("Create instance: {}", (std::size_t)(api::create_instance));
 	vkc(api::create_instance(&vk_info, nullptr, &m_instance));
 	debug::ensure(m_instance, "Failed to create vulkan instance");
 }
@@ -3096,6 +3148,7 @@ Surface::~Surface()
 	};
 
 	api::get_physical_device_features(m_physical_device, &features_2);
+	log::debug("Dynamic rendering features: {}", features.dynamicRendering);
 	return DynamicRenderingFeatures {
 		.enabled = !!features.dynamicRendering,
 	};
@@ -3116,26 +3169,26 @@ Surface::~Surface()
 	api::get_physical_device_features(m_physical_device, &features_2);
 	return DescriptorIndexingFeatures {
 		// clang-format off
-		.shader_input_attachment_array_dynamic_indexing = features.shaderInputAttachmentArrayDynamicIndexing,
-		.shader_uniform_texel_buffer_array_dynamic_indexing = features.shaderUniformTexelBufferArrayDynamicIndexing,
-		.shader_storage_texel_buffer_array_dynamic_indexing = features.shaderStorageTexelBufferArrayDynamicIndexing,
-		.shader_uniform_buffer_array_non_uniform_indexing = features.shaderUniformBufferArrayNonUniformIndexing,
-		.shader_sampled_image_array_non_uniform_indexing = features.shaderSampledImageArrayNonUniformIndexing,
-		.shader_storage_buffer_array_non_uniform_indexing = features.shaderStorageBufferArrayNonUniformIndexing,
-		.shader_storage_image_array_non_uniform_indexing = features.shaderStorageImageArrayNonUniformIndexing,
-		.shader_input_attachment_array_non_uniform_indexing = features.shaderInputAttachmentArrayNonUniformIndexing,
-		.shader_uniform_texel_buffer_array_non_uniform_indexing = features.shaderUniformTexelBufferArrayNonUniformIndexing,
-		.shader_storage_texel_buffer_array_non_uniform_indexing = features.shaderStorageTexelBufferArrayNonUniformIndexing,
-		.descriptor_binding_uniform_buffer_update_after_bind = features.descriptorBindingUniformBufferUpdateAfterBind,
-		.descriptor_binding_sampled_image_update_after_bind = features.descriptorBindingSampledImageUpdateAfterBind,
-		.descriptor_binding_storage_image_update_after_bind = features.descriptorBindingStorageImageUpdateAfterBind,
-		.descriptor_binding_storage_buffer_update_after_bind = features.descriptorBindingStorageBufferUpdateAfterBind,
-		.descriptor_binding_uniform_texel_buffer_update_after_bind = features.descriptorBindingUniformTexelBufferUpdateAfterBind,
-		.descriptor_binding_storage_texel_buffer_update_after_bind = features.descriptorBindingStorageTexelBufferUpdateAfterBind,
-		.descriptor_binding_update_unused_while_pending = features.descriptorBindingUpdateUnusedWhilePending,
-		.descriptor_binding_partially_bound = features.descriptorBindingPartiallyBound, 
-        .descriptor_binding_variable_descriptor_count = features.descriptorBindingVariableDescriptorCount,
-        .runtime_descriptor_array = features.runtimeDescriptorArray,
+		.shader_input_attachment_array_dynamic_indexing =false,
+		.shader_uniform_texel_buffer_array_dynamic_indexing =false,
+		.shader_storage_texel_buffer_array_dynamic_indexing =false,
+		.shader_uniform_buffer_array_non_uniform_indexing =false,
+		.shader_sampled_image_array_non_uniform_indexing =false,
+		.shader_storage_buffer_array_non_uniform_indexing =false,
+		.shader_storage_image_array_non_uniform_indexing =false,
+		.shader_input_attachment_array_non_uniform_indexing =false,
+		.shader_uniform_texel_buffer_array_non_uniform_indexing =false,
+		.shader_storage_texel_buffer_array_non_uniform_indexing =false,
+		.descriptor_binding_uniform_buffer_update_after_bind =false,
+		.descriptor_binding_sampled_image_update_after_bind =false,
+		.descriptor_binding_storage_image_update_after_bind =false,
+		.descriptor_binding_storage_buffer_update_after_bind =false,
+		.descriptor_binding_uniform_texel_buffer_update_after_bind =false,
+		.descriptor_binding_storage_texel_buffer_update_after_bind =false,
+		.descriptor_binding_update_unused_while_pending =false,
+		.descriptor_binding_partially_bound =false, 
+        .descriptor_binding_variable_descriptor_count =false,
+        .runtime_descriptor_array =false,
 		// clang-format on
 	};
 }
@@ -3413,10 +3466,12 @@ Surface::~Surface()
 	auto formats = std::vector<Surface::Format> {};
 	for (auto &vk_format : vk_formats)
 	{
-		formats.emplace_back(Surface::Format {
-		    .format = static_cast<Format>(vk_format.format),
-		    .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
-		});
+		formats.emplace_back(
+		    Surface::Format {
+		        .format = static_cast<Format>(vk_format.format),
+		        .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
+		    }
+		);
 	}
 
 	return formats;
@@ -3473,15 +3528,17 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 	auto vk_queue_infos = std::vector<VkDeviceQueueCreateInfo> {};
 	for (auto queue_family : info.queue_indices)
 	{
-		vk_queue_infos.emplace_back(VkDeviceQueueCreateInfo {
-		    .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-		    .queueFamilyIndex = queue_family,
-		    .queueCount = 1u,
-		    .pQueuePriorities = &priorities,
-		});
+		vk_queue_infos.emplace_back(
+		    VkDeviceQueueCreateInfo {
+		        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		        .queueFamilyIndex = queue_family,
+		        .queueCount = 1u,
+		        .pQueuePriorities = &priorities,
+		    }
+		);
 	}
 
-	auto vk_extension_names = std::vector<const char *>(info.extensions.size());
+	auto vk_extension_names = std::vector<const char *> {};
 	for (const auto &extension : info.extensions)
 	{
 		vk_extension_names.emplace_back(extension.c_str());
@@ -3562,11 +3619,12 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 		vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
 			.pNext = {},
-			.dynamicRendering = (*info.dynamic_rendering_features).enabled,
+			.dynamicRendering = true,
 		};
+		log::debug("Dynamic rendering: {}", vk_dynamic_rendering_features.dynamicRendering);
 
-		*last_p_next = &vk_descriptor_indexing_features;
-		last_p_next = &vk_descriptor_indexing_features.pNext;
+		*last_p_next = &vk_dynamic_rendering_features;
+		// last_p_next = &vk_dynamic_rendering_features.pNext;
 	}
 
 	if (info.descriptor_indexing_features)
@@ -3599,18 +3657,22 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 			// clang-format on
 		};
 
-		*last_p_next = &vk_descriptor_indexing_features;
-		last_p_next = &vk_descriptor_indexing_features.pNext;
+		// *last_p_next = &vk_descriptor_indexing_features;
+		// last_p_next = &vk_descriptor_indexing_features.pNext;
+	}
+	for (auto name : vk_extension_names)
+	{
+		log::debug("Extension name: {}", name);
 	}
 
 	auto vk_info = VkDeviceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = &vk_features_2,
+		.pNext = &vk_dynamic_rendering_features,
 		.queueCreateInfoCount = static_cast<uint32_t>(vk_queue_infos.size()),
 		.pQueueCreateInfos = vk_queue_infos.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(vk_extension_names.size()),
 		.ppEnabledExtensionNames = vk_extension_names.data(),
-		.pEnabledFeatures = nullptr, // replaced with VkPhysicalDeviceFeatures2
+		.pEnabledFeatures = &vk_features_2.features, // replaced with VkPhysicalDeviceFeatures2
 	};
 
 	vkc(api::create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
@@ -3871,8 +3933,10 @@ void Device::free_memory(VkDeviceMemory memory) const
 	api::free_memory(m_device, memory, nullptr);
 }
 
-void Device::free_descriptor_set(VkDescriptorPool descriptor_pool, VkDescriptorSet descriptor_set)
-    const
+void Device::free_descriptor_set(
+    VkDescriptorPool descriptor_pool,
+    VkDescriptorSet descriptor_set
+) const
 {
 	vkc(api::free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
 }
@@ -4164,18 +4228,19 @@ void Memory::unmap()
 
 Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
     : m_device(device.m_device.get())
-    , m_pipeline()
 
 {
 	auto shader_stages = std::vector<VkPipelineShaderStageCreateInfo> {};
 	for (auto &[shader, stage] : info.shaders)
 	{
-		shader_stages.emplace_back(VkPipelineShaderStageCreateInfo {
-		    .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-		    .stage = static_cast<VkShaderStageFlagBits>(stage),
-		    .module = shader.get_vk_handle(),
-		    .pName = "main",
-		});
+		shader_stages.emplace_back(
+		    VkPipelineShaderStageCreateInfo {
+		        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+		        .stage = static_cast<VkShaderStageFlagBits>(stage),
+		        .module = shader.get_vk_handle(),
+		        .pName = "main",
+		    }
+		);
 	}
 
 	auto dynamic_states = std::array<VkDynamicState, 2> {
@@ -4258,7 +4323,8 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 		.colorAttachmentCount = static_cast<uint32_t>(color_attachment_formats.size()),
 		.pColorAttachmentFormats = std::bit_cast<VkFormat *>(color_attachment_formats.data()),
 		.depthAttachmentFormat = info.attachment_state.depth_attachment ?
-		                             static_cast<VkFormat>(*info.attachment_state.depth_attachment
+		                             static_cast<VkFormat>(
+		                                 *info.attachment_state.depth_attachment
 		                             ) :
 		                             VK_FORMAT_UNDEFINED,
 
@@ -4298,10 +4364,33 @@ Pipeline::~Pipeline()
 
 Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.get_vk_handle())
 {
+	constexpr auto native_callback = [](VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+	                                    VkDebugUtilsMessageTypeFlagsEXT types,
+	                                    const VkDebugUtilsMessengerCallbackDataEXT *data,
+	                                    void *user_data) {
+		auto *messenger = std::bit_cast<Messenger *>(user_data);
+		messenger->m_user_callback(
+		    severity,
+		    types,
+		    { .message = data->pMessage },
+		    messenger->m_user_data
+		);
+
+		return VK_FALSE;
+	};
+
+	m_user_callback = std::move(info.user_callback);
+	m_user_data = info.user_data;
 	auto vk_info = VkDebugUtilsMessengerCreateInfoEXT {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		.messageSeverity = info.enabled_severities,
+		.messageType = info.enabled_types,
+		.pfnUserCallback = native_callback,
+		.pUserData = this,
 
 	};
 
+	log::debug("Creating debug messenger....");
 	vkc(api::create_debug_messenger(m_instance, &vk_info, nullptr, &m_messenger));
 }
 

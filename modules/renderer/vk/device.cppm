@@ -101,9 +101,12 @@ void Device::initialize_logical_device()
                 vk::device_extension_names::swapchain,
                 vk::device_extension_names::dynamic_rendering,
                 vk::device_extension_names::descriptor_indexing,
+                vk::device_extension_names::depth_stencil_resolve,
+                vk::device_extension_names::maintenance_3,
+                vk::device_extension_names::create_renderpass2,
             },
 
-            .features = m_gpu->vk().get_features(),
+            .features = {},
 
             .dynamic_rendering_features = m_gpu->vk().get_supported_dynamic_rendering_features(),
 

@@ -51,6 +51,13 @@ export namespace lt::renderer {
     std::uint32_t max_frames_in_flight
 ) -> memory::Scope<IRenderer>;
 
+[[nodiscard]] auto create_buffer(
+    Api target_api,
+    IDevice *device,
+    IGpu *gpu,
+    const IBuffer::CreateInfo &info
+) -> memory::Scope<IBuffer>;
+
 } // namespace lt::renderer
 
 module :private;
@@ -71,7 +78,7 @@ namespace lt::renderer {
 
 [[nodiscard]] auto create_surface(
     Api target_api,
-    class IInstance *instance,
+    IInstance *instance,
     const lt::ecs::Entity &surface_entity
 ) -> memory::Scope<ISurface>
 {
@@ -134,8 +141,8 @@ namespace lt::renderer {
 
 [[nodiscard]] auto create_buffer(
     Api target_api,
-    class IDevice *device,
-    class IGpu *gpu,
+    IDevice *device,
+    IGpu *gpu,
     const IBuffer::CreateInfo &info
 ) -> memory::Scope<IBuffer>
 {

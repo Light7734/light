@@ -1,21 +1,21 @@
-#include <renderer/frontend/data/buffer.hpp>
-#include <renderer/test/utils.hpp>
+import renderer.frontend;
+import renderer.test_utils;
 
-using ::lt::renderer::IBuffer;
-using enum ::lt::renderer::IMessenger::MessageSeverity;
+using enum ::lt::renderer::IDebugger::MessageSeverity;
+using enum ::lt::renderer::IBuffer::Usage;
 
 Suite raii = "buffer_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 
-		for (auto idx = 0; idx <= std::to_underlying(IBuffer::Usage::staging); ++idx)
+		for (auto idx = 0; idx <= std::to_underlying(staging); ++idx)
 		{
-			ignore = IBuffer::create(
+			ignore = lt::renderer::create_buffer(
 			    lt::renderer::Api::vulkan,
 			    fixture.device(),
 			    fixture.gpu(),
-			    IBuffer::CreateInfo {
-			        .usage = static_cast<IBuffer::Usage>(idx),
+			    lt::renderer::IBuffer::CreateInfo {
+			        .usage = static_cast<lt::renderer::IBuffer::Usage>(idx),
 			        .size = 1000u,
 			        .debug_name = "",
 			    }
@@ -29,23 +29,28 @@ Suite raii = "buffer_raii"_suite = [] {
 	Case { "unhappy path throws" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 
-		auto info = IBuffer::CreateInfo {
-			.usage = IBuffer::Usage::vertex,
+		auto info = lt::renderer::IBuffer::CreateInfo {
+			.usage = vertex,
 			.size = 10000u,
 			.debug_name = "",
 		};
 
 		expect_throw([&] {
-			ignore = IBuffer::create(lt::renderer::Api::vulkan, nullptr, fixture.gpu(), info);
+			ignore = lt::renderer::create_buffer(
+			    lt::renderer::Api::vulkan,
+			    nullptr,
+			    fixture.gpu(),
+			    info
+			);
 		});
 
 		expect_throw([&] {
-			ignore = IBuffer::create(lt::renderer::Api::vulkan, fixture.device(), nullptr, info);
+			ignore = lt::renderer::create_buffer(lt::renderer::Api::vulkan, fixture.device(), nullptr, info);
 		});
 
 		expect_throw([&, info] mutable {
 			info.size = 0;
-			ignore = IBuffer::create(
+			ignore = lt::renderer::create_buffer(
 			    lt::renderer::Api::vulkan,
 			    fixture.device(),
 			    fixture.gpu(),
@@ -54,7 +59,7 @@ Suite raii = "buffer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = IBuffer::create(
+			ignore = lt::renderer::create_buffer(
 			    lt::renderer::Api::direct_x,
 			    fixture.device(),
 			    fixture.gpu(),
@@ -63,7 +68,7 @@ Suite raii = "buffer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = IBuffer::create(
+			ignore = lt::renderer::create_buffer(
 			    lt::renderer::Api::metal,
 			    fixture.device(),
 			    fixture.gpu(),
@@ -72,7 +77,7 @@ Suite raii = "buffer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = IBuffer::create(
+			ignore = lt::renderer::create_buffer(
 			    lt::renderer::Api::none,
 			    fixture.device(),
 			    fixture.gpu(),
@@ -81,7 +86,7 @@ Suite raii = "buffer_raii"_suite = [] {
 		});
 
 		/** Make sure the default-case was OK */
-		ignore = IBuffer::create(lt::renderer::Api::vulkan, fixture.device(), fixture.gpu(), info);
+		ignore = lt::renderer::create_buffer(lt::renderer::Api::vulkan, fixture.device(), fixture.gpu(), info);
 
 		expect_false(fixture.has_any_messages_of(error));
 		expect_false(fixture.has_any_messages_of(warning));
@@ -94,12 +99,12 @@ Suite mapping = "buffer_mapping"_suite = [] {
 
 		constexpr auto size = 1000u;
 
-		auto buffer = IBuffer::create(
+		auto buffer = lt::renderer::create_buffer(
 		    lt::renderer::Api::vulkan,
 		    fixture.device(),
 		    fixture.gpu(),
-		    IBuffer::CreateInfo {
-		        .usage = IBuffer::Usage::staging,
+		    lt::renderer::IBuffer::CreateInfo {
+		        .usage = staging,
 		        .size = size,
 		        .debug_name = "",
 		    }
