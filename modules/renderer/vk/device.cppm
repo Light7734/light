@@ -103,7 +103,9 @@ void Device::initialize_logical_device()
                 vk::device_extension_names::descriptor_indexing,
                 vk::device_extension_names::depth_stencil_resolve,
                 vk::device_extension_names::maintenance_3,
-                vk::device_extension_names::create_renderpass2,
+                vk::device_extension_names::maintenance_2,
+                vk::device_extension_names::create_renderpass_2,
+                vk::device_extension_names::multiview,
             },
 
             .features = {},

@@ -104,7 +104,9 @@ constexpr auto dynamic_rendering = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
 constexpr auto descriptor_indexing = VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME;
 constexpr auto depth_stencil_resolve = VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME;
 constexpr auto maintenance_3 = VK_KHR_MAINTENANCE3_EXTENSION_NAME;
-constexpr auto create_renderpass2=  VK_KHR_CREATE_RENDERPASS2_EXTENSION_NAME
+constexpr auto maintenance_2 = VK_KHR_MAINTENANCE2_EXTENSION_NAME;
+constexpr auto create_renderpass_2 = VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME;
+constexpr auto multiview = VK_KHR_MULTIVIEW_EXTENSION_NAME;
 
 
 }; // namespace device_extension_names
@@ -2854,6 +2856,7 @@ void Device::load_functions()
 {
 	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
 		pfn = std::bit_cast<T>(api::get_device_proc_address(m_device, fn_name));
+		log::trace("Loading: {}", fn_name);
 		lt::debug::ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
 	};
 
@@ -3612,59 +3615,77 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 
 	auto vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {};
 	auto vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {};
-	void **last_p_next = &vk_features_2.pNext;
+	vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+		.pNext = {},
+		.dynamicRendering = true,
+	};
+	log::debug("Dynamic rendering: {}", vk_dynamic_rendering_features.dynamicRendering);
+	// void **last_p_next = &vk_features_2.pNext;
 
 	if (info.dynamic_rendering_features)
 	{
-		vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
-			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
-			.pNext = {},
-			.dynamicRendering = true,
-		};
-		log::debug("Dynamic rendering: {}", vk_dynamic_rendering_features.dynamicRendering);
-
-		*last_p_next = &vk_dynamic_rendering_features;
+		// *last_p_next = &vk_dynamic_rendering_features;
 		// last_p_next = &vk_dynamic_rendering_features.pNext;
 	}
 
-	if (info.descriptor_indexing_features)
-	{
-		const auto features = *info.descriptor_indexing_features;
-		vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {
-			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
-			.pNext = {},
-			// clang-format off
-			.shaderInputAttachmentArrayDynamicIndexing = features.shader_input_attachment_array_dynamic_indexing,
-			.shaderUniformTexelBufferArrayDynamicIndexing = features.shader_uniform_texel_buffer_array_dynamic_indexing,
-			.shaderStorageTexelBufferArrayDynamicIndexing = features.shader_storage_texel_buffer_array_dynamic_indexing,
-			.shaderUniformBufferArrayNonUniformIndexing = features.shader_uniform_buffer_array_non_uniform_indexing,
-			.shaderSampledImageArrayNonUniformIndexing = features.shader_sampled_image_array_non_uniform_indexing,
-			.shaderStorageBufferArrayNonUniformIndexing = features.shader_storage_buffer_array_non_uniform_indexing,
-			.shaderStorageImageArrayNonUniformIndexing = features.shader_storage_image_array_non_uniform_indexing,
-			.shaderInputAttachmentArrayNonUniformIndexing = features.shader_input_attachment_array_non_uniform_indexing,
-			.shaderUniformTexelBufferArrayNonUniformIndexing = features.shader_uniform_texel_buffer_array_non_uniform_indexing,
-			.shaderStorageTexelBufferArrayNonUniformIndexing = features.shader_storage_texel_buffer_array_non_uniform_indexing,
-			.descriptorBindingUniformBufferUpdateAfterBind = features.descriptor_binding_uniform_buffer_update_after_bind,
-			.descriptorBindingSampledImageUpdateAfterBind = features.descriptor_binding_sampled_image_update_after_bind,
-			.descriptorBindingStorageImageUpdateAfterBind = features.descriptor_binding_storage_image_update_after_bind,
-			.descriptorBindingStorageBufferUpdateAfterBind = features.descriptor_binding_storage_buffer_update_after_bind,
-			.descriptorBindingUniformTexelBufferUpdateAfterBind = features.descriptor_binding_uniform_texel_buffer_update_after_bind,
-			.descriptorBindingStorageTexelBufferUpdateAfterBind = features.descriptor_binding_storage_texel_buffer_update_after_bind,
-			.descriptorBindingUpdateUnusedWhilePending = features.descriptor_binding_update_unused_while_pending,
-			.descriptorBindingPartiallyBound = features.descriptor_binding_partially_bound,
-			.descriptorBindingVariableDescriptorCount = features.descriptor_binding_variable_descriptor_count,
-			.runtimeDescriptorArray = features.runtime_descriptor_array,
-			// clang-format on
-		};
-
-		// *last_p_next = &vk_descriptor_indexing_features;
-		// last_p_next = &vk_descriptor_indexing_features.pNext;
-	}
+	// if (info.descriptor_indexing_features)
+	// {
+	// 	const auto features = *info.descriptor_indexing_features;
+	// 	vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {
+	// 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
+	// 		.pNext = {},
+	// 		// clang-format off
+	// 		.shaderInputAttachmentArrayDynamicIndexing =
+	// features.shader_input_attachment_array_dynamic_indexing,
+	// 		.shaderUniformTexelBufferArrayDynamicIndexing =
+	// features.shader_uniform_texel_buffer_array_dynamic_indexing,
+	// 		.shaderStorageTexelBufferArrayDynamicIndexing =
+	// features.shader_storage_texel_buffer_array_dynamic_indexing,
+	// 		.shaderUniformBufferArrayNonUniformIndexing =
+	// features.shader_uniform_buffer_array_non_uniform_indexing,
+	// 		.shaderSampledImageArrayNonUniformIndexing =
+	// features.shader_sampled_image_array_non_uniform_indexing,
+	// 		.shaderStorageBufferArrayNonUniformIndexing =
+	// features.shader_storage_buffer_array_non_uniform_indexing,
+	// 		.shaderStorageImageArrayNonUniformIndexing =
+	// features.shader_storage_image_array_non_uniform_indexing,
+	// 		.shaderInputAttachmentArrayNonUniformIndexing =
+	// features.shader_input_attachment_array_non_uniform_indexing,
+	// 		.shaderUniformTexelBufferArrayNonUniformIndexing =
+	// features.shader_uniform_texel_buffer_array_non_uniform_indexing,
+	// 		.shaderStorageTexelBufferArrayNonUniformIndexing =
+	// features.shader_storage_texel_buffer_array_non_uniform_indexing,
+	// 		.descriptorBindingUniformBufferUpdateAfterBind =
+	// features.descriptor_binding_uniform_buffer_update_after_bind,
+	// 		.descriptorBindingSampledImageUpdateAfterBind =
+	// features.descriptor_binding_sampled_image_update_after_bind,
+	// 		.descriptorBindingStorageImageUpdateAfterBind =
+	// features.descriptor_binding_storage_image_update_after_bind,
+	// 		.descriptorBindingStorageBufferUpdateAfterBind =
+	// features.descriptor_binding_storage_buffer_update_after_bind,
+	// 		.descriptorBindingUniformTexelBufferUpdateAfterBind =
+	// features.descriptor_binding_uniform_texel_buffer_update_after_bind,
+	// 		.descriptorBindingStorageTexelBufferUpdateAfterBind =
+	// features.descriptor_binding_storage_texel_buffer_update_after_bind,
+	// 		.descriptorBindingUpdateUnusedWhilePending =
+	// features.descriptor_binding_update_unused_while_pending,
+	// .descriptorBindingPartiallyBound = features.descriptor_binding_partially_bound,
+	// .descriptorBindingVariableDescriptorCount =
+	// features.descriptor_binding_variable_descriptor_count, 		.runtimeDescriptorArray =
+	// features.runtime_descriptor_array,
+	// 		// clang-format on
+	// 	};
+	//
+	// 	// *last_p_next = &vk_descriptor_indexing_features;
+	// 	// last_p_next = &vk_descriptor_indexing_features.pNext;
+	// }
 	for (auto name : vk_extension_names)
 	{
 		log::debug("Extension name: {}", name);
 	}
 
+	auto physical_device_features = VkPhysicalDeviceFeatures {};
 	auto vk_info = VkDeviceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 		.pNext = &vk_dynamic_rendering_features,
@@ -3672,7 +3693,7 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 		.pQueueCreateInfos = vk_queue_infos.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(vk_extension_names.size()),
 		.ppEnabledExtensionNames = vk_extension_names.data(),
-		.pEnabledFeatures = &vk_features_2.features, // replaced with VkPhysicalDeviceFeatures2
+		.pEnabledFeatures = &physical_device_features,
 	};
 
 	vkc(api::create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
@@ -3682,6 +3703,7 @@ Device::~Device()
 {
 	if (m_device)
 	{
+		log::debug("Destrying device");
 		api::destroy_device(m_device, nullptr);
 	}
 }
