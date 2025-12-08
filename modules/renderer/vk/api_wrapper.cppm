@@ -61,7 +61,8 @@ namespace constants {
 constexpr auto application_version = VK_MAKE_VERSION(1, 0, 0);
 constexpr auto engine_version = VK_MAKE_VERSION(1, 0, 0);
 constexpr auto api_version = VK_API_VERSION_1_4;
-constexpr auto engine_name = std::string_view { "light_engine_vulkan_renderer" };
+constexpr auto app_name = "load_this_from_envs...";
+constexpr auto engine_name = "light_engine_vulkan_renderer";
 
 constexpr auto max_physical_device_name = VK_MAX_PHYSICAL_DEVICE_NAME_SIZE;
 constexpr auto max_memory_types = VK_MAX_MEMORY_TYPES;
@@ -101,12 +102,6 @@ namespace device_extension_names {
 
 constexpr auto swapchain = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 constexpr auto dynamic_rendering = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
-constexpr auto descriptor_indexing = VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME;
-constexpr auto depth_stencil_resolve = VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME;
-constexpr auto maintenance_3 = VK_KHR_MAINTENANCE3_EXTENSION_NAME;
-constexpr auto maintenance_2 = VK_KHR_MAINTENANCE2_EXTENSION_NAME;
-constexpr auto create_renderpass_2 = VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME;
-constexpr auto multiview = VK_KHR_MULTIVIEW_EXTENSION_NAME;
 
 
 }; // namespace device_extension_names
@@ -1170,12 +1165,16 @@ class Device
 {
 public:
 	friend class Queue;
+	friend class Memory;
+	friend class Buffer;
 	friend class Swapchain;
 	friend class Image;
 	friend class ImageView;
 	friend class Pipeline;
 	friend class Semaphore;
 	friend class Fence;
+	friend class ShaderModule;
+	friend class DescriptorSetLayout;
 
 	struct CreateInfo
 	{
@@ -1435,6 +1434,11 @@ private:
 class Buffer
 {
 public:
+	friend class Device;
+	friend class Memory;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_BUFFER;
+
 	enum UsageFlags : VkFlags
 	{
 		transfer_src_bit = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -1484,6 +1488,8 @@ public:
 		SharingMode sharing_mode;
 
 		std::vector<uint32_t> queue_family_indices;
+
+		std::string_view name;
 	};
 
 	Buffer(Device &device, CreateInfo info);
@@ -1517,6 +1523,8 @@ public:
 	friend class Device;
 
 	friend class Swapchain;
+
+	friend class ImageView;
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
 
@@ -1649,7 +1657,7 @@ private:
 		return m_image;
 	}
 
-	VkDevice m_device;
+	memory::NullOnMove<VkDevice> m_device;
 
 	VkImage m_image;
 };
@@ -1694,7 +1702,7 @@ public:
 
 		Image::Range range;
 
-		std::string_view debug_name;
+		std::string_view name;
 	};
 
 	ImageView() = default;
@@ -1709,10 +1717,7 @@ public:
 
 	auto operator=(const ImageView &) -> ImageView & = delete;
 
-	~ImageView()
-	{
-		// WIP;
-	}
+	~ImageView();
 
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkImageView
@@ -1720,7 +1725,7 @@ private:
 		return m_image_view;
 	}
 
-	VkDevice m_device;
+	memory::NullOnMove<VkDevice> m_device;
 
 	VkImageView m_image_view;
 };
@@ -1728,24 +1733,23 @@ private:
 class ShaderModule
 {
 public:
+	friend class Device;
 	friend class Pipeline;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_SHADER_MODULE;
 
 	struct CreateInfo
 	{
 		std::vector<std::byte> code;
+
+		std::string_view name;
 	};
 
 	ShaderModule() = default;
 
-	ShaderModule(Device &device, CreateInfo info)
-	{
-		// WIP
-	}
+	ShaderModule(Device &device, CreateInfo info);
 
-	~ShaderModule()
-	{
-		// WIP
-	}
+	~ShaderModule();
 
 	ShaderModule(ShaderModule &&) = default;
 
@@ -1841,14 +1845,13 @@ public:
 		Flags flags;
 
 		std::vector<Binding> bindings;
+
+		std::string_view name;
 	};
 
 	DescriptorSetLayout() = default;
 
-	DescriptorSetLayout(Device &device, CreateInfo info)
-	{
-		// WIP
-	}
+	DescriptorSetLayout(Device &device, CreateInfo info);
 
 	DescriptorSetLayout(DescriptorSetLayout &&) = default;
 
@@ -1858,15 +1861,16 @@ public:
 
 	auto operator=(const DescriptorSetLayout &) -> DescriptorSetLayout & = delete;
 
-	~DescriptorSetLayout()
-	{
-		// WIP
-	}
+	~DescriptorSetLayout();
 
 private:
+	auto get_vk_handle() -> VkDescriptorSetLayout
+	{
+		return m_descriptor_set_layout;
+	}
 	memory::NullOnMove<VkDevice> m_device;
 
-	VkDescriptorSetLayout m_layout;
+	VkDescriptorSetLayout m_descriptor_set_layout;
 };
 
 class Pipeline
@@ -2022,10 +2026,7 @@ public:
 
 	PipelineLayout() = default;
 
-	PipelineLayout(Device &device, CreateInfo info)
-	{
-		// WIP
-	}
+	PipelineLayout(Device &device, CreateInfo info);
 
 	PipelineLayout(PipelineLayout &&) = default;
 
@@ -2035,20 +2036,17 @@ public:
 
 	auto operator=(const PipelineLayout &) -> PipelineLayout & = delete;
 
-	~PipelineLayout()
-	{
-		// WIP
-	}
+	~PipelineLayout();
 
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkPipelineLayout
 	{
-		return m_layout;
+		return m_pipeline_layout;
 	}
 
 	memory::NullOnMove<VkDevice> m_device {};
 
-	VkPipelineLayout m_layout {};
+	VkPipelineLayout m_pipeline_layout {};
 };
 
 class CommandBuffer
@@ -2352,6 +2350,8 @@ public:
 		PresentMode present_mode;
 
 		Surface::Transform pre_transform;
+
+		std::string_view name;
 	};
 
 	Swapchain() = default;
@@ -2384,7 +2384,7 @@ private:
 		return &m_swapchain;
 	}
 
-	VkDevice m_device;
+	memory::NullOnMove<VkDevice> m_device;
 
 	VkSwapchainKHR m_swapchain;
 };
@@ -2472,6 +2472,8 @@ public:
 		std::size_t size;
 
 		std::uint32_t memory_type_idx;
+
+		std::string_view name;
 	};
 
 	Memory(Device &device, Buffer &buffer, AllocateInfo info);
@@ -2791,10 +2793,8 @@ void unload_library()
 void load_global_functions()
 {
 	constexpr auto load_fn = []<typename T>(T &pfn, const char *fn_name) {
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		pfn = reinterpret_cast<T>(api::get_instance_proc_address(nullptr, fn_name));
+		pfn = std::bit_cast<T>(api::get_instance_proc_address(nullptr, fn_name));
 		lt::debug::ensure(pfn, "Failed to load vulkan global function: {}", fn_name);
-		// log::trace("Loaded global function: {}", fn_name);
 	};
 
 	load_fn(api::create_instance, "vkCreateInstance");
@@ -2856,7 +2856,6 @@ void Device::load_functions()
 {
 	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
 		pfn = std::bit_cast<T>(api::get_device_proc_address(m_device, fn_name));
-		log::trace("Loading: {}", fn_name);
 		lt::debug::ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
 	};
 
@@ -2919,6 +2918,7 @@ void Device::load_functions()
 	load_fn(api::free_memory, "vkFreeMemory");
 	load_fn(api::get_buffer_memory_requirements, "vkGetBufferMemoryRequirements");
 	load_fn(api::reset_command_buffer, "vkResetCommandBuffer");
+
 	load_fn(api::cmd_begin_rendering, "vkCmdBeginRendering");
 	load_fn(api::cmd_end_rendering, "vkCmdEndRendering");
 }
@@ -2995,6 +2995,14 @@ Instance::Instance(CreateInfo info)
 		.pSettings = layer_settings.data(),
 	};
 
+	auto app_info = VkApplicationInfo {
+		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+		.applicationVersion = constants::application_version,
+		.pApplicationName = constants::engine_name,
+		.pEngineName = constants::app_name,
+		.apiVersion = constants::api_version,
+	};
+
 	auto vk_info = VkInstanceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 		.pNext = &layer_settings_create_info,
@@ -3003,6 +3011,7 @@ Instance::Instance(CreateInfo info)
 		.ppEnabledLayerNames = layer_names.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(extension_names.size()),
 		.ppEnabledExtensionNames = extension_names.data(),
+		.pApplicationInfo = &app_info,
 	};
 
 	log::debug("Extension names:");
@@ -3614,13 +3623,8 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 	};
 
 	auto vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {};
-	auto vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {};
-	vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
-		.pNext = {},
-		.dynamicRendering = true,
-	};
-	log::debug("Dynamic rendering: {}", vk_dynamic_rendering_features.dynamicRendering);
+
+	// log::debug("Dynamic rendering: {}", vk_dynamic_rendering_features.dynamicRendering);
 	// void **last_p_next = &vk_features_2.pNext;
 
 	if (info.dynamic_rendering_features)
@@ -3680,12 +3684,18 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 	// 	// *last_p_next = &vk_descriptor_indexing_features;
 	// 	// last_p_next = &vk_descriptor_indexing_features.pNext;
 	// }
-	for (auto name : vk_extension_names)
-	{
-		log::debug("Extension name: {}", name);
-	}
 
-	auto physical_device_features = VkPhysicalDeviceFeatures {};
+	auto physical_device_features = VkPhysicalDeviceFeatures {
+		.geometryShader = true,
+		.samplerAnisotropy = true,
+		.multiDrawIndirect = true,
+		.drawIndirectFirstInstance = true,
+	};
+	auto vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+		.pNext = {},
+		.dynamicRendering = true,
+	};
 	auto vk_info = VkDeviceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 		.pNext = &vk_dynamic_rendering_features,
@@ -3695,6 +3705,39 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 		.ppEnabledExtensionNames = vk_extension_names.data(),
 		.pEnabledFeatures = &physical_device_features,
 	};
+
+	log::debug("sType: VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO");
+	log::debug("*pNext (dynamic rendering features):");
+	log::debug("\tsType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES");
+	log::debug("\tdynamicRendering = {}", vk_dynamic_rendering_features.dynamicRendering);
+	log::debug("\tpNext = {}", vk_dynamic_rendering_features.pNext);
+
+	log::debug("queueCreateInfoCount: {}", static_cast<uint32_t>(vk_queue_infos.size()));
+	log::debug("*pQueueCreateInfos:");
+	for (auto &info : vk_queue_infos)
+	{
+		log::debug("\tsType: VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO");
+		log::debug("\tpNext: {}", info.pNext);
+		log::debug("\tqueueCount: {}", info.queueCount);
+		log::debug("\tqueueFamilyIndex: {}", info.queueFamilyIndex);
+		log::debug("\t*pQueuePriorities: {}", *info.pQueuePriorities);
+		log::debug("----");
+	}
+
+	log::debug("enabledExtensionCount: {}", vk_info.enabledExtensionCount);
+	for (const auto *name : vk_extension_names)
+	{
+		log::debug("\t{}", name);
+	}
+	log::debug("*pEnabledFeatures:");
+	log::debug("\t.geometryShader = {}", physical_device_features.geometryShader);
+	log::debug("\t.samplerAnisotropy = {}", physical_device_features.samplerAnisotropy);
+	log::debug("\t.multiDrawIndirect = {}", physical_device_features.multiDrawIndirect);
+	log::debug(
+	    "\t.drawIndirectFirstInstance = {}",
+	    physical_device_features.drawIndirectFirstInstance
+	);
+
 
 	vkc(api::create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
 }
@@ -4136,19 +4179,45 @@ ImageView::ImageView(Device &device, Image &image, CreateInfo info)
     : m_device(device.get_vk_handle())
     , m_image_view()
 {
-	auto vk_info = VkImageViewCreateInfo {};
+	auto vk_info = VkImageViewCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.pNext = {},
+		.image = image.get_vk_handle(),
+		.viewType = static_cast<VkImageViewType>(info.type),
+		.format = static_cast<VkFormat>(info.format),
+		.components = VkComponentMapping{
+            .r = static_cast<VkComponentSwizzle>(info.components[0]),
+            .g = static_cast<VkComponentSwizzle>(info.components[1]),
+            .b = static_cast<VkComponentSwizzle>(info.components[2]),
+            .a = static_cast<VkComponentSwizzle>(info.components[3]),
+        },
+		.subresourceRange = {
+            .aspectMask = static_cast<VkImageAspectFlags>(info.range.aspect_flags),
+            .baseMipLevel = info.range.base_mip_level,
+            .levelCount = info.range.level_count,
+            .baseArrayLayer = info.range.base_array_layer,
+            .layerCount = info.range.layer_count,
+        },
+	};
 	vkc(api::create_image_view(m_device, &vk_info, nullptr, &m_image_view));
 
-	if (info.debug_name.empty())
+	if (info.name.empty())
 	{
-		info.debug_name = "<unnamed>";
+		info.name = "<unnamed>";
 	}
+	device.name(*this, "{}", info.name);
+}
 
-	device.name(*this, "{}", info.debug_name);
+ImageView::~ImageView()
+{
+	if (m_device)
+	{
+		api::destroy_image_view(m_device, m_image_view, nullptr);
+	}
 }
 
 Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
-    : m_device(device.m_device)
+    : m_device(device.m_device.get())
     , m_swapchain()
 {
 	auto vk_info = VkSwapchainCreateInfoKHR {
@@ -4170,11 +4239,20 @@ Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
 		.oldSwapchain = nullptr,
 	};
 	vkc(api::create_swapchain_khr(m_device, &vk_info, nullptr, &m_swapchain));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
 }
 
 Swapchain::~Swapchain()
 {
-	api::destroy_swapchain_khr(m_device, m_swapchain, nullptr);
+	if (m_device)
+	{
+		api::destroy_swapchain_khr(m_device, m_swapchain, nullptr);
+	}
 }
 
 [[nodiscard]] auto Swapchain::get_images() -> std::vector<Image>
@@ -4211,10 +4289,27 @@ Swapchain::~Swapchain()
 }
 
 
-Buffer::Buffer(Device &device, CreateInfo info) {};
+Buffer::Buffer(Device &device, CreateInfo info): m_device(device.m_device.get())
+{
+	auto vk_info = VkBufferCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+		.size = info.size,
+		.usage = info.usage,
+		.sharingMode = static_cast<VkSharingMode>(info.sharing_mode),
+	};
+
+	vkc(api::create_buffer(m_device, &vk_info, nullptr, &m_buffer));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
+};
 
 Buffer::~Buffer()
 {
+	api::destroy_buffer(m_device, m_buffer, nullptr);
 }
 
 [[nodiscard]] auto Buffer::get_memory_requirements() const -> MemoryRequirements
@@ -4228,12 +4323,28 @@ Buffer::~Buffer()
 	};
 }
 
-Memory::Memory(Device &device, Buffer &buffer, AllocateInfo info)
+Memory::Memory(Device &device, Buffer &buffer, AllocateInfo info): m_device(device.m_device.get())
 {
+	auto vk_info = VkMemoryAllocateInfo {
+		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+		.pNext = {},
+		.allocationSize = info.size,
+		.memoryTypeIndex = info.memory_type_idx,
+	};
+	api::allocate_memory(m_device, &vk_info, nullptr, &m_memory);
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
+
+	vkc(api::bind_buffer_memory(m_device, buffer.get_vk_handle(), m_memory, 0u));
 }
 
 Memory::~Memory()
 {
+	api::free_memory(m_device, m_memory, nullptr);
 }
 
 [[nodiscard]] auto Memory::map(std::size_t size, std::size_t offset) -> std::span<std::byte>
@@ -4246,6 +4357,53 @@ Memory::~Memory()
 void Memory::unmap()
 {
 	api::unmap_memory(m_device, m_memory);
+}
+
+ShaderModule::ShaderModule(Device &device, CreateInfo info): m_device(device.get_vk_handle())
+{
+	auto vk_info = VkShaderModuleCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.pNext = {},
+		.flags = {},
+		.codeSize = info.code.size() / 4ul,
+		.pCode = std::bit_cast<std::uint32_t *>(info.code.data()),
+	};
+	vkc(api::create_shader_module(m_device, &vk_info, nullptr, &m_shader_module));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
+}
+
+ShaderModule::~ShaderModule()
+{
+	api::destroy_shader_module(m_device, m_shader_module, nullptr);
+}
+
+DescriptorSetLayout::DescriptorSetLayout(Device &device, CreateInfo info)
+    : m_device(device.get_vk_handle())
+{
+	auto vk_info = VkDescriptorSetLayoutCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.pNext = {},
+		.flags = {},
+		.bindingCount = static_cast<std::uint32_t>(info.bindings.size()),
+		.pBindings = std::bit_cast<VkDescriptorSetLayoutBinding *>(info.bindings.data()),
+	};
+	vkc(api::create_descriptor_set_layout(m_device, &vk_info, nullptr, &m_descriptor_set_layout));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
+}
+
+DescriptorSetLayout::~DescriptorSetLayout()
+{
+	api::destroy_descriptor_set_layout(m_device, m_descriptor_set_layout, nullptr);
 }
 
 Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
@@ -4381,6 +4539,16 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 }
 
 Pipeline::~Pipeline()
+{
+	api::destroy_pipeline(m_device, m_pipeline, nullptr);
+}
+
+
+PipelineLayout::PipelineLayout(Device &device, CreateInfo info) {
+	vkc(api::create_pipeline_layout(m_device, &vk_info, nullptr, &m_layout))
+}
+
+PipelineLayout::~PipelineLayout()
 {
 }
 

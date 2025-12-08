@@ -1,35 +1,25 @@
-#include <memory/reference.hpp>
-#include <ranges>
-#include <renderer/frontend/context/device.hpp>
-#include <renderer/frontend/context/surface.hpp>
-#include <renderer/test/utils.hpp>
-#include <surface/components.hpp>
-#include <surface/system.hpp>
-#include <test/test.hpp>
+import renderer.frontend;
+import renderer.test_utils;
 
 Suite raii = "device_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = Fixture_SurfaceGpu {};
-		std::ignore = lt::renderer::IDevice::create(
-		    constants::api,
-		    fixture.gpu(),
-		    fixture.surface()
-		);
+		std::ignore = lt::renderer::create_device(constants::api, fixture.gpu(), fixture.surface());
 	};
 
 	Case { "unhappy path throws" } = [] {
 		auto fixture = Fixture_SurfaceGpu {};
 
 		expect_throw([&] {
-			ignore = lt::renderer::IDevice::create(constants::api, nullptr, fixture.surface());
+			ignore = lt::renderer::create_device(constants::api, nullptr, fixture.surface());
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IDevice::create(constants::api, fixture.gpu(), nullptr);
+			ignore = lt::renderer::create_device(constants::api, fixture.gpu(), nullptr);
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IDevice::create(
+			ignore = lt::renderer::create_device(
 			    lt::renderer::Api::none,
 			    fixture.gpu(),
 			    fixture.surface()
@@ -37,7 +27,7 @@ Suite raii = "device_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IDevice::create(
+			ignore = lt::renderer::create_device(
 			    lt::renderer::Api::direct_x,
 			    fixture.gpu(),
 			    fixture.surface()
@@ -45,7 +35,7 @@ Suite raii = "device_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IDevice::create(
+			ignore = lt::renderer::create_device(
 			    lt::renderer::Api::metal,
 			    fixture.gpu(),
 			    fixture.surface()

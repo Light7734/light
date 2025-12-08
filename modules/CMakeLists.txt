@@ -1,12 +1,8 @@
-add_module(
-    NAME logger INTERFACES logger.cppm TESTS logger.test.cpp
-)
+add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp)
 add_module(NAME bitwise INTERFACES operations.cppm)
 add_module(NAME env INTERFACES constants.cppm)
-add_module(
-    NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
-)
-add_module(NAME time INTERFACES timer.cppm)
+add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm)
+add_module(NAME time INTERFACES timer.cppm TESTS timer.test.cpp)
 
 add_module(
     NAME
@@ -19,6 +15,8 @@ add_module(
     entrypoint.cpp
     DEPENDENCIES
     logger
+    TESTS
+    test.test.cpp
 )
 
 add_module(
@@ -55,19 +53,25 @@ add_module(
     DEPENDENCIES
     logger
     lt_debug
+    TESTS
+    shader.test.cpp
 )
 
 add_module(
     NAME
-    libasset_baker
+    asset_baker
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/asset_baker
     INTERFACES
     bakers.cppm
+    ENTRYPOINT
+    entrypoint.cpp
     DEPENDENCIES
     assets
     logger
     lt_debug
+    TESTS
+    bakers.test.cpp
 )
 
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
@@ -98,7 +102,12 @@ add_module(
     logger
     lt_debug
     memory
+    TESTS
+    registry.test.cpp
+    sparse_set.test.cpp
 )
+
+add_module(NAME input_codes INTERFACES input_codes.cppm)
 
 if(WIN32)
     add_module(
@@ -117,6 +126,7 @@ if(WIN32)
         app
         math
         memory
+        input_codes
         PRIVATE_DEPENDENCIES
         logger
         lt_debug
@@ -140,11 +150,14 @@ elseif(UNIX)
         app
         math
         memory
+        input_codes
         PRIVATE_DEPENDENCIES
         X11
         logger
         lt_debug
         time
+        TESTS
+        system.test.cpp
     )
 
 else()
@@ -157,13 +170,15 @@ add_module(
     input
     INTERFACES
     system.cppm
-    codes.cppm
     components.cppm
     events.cppm
     DEPENDENCIES
+    input_codes
     surface
     math
     logger
+    TESTS
+    system.test.cpp
 )
 
 find_package(Vulkan REQUIRED)
@@ -199,6 +214,14 @@ add_module(
     Vulkan::Vulkan
     PRIVATE_DEPENDENCIES
     surface
+    TESTS
+    _tests/buffer.cpp
+    _tests/debugger.cpp
+    _tests/device.cpp
+    _tests/pass.cpp
+    TEST_INTERFACES
+    _tests/utils.cppm
+    # _tests/renderer.cpp _tests/surface.cpp _tests/system.cpp
 )
 
 add_module(
@@ -216,22 +239,20 @@ add_module(
     surface
     renderer
     camera
-    # TESTS
-    # system.test.cpp
+    # TESTS system.test.cpp
 )
 
-add_executable(exectest ${CMAKE_CURRENT_SOURCE_DIR}/mirror/entrypoint.cpp
-)
+add_executable(exectest ${CMAKE_CURRENT_SOURCE_DIR}/mirror/entrypoint.cpp)
 
-target_link_libraries(exectest PRIVATE
-
-    mirror
-    app
-    time
-    input
-    surface
-    renderer
-    camera
+target_link_libraries(
+    exectest
+    PRIVATE mirror
+            app
+            time
+            input
+            surface
+            renderer
+            camera
 )
 
 # add_executable_module(mirror entrypoint/mirror.cpp)

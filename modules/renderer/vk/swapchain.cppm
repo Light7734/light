@@ -103,10 +103,10 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	        .queue_family_indices = m_device->get_family_indices(),
 	        .present_mode = vk::Swapchain::PresentMode::immediate,
 	        .pre_transform = capabilities.current_transform,
+	        .name = std::format("swapchain {}", idx++),
 	    }
 	);
 	m_resolution = capabilities.current_extent;
-	m_device->vk().name(m_swapchain, "swapchain {}", idx++);
 	m_device->vk().wait_idle();
 
 	m_images = m_swapchain.get_images();
@@ -133,7 +133,7 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 		            .layer_count = 1u,
                 },
 
-                .debug_name = std::format("swapchain image {}", idx++),
+                .name = std::format("swapchain image view {}", idx++),
 		        },
 		    }
 		);

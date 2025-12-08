@@ -1,46 +1,27 @@
-#include <assets/shader.hpp>
-#include <renderer/frontend/messenger.hpp>
-#include <renderer/frontend/renderer/pass.hpp>
-#include <renderer/test/utils.hpp>
-
-using ::lt::renderer::IMessenger;
+import renderer.frontend;
+import renderer.test_utils;
 
 Suite raii = "pass_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
-		Fixture_ auto fixture = Fixture_RendererSystem {};
-		auto &system = fixture.renderer_system();
-
-		std::ignore = lt::renderer::IPass::create(
+		auto fixture = FixtureDeviceSwapchain {};
+		std::ignore = lt::renderer::create_pass(
 		    constants::api,
-		    system.get_device(),
-		    system.get_swapchain(),
+		    fixture.device(),
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 		);
 
-		expect_false(fixture.has_any_messages_of(IMessenger ::MessageSeverity::error));
-		expect_false(fixture.has_any_messages_of(IMessenger ::MessageSeverity::warning));
+		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::error));
+		expect_false(
+		    fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::warning)
+		);
 	};
 
 	Case { "unhappy path throws" } = [] {
-		auto fixture = Fixture_RendererSystem {};
-		auto &system = fixture.renderer_system();
-
+		auto fixture = FixtureDeviceSwapchain {};
 		expect_throw([&] {
-			std::ignore = lt::renderer::IPass::create(
+			std::ignore = lt::renderer::create_pass(
 			    constants::api,
-			    nullptr,
-			    system.get_swapchain(),
-			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
-			    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
-			);
-		});
-
-
-		expect_throw([&] {
-			std::ignore = lt::renderer::IPass::create(
-			    constants::api,
-			    system.get_device(),
 			    nullptr,
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
@@ -48,30 +29,27 @@ Suite raii = "pass_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::IPass::create(
+			std::ignore = lt::renderer::create_pass(
 			    lt::renderer::Api::none,
-			    system.get_device(),
-			    system.get_swapchain(),
+			    fixture.device(),
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 			);
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::IPass::create(
+			std::ignore = lt::renderer::create_pass(
 			    lt::renderer::Api::direct_x,
-			    system.get_device(),
-			    system.get_swapchain(),
+			    fixture.device(),
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 			);
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::IPass::create(
+			std::ignore = lt::renderer::create_pass(
 			    lt::renderer::Api::metal,
-			    system.get_device(),
-			    system.get_swapchain(),
+			    fixture.device(),
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 			);

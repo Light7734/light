@@ -156,7 +156,7 @@ void System::on_surface_lost_focus()
 
 void System::on_key_press(const lt::surface::KeyPressedEvent &event)
 {
-	if (event.get_key() > m_keys.size())
+	if (std::to_underlying(event.get_key()) > m_keys.size())
 	{
 		log::debug("Key code larger than key container size, implement platform-dependant "
 		           "key-code-mapping!");
@@ -164,12 +164,12 @@ void System::on_key_press(const lt::surface::KeyPressedEvent &event)
 		return;
 	}
 
-	m_keys[event.get_key()] = true;
+	m_keys[std::to_underlying(event.get_key())] = true;
 }
 
 void System::on_key_release(const lt::surface::KeyReleasedEvent &event)
 {
-	if (event.get_key() > m_keys.size())
+	if (std::to_underlying(event.get_key()) > m_keys.size())
 	{
 		log::debug("Key code larger than key container size, implement platform-dependant "
 		           "key-code-mapping!");
@@ -177,7 +177,7 @@ void System::on_key_release(const lt::surface::KeyReleasedEvent &event)
 		return;
 	}
 
-	m_keys[event.get_key()] = false;
+	m_keys[std::to_underlying(event.get_key())] = false;
 }
 
 void System::on_pointer_move(const lt::surface::MouseMovedEvent &event)
@@ -187,12 +187,12 @@ void System::on_pointer_move(const lt::surface::MouseMovedEvent &event)
 
 void System::on_button_press(const lt::surface::ButtonPressedEvent &event)
 {
-	m_buttons[event.get_button()] = true;
+	m_buttons[std::to_underlying(event.get_button())] = true;
 }
 
 void System::on_button_release(const lt::surface::ButtonReleasedEvent &event)
 {
-	m_buttons[event.get_button()] = false;
+	m_buttons[std::to_underlying(event.get_button())] = false;
 }
 
 } // namespace lt::input

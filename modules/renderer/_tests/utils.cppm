@@ -172,7 +172,7 @@ private:
 	{
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
-		lt::log::error("vulkan: {}", data.message);
+		lt::log::debug("vulkan: {}", data.message);
 		std::ignore = data;
 		std::ignore = type;
 
@@ -219,6 +219,10 @@ public:
 	[[nodiscard]] auto renderer_system() -> lt::renderer::System &
 	{
 		return m_system;
+	}
+
+	auto device() -> lt::renderer::IDevice &
+	{
 	}
 
 	[[nodiscard]] auto has_any_messages() const -> bool

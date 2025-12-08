@@ -1,11 +1,17 @@
-#include <ecs/entity.hpp>
-#include <input/components.hpp>
-#include <input/system.hpp>
-#include <memory/reference.hpp>
-#include <memory/scope.hpp>
-#include <ranges>
-#include <surface/system.hpp>
-#include <test/test.hpp>
+import std;
+import input.system;
+import input.codes;
+import std;
+import test.test;
+import test.expects;
+import surface.events;
+import memory.scope;
+import memory.reference;
+import app.system;
+import ecs.entity;
+import ecs.registry;
+import surface.system;
+
 
 // NOLINTBEGIN
 using namespace lt;
@@ -17,6 +23,7 @@ using test::expect_eq;
 using test::expect_false;
 using test::expect_ne;
 using test::expect_not_nullptr;
+using test::operator""_suite;
 using test::expect_throw;
 using test::Suite;
 // NOLINTEND
@@ -155,7 +162,7 @@ Suite tick = "tick"_suite = [] {
 		auto action_key = input.add_action(
 		    {
 		        .name { "test" },
-		        .trigger = { .mapped_keycode = 69 },
+		        .trigger = { .mapped_keycode = Key::A },
 		    }
 		);
 
@@ -163,7 +170,7 @@ Suite tick = "tick"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
 
-		surface.push_event(surface::KeyPressedEvent(69));
+		surface.push_event(surface::KeyPressedEvent(Key::A));
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::triggered);
 
@@ -175,7 +182,7 @@ Suite tick = "tick"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
 
-		surface.push_event(surface::KeyReleasedEvent(69));
+		surface.push_event(surface::KeyReleasedEvent(Key::A));
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
 	};
@@ -195,7 +202,7 @@ Suite tick = "tick"_suite = [] {
 		auto action_key = input.add_action(
 		    {
 		        .name { "test" },
-		        .trigger = { .mapped_keycode = 69 },
+		        .trigger = { .mapped_keycode = Key::A },
 		    }
 		);
 	};

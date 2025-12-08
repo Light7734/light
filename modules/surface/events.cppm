@@ -1,4 +1,5 @@
 export module surface.events;
+import input.codes;
 import math.vec2;
 import std;
 
@@ -7,85 +8,85 @@ export namespace lt::surface {
 class KeyPressedEvent
 {
 public:
-	KeyPressedEvent(std::uint32_t key): m_key(key)
+	KeyPressedEvent(Key key): m_key(key)
 	{
 	}
 
-	[[nodiscard]] auto get_key() const -> std::uint32_t
+	[[nodiscard]] auto get_key() const -> Key
 	{
 		return m_key;
 	}
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("KeyPressed: {}", m_key);
+		return std::format("KeyPressed: {}", std::to_underlying(m_key));
 	}
 
 private:
-	std::uint32_t m_key;
+	Key m_key;
 };
 
 class KeyRepeatEvent
 {
 public:
-	KeyRepeatEvent(std::int32_t key): m_key(key)
+	KeyRepeatEvent(Key key): m_key(key)
 	{
 	}
 
-	[[nodiscard]] auto get_key() const -> std::uint32_t
+	[[nodiscard]] auto get_key() const -> Key
 	{
 		return m_key;
 	}
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("KeyRepeated: {}", m_key);
+		return std::format("KeyRepeated: {}", std::to_underlying(m_key));
 	}
 
 private:
-	std::uint32_t m_key;
+	Key m_key;
 };
 
 class KeyReleasedEvent
 {
 public:
-	KeyReleasedEvent(std::uint32_t key): m_key(key)
+	KeyReleasedEvent(Key key): m_key(key)
 	{
 	}
 
-	[[nodiscard]] auto get_key() const -> std::uint32_t
+	[[nodiscard]] auto get_key() const -> Key
 	{
 		return m_key;
 	}
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("KeyReleased: {}", m_key);
+		return std::format("KeyReleased: {}", std::to_underlying(m_key));
 	}
 
 private:
-	std::uint32_t m_key;
+	Key m_key;
 };
 
 class KeySetCharEvent
 {
 public:
-	KeySetCharEvent(std::uint32_t character): m_character(character)
+	KeySetCharEvent(Key character): m_character(character)
 	{
 	}
 
-	[[nodiscard]] auto get_character() const -> std::uint32_t
+	[[nodiscard]] auto get_character() const -> Key
 	{
 		return m_character;
 	}
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("KeyCharSet: {}", m_character);
+		return std::format("KeyCharSet: {}", std::to_underlying(m_character));
 	}
 
 private:
-	std::uint32_t m_character;
+	Key m_character;
 };
 
 class MouseMovedEvent
@@ -145,43 +146,43 @@ private:
 class ButtonPressedEvent
 {
 public:
-	ButtonPressedEvent(std::int32_t button): m_button(button)
+	ButtonPressedEvent(Key button): m_button(button)
 	{
 	}
 
-	[[nodiscard]] auto get_button() const -> std::int32_t
+	[[nodiscard]] auto get_button() const -> Key
 	{
 		return m_button;
 	}
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("ButtonPressed: {}", m_button);
+		return std::format("ButtonPressed: {}", std::to_underlying(m_button));
 	}
 
 private:
-	std::int32_t m_button;
+	Key m_button;
 };
 
 class ButtonReleasedEvent
 {
 public:
-	ButtonReleasedEvent(std::int32_t button): m_button(button)
+	ButtonReleasedEvent(Key button): m_button(button)
 	{
 	}
 
-	[[nodiscard]] auto get_button() const -> std::int32_t
+	[[nodiscard]] auto get_button() const -> Key
 	{
 		return m_button;
 	}
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("ButtonReleased: {}", m_button);
+		return std::format("ButtonReleased: {}", std::to_underlying(m_button));
 	}
 
 private:
-	std::int32_t m_button;
+	Key m_button;
 };
 
 class ClosedEvent
@@ -207,9 +208,7 @@ public:
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		auto stream = std::stringstream {};
-		stream << "WindwoMoved: " << m_position.x << ", " << m_position.y;
-		return stream.str();
+		return std::format("WindowMoved: {}, {}", m_position.x, m_position.y);
 	}
 
 private:
@@ -230,9 +229,7 @@ public:
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		auto stream = std::stringstream {};
-		stream << "SurfaceResized: " << m_size.x << ", " << m_size.y;
-		return stream.str();
+		return std::format("SurfaceResized: {}, {}", m_size.x, m_size.y);
 	}
 
 private:

@@ -13,6 +13,7 @@ import logger;
 import ecs.registry;
 import time;
 import std;
+import input.codes;
 
 namespace lt::surface {
 
@@ -226,26 +227,22 @@ void System::handle_events(SurfaceComponent &surface)
 		{
 		case KeyPress:
 		{
-			queue.emplace_back<KeyPressedEvent>(
-			    static_cast<std::uint32_t>(XLookupKeysym(&event.xkey, 0))
-			);
+			queue.emplace_back<KeyPressedEvent>(static_cast<Key>(XLookupKeysym(&event.xkey, 0)));
 			break;
 		}
 		case KeyRelease:
 		{
-			queue.emplace_back<KeyReleasedEvent>(
-			    static_cast<std::uint32_t>(XLookupKeysym(&event.xkey, 0))
-			);
+			queue.emplace_back<KeyReleasedEvent>(static_cast<Key>(XLookupKeysym(&event.xkey, 0)));
 			break;
 		}
 		case ButtonPress:
 		{
-			queue.emplace_back<ButtonPressedEvent>(static_cast<int>(event.xbutton.button));
+			queue.emplace_back<ButtonPressedEvent>(static_cast<Key>(event.xbutton.button));
 			break;
 		}
 		case ButtonRelease:
 		{
-			queue.emplace_back<ButtonReleasedEvent>(static_cast<int>(event.xbutton.button));
+			queue.emplace_back<ButtonReleasedEvent>(static_cast<Key>(event.xbutton.button));
 			break;
 		}
 		case FocusIn:
