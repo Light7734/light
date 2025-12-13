@@ -49,8 +49,8 @@ find ./build/modules -type f -name "*.profraw" -exec rm -fv {} +
 LLVM_COV_SHOW=$(
     llvm-cov show \
         -instr-profile='./build/coverage/merged.profdata' \
-        "$(find ./build -type f -name '*_tests' -executable -exec printf -- '-o %s ' {} \;)" \
-        "$(find ./build -type f -name '*\.a' -exec printf -- '-o %s ' {} \;)" \
+        "$(find ./build -type f -name '*_tests' -executable -exec printf -- '--object=%s ' {} \;)" \
+        "$(find ./build -type f -name '*\.a' -exec printf -- '--object=%s ' {} \;)" \
         -ignore-filename-regex='\.test\.cpp$' \
         -ignore-filename-regex='\.fuzz\.cpp$'
 )
