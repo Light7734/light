@@ -25,9 +25,14 @@ public:
 		return m_pipeline;
 	}
 
-	[[nodiscard]] auto get_layout() -> vk::PipelineLayout &
+	[[nodiscard]] auto get_pipeline_layout() -> vk::PipelineLayout &
 	{
 		return m_layout;
+	}
+
+	[[nodiscard]] auto get_descriptor_set_layout() -> vk::DescriptorSetLayout &
+	{
+		return m_descriptor_set_layout;
 	}
 
 private:
@@ -51,60 +56,30 @@ module :private;
 using namespace ::lt::renderer::vkb;
 using namespace ::lt::renderer;
 
+using enum vk::DescriptorSetLayout::Binding::FlagBits;
+
 Pass::Pass(
     IDevice *device,
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
 )
     : m_device(static_cast<Device *>(device))
-
+      , m_descriptor_set_layout(m_device->vk(),{
+        .flags = vk::DescriptorSetLayout::CreateInfo::FlagBits::update_after_bind_pool,
+        .bindings = { 
+        {
+            .flags = partially_bound | update_after_bind | update_unused_while_pending,
+            .idx = 0u,
+            .count = 1'000u,
+            .type = vk::DescriptorSet::Type::storage_buffer,
+            .shader_stages = vk::ShaderStageFlags::vertex_bit,
+        },
+    }}),
+	m_layout(vk::PipelineLayout(m_device->vk(),{
+        .descriptor_set_layouts = { &m_descriptor_set_layout },
+        .push_constant_ranges = { {  vk::ShaderStageFlags::vertex_bit,  0u,  sizeof(FrameConstants) } }
+    }))
 {
-	using enum vk::DescriptorSetLayout::Binding::FlagBits;
-	auto bindings = std::vector<vk::DescriptorSetLayout::Binding> {
-		{
-		    .flags = variable_descriptor_count | partially_bound | update_after_bind
-		             | update_unused_while_pending,
-		    .idx = 0u,
-		    .count = 1'000u,
-		    .type = vk::DescriptorSet::Type::storage_buffer,
-		    .shader_stages = vk::ShaderStageFlags::vertex_bit,
-		},
-	};
-
-	using enum vk::DescriptorSetLayout::CreateInfo::FlagBits;
-	m_descriptor_set_layout = vk::DescriptorSetLayout(
-	    m_device->vk(),
-	    vk::DescriptorSetLayout::CreateInfo {
-	        .flags = update_after_bind_pool,
-	        .bindings = { 
-                vk::DescriptorSetLayout::Binding {
-                    .flags = variable_descriptor_count | partially_bound | update_after_bind | update_unused_while_pending,
-                    .idx = 0u,
-                    .count = 1'000u,
-                    .type = vk::DescriptorSet::Type::storage_buffer,
-                    .shader_stages = vk::ShaderStageFlags::vertex_bit,
-                },
-            },
-	    }
-	);
-
-	auto push_constant_ranges = std::vector<vk::PipelineLayout::PushConstantRange> {
-		{
-		    .shader_stages = vk::ShaderStageFlags::vertex_bit,
-		    .offset = 0u,
-		    .size = sizeof(FrameConstants),
-		},
-	};
-	m_layout = vk::PipelineLayout(
-	    m_device->vk(),
-	    vk::PipelineLayout::CreateInfo {
-            .descriptor_set_layouts = {
-                &m_descriptor_set_layout,
-            },
-            .push_constant_ranges = push_constant_ranges,
-	    }
-	);
-
 	// auto pool_size = VkDescriptorPoolSize {
 	// 	.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 	// 	.descriptorCount = descriptor_count,
@@ -135,7 +110,6 @@ Pass::Pass(
 	//     }
 	// );
 
-
 	auto shaders = std::vector<std::pair<vk::ShaderModule, vk::ShaderStageFlags::T>> {};
 	shaders.emplace_back(
 	    vk::ShaderModule(
@@ -162,7 +136,7 @@ Pass::Pass(
 	    vk::Pipeline::CreateInfo {
 	        .shaders = std::move(shaders),
 	        .input_assembly_state = {
-                .topology = vk::PrimitiveTopology::triangle_list,
+                .topology = vk::PrimitiveTopology::triangle_strip,
                 .primitive_restart_enabled = true,
             },
 	        .viewport_state = {

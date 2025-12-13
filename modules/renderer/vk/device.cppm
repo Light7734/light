@@ -100,9 +100,15 @@ void Device::initialize_logical_device()
             .extensions = {
                 vk::device_extension_names::swapchain,
                 vk::device_extension_names::dynamic_rendering,
+                vk::device_extension_names::descriptor_indexing,
             },
 
-            .features = {},
+            .features = {
+                .geometry_shader = true,
+                .sampler_anisotropy = true,
+                .multi_draw_indirect = true,
+                .draw_indirect_first_instance = true,
+            },
 
             .dynamic_rendering_features = m_gpu->vk().get_supported_dynamic_rendering_features(),
 

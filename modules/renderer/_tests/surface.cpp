@@ -1,22 +1,13 @@
-#include <logger/logger.hpp>
-#include <memory/reference.hpp>
-#include <renderer/frontend/context/instance.hpp>
-#include <renderer/frontend/context/surface.hpp>
-#include <renderer/test/utils.hpp>
-#include <surface/components.hpp>
-#include <surface/system.hpp>
-#include <test/test.hpp>
-
-using ::lt::ecs::EntityId;
-using ::lt::ecs::Registry;
+import renderer.frontend;
+import renderer.test_utils;
 
 Suite raii = "surface"_suite = [] {
 	Case { "happy path won't throw" } = [&] {
 		auto fixture = Fixture_SurfaceSystem {};
 
-		const auto surface = lt::renderer::ISurface::create(
+		const auto surface = lt::renderer::create_surface(
 		    constants::api,
-		    lt::renderer::IInstance::get(constants::api),
+		    lt::renderer::get_instance(constants::api),
 		    fixture.surface_entity()
 		);
 
@@ -31,9 +22,9 @@ Suite raii = "surface"_suite = [] {
 		auto system = lt::surface::System(registry);
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::ISurface::create(
+			std::ignore = lt::renderer::create_surface(
 			    constants::api,
-			    lt::renderer::IInstance::get(constants::api),
+			    lt::renderer::get_instance(constants::api),
 			    entity
 			);
 		});
@@ -47,42 +38,38 @@ Suite raii = "surface"_suite = [] {
 		);
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::ISurface::create(constants::api, nullptr, entity);
+			std::ignore = lt::renderer::create_surface(constants::api, nullptr, entity);
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::ISurface::create(
+			std::ignore = lt::renderer::create_surface(
 			    lt::renderer::Api::none,
-			    lt::renderer::IInstance::get(constants::api),
+			    lt::renderer::get_instance(constants::api),
 			    entity
 			);
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::ISurface::create(
+			std::ignore = lt::renderer::create_surface(
 			    lt::renderer::Api::direct_x,
-			    lt::renderer::IInstance::get(constants::api),
+			    lt::renderer::get_instance(constants::api),
 			    entity
 			);
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::ISurface::create(
+			std::ignore = lt::renderer::create_surface(
 			    lt::renderer::Api::metal,
-			    lt::renderer::IInstance::get(constants::api),
+			    lt::renderer::get_instance(constants::api),
 			    entity
 			);
 		});
 
 		// Ensure base creation info is non-throwing
-		std::ignore = lt::renderer::ISurface::create(
+		std::ignore = lt::renderer::create_surface(
 		    constants::api,
-		    lt::renderer::IInstance::get(constants::api),
+		    lt::renderer::get_instance(constants::api),
 		    entity
 		);
-	};
-
-	// TODO(Light): add torture tests
-	Case { "torture tests" } = [] {
 	};
 };

@@ -1,16 +1,20 @@
-#include <memory/reference.hpp>
-#include <renderer/frontend/renderer/renderer.hpp>
-#include <renderer/test/utils.hpp>
+import renderer.frontend;
+import renderer.test_utils;
 
 Suite raii = "renderer_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
-		ignore = lt::renderer::IRenderer::create(
+		ignore = lt::renderer::create_renderer(
 		    constants::api,
 		    fixture.gpu(),
 		    fixture.device(),
 		    fixture.swapchain(),
 		    constants::frames_in_flight
+		);
+
+		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::error));
+		expect_false(
+		    fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::warning)
 		);
 	};
 
@@ -18,7 +22,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 
 		expect_throw([&] {
-			ignore = lt::renderer::IRenderer::create(
+			ignore = lt::renderer::create_renderer(
 			    constants::api,
 			    nullptr,
 			    fixture.device(),
@@ -28,7 +32,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IRenderer::create(
+			ignore = lt::renderer::create_renderer(
 			    constants::api,
 			    fixture.gpu(),
 			    nullptr,
@@ -38,7 +42,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IRenderer::create(
+			ignore = lt::renderer::create_renderer(
 			    constants::api,
 			    fixture.gpu(),
 			    fixture.device(),
@@ -48,7 +52,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IRenderer::create(
+			ignore = lt::renderer::create_renderer(
 			    constants::api,
 			    fixture.gpu(),
 			    fixture.device(),
@@ -58,7 +62,7 @@ Suite raii = "renderer_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			ignore = lt::renderer::IRenderer::create(
+			ignore = lt::renderer::create_renderer(
 			    constants::api,
 			    fixture.gpu(),
 			    fixture.device(),
@@ -74,7 +78,7 @@ Suite draw = "renderer_draw"_suite = [] {
 
 	Case { "renderer draw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
-		auto renderer = lt::renderer::IRenderer::create(
+		auto renderer = lt::renderer::create_renderer(
 		    constants::api,
 		    fixture.gpu(),
 		    fixture.device(),
@@ -86,11 +90,16 @@ Suite draw = "renderer_draw"_suite = [] {
 		{
 			expect_eq(renderer->frame(frame_idx % constants::frames_in_flight, [] {}), success);
 		}
+
+		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::error));
+		expect_false(
+		    fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::warning)
+		);
 	};
 
 	Case { "post swapchain replacement renderer draw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
-		auto renderer = lt::renderer::IRenderer::create(
+		auto renderer = lt::renderer::create_renderer(
 		    constants::api,
 		    fixture.gpu(),
 		    fixture.device(),
@@ -109,5 +118,10 @@ Suite draw = "renderer_draw"_suite = [] {
 		{
 			expect_eq(renderer->frame(frame_idx % constants::frames_in_flight, [] {}), success);
 		}
+
+		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::error));
+		expect_false(
+		    fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::warning)
+		);
 	};
 };

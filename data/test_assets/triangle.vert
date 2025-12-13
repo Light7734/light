@@ -1,25 +1,26 @@
 #version 450 core
 
-layout(push_constant ) uniform pc {
-mat4 view_projection;
+layout(push_constant) uniform pc {
+    mat4 view_projection;
 };
 
-vec3 positions[3] = vec3[](
-    vec3(0.0, -0.5, 0.5),
-    vec3(0.5, 0.5, 0.5),
-    vec3(-0.5, 0.5, 0.5)
-);
+struct VertexData
+{
+    vec3 position;
+    vec3 color;
+};
 
-vec3 colors[3] = vec3[](
-    vec3(0.0, 0.0, 0.0),
-    vec3(0.0, 0.0, 0.0),
-    vec3(0.0, 0.0, 0.0)
-);
+layout(std140, set = 0, binding = 0) readonly buffer Vertices {
+
+	VertexData vertices[];
+} ssbo_vertices;
 
 layout(location = 0) out vec3 out_frag_color;
 
 void main() 
 {
-    gl_Position = view_projection * vec4(positions[gl_VertexIndex], 1.0);
-    out_frag_color = colors[gl_VertexIndex];
+    VertexData vertex = ssbo_vertices.vertices[gl_VertexIndex];
+
+    gl_Position = view_projection * vec4(vertex.position, 1.0);
+    out_frag_color = vertex.color;
 }

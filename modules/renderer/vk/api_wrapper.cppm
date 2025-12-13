@@ -102,7 +102,7 @@ namespace device_extension_names {
 
 constexpr auto swapchain = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 constexpr auto dynamic_rendering = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
-
+constexpr auto descriptor_indexing = VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME;
 
 }; // namespace device_extension_names
 
@@ -688,6 +688,24 @@ enum class Format : std::underlying_type_t<VkFormat>
 
 };
 
+struct Viewport
+{
+	math::vec2 origin;
+
+	math::vec2 extent;
+
+	float min_depth {};
+
+	float max_depth {};
+};
+
+struct Rect2d
+{
+	math::ivec2 offset;
+
+	math::uvec2 extent;
+};
+
 /** There is no global state in Vulkan and all per-application state is stored in a VkInstance
  * object. Creating a VkInstance object initializes the Vulkan library and allows the application to
  * pass information about itself to the implementation.
@@ -842,12 +860,12 @@ public:
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkSurfaceKHR
 	{
-		return m_surface.get();
+		return m_surface;
 	}
 
-	memory::NullOnMove<VkSurfaceKHR> m_surface {};
+	memory::NullOnMove<VkInstance> m_instance {};
 
-	VkInstance m_instance {};
+	VkSurfaceKHR m_surface {};
 };
 
 class Gpu
@@ -1175,6 +1193,9 @@ public:
 	friend class Fence;
 	friend class ShaderModule;
 	friend class DescriptorSetLayout;
+	friend class PipelineLayout;
+	friend class CommandPool;
+	friend class DescriptorPool;
 
 	struct CreateInfo
 	{
@@ -1436,6 +1457,7 @@ class Buffer
 public:
 	friend class Device;
 	friend class Memory;
+	friend class CommandBuffer;
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_BUFFER;
 
@@ -1521,10 +1543,9 @@ class Image
 {
 public:
 	friend class Device;
-
 	friend class Swapchain;
-
 	friend class ImageView;
+	friend class CommandBuffer;
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
 
@@ -1666,6 +1687,7 @@ class ImageView
 {
 public:
 	friend class Device;
+	friend class CommandBuffer;
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
 
@@ -1770,13 +1792,13 @@ private:
 	VkShaderModule m_shader_module {};
 };
 
-class DescriptorPool
-{
-};
-
 class DescriptorSet
 {
 public:
+	friend class Device;
+	friend class DescriptorPool;
+	friend class CommandBuffer;
+
 	enum class Type : std::underlying_type_t<VkDescriptorType>
 	{
 		sampler = VK_DESCRIPTOR_TYPE_SAMPLER,
@@ -1800,11 +1822,42 @@ public:
 		partitioned_acceleration_structure_nv
 		= VK_DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV,
 	};
+
+	DescriptorSet() = default;
+
+	DescriptorSet(DescriptorSet &&) = default;
+
+	DescriptorSet(const DescriptorSet &) = delete;
+
+	auto operator=(DescriptorSet &&) -> DescriptorSet & = default;
+
+	auto operator=(const DescriptorSet &) -> DescriptorSet & = delete;
+
+	~DescriptorSet() = default;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkDescriptorSet
+	{
+		return m_descriptor_set;
+	}
+
+	[[nodiscard]] auto get_vk_handle_addr() -> VkDescriptorSet *
+	{
+		return &m_descriptor_set;
+	}
+
+	DescriptorSet(VkDescriptorSet descriptor_set);
+
+	VkDescriptorSet m_descriptor_set {};
 };
 
 class DescriptorSetLayout
 {
 public:
+	friend class Device;
+	friend class PipelineLayout;
+	friend class DescriptorPool;
+
 	static constexpr auto object_type = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
 
 	struct Binding
@@ -1864,18 +1917,77 @@ public:
 	~DescriptorSetLayout();
 
 private:
-	auto get_vk_handle() -> VkDescriptorSetLayout
+	[[nodiscard]] auto get_vk_handle() -> VkDescriptorSetLayout
 	{
 		return m_descriptor_set_layout;
 	}
-	memory::NullOnMove<VkDevice> m_device;
 
-	VkDescriptorSetLayout m_descriptor_set_layout;
+	[[nodiscard]] auto get_vk_handle_addr() -> VkDescriptorSetLayout *
+	{
+		return &m_descriptor_set_layout;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkDescriptorSetLayout m_descriptor_set_layout {};
+};
+
+class DescriptorPool
+{
+public:
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_DESCRIPTOR_POOL;
+
+	struct Size
+	{
+		DescriptorSet::Type type;
+
+		std::uint32_t count;
+	};
+
+	struct CreateInfo
+	{
+		std::vector<Size> sizes;
+
+		std::uint32_t max_sets;
+
+		std::string_view name;
+	};
+
+	DescriptorPool() = default;
+
+	DescriptorPool(Device &device, CreateInfo info);
+
+	DescriptorPool(DescriptorPool &&) = default;
+
+	DescriptorPool(const DescriptorPool &) = delete;
+
+	auto operator=(DescriptorPool &&) -> DescriptorPool & = default;
+
+	auto operator=(const DescriptorPool &) -> DescriptorPool & = delete;
+
+	~DescriptorPool();
+
+	[[nodiscard]] auto allocate(DescriptorSetLayout &layout) -> DescriptorSet;
+
+private:
+	[[nodiscard]] auto get_vk_handle() -> VkDescriptorPool
+	{
+		return m_descriptor_pool;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
+
+	VkDescriptorPool m_descriptor_pool {};
 };
 
 class Pipeline
 {
 public:
+	friend class Device;
+	friend class CommandBuffer;
+
 	static constexpr auto object_type = VK_OBJECT_TYPE_PIPELINE;
 
 	enum class BindPoint : std::underlying_type_t<VkPipelineBindPoint>
@@ -1998,6 +2110,11 @@ public:
 	~Pipeline();
 
 private:
+	[[nodiscard]] auto get_vk_handle() -> VkPipeline
+	{
+		return m_pipeline;
+	}
+
 	memory::NullOnMove<VkDevice> m_device {};
 
 	VkPipeline m_pipeline {};
@@ -2007,6 +2124,8 @@ class PipelineLayout
 {
 public:
 	friend class Pipeline;
+	friend class Device;
+	friend class CommandBuffer;
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 
@@ -2022,6 +2141,8 @@ public:
 		std::vector<DescriptorSetLayout *> descriptor_set_layouts;
 
 		std::vector<PushConstantRange> push_constant_ranges;
+
+		std::string_view name;
 	};
 
 	PipelineLayout() = default;
@@ -2054,6 +2175,7 @@ class CommandBuffer
 public:
 	friend class Device;
 	friend class Queue;
+	friend class CommandPool;
 
 	struct BeginInfo
 	{
@@ -2183,7 +2305,7 @@ public:
 			Flags resolve_mode_flags;
 		};
 
-		math::uvec2 area_offset;
+		math::ivec2 area_offset;
 
 		math::uvec2 area_extent;
 
@@ -2201,7 +2323,7 @@ public:
 		std::uint32_t first_instance;
 	};
 
-	CommandBuffer() = default; // WIP
+	CommandBuffer() = default;
 
 	CommandBuffer(CommandBuffer &&) = default;
 
@@ -2211,43 +2333,39 @@ public:
 
 	auto operator=(const CommandBuffer &) -> CommandBuffer & = delete;
 
-	void begin(BeginInfo info = {})
-	{
-	}
+	void begin(BeginInfo info = {});
 
-	void end()
-	{
-	}
+	void end();
 
-	void copy(BufferCopyInfo info)
-	{
-	}
+	void copy(BufferCopyInfo info);
 
-	void push_constants(PushConstantsInfo info)
-	{
-	}
+	void push_constants(PushConstantsInfo info);
 
-	void image_barrier(ImageBarrierInfo info)
-	{
-	}
+	void image_barrier(ImageBarrierInfo info);
 
-	void begin_rendering(RenderingInfo info)
-	{
-	}
+	void begin_rendering(RenderingInfo info);
 
-	void end_rendering()
-	{
-	}
+	void end_rendering();
 
-	void bind_pipeline(Pipeline &pipeline, Pipeline::BindPoint bind_point)
-	{
-	}
+	void bind_pipeline(Pipeline &pipeline, Pipeline::BindPoint bind_point);
 
-	void draw(DrawInfo info)
-	{
-	}
+	void draw(DrawInfo info);
+
+	void set_viewport(Viewport viewport);
+
+	void set_scissor(Rect2d scissor);
+
+	void bind_descriptor_set(
+	    DescriptorSet &set,
+	    Pipeline::BindPoint bind_point,
+	    PipelineLayout &layout,
+	    uint32_t idx
+	);
+
 
 private:
+	CommandBuffer(VkCommandBuffer buffer);
+
 	[[nodiscard]] auto get_vk_handle() -> VkCommandBuffer
 	{
 		return m_buffer;
@@ -2264,6 +2382,10 @@ private:
 class CommandPool
 {
 public:
+	friend class Device;
+
+	static constexpr auto object_type = VK_OBJECT_TYPE_COMMAND_POOL;
+
 	struct CreateInfo
 	{
 		enum FlagBits : std::underlying_type_t<VkCommandPoolCreateFlagBits>
@@ -2274,6 +2396,8 @@ public:
 		};
 
 		Flags flags;
+
+		std::string_view name;
 	};
 
 	enum class BufferLevel
@@ -2284,15 +2408,9 @@ public:
 
 	CommandPool() = default;
 
-	CommandPool(Device &device, CreateInfo info)
-	{
-		// WIP
-	}
+	CommandPool(Device &device, CreateInfo info);
 
-	~CommandPool()
-	{
-		// WIP
-	}
+	~CommandPool();
 
 	CommandPool(CommandPool &&) = default;
 
@@ -2302,14 +2420,15 @@ public:
 
 	auto operator=(const CommandPool &) -> CommandPool & = delete;
 
-	[[nodiscard]] auto allocate(uint32_t count, BufferLevel level) -> std::vector<CommandBuffer>
-	{
-		// WIP
-		return {};
-	}
+	[[nodiscard]] auto allocate(uint32_t count, BufferLevel level) -> std::vector<CommandBuffer>;
 
 private:
-	VkDevice m_device {};
+	[[nodiscard]] auto get_vk_handle() -> VkCommandPool
+	{
+		return m_pool;
+	}
+
+	memory::NullOnMove<VkDevice> m_device {};
 
 	VkCommandPool m_pool {};
 };
@@ -2698,6 +2817,7 @@ PFN_vkDestroyPipeline destroy_pipeline {};
 PFN_vkCmdBeginRenderPass cmd_begin_render_pass {};
 PFN_vkCmdEndRenderPass cmd_end_render_pass {};
 PFN_vkCmdBindPipeline cmd_bind_pipeline {};
+PFN_vkCmdBindDescriptorSets cmd_bind_descriptor_sets {};
 PFN_vkCmdDraw cmd_draw {};
 PFN_vkCmdSetViewport cmd_set_viewport {};
 PFN_vkCmdSetScissor cmd_set_scissors {};
@@ -2898,6 +3018,7 @@ void Device::load_functions()
 	load_fn(api::cmd_begin_render_pass, "vkCmdBeginRenderPass");
 	load_fn(api::cmd_end_render_pass, "vkCmdEndRenderPass");
 	load_fn(api::cmd_bind_pipeline, "vkCmdBindPipeline");
+	load_fn(api::cmd_bind_descriptor_sets, "vkCmdBindDescriptorSets");
 	load_fn(api::cmd_draw, "vkCmdDraw");
 	load_fn(api::cmd_set_viewport, "vkCmdSetViewport");
 	load_fn(api::cmd_set_scissors, "vkCmdSetScissor");
@@ -2979,16 +3100,6 @@ Instance::Instance(CreateInfo info)
 		}
 	}
 
-	log::debug("Settings size: {}", layer_settings.size());
-	log::debug("Settings:");
-	for (auto &setting : layer_settings)
-	{
-		log::debug("\tpValues: {}", (std::size_t)setting.pValues);
-		log::debug("\tname: {}", setting.pSettingName);
-		log::debug("\tlayer name: {}", setting.pLayerName);
-		log::debug("\ttype: {}", std::to_underlying(setting.type));
-		log::debug("\tvalue count: {}", setting.valueCount);
-	}
 	const auto layer_settings_create_info = VkLayerSettingsCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT,
 		.settingCount = static_cast<uint32_t>(layer_settings.size()),
@@ -3014,18 +3125,12 @@ Instance::Instance(CreateInfo info)
 		.pApplicationInfo = &app_info,
 	};
 
-	log::debug("Extension names:");
-	for (auto &extension_name : extension_names)
-	{
-		log::debug("\t{}", extension_name);
-	}
-
-	log::debug("Create instance: {}", (std::size_t)(api::create_instance));
 	vkc(api::create_instance(&vk_info, nullptr, &m_instance));
 	debug::ensure(m_instance, "Failed to create vulkan instance");
 }
 
-Surface::Surface(const Instance &instance, const CreateInfo &info): m_instance(instance.m_instance)
+Surface::Surface(const Instance &instance, const CreateInfo &info)
+    : m_instance(instance.m_instance.get())
 {
 #if defined(LIGHT_PLATFORM_LINUX)
 	const auto vk_info = VkXlibSurfaceCreateInfoKHR {
@@ -3056,7 +3161,10 @@ Surface::Surface(const Instance &instance, const CreateInfo &info): m_instance(i
 
 Surface::~Surface()
 {
-	api::destroy_surface_khr(m_instance, m_surface, nullptr);
+	if (m_instance)
+	{
+		api::destroy_surface_khr(m_instance, m_surface, nullptr);
+	}
 }
 
 [[nodiscard]]
@@ -3160,7 +3268,6 @@ Surface::~Surface()
 	};
 
 	api::get_physical_device_features(m_physical_device, &features_2);
-	log::debug("Dynamic rendering features: {}", features.dynamicRendering);
 	return DynamicRenderingFeatures {
 		.enabled = !!features.dynamicRendering,
 	};
@@ -3181,26 +3288,26 @@ Surface::~Surface()
 	api::get_physical_device_features(m_physical_device, &features_2);
 	return DescriptorIndexingFeatures {
 		// clang-format off
-		.shader_input_attachment_array_dynamic_indexing =false,
-		.shader_uniform_texel_buffer_array_dynamic_indexing =false,
-		.shader_storage_texel_buffer_array_dynamic_indexing =false,
-		.shader_uniform_buffer_array_non_uniform_indexing =false,
-		.shader_sampled_image_array_non_uniform_indexing =false,
-		.shader_storage_buffer_array_non_uniform_indexing =false,
-		.shader_storage_image_array_non_uniform_indexing =false,
-		.shader_input_attachment_array_non_uniform_indexing =false,
-		.shader_uniform_texel_buffer_array_non_uniform_indexing =false,
-		.shader_storage_texel_buffer_array_non_uniform_indexing =false,
-		.descriptor_binding_uniform_buffer_update_after_bind =false,
-		.descriptor_binding_sampled_image_update_after_bind =false,
-		.descriptor_binding_storage_image_update_after_bind =false,
-		.descriptor_binding_storage_buffer_update_after_bind =false,
-		.descriptor_binding_uniform_texel_buffer_update_after_bind =false,
-		.descriptor_binding_storage_texel_buffer_update_after_bind =false,
-		.descriptor_binding_update_unused_while_pending =false,
-		.descriptor_binding_partially_bound =false, 
-        .descriptor_binding_variable_descriptor_count =false,
-        .runtime_descriptor_array =false,
+		.shader_input_attachment_array_dynamic_indexing =true,
+		.shader_uniform_texel_buffer_array_dynamic_indexing =true,
+		.shader_storage_texel_buffer_array_dynamic_indexing =true,
+		.shader_uniform_buffer_array_non_uniform_indexing =true,
+		.shader_sampled_image_array_non_uniform_indexing =true,
+		.shader_storage_buffer_array_non_uniform_indexing =true,
+		.shader_storage_image_array_non_uniform_indexing =true,
+		.shader_input_attachment_array_non_uniform_indexing =true,
+		.shader_uniform_texel_buffer_array_non_uniform_indexing =true,
+		.shader_storage_texel_buffer_array_non_uniform_indexing =true,
+		.descriptor_binding_uniform_buffer_update_after_bind =true,
+		.descriptor_binding_sampled_image_update_after_bind =true,
+		.descriptor_binding_storage_image_update_after_bind =true,
+		.descriptor_binding_storage_buffer_update_after_bind =true,
+		.descriptor_binding_uniform_texel_buffer_update_after_bind =true,
+		.descriptor_binding_storage_texel_buffer_update_after_bind =true,
+		.descriptor_binding_update_unused_while_pending =true,
+		.descriptor_binding_partially_bound =true, 
+        .descriptor_binding_variable_descriptor_count =true,
+        .runtime_descriptor_array =true,
 		// clang-format on
 	};
 }
@@ -3556,7 +3663,7 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 		vk_extension_names.emplace_back(extension.c_str());
 	}
 
-	const auto vk_features = VkPhysicalDeviceFeatures {
+	const auto vk_physical_device_features = VkPhysicalDeviceFeatures {
 		// clang-format off
 		.robustBufferAccess = info.features.robust_buffer_access,
 		.fullDrawIndexUint32 = info.features.full_draw_index_uint32,
@@ -3616,128 +3723,71 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 		// clang-format on
 	};
 
-	auto vk_features_2 = VkPhysicalDeviceFeatures2 {
+	auto vk_physical_device_features2 = VkPhysicalDeviceFeatures2 {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
 		.pNext = {},
-		.features = vk_features,
+		.features = vk_physical_device_features,
 	};
 
-	auto vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {};
-
-	// log::debug("Dynamic rendering: {}", vk_dynamic_rendering_features.dynamicRendering);
-	// void **last_p_next = &vk_features_2.pNext;
-
-	if (info.dynamic_rendering_features)
-	{
-		// *last_p_next = &vk_dynamic_rendering_features;
-		// last_p_next = &vk_dynamic_rendering_features.pNext;
-	}
-
-	// if (info.descriptor_indexing_features)
-	// {
-	// 	const auto features = *info.descriptor_indexing_features;
-	// 	vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {
-	// 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
-	// 		.pNext = {},
-	// 		// clang-format off
-	// 		.shaderInputAttachmentArrayDynamicIndexing =
-	// features.shader_input_attachment_array_dynamic_indexing,
-	// 		.shaderUniformTexelBufferArrayDynamicIndexing =
-	// features.shader_uniform_texel_buffer_array_dynamic_indexing,
-	// 		.shaderStorageTexelBufferArrayDynamicIndexing =
-	// features.shader_storage_texel_buffer_array_dynamic_indexing,
-	// 		.shaderUniformBufferArrayNonUniformIndexing =
-	// features.shader_uniform_buffer_array_non_uniform_indexing,
-	// 		.shaderSampledImageArrayNonUniformIndexing =
-	// features.shader_sampled_image_array_non_uniform_indexing,
-	// 		.shaderStorageBufferArrayNonUniformIndexing =
-	// features.shader_storage_buffer_array_non_uniform_indexing,
-	// 		.shaderStorageImageArrayNonUniformIndexing =
-	// features.shader_storage_image_array_non_uniform_indexing,
-	// 		.shaderInputAttachmentArrayNonUniformIndexing =
-	// features.shader_input_attachment_array_non_uniform_indexing,
-	// 		.shaderUniformTexelBufferArrayNonUniformIndexing =
-	// features.shader_uniform_texel_buffer_array_non_uniform_indexing,
-	// 		.shaderStorageTexelBufferArrayNonUniformIndexing =
-	// features.shader_storage_texel_buffer_array_non_uniform_indexing,
-	// 		.descriptorBindingUniformBufferUpdateAfterBind =
-	// features.descriptor_binding_uniform_buffer_update_after_bind,
-	// 		.descriptorBindingSampledImageUpdateAfterBind =
-	// features.descriptor_binding_sampled_image_update_after_bind,
-	// 		.descriptorBindingStorageImageUpdateAfterBind =
-	// features.descriptor_binding_storage_image_update_after_bind,
-	// 		.descriptorBindingStorageBufferUpdateAfterBind =
-	// features.descriptor_binding_storage_buffer_update_after_bind,
-	// 		.descriptorBindingUniformTexelBufferUpdateAfterBind =
-	// features.descriptor_binding_uniform_texel_buffer_update_after_bind,
-	// 		.descriptorBindingStorageTexelBufferUpdateAfterBind =
-	// features.descriptor_binding_storage_texel_buffer_update_after_bind,
-	// 		.descriptorBindingUpdateUnusedWhilePending =
-	// features.descriptor_binding_update_unused_while_pending,
-	// .descriptorBindingPartiallyBound = features.descriptor_binding_partially_bound,
-	// .descriptorBindingVariableDescriptorCount =
-	// features.descriptor_binding_variable_descriptor_count, 		.runtimeDescriptorArray =
-	// features.runtime_descriptor_array,
-	// 		// clang-format on
-	// 	};
-	//
-	// 	// *last_p_next = &vk_descriptor_indexing_features;
-	// 	// last_p_next = &vk_descriptor_indexing_features.pNext;
-	// }
-
-	auto physical_device_features = VkPhysicalDeviceFeatures {
-		.geometryShader = true,
-		.samplerAnisotropy = true,
-		.multiDrawIndirect = true,
-		.drawIndirectFirstInstance = true,
-	};
-	auto vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
-		.pNext = {},
-		.dynamicRendering = true,
-	};
 	auto vk_info = VkDeviceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = &vk_dynamic_rendering_features,
+		.pNext = &vk_physical_device_features2,
 		.queueCreateInfoCount = static_cast<uint32_t>(vk_queue_infos.size()),
 		.pQueueCreateInfos = vk_queue_infos.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(vk_extension_names.size()),
 		.ppEnabledExtensionNames = vk_extension_names.data(),
-		.pEnabledFeatures = &physical_device_features,
+		.pEnabledFeatures = {}, // replaced by vk_physical_device_features2
 	};
 
-	log::debug("sType: VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO");
-	log::debug("*pNext (dynamic rendering features):");
-	log::debug("\tsType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES");
-	log::debug("\tdynamicRendering = {}", vk_dynamic_rendering_features.dynamicRendering);
-	log::debug("\tpNext = {}", vk_dynamic_rendering_features.pNext);
+	void **last_p_next = &vk_physical_device_features2.pNext;
+	auto vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {};
+	auto vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {};
 
-	log::debug("queueCreateInfoCount: {}", static_cast<uint32_t>(vk_queue_infos.size()));
-	log::debug("*pQueueCreateInfos:");
-	for (auto &info : vk_queue_infos)
+	if (info.dynamic_rendering_features)
 	{
-		log::debug("\tsType: VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO");
-		log::debug("\tpNext: {}", info.pNext);
-		log::debug("\tqueueCount: {}", info.queueCount);
-		log::debug("\tqueueFamilyIndex: {}", info.queueFamilyIndex);
-		log::debug("\t*pQueuePriorities: {}", *info.pQueuePriorities);
-		log::debug("----");
+		vk_dynamic_rendering_features = VkPhysicalDeviceDynamicRenderingFeatures {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES,
+			.pNext = {},
+			.dynamicRendering = true,
+		};
+
+		*last_p_next = &vk_dynamic_rendering_features;
+		last_p_next = &vk_dynamic_rendering_features.pNext;
 	}
 
-	log::debug("enabledExtensionCount: {}", vk_info.enabledExtensionCount);
-	for (const auto *name : vk_extension_names)
+	if (info.descriptor_indexing_features)
 	{
-		log::debug("\t{}", name);
-	}
-	log::debug("*pEnabledFeatures:");
-	log::debug("\t.geometryShader = {}", physical_device_features.geometryShader);
-	log::debug("\t.samplerAnisotropy = {}", physical_device_features.samplerAnisotropy);
-	log::debug("\t.multiDrawIndirect = {}", physical_device_features.multiDrawIndirect);
-	log::debug(
-	    "\t.drawIndirectFirstInstance = {}",
-	    physical_device_features.drawIndirectFirstInstance
-	);
+		const auto &features = *info.descriptor_indexing_features;
+		vk_descriptor_indexing_features = VkPhysicalDeviceDescriptorIndexingFeatures {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
+			.pNext = {},
+			// clang-format off
+			.shaderInputAttachmentArrayDynamicIndexing = features.shader_input_attachment_array_dynamic_indexing,
+			.shaderUniformTexelBufferArrayDynamicIndexing = features.shader_uniform_texel_buffer_array_dynamic_indexing,
+			.shaderStorageTexelBufferArrayDynamicIndexing = features.shader_storage_texel_buffer_array_dynamic_indexing,
+			.shaderUniformBufferArrayNonUniformIndexing = features.shader_uniform_buffer_array_non_uniform_indexing,
+			.shaderSampledImageArrayNonUniformIndexing = features.shader_sampled_image_array_non_uniform_indexing,
+			.shaderStorageBufferArrayNonUniformIndexing = features.shader_storage_buffer_array_non_uniform_indexing,
+			.shaderStorageImageArrayNonUniformIndexing = features.shader_storage_image_array_non_uniform_indexing,
+			.shaderInputAttachmentArrayNonUniformIndexing = features.shader_input_attachment_array_non_uniform_indexing,
+			.shaderUniformTexelBufferArrayNonUniformIndexing = features.shader_uniform_texel_buffer_array_non_uniform_indexing,
+			.shaderStorageTexelBufferArrayNonUniformIndexing = features.shader_storage_texel_buffer_array_non_uniform_indexing,
+			.descriptorBindingUniformBufferUpdateAfterBind = features.descriptor_binding_uniform_buffer_update_after_bind,
+			.descriptorBindingSampledImageUpdateAfterBind = features.descriptor_binding_sampled_image_update_after_bind,
+			.descriptorBindingStorageImageUpdateAfterBind = features.descriptor_binding_storage_image_update_after_bind,
+			.descriptorBindingStorageBufferUpdateAfterBind = features.descriptor_binding_storage_buffer_update_after_bind,
+			.descriptorBindingUniformTexelBufferUpdateAfterBind = features.descriptor_binding_uniform_texel_buffer_update_after_bind,
+			.descriptorBindingStorageTexelBufferUpdateAfterBind = features.descriptor_binding_storage_texel_buffer_update_after_bind,
+			.descriptorBindingUpdateUnusedWhilePending = features.descriptor_binding_update_unused_while_pending,
+            .descriptorBindingPartiallyBound = features.descriptor_binding_partially_bound,
+            .descriptorBindingVariableDescriptorCount = features.descriptor_binding_variable_descriptor_count, 		
+            .runtimeDescriptorArray = features.runtime_descriptor_array,
+			// clang-format on
+		};
 
+		*last_p_next = &vk_descriptor_indexing_features;
+		last_p_next = &vk_descriptor_indexing_features.pNext;
+	}
 
 	vkc(api::create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
 }
@@ -3746,7 +3796,6 @@ Device::~Device()
 {
 	if (m_device)
 	{
-		log::debug("Destrying device");
 		api::destroy_device(m_device, nullptr);
 	}
 }
@@ -4216,6 +4265,242 @@ ImageView::~ImageView()
 	}
 }
 
+CommandBuffer::CommandBuffer(VkCommandBuffer buffer): m_buffer(buffer)
+{
+}
+
+void CommandBuffer::begin(BeginInfo info /* = {} */)
+{
+	auto vk_info = VkCommandBufferBeginInfo {
+		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+		.pNext = {},
+		.flags = {},
+		.pInheritanceInfo = {},
+	};
+
+	vkc(api::begin_command_buffer(m_buffer, &vk_info));
+}
+
+void CommandBuffer::end()
+{
+	vkc(api::end_command_buffer(m_buffer));
+}
+
+void CommandBuffer::copy(BufferCopyInfo info)
+{
+	auto vk_copy_region = VkBufferCopy {
+		.srcOffset = info.src_offset,
+		.dstOffset = info.dst_offset,
+		.size = info.size,
+	};
+
+	api::cmd_copy_buffer(
+	    m_buffer,
+	    info.src_buffer->get_vk_handle(),
+	    info.dst_buffer->get_vk_handle(),
+	    1u,
+	    &vk_copy_region
+	);
+}
+
+void CommandBuffer::push_constants(PushConstantsInfo info)
+{
+	api::cmd_push_constants(
+	    m_buffer,
+	    info.layout->get_vk_handle(),
+	    info.shader_stages,
+	    info.offset,
+	    info.size,
+	    info.data
+	);
+}
+
+void CommandBuffer::image_barrier(ImageBarrierInfo info)
+{
+	auto vk_barrier = VkImageMemoryBarrier {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.pNext = {},
+		.srcAccessMask = info.src_accesses,
+		.dstAccessMask = info.dst_accesses,
+		.oldLayout = static_cast<VkImageLayout>(info.src_layout),
+		.newLayout = static_cast<VkImageLayout>(info.dst_layout),
+		.srcQueueFamilyIndex = {},
+		.dstQueueFamilyIndex = {},
+		.image = info.image->get_vk_handle(),
+		.subresourceRange = {
+            .aspectMask = info.range.aspect_flags,
+            .baseMipLevel = info.range.base_mip_level,
+            .levelCount = info.range.level_count,
+            .baseArrayLayer = info.range.base_array_layer,
+            .layerCount = info.range.layer_count,
+        },
+	};
+
+	api::cmd_pipeline_barrier(
+	    m_buffer,
+	    info.src_stages,
+	    info.dst_stages,
+	    {},
+	    {},
+	    {},
+	    {},
+	    {},
+	    1u,
+	    &vk_barrier
+	);
+}
+
+void CommandBuffer::begin_rendering(RenderingInfo info)
+{
+	auto vk_color_attachments = std::vector<VkRenderingAttachmentInfo> {};
+	for (auto attachment : info.color_attachments)
+	{
+		vk_color_attachments.emplace_back(
+		    VkRenderingAttachmentInfo {
+		        .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+		        .pNext = {},
+		        .imageView = attachment.view->get_vk_handle(),
+		        .imageLayout = static_cast<VkImageLayout>(attachment.layout),
+		        .resolveMode = static_cast<VkResolveModeFlagBits>(attachment.resolve_mode_flags),
+		        .loadOp = static_cast<VkAttachmentLoadOp>(attachment.load_operation),
+		        .storeOp = static_cast<VkAttachmentStoreOp>(attachment.store_operation),
+		        .clearValue = { .color { .float32 = { attachment.color_clear_values[0], attachment.color_clear_values[1], attachment.color_clear_values[2], attachment.color_clear_values[3], } } },
+		    }
+		);
+	}
+
+	auto vk_info = VkRenderingInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO, .pNext = {}, .flags = {},
+		.renderArea = {
+			.offset = {info.area_offset.x, info.area_offset.y},
+			.extent = {info.area_extent.x, info.area_extent.y},
+		},
+        .layerCount = 1u,
+        .colorAttachmentCount = static_cast<std::uint32_t>(vk_color_attachments.size()),
+        .pColorAttachments= vk_color_attachments.data(),
+    };
+
+	api::cmd_begin_rendering(m_buffer, &vk_info);
+}
+
+void CommandBuffer::end_rendering()
+{
+	api::cmd_end_rendering(m_buffer);
+}
+
+void CommandBuffer::bind_pipeline(Pipeline &pipeline, Pipeline::BindPoint bind_point)
+{
+	api::cmd_bind_pipeline(
+	    m_buffer,
+	    static_cast<VkPipelineBindPoint>(bind_point),
+	    pipeline.get_vk_handle()
+	);
+}
+
+void CommandBuffer::bind_descriptor_set(
+    DescriptorSet &set,
+    Pipeline::BindPoint bind_point,
+    PipelineLayout &layout,
+    uint32_t idx
+)
+{
+	api::cmd_bind_descriptor_sets(
+	    m_buffer,
+	    static_cast<VkPipelineBindPoint>(bind_point),
+	    layout.get_vk_handle(),
+	    idx,
+	    1u,
+	    set.get_vk_handle_addr(),
+	    0u,
+	    {}
+	);
+}
+
+void CommandBuffer::draw(DrawInfo info)
+{
+	api::cmd_draw(
+	    m_buffer,
+	    info.vertex_count,
+	    info.instance_count,
+	    info.first_vertex,
+	    info.first_instance
+	);
+}
+
+void CommandBuffer::set_viewport(Viewport viewport)
+{
+	auto vk_viewport = VkViewport {
+		.x = viewport.origin.x,
+		.y = viewport.origin.y,
+		.width = viewport.extent.x,
+		.height = viewport.extent.y,
+		.minDepth = viewport.min_depth,
+		.maxDepth = viewport.max_depth,
+	};
+	api::cmd_set_viewport(m_buffer, 0u, 1u, &vk_viewport);
+}
+
+void CommandBuffer::set_scissor(Rect2d scissor)
+{
+	auto vk_scissor = VkRect2D {
+		.offset = { .x = scissor.offset.x, .y = scissor.offset.y },
+		.extent = { .width = scissor.extent.x, .height = scissor.extent.y },
+	};
+	api::cmd_set_scissors(m_buffer, 0u, 1u, &vk_scissor);
+}
+
+CommandPool::CommandPool(Device &device, CreateInfo info): m_device(device.get_vk_handle())
+{
+	auto vk_info = VkCommandPoolCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+		.flags = info.flags,
+		.pNext = {},
+		.queueFamilyIndex = {},
+	};
+
+	vkc(api::create_command_pool(m_device, &vk_info, nullptr, &m_pool));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
+}
+
+CommandPool::~CommandPool()
+{
+	if (m_device)
+	{
+		api::destroy_command_pool(m_device, m_pool, nullptr);
+	}
+}
+
+[[nodiscard]] auto CommandPool::allocate(uint32_t count, BufferLevel level)
+    -> std::vector<CommandBuffer>
+{
+	auto vk_buffers = std::vector<VkCommandBuffer>(count);
+
+	auto vk_info = VkCommandBufferAllocateInfo {
+		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+		.pNext = {},
+		.commandPool = m_pool,
+		.level = static_cast<VkCommandBufferLevel>(level),
+		.commandBufferCount = count,
+	};
+
+	vkc(api::allocate_command_buffers(m_device, &vk_info, vk_buffers.data()));
+
+	auto buffers = std::vector<CommandBuffer>();
+	buffers.reserve(vk_buffers.size());
+	for (auto &vk_buffer : vk_buffers)
+	{
+		buffers.emplace_back(CommandBuffer { vk_buffer });
+	}
+
+	return buffers;
+}
+
 Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
     : m_device(device.m_device.get())
     , m_swapchain()
@@ -4287,7 +4572,6 @@ Swapchain::~Swapchain()
 
 	return idx;
 }
-
 
 Buffer::Buffer(Device &device, CreateInfo info): m_device(device.m_device.get())
 {
@@ -4365,7 +4649,7 @@ ShaderModule::ShaderModule(Device &device, CreateInfo info): m_device(device.get
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 		.pNext = {},
 		.flags = {},
-		.codeSize = info.code.size() / 4ul,
+		.codeSize = info.code.size(),
 		.pCode = std::bit_cast<std::uint32_t *>(info.code.data()),
 	};
 	vkc(api::create_shader_module(m_device, &vk_info, nullptr, &m_shader_module));
@@ -4379,18 +4663,48 @@ ShaderModule::ShaderModule(Device &device, CreateInfo info): m_device(device.get
 
 ShaderModule::~ShaderModule()
 {
-	api::destroy_shader_module(m_device, m_shader_module, nullptr);
+	if (m_device)
+	{
+		api::destroy_shader_module(m_device, m_shader_module, nullptr);
+	}
 }
 
 DescriptorSetLayout::DescriptorSetLayout(Device &device, CreateInfo info)
     : m_device(device.get_vk_handle())
 {
+	auto vk_bindings = std::vector<VkDescriptorSetLayoutBinding> {};
+	auto vk_binding_flag_values = std::vector<Flags> {};
+
+	vk_bindings.reserve(info.bindings.size());
+	vk_binding_flag_values.reserve(info.bindings.size());
+	for (auto &binding_info : info.bindings)
+	{
+		vk_bindings.emplace_back(
+		    VkDescriptorSetLayoutBinding {
+		        .binding = binding_info.idx,
+		        .descriptorType = static_cast<VkDescriptorType>(binding_info.type),
+		        .descriptorCount = binding_info.count,
+		        .stageFlags = binding_info.shader_stages,
+		        .pImmutableSamplers = {},
+		    }
+		);
+
+		vk_binding_flag_values.emplace_back(binding_info.flags);
+	}
+
+	auto vk_binding_flags_info = VkDescriptorSetLayoutBindingFlagsCreateInfoEXT {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
+		.pNext = {},
+		.bindingCount = static_cast<std::uint32_t>(vk_binding_flag_values.size()),
+		.pBindingFlags = vk_binding_flag_values.data(),
+	};
+
 	auto vk_info = VkDescriptorSetLayoutCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		.pNext = {},
-		.flags = {},
-		.bindingCount = static_cast<std::uint32_t>(info.bindings.size()),
-		.pBindings = std::bit_cast<VkDescriptorSetLayoutBinding *>(info.bindings.data()),
+		.pNext = &vk_binding_flags_info,
+		.flags = info.flags,
+		.bindingCount = static_cast<std::uint32_t>(vk_bindings.size()),
+		.pBindings = vk_bindings.data(),
 	};
 	vkc(api::create_descriptor_set_layout(m_device, &vk_info, nullptr, &m_descriptor_set_layout));
 
@@ -4403,7 +4717,68 @@ DescriptorSetLayout::DescriptorSetLayout(Device &device, CreateInfo info)
 
 DescriptorSetLayout::~DescriptorSetLayout()
 {
-	api::destroy_descriptor_set_layout(m_device, m_descriptor_set_layout, nullptr);
+	if (m_device)
+	{
+		api::destroy_descriptor_set_layout(m_device, m_descriptor_set_layout, nullptr);
+	}
+}
+
+DescriptorPool::DescriptorPool(Device &device, CreateInfo info): m_device(device.get_vk_handle())
+{
+	auto vk_sizes = std::vector<VkDescriptorPoolSize> {};
+	vk_sizes.reserve(info.sizes.size());
+	for (auto &size : info.sizes)
+	{
+		vk_sizes.emplace_back(
+		    VkDescriptorPoolSize {
+		        .type = static_cast<VkDescriptorType>(size.type),
+		        .descriptorCount = size.count,
+		    }
+		);
+	}
+
+	auto vk_info = VkDescriptorPoolCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.pNext = {},
+		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
+		.maxSets = info.max_sets,
+		.poolSizeCount = static_cast<std::uint32_t>(vk_sizes.size()),
+		.pPoolSizes = vk_sizes.data(),
+	};
+
+	vkc(api::create_descriptor_pool(m_device, &vk_info, nullptr, &m_descriptor_pool));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
+}
+
+DescriptorPool::~DescriptorPool()
+{
+	if (m_device)
+	{
+		api::destroy_descriptor_pool(m_device, m_descriptor_pool, nullptr);
+	}
+}
+
+[[nodiscard]] auto DescriptorPool::allocate(DescriptorSetLayout &layout) -> DescriptorSet
+{
+	auto *vk_set = VkDescriptorSet {};
+	auto vk_info = VkDescriptorSetAllocateInfo {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.descriptorPool = m_descriptor_pool,
+		.descriptorSetCount = 1,
+		.pSetLayouts = layout.get_vk_handle_addr(),
+	};
+	vkc(api::allocate_descriptor_sets(m_device, &vk_info, &vk_set));
+
+	return DescriptorSet { vk_set };
+}
+
+DescriptorSet::DescriptorSet(VkDescriptorSet descriptor_set): m_descriptor_set(descriptor_set)
+{
 }
 
 Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
@@ -4540,16 +4915,57 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 
 Pipeline::~Pipeline()
 {
-	api::destroy_pipeline(m_device, m_pipeline, nullptr);
+	if (m_device)
+	{
+		api::destroy_pipeline(m_device, m_pipeline, nullptr);
+	}
 }
 
+PipelineLayout::PipelineLayout(Device &device, CreateInfo info): m_device(device.get_vk_handle())
+{
+	auto vk_set_layouts = std::vector<VkDescriptorSetLayout> {};
+	vk_set_layouts.reserve(info.descriptor_set_layouts.size());
 
-PipelineLayout::PipelineLayout(Device &device, CreateInfo info) {
-	vkc(api::create_pipeline_layout(m_device, &vk_info, nullptr, &m_layout))
+	auto vk_push_constant_ranges = std::vector<VkPushConstantRange> {};
+	vk_push_constant_ranges.reserve(info.push_constant_ranges.size());
+
+	for (const auto &range : info.push_constant_ranges)
+	{
+		vk_push_constant_ranges.emplace_back(
+		    VkPushConstantRange {
+		        .stageFlags = range.shader_stages,
+		        .offset = range.offset,
+		        .size = range.size,
+		    }
+		);
+	}
+
+	for (const auto &layout : info.descriptor_set_layouts)
+	{
+		vk_set_layouts.emplace_back(layout->get_vk_handle());
+	}
+
+	auto vk_info = VkPipelineLayoutCreateInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.pNext = {},
+		.flags = {},
+		.setLayoutCount = static_cast<std::uint32_t>(vk_set_layouts.size()),
+		.pSetLayouts = vk_set_layouts.data(),
+		.pushConstantRangeCount = static_cast<std::uint32_t>(vk_push_constant_ranges.size()),
+		.pPushConstantRanges = vk_push_constant_ranges.data()
+	};
+	vkc(api::create_pipeline_layout(m_device, &vk_info, nullptr, &m_pipeline_layout));
+
+	if (info.name.empty())
+	{
+		info.name = "<unnamed>";
+	}
+	device.name(*this, "{}", info.name);
 }
 
 PipelineLayout::~PipelineLayout()
 {
+	api::destroy_pipeline_layout(m_device, m_pipeline_layout, nullptr);
 }
 
 Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.get_vk_handle())
@@ -4580,7 +4996,6 @@ Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.g
 
 	};
 
-	log::debug("Creating debug messenger....");
 	vkc(api::create_debug_messenger(m_instance, &vk_info, nullptr, &m_messenger));
 }
 

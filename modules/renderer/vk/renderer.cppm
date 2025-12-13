@@ -1,4 +1,5 @@
 export module renderer.vk.renderer;
+import logger;
 import assets.shader;
 import debug.assertions;
 import renderer.vk.api_wrapper;
@@ -17,6 +18,7 @@ import std;
 
 namespace lt::renderer::vkb {
 
+// NOLINTNEXTLINE
 export class Renderer: public IRenderer
 {
 public:
@@ -26,6 +28,18 @@ public:
 	    class ISwapchain *swapchain,
 	    std::uint32_t max_frames_in_flight
 	);
+
+	~Renderer() override
+	{
+		try
+		{
+			m_device->vk().wait_idle();
+		}
+		catch (std::exception &exp)
+		{
+			log::error("Failed to wait idle on device in renderer destructor");
+		}
+	}
 
 	[[nodiscard]] auto frame(std::uint32_t frame_idx, std::function<void()> submit_scene)
 	    -> Result override;
@@ -80,6 +94,10 @@ private:
 	std::span<components::Sprite::Vertex> m_sprite_vertex_map;
 
 	std::size_t m_current_sprite_idx;
+
+	vk::DescriptorPool m_global_set_pool;
+
+	vk::DescriptorSet m_global_set;
 };
 
 } // namespace lt::renderer::vkb
@@ -102,7 +120,7 @@ Renderer::Renderer(
           device,
           gpu,
           {
-              .usage = IBuffer::Usage::vertex,
+              .usage = IBuffer::Usage::storage,
               .size = 1'000'000,
               .debug_name = "vertex buffer",
           }
@@ -116,11 +134,13 @@ Renderer::Renderer(
               .debug_name = "staging buffer",
           }
       )
-    , m_pass(memory::create_ref<Pass>(
-          m_device,
-          assets::ShaderAsset { "./data/test_assets/sprite.vert.asset" },
-          assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
-      ))
+    , m_pass(
+          memory::create_ref<Pass>(
+              m_device,
+              assets::ShaderAsset { "./data/test_assets/sprite.vert.asset" },
+              assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
+          )
+      )
     , m_pool(
           m_device->vk(),
           {
@@ -131,6 +151,16 @@ Renderer::Renderer(
     , m_acquire_image_semaphores(m_max_frames_in_flight)
     , m_frame_fences(m_max_frames_in_flight)
     , m_submit_semaphores(m_swapchain->get_image_count())
+    , m_global_set_pool(
+          m_device->vk(),
+          vk::DescriptorPool::CreateInfo {
+              .sizes = { { .type = vk::DescriptorSet::Type::storage_buffer, .count = 1'000 } },
+              .max_sets = 1'000,
+              .name = "global pool",
+          }
+      )
+
+    , m_global_set(m_global_set_pool.allocate(m_pass->get_descriptor_set_layout()))
 {
 	for (auto [semaphore, fence] : std::views::zip(m_acquire_image_semaphores, m_frame_fences))
 	{
@@ -167,19 +197,23 @@ Renderer::Renderer(
 	record_cmd(cmd, image_idx);
 
 	auto &submit_semaphore = m_submit_semaphores[image_idx];
-	m_device->graphics_queue().submit(vk::Queue::SubmitInfo {
-	    .command_buffer = &cmd,
-	    .wait_stages = vk::PipelineStageFlags::color_attachment_output_bit,
-	    .wait_semaphore = &acquire_semaphore,
-	    .signal_semaphore = &submit_semaphore,
-	    .signal_fence = &frame_fence,
-	});
+	m_device->graphics_queue().submit(
+	    vk::Queue::SubmitInfo {
+	        .command_buffer = &cmd,
+	        .wait_stages = vk::PipelineStageFlags::color_attachment_output_bit,
+	        .wait_semaphore = &acquire_semaphore,
+	        .signal_semaphore = &submit_semaphore,
+	        .signal_fence = &frame_fence,
+	    }
+	);
 
-	m_device->present_queue().present(vk::Queue::PresentInfo {
-	    .wait_semaphore = &submit_semaphore,
-	    .swapchain = &m_swapchain->vk(),
-	    .image_idx = image_idx,
-	});
+	m_device->present_queue().present(
+	    vk::Queue::PresentInfo {
+	        .wait_semaphore = &submit_semaphore,
+	        .swapchain = &m_swapchain->vk(),
+	        .image_idx = image_idx,
+	    }
+	);
 
 	return Result::success;
 }
@@ -210,136 +244,55 @@ void Renderer::map_buffers(std::uint32_t frame_idx)
 
 void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
 {
-	// const auto cmd_begin_info = VkCommandBufferBeginInfo {
-	// 	.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-	// 	.flags = {},
-	// 	.pInheritanceInfo = nullptr,
-	// };
-
-	// vk_reset_command_buffer(cmd, {});
-	// vkc(vk_begin_command_buffer(cmd, &cmd_begin_info));
-	// const auto begin_frame_barrier = VkImageMemoryBarrier {
-	// 	.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-	// 	.srcAccessMask = {},
-	// 	.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-	// 	.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-	// 	.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-	//        .image = m_swapchain->get_image(image_idx),
-	//        .range = vk::Image::full_color_range,
-	//        .subresourceRange = VkImageSubresourceRange{
-	//            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-	//            .baseMipLevel   = 0u,
-	//            .levelCount     = VK_REMAINING_MIP_LEVELS,
-	//            .baseArrayLayer = 0u,
-	//            .layerCount     = VK_REMAINING_ARRAY_LAYERS,
-	//        },
-	// };
-	//
-	//
-	// vk_cmd_pipeline_barrier(
-	//     cmd,
-	//     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-	//     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-	//     0,
-	//     0,
-	//     nullptr,
-	//     0,
-	//     nullptr,
-	//     1,
-	//     &begin_frame_barrier
-	// );
-	//
-	// const auto end_frame_barrier = VkImageMemoryBarrier {
-	// 	.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-	// 	.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-	// VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, 	.dstAccessMask = {}, 	.oldLayout =
-	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 	.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	//        .image = m_swapchain->get_image(image_idx),
-	//
-	//        .subresourceRange = VkImageSubresourceRange{
-	//            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-	//            .baseMipLevel   = 0u,
-	//            .levelCount     = VK_REMAINING_MIP_LEVELS,
-	//            .baseArrayLayer = 0u,
-	//            .layerCount     = VK_REMAINING_ARRAY_LAYERS,
-	//        },
-	// };
-	// vk_cmd_pipeline_barrier(
-	//     cmd,
-	//     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-	//     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-	//     0,
-	//     0,
-	//     nullptr,
-	//     0,
-	//     nullptr,
-	//     1,
-	//     &end_frame_barrier
-	// );
-
-	// const auto scissor = VkRect2D {
-	// 	.offset = { .x = 0u, .y = 0u },
-	// 	.extent = m_resolution,
-	// };
-	// const auto viewport = VkViewport {
-	// 	.x = 0.0f,
-	// 	.y = 0.0f,
-	// 	.width = static_cast<float>(m_resolution.width),
-	// 	.height = static_cast<float>(m_resolution.height),
-	// 	.minDepth = 0.0f,
-	// 	.maxDepth = 1.0f,
-	// };
-
-	// const auto color_attachment_info = VkRenderingAttachmentInfoKHR {
-	// 	.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-	// 	.imageView = m_swapchain->get_image_view(image_idx),
-	// 	.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-	// 	.resolveMode = VK_RESOLVE_MODE_NONE,
-	// 	.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 	.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-	// 	.clearValue = VkClearValue { .color = { 0.93, 0.93, 0.93, 1.0 } },
-	// };
-
-	// const auto rendering_info = VkRenderingInfoKHR {
-	// 	.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
-	// 	.renderArea = scissor,
-	// 	.layerCount = 1,
-	// 	.colorAttachmentCount = 1,
-	// 	.pColorAttachments = &color_attachment_info,
-	//
-	// };
-
 	m_staging_map = {};
 	m_sprite_vertex_map = {};
 	cmd.begin({});
 
 	m_staging_buffer.unmap();
-	cmd.copy({
-	    .src_buffer = &m_staging_buffer.vk(),
-	    .dst_buffer = &m_vertex_buffer.vk(),
-	    .src_offset = m_staging_offset,
-	    .dst_offset = m_staging_offset,
-	    .size = m_current_sprite_idx * sizeof(components::Sprite::Vertex),
-	});
-	cmd.push_constants({
-	    .layout = &m_pass->get_layout(),
-	    .shader_stages = vk::ShaderStageFlags::vertex_bit,
-	    .offset = 0u,
-	    .size = sizeof(FrameConstants),
-	    .data = &m_frame_constants,
-	});
+
+	if (m_current_sprite_idx)
+	{
+		cmd.copy(
+		    {
+		        .src_buffer = &m_staging_buffer.vk(),
+		        .dst_buffer = &m_vertex_buffer.vk(),
+		        .src_offset = m_staging_offset,
+		        .dst_offset = m_staging_offset,
+		        .size = m_current_sprite_idx * sizeof(components::Sprite::Vertex),
+		    }
+		);
+	}
+
+	cmd.push_constants(
+	    {
+	        .layout = &m_pass->get_pipeline_layout(),
+	        .shader_stages = vk::ShaderStageFlags::vertex_bit,
+	        .offset = 0u,
+	        .size = sizeof(FrameConstants),
+	        .data = &m_frame_constants,
+	    }
+	);
+
+	cmd.bind_descriptor_set(
+	    m_global_set,
+	    vk::Pipeline::BindPoint::graphics,
+	    m_pass->get_pipeline_layout(),
+	    0
+	);
 
 	using AccessFlagBits = vk::CommandBuffer::ImageBarrierInfo::AccessFlagBits;
-	cmd.image_barrier({
-	    .image = &m_swapchain->get_image(image_idx),
-	    .range = vk::Image::full_color_range,
-	    .src_stages = vk::PipelineStageFlags::color_attachment_output_bit,
-	    .dst_stages = vk::PipelineStageFlags::color_attachment_output_bit,
-	    .src_accesses = AccessFlagBits::none,
-	    .dst_accesses = AccessFlagBits::color_attachment_write,
-	    .src_layout = vk::Image::Layout::undefined,
-	    .dst_layout = vk::Image::Layout::color_attachment_optimal,
-	});
+	cmd.image_barrier(
+	    {
+	        .image = &m_swapchain->get_image(image_idx),
+	        .range = vk::Image::full_color_range,
+	        .src_stages = vk::PipelineStageFlags::color_attachment_output_bit,
+	        .dst_stages = vk::PipelineStageFlags::color_attachment_output_bit,
+	        .src_accesses = AccessFlagBits::none,
+	        .dst_accesses = AccessFlagBits::color_attachment_write,
+	        .src_layout = vk::Image::Layout::undefined,
+	        .dst_layout = vk::Image::Layout::color_attachment_optimal,
+	    }
+	);
 
 	using Attachment = vk::CommandBuffer::RenderingInfo::AttachmentInfo;
 	cmd.begin_rendering(
@@ -350,7 +303,7 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
         Attachment{
             .view= &m_swapchain->get_image_view(image_idx),
             .layout = vk::Image::Layout::color_attachment_optimal,
-            .load_operation = Attachment::LoadOperation::load,
+            .load_operation = Attachment::LoadOperation::clear,
             .store_operation = Attachment::StoreOperation::store,
             .color_clear_values = {.5f, .5f, .5f, 1.f}
         }
@@ -358,27 +311,39 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
 	    }
 	);
 	cmd.bind_pipeline(m_pass->get_pipeline(), vk::Pipeline::BindPoint::graphics);
-	//    cmd.set_viewport();
-	//    cmd.set_scissors();
-	cmd.draw({
-	    .vertex_count = static_cast<std::uint32_t>(m_current_sprite_idx),
-	    .instance_count = 1u,
-	    .first_vertex = 0u,
-	    .first_instance = 0u,
-	});
+	cmd.set_viewport(
+	    {
+	        .origin = {},
+	        .extent = { static_cast<float>(m_resolution.x), static_cast<float>(m_resolution.y) },
+	        .min_depth = 0.0f,
+	        .max_depth = 1.0f,
+	    }
+	);
+	cmd.set_scissor({ .offset = {}, .extent = m_resolution });
+	cmd.draw(
+	    {
+	        .vertex_count = static_cast<std::uint32_t>(m_current_sprite_idx),
+	        .instance_count = 1u,
+	        .first_vertex = 0u,
+	        .first_instance = 0u,
+	    }
+	);
 
 	cmd.end_rendering();
-	cmd.image_barrier({
-	    .image = &m_swapchain->get_image(image_idx),
-	    .src_stages = vk::PipelineStageFlags::color_attachment_output_bit,
-	    .dst_stages = vk::PipelineStageFlags::bottom_of_pipe_bit,
-	    .src_accesses = AccessFlagBits::color_attachment_read
-	                    | AccessFlagBits::color_attachment_write,
-	    .dst_accesses = {},
-	    .src_layout = vk::Image::Layout::color_attachment_optimal,
-	    .dst_layout = vk::Image::Layout::present_src,
+	cmd.image_barrier(
+	    {
+	        .image = &m_swapchain->get_image(image_idx),
+	        .range = vk::Image::full_color_range,
+	        .src_stages = vk::PipelineStageFlags::color_attachment_output_bit,
+	        .dst_stages = vk::PipelineStageFlags::bottom_of_pipe_bit,
+	        .src_accesses = AccessFlagBits::color_attachment_read
+	                        | AccessFlagBits::color_attachment_write,
+	        .dst_accesses = {},
+	        .src_layout = vk::Image::Layout::color_attachment_optimal,
+	        .dst_layout = vk::Image::Layout::present_src,
 
-	});
+	    }
+	);
 	cmd.end();
 }
 
