@@ -105,9 +105,9 @@ void Device::initialize_logical_device()
 
             .features = {
                 .geometry_shader = true,
-                .sampler_anisotropy = true,
                 .multi_draw_indirect = true,
                 .draw_indirect_first_instance = true,
+                .sampler_anisotropy = true,
             },
 
             .dynamic_rendering_features = m_gpu->vk().get_supported_dynamic_rendering_features(),

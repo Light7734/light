@@ -172,7 +172,7 @@ private:
 	{
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
-		lt::log::debug("vulkan: {}", data.message);
+		lt::log::trace("vulkan: {}", std::string { data.message });
 		std::ignore = data;
 		std::ignore = type;
 
@@ -221,10 +221,6 @@ public:
 		return m_system;
 	}
 
-	auto device() -> lt::renderer::IDevice &
-	{
-	}
-
 	[[nodiscard]] auto has_any_messages() const -> bool
 	{
 		return m_user_data->m_has_any_messages;
@@ -246,7 +242,7 @@ private:
 	{
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
-		lt::log::trace("vulkan: {}", data.message);
+		lt::log::trace("vulkan: {}", std::string { data.message });
 
 		std::ignore = data;
 		std::ignore = type;

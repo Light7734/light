@@ -1,5 +1,6 @@
 export module renderer.vk.gpu;
 import renderer.vk.api_wrapper;
+import logger;
 import debug.assertions;
 import renderer.frontend;
 import renderer.vk.instance;
@@ -75,12 +76,30 @@ Gpu::Gpu(IInstance *instance)
 		auto properties = gpu.get_properties();
 		auto features = gpu.get_features();
 
+		// GPU is dedicated, a great success!
 		if (properties.device_type == vk::Gpu::Type::discrete_gpu && features.geometry_shader)
 		{
 			m_gpu = gpu;
 		}
 	}
 
+	if (!m_gpu)
+	{
+		for (auto &gpu : gpus)
+		{
+			auto properties = gpu.get_properties();
+			auto features = gpu.get_features();
+
+			// GPU is integrated, fall back to anything with geometry shader support...
+			if (features.geometry_shader)
+			{
+				m_gpu = gpu;
+				log::warn("Using integrated GPU");
+			}
+		}
+	}
+
+	// No suitable GPU is fonud...
 	debug::ensure(m_gpu, "Failed to find any suitable Vulkan physical device");
 
 	m_memory_properties = m_gpu.get_memory_properties();

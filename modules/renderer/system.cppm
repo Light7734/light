@@ -56,7 +56,7 @@ public:
 
 	System(CreateInfo info);
 
-	~System() override;
+	~System() override = default;
 
 	System(System &&) = default;
 
@@ -151,8 +151,6 @@ System::System(CreateInfo info)
 		info.config.max_frames_in_flight
 	) };
 }
-
-System::~System() = default;
 
 void System::on_register()
 {

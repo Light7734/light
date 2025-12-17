@@ -1306,10 +1306,8 @@ public:
 	/** de-allocation functions */
 	void free_memory(VkDeviceMemory memory) const;
 
-	void free_descriptor_set(
-	    VkDescriptorPool descriptor_pool,
-	    VkDescriptorSet descriptor_set
-	) const;
+	void free_descriptor_set(VkDescriptorPool descriptor_pool, VkDescriptorSet descriptor_set)
+	    const;
 
 	/** destroy functions */
 	void destroy_swapchain(VkSwapchainKHR swapchain) const;
@@ -3071,7 +3069,7 @@ Instance::Instance(CreateInfo info)
 		layer_names.emplace_back(layer.name.c_str());
 		for (const auto &setting : layer.settings)
 		{
-			const auto *values = (void *) { nullptr };
+			const auto *values = static_cast<void *>(nullptr);
 
 			if (setting.values.index() == 0)
 			{
@@ -3088,15 +3086,13 @@ Instance::Instance(CreateInfo info)
 
 			debug::ensure(values, "Failed to get variant from setting.values");
 
-			layer_settings.emplace_back(
-			    VkLayerSettingEXT {
-			        .pLayerName = layer.name.c_str(),
-			        .pSettingName = setting.name.c_str(),
-			        .type = std::visit(layer_setting_type_visitor, setting.values),
-			        .valueCount = 1u,
-			        .pValues = values,
-			    }
-			);
+			layer_settings.emplace_back(VkLayerSettingEXT {
+			    .pLayerName = layer.name.c_str(),
+			    .pSettingName = setting.name.c_str(),
+			    .type = std::visit(layer_setting_type_visitor, setting.values),
+			    .valueCount = 1u,
+			    .pValues = values,
+			});
 		}
 	}
 
@@ -3108,8 +3104,8 @@ Instance::Instance(CreateInfo info)
 
 	auto app_info = VkApplicationInfo {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-		.applicationVersion = constants::application_version,
 		.pApplicationName = constants::engine_name,
+		.applicationVersion = constants::application_version,
 		.pEngineName = constants::app_name,
 		.apiVersion = constants::api_version,
 	};
@@ -3118,11 +3114,11 @@ Instance::Instance(CreateInfo info)
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 		.pNext = &layer_settings_create_info,
 		.flags = {},
+		.pApplicationInfo = &app_info,
 		.enabledLayerCount = static_cast<uint32_t>(info.layers.size()),
 		.ppEnabledLayerNames = layer_names.data(),
 		.enabledExtensionCount = static_cast<uint32_t>(extension_names.size()),
 		.ppEnabledExtensionNames = extension_names.data(),
-		.pApplicationInfo = &app_info,
 	};
 
 	vkc(api::create_instance(&vk_info, nullptr, &m_instance));
@@ -3295,7 +3291,7 @@ Surface::~Surface()
 		.shader_sampled_image_array_non_uniform_indexing =true,
 		.shader_storage_buffer_array_non_uniform_indexing =true,
 		.shader_storage_image_array_non_uniform_indexing =true,
-		.shader_input_attachment_array_non_uniform_indexing =true,
+		.shader_input_attachment_array_non_uniform_indexing =false,
 		.shader_uniform_texel_buffer_array_non_uniform_indexing =true,
 		.shader_storage_texel_buffer_array_non_uniform_indexing =true,
 		.descriptor_binding_uniform_buffer_update_after_bind =true,
@@ -3585,12 +3581,10 @@ Surface::~Surface()
 	auto formats = std::vector<Surface::Format> {};
 	for (auto &vk_format : vk_formats)
 	{
-		formats.emplace_back(
-		    Surface::Format {
-		        .format = static_cast<Format>(vk_format.format),
-		        .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
-		    }
-		);
+		formats.emplace_back(Surface::Format {
+		    .format = static_cast<Format>(vk_format.format),
+		    .color_space = static_cast<ColorSpace>(vk_format.colorSpace),
+		});
 	}
 
 	return formats;
@@ -3647,14 +3641,12 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 	auto vk_queue_infos = std::vector<VkDeviceQueueCreateInfo> {};
 	for (auto queue_family : info.queue_indices)
 	{
-		vk_queue_infos.emplace_back(
-		    VkDeviceQueueCreateInfo {
-		        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-		        .queueFamilyIndex = queue_family,
-		        .queueCount = 1u,
-		        .pQueuePriorities = &priorities,
-		    }
-		);
+		vk_queue_infos.emplace_back(VkDeviceQueueCreateInfo {
+		    .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		    .queueFamilyIndex = queue_family,
+		    .queueCount = 1u,
+		    .pQueuePriorities = &priorities,
+		});
 	}
 
 	auto vk_extension_names = std::vector<const char *> {};
@@ -4047,10 +4039,8 @@ void Device::free_memory(VkDeviceMemory memory) const
 	api::free_memory(m_device, memory, nullptr);
 }
 
-void Device::free_descriptor_set(
-    VkDescriptorPool descriptor_pool,
-    VkDescriptorSet descriptor_set
-) const
+void Device::free_descriptor_set(VkDescriptorPool descriptor_pool, VkDescriptorSet descriptor_set)
+    const
 {
 	vkc(api::free_descriptor_sets(m_device, descriptor_pool, 1, &descriptor_set));
 }
@@ -4454,8 +4444,8 @@ CommandPool::CommandPool(Device &device, CreateInfo info): m_device(device.get_v
 {
 	auto vk_info = VkCommandPoolCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-		.flags = info.flags,
 		.pNext = {},
+		.flags = info.flags,
 		.queueFamilyIndex = {},
 	};
 
@@ -4679,15 +4669,13 @@ DescriptorSetLayout::DescriptorSetLayout(Device &device, CreateInfo info)
 	vk_binding_flag_values.reserve(info.bindings.size());
 	for (auto &binding_info : info.bindings)
 	{
-		vk_bindings.emplace_back(
-		    VkDescriptorSetLayoutBinding {
-		        .binding = binding_info.idx,
-		        .descriptorType = static_cast<VkDescriptorType>(binding_info.type),
-		        .descriptorCount = binding_info.count,
-		        .stageFlags = binding_info.shader_stages,
-		        .pImmutableSamplers = {},
-		    }
-		);
+		vk_bindings.emplace_back(VkDescriptorSetLayoutBinding {
+		    .binding = binding_info.idx,
+		    .descriptorType = static_cast<VkDescriptorType>(binding_info.type),
+		    .descriptorCount = binding_info.count,
+		    .stageFlags = binding_info.shader_stages,
+		    .pImmutableSamplers = {},
+		});
 
 		vk_binding_flag_values.emplace_back(binding_info.flags);
 	}
@@ -4729,12 +4717,10 @@ DescriptorPool::DescriptorPool(Device &device, CreateInfo info): m_device(device
 	vk_sizes.reserve(info.sizes.size());
 	for (auto &size : info.sizes)
 	{
-		vk_sizes.emplace_back(
-		    VkDescriptorPoolSize {
-		        .type = static_cast<VkDescriptorType>(size.type),
-		        .descriptorCount = size.count,
-		    }
-		);
+		vk_sizes.emplace_back(VkDescriptorPoolSize {
+		    .type = static_cast<VkDescriptorType>(size.type),
+		    .descriptorCount = size.count,
+		});
 	}
 
 	auto vk_info = VkDescriptorPoolCreateInfo {
@@ -4788,14 +4774,12 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 	auto shader_stages = std::vector<VkPipelineShaderStageCreateInfo> {};
 	for (auto &[shader, stage] : info.shaders)
 	{
-		shader_stages.emplace_back(
-		    VkPipelineShaderStageCreateInfo {
-		        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-		        .stage = static_cast<VkShaderStageFlagBits>(stage),
-		        .module = shader.get_vk_handle(),
-		        .pName = "main",
-		    }
-		);
+		shader_stages.emplace_back(VkPipelineShaderStageCreateInfo {
+		    .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+		    .stage = static_cast<VkShaderStageFlagBits>(stage),
+		    .module = shader.get_vk_handle(),
+		    .pName = "main",
+		});
 	}
 
 	auto dynamic_states = std::array<VkDynamicState, 2> {
@@ -4878,8 +4862,7 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 		.colorAttachmentCount = static_cast<uint32_t>(color_attachment_formats.size()),
 		.pColorAttachmentFormats = std::bit_cast<VkFormat *>(color_attachment_formats.data()),
 		.depthAttachmentFormat = info.attachment_state.depth_attachment ?
-		                             static_cast<VkFormat>(
-		                                 *info.attachment_state.depth_attachment
+		                             static_cast<VkFormat>(*info.attachment_state.depth_attachment
 		                             ) :
 		                             VK_FORMAT_UNDEFINED,
 
@@ -4931,13 +4914,11 @@ PipelineLayout::PipelineLayout(Device &device, CreateInfo info): m_device(device
 
 	for (const auto &range : info.push_constant_ranges)
 	{
-		vk_push_constant_ranges.emplace_back(
-		    VkPushConstantRange {
-		        .stageFlags = range.shader_stages,
-		        .offset = range.offset,
-		        .size = range.size,
-		    }
-		);
+		vk_push_constant_ranges.emplace_back(VkPushConstantRange {
+		    .stageFlags = range.shader_stages,
+		    .offset = range.offset,
+		    .size = range.size,
+		});
 	}
 
 	for (const auto &layout : info.descriptor_set_layouts)
