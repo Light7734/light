@@ -22,7 +22,7 @@ cmake \
     -D CMAKE_LINKER_TYPE=MOLD \
     -D ENABLE_UNIT_TESTS=ON \
     -D CMAKE_BUILD_TYPE=Release \
-    -D CMAKE_CXX_FLAGS="-std=c++26 -g -fno-omit-frame-pointer"
+    -D CMAKE_CXX_FLAGS="-std=c++23 -g -fno-omit-frame-pointer"
 
 cmake --build ./build -j"$(nproc)"
 
