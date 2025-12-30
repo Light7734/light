@@ -1,13 +1,7 @@
 module;
 #if defined(LIGHT_PLATFORM_LINUX)
-	#define _POSIX_C_SOURCE 200112L
-	#include <errno.h>
-	#include <fcntl.h>
-	#include <sys/mman.h>
-	#include <time.h>
-	#include <unistd.h>
 	#include <wayland-client.h>
-	#include <wayland-protocols/xdg-shell.h>
+	#include <xdg-shell.h>
 #else
 	#error "Unsupported platform"
 #endif
@@ -21,6 +15,7 @@ import ecs.registry;
 import math.vec2;
 import surface.requests;
 import memory.reference;
+import memory.null_on_move;
 import std;
 
 export namespace lt::surface {
@@ -55,7 +50,7 @@ public:
 
 private:
 #if defined(LIGHT_PLATFORM_LINUX)
-	static void registry_handle_global(
+	static void handle_globals(
 	    void *data,
 	    wl_registry *registry,
 	    std::uint32_t name,
@@ -89,19 +84,15 @@ private:
 	app::TickResult m_last_tick_result;
 
 #if defined(LIGHT_PLATFORM_LINUX)
-	wl_display *m_wl_display {};
+	memory::NullOnMove<wl_display *> m_wl_display {};
 
-	wl_registry *m_wl_registry {};
+	memory::NullOnMove<wl_registry *> m_wl_registry {};
 
 	wl_registry_listener m_wl_registry_listener {};
 
-	wl_compositor *m_wl_compositor {};
+	memory::NullOnMove<wl_compositor *> m_wl_compositor {};
 
-	wl_surface *m_wl_surface {};
-
-	wl_shm *m_wl_shm {};
-
-	wl_shm_pool *m_wl_shm_pool {};
+	memory::NullOnMove<xdg_wm_base *> m_shell = {};
 #endif
 };
 
@@ -112,7 +103,46 @@ namespace lt::surface {
 
 #ifdef LIGHT_PLATFORM_LINUX
 
-void System::registry_handle_global(
+void handle_shell_ping(void *data, xdg_wm_base *shell, std::uint32_t serial)
+{
+	std::ignore = data;
+
+	xdg_wm_base_pong(shell, serial);
+}
+const auto shell_listener = xdg_wm_base_listener {
+	.ping = &handle_shell_ping,
+};
+
+void handle_shell_surface_configure(void *data, xdg_surface *shell_surface, std::uint32_t serial)
+{
+	std::ignore = data;
+
+	xdg_surface_ack_configure(shell_surface, serial);
+}
+const auto shell_surface_listener = xdg_surface_listener {
+	.configure = &handle_shell_surface_configure
+};
+
+void handle_toplevel_configure(
+    void *data,
+    xdg_toplevel *toplevel,
+    std::int32_t width,
+    std::int32_t height,
+    wl_array *states
+)
+{
+	// TODO(Light): handle resizing
+}
+void handle_toplevel_close(void *data, xdg_toplevel *toplevel)
+{
+	// TODO(Light): handle quitting
+}
+const auto toplevel_listener = xdg_toplevel_listener {
+	.configure = &handle_toplevel_configure,
+	.close = &handle_toplevel_close,
+};
+
+void System::handle_globals(
     void *data,
     wl_registry *registry,
     std::uint32_t name,
@@ -123,42 +153,22 @@ void System::registry_handle_global(
 {
 	auto *system = std::bit_cast<System *>(data);
 
-	// log::trace("Registry global:");
-	// log::trace("\tinterface: {}", interface);
-	// log::trace("\tversion: {}", version);
-	// log::trace("\tname: {}", name);
-
 	if (std::strcmp(interface, wl_compositor_interface.name) == 0)
 	{
 		system->m_wl_compositor = std::bit_cast<wl_compositor *>(
-		    wl_registry_bind(registry, name, &wl_compositor_interface, 4)
+		    wl_registry_bind(registry, name, &wl_compositor_interface, 1)
 		);
 		log::info("Bound successfuly to the wl_compositor global");
-
-		system->m_wl_surface = wl_compositor_create_surface(system->m_wl_compositor);
-
-		if (system->m_wl_surface)
-		{
-			log::info("Created a wl_surface from the compositor");
-		}
-		else
-		{
-			log::critical("Failed to create a wl_surface from the compositor");
-			std::terminate();
-		}
 	}
 
-	if (std::strcmp(interface, wl_shm_interface.name) == 0)
+	if (std::strcmp(interface, xdg_wm_base_interface.name) == 0)
 	{
-		system->m_wl_shm = std::bit_cast<wl_shm *>(
-		    wl_registry_bind(registry, name, &wl_shm_interface, 1)
+		system->m_shell = std::bit_cast<xdg_wm_base *>(
+		    wl_registry_bind(registry, name, &xdg_wm_base_interface, 1)
 		);
-
-		log::info("Bound successfuly to the wl_shm global");
+		xdg_wm_base_add_listener(system->m_shell, &shell_listener, {});
+		log::info("Bound successfuly to the xdg_wm_base global");
 	}
-
-
-	if (std::strcmp(interface, xdg_))
 }
 
 void registry_handle_global_remove(void *data, wl_registry *registry, std::uint32_t name)
@@ -167,121 +177,43 @@ void registry_handle_global_remove(void *data, wl_registry *registry, std::uint3
 	log::trace("\tname: {}", name);
 }
 
-void read_name(char *buffer)
-{
-	auto time_spec = timespec {};
-	clock_gettime(CLOCK_REALTIME, &time_spec);
-	auto nanoseconds = time_spec.tv_nsec;
-
-	for (auto idx = std::uint32_t { 0u }; idx < 6u; ++idx)
-	{
-		buffer[idx] = 'A' + (nanoseconds & 15) + (nanoseconds & 16) * 2; // NOLINT
-		nanoseconds >>= 5;                                               // NOLINT
-	}
-}
-
-[[nodiscard]] auto create_shm_file() -> int
-{
-	auto retries = 100u;
-	do // NOLINT
-	{
-		char name[] = "/wl_shm-XXXXXX";
-		read_name(name + sizeof(name) - 7);
-		--retries;
-		auto file_descriptor = shm_open(name, O_RDWR | O_CREAT | O_EXCL, 0600);
-		if (file_descriptor >= 0)
-		{
-			shm_unlink(name);
-			return file_descriptor;
-		}
-	} while (retries > 0 && errno == EEXIST);
-	return -1;
-}
-
-[[nodiscard]] auto allocate_shm_file(std::size_t size) -> int
-{
-	auto file_descriptor = create_shm_file();
-	if (file_descriptor < 0)
-	{
-		return -1;
-	}
-
-	auto ret = 0;
-	do // NOLINT
-	{
-		ret = ftruncate(file_descriptor, size); // NOLINT
-
-	} while (ret < 0 && errno == EINTR);
-
-	if (ret < 0)
-	{
-		close(file_descriptor);
-		return -1;
-	}
-
-	return file_descriptor;
-}
-
 System::System(memory::Ref<ecs::Registry> registry)
     : m_wl_registry_listener(
           {
-              .global = registry_handle_global,
+              .global = handle_globals,
               .global_remove = registry_handle_global_remove,
           }
       )
+    , m_registry(std::move(registry))
 {
 	// NOLINTNEXTLINE
 	m_wl_display = wl_display_connect({});
-
 	debug::ensure(m_wl_display, "Failed to connect to Wayland display");
-
-	log::info("Wayland connection established");
 
 	// NOLINTNEXTLINE
 	m_wl_registry = wl_display_get_registry(m_wl_display);
+	debug::ensure(m_wl_registry, "Failed to get Wayland display's registry");
 
 	// TODO(Light): "this" could be moved around... replace with a pointer to some heap allocation
 	wl_registry_add_listener(m_wl_registry, &m_wl_registry_listener, this);
-
 	wl_display_roundtrip(m_wl_display);
 
-	debug::ensure(m_wl_compositor, "Could not bind to the Wayland's compositor global");
-	debug::ensure(m_wl_shm, "Could not bind to the Wayland's compositor global");
-
-	const auto width = 1080u;
-	const auto height = 1920u;
-	const auto stride = 4u;
-	const auto shm_pool_size = width * stride * height * 2;
-
-	auto file_descriptor = allocate_shm_file(shm_pool_size);
-	auto *pool_data = std::bit_cast<std::uint8_t *>(
-	    mmap({}, shm_pool_size, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0)
-	);
-
-	m_wl_shm_pool = wl_shm_create_pool(m_wl_shm, file_descriptor, shm_pool_size);
-	debug::ensure(
-	    m_wl_shm_pool,
-	    "Failed to create Wayland shared memory pool of size: {}",
-	    shm_pool_size
-	);
-
-	log::info("Created Wayland shared memory pool size of: {}", shm_pool_size);
-
-	auto idx = 0;
-	auto offset = width * height * stride * idx;
-	auto *wl_buffer = wl_shm_pool_create_buffer(
-	    m_wl_shm_pool,
-	    offset,
-	    width,
-	    height,
-	    width * stride,
-	    WL_SHM_FORMAT_XRGB8888,
-	);
+	debug::ensure(m_wl_compositor, "Failed to bind to the Wayland's compositor global");
+	debug::ensure(m_shell, "Failed to bind to the Wayland's  XDG-shell global");
 }
 
 System::~System()
 {
-	wl_display_disconnect(m_wl_display);
+	if (m_wl_display)
+	{
+		log::debug("Closing Wayland display...");
+		wl_display_disconnect(m_wl_display);
+		log::debug("Closed Wayland display");
+	}
+	else
+	{
+		log::debug("Wayland display nulled on move!");
+	}
 }
 
 void System::on_register()
@@ -294,6 +226,35 @@ void System::on_unregister()
 
 void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
 {
+	auto &component = m_registry->add<SurfaceComponent>(entity, info);
+	auto &surface = m_registry->get<SurfaceComponent>(entity);
+	const auto &resolution = surface.get_resolution();
+	const auto &position = surface.get_position();
+
+	auto *wayland_surface = (wl_surface *)nullptr;
+	auto *shell_surface = (xdg_surface *)nullptr;
+	auto *shell_toplevel = (xdg_toplevel *)nullptr;
+
+	wayland_surface = wl_compositor_create_surface(m_wl_compositor);
+	debug::ensure(wayland_surface, "Failed to create Wayland surface");
+
+	shell_surface = xdg_wm_base_get_xdg_surface(m_shell, wayland_surface);
+	debug::ensure(shell_surface, "Failed to get XDG-shell surface");
+	xdg_surface_add_listener(shell_surface, &shell_surface_listener, {});
+
+	shell_toplevel = xdg_surface_get_toplevel(shell_surface);
+	debug::ensure(shell_toplevel, "Failed to get XDG-shell toplevel");
+	xdg_toplevel_add_listener(shell_toplevel, &toplevel_listener, {});
+
+	xdg_toplevel_set_title(shell_toplevel, "Wayland Vulkan Example");
+	xdg_toplevel_set_app_id(shell_toplevel, "Wayland Vulkan Example");
+
+	wl_surface_commit(wayland_surface);
+	wl_display_roundtrip(m_wl_display);
+	wl_surface_commit(wayland_surface);
+
+	surface.m_native_data.surface = wayland_surface;
+	surface.m_native_data.display = m_wl_display;
 }
 
 void System::tick(app::TickInfo tick)

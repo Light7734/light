@@ -1,6 +1,7 @@
 module;
 #if defined(LIGHT_PLATFORM_LINUX)
-typedef struct _XDisplay Display;
+struct wl_display;
+struct wl_surface;
 #else defined(LIGHT_PLATFORM_WINDOWS)
 	#include <Windows.h>
 #endif
@@ -43,9 +44,9 @@ public:
 #if defined(LIGHT_PLATFORM_LINUX)
 	struct NativeData
 	{
-		Display *display;
-		std::uint32_t window;
-		unsigned long wm_delete_message;
+		wl_display *display;
+
+		wl_surface *surface;
 	};
 #elif defined(LIGHT_PLATFORM_WINDOWS)
 	struct NativeData

@@ -1,7 +1,11 @@
 add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp)
 add_module(NAME bitwise INTERFACES operations.cppm)
 add_module(NAME env INTERFACES constants.cppm)
-add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm)
+add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
+
+    DEPENDENCIES
+    logger
+)
 add_module(NAME time INTERFACES timer.cppm TESTS timer.test.cpp)
 
 add_module(
@@ -153,12 +157,27 @@ elseif(UNIX)
         input_codes
         PRIVATE_DEPENDENCIES
         X11
+        wayland-client
         logger
         lt_debug
         time
         TESTS
         system.test.cpp
+        platform_linux.test.cpp
     )
+
+
+function(add_wayland_protocol_target TARGET_NAME SPEC NAME)
+    add_custom_target(wayland_${TARGET_NAME}_header COMMAND wayland-scanner client-header /usr/share/wayland-protocols${SPEC} ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.h)
+    add_dependencies(surface wayland_${TARGET_NAME}_header)
+    add_custom_target(wayland_${TARGET_NAME}_source COMMAND wayland-scanner private-code /usr/share/wayland-protocols${SPEC} ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.c)
+    add_dependencies(surface wayland_${TARGET_NAME}_source)
+
+    target_sources(surface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.c)
+endfunction()
+
+target_include_directories(surface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/)
+add_wayland_protocol_target(xdg_shell "/stable/xdg-shell/xdg-shell.xml" xdg-shell)
 
 else()
     message(FATAL "Failed to generate cmake: unsupported platform")
@@ -204,6 +223,7 @@ add_module(
     vk/debugger.cppm
     DEPENDENCIES
     app
+    wayland-client
     ecs
     memory
     assets

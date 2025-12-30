@@ -1,5 +1,7 @@
 export module memory.null_on_move;
 
+import logger;
+
 import std;
 
 namespace lt::memory {
@@ -37,6 +39,7 @@ public:
 			return *this;
 		}
 
+		log::debug("Nulling 0x{:x}", (std::size_t)other.m_value);
 		m_value = other.m_value;
 		other.m_value = null_value;
 

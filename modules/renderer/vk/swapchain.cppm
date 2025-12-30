@@ -83,13 +83,26 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 {
 	static auto idx = 0u;
 
-	const auto capabilities = m_gpu->vk().get_surface_capabilities(m_surface->vk());
+	auto capabilities = m_gpu->vk().get_surface_capabilities(m_surface->vk());
 	const auto formats = m_gpu->vk().get_surface_formats(m_surface->vk());
 
 	// TODO(Light): parameterize
 	constexpr auto desired_image_count = std::uint32_t { 3u };
 	const auto surface_format = formats.front();
 	m_format = surface_format.format;
+
+	if (capabilities.current_extent.x == std::numeric_limits<std::uint32_t>::max())
+	{
+		log::info(
+		    "Vulkan surface capabilities current extent is uint32 max... This indicates that the "
+		    "surface size will be determined by the extent of a swapchain targeting the surface."
+		);
+
+
+		// TODO(Light): Take surface extent as swapchain creation argument...
+		capabilities.current_extent.x = 800u;
+		capabilities.current_extent.y = 600u;
+	}
 
 	m_swapchain = vk::Swapchain(
 	    m_device->vk(),
@@ -101,7 +114,7 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	        .extent = capabilities.current_extent,
 	        .min_image_count = get_optimal_image_count(capabilities, desired_image_count),
 	        .queue_family_indices = m_device->get_family_indices(),
-	        .present_mode = vk::Swapchain::PresentMode::immediate,
+	        .present_mode = vk::Swapchain::PresentMode::mailbox,
 	        .pre_transform = capabilities.current_transform,
 	        .name = std::format("swapchain {}", idx++),
 	    }

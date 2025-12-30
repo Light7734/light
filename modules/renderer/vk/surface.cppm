@@ -43,18 +43,18 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 #if defined(LIGHT_PLATFORM_LINUX)
 	debug::ensure(
 	    component.get_native_data().display,
-	    "Failed to initialize vk::Surface: null x-display"
+	    "Failed to initialize vk::Surface: null Wayland display"
 	);
 	debug::ensure(
-	    component.get_native_data().window,
-	    "Failed to initialize vk::Surface: null x-window"
+	    component.get_native_data().surface,
+	    "Failed to initialize vk::Surface: null Wayland surface"
 	);
 
 	m_surface = vk::Surface(
 	    static_cast<Instance *>(instance)->vk(),
 	    vk::Surface::CreateInfo {
 	        .display = component.get_native_data().display,
-	        .window = component.get_native_data().window,
+	        .surface = component.get_native_data().surface,
 	    }
 	);
 
