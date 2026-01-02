@@ -123,8 +123,6 @@ if(WIN32)
         requests.cppm
         events.cppm
         components.cppm
-        SOURCES
-        platform_windows.cpp
         DEPENDENCIES
         ecs
         app
@@ -147,8 +145,6 @@ elseif(UNIX)
         requests.cppm
         events.cppm
         components.cppm
-        SOURCES
-        platform_linux.cpp
         DEPENDENCIES
         ecs
         app
@@ -163,7 +159,6 @@ elseif(UNIX)
         time
         TESTS
         system.test.cpp
-        platform_linux.test.cpp
     )
 
 
