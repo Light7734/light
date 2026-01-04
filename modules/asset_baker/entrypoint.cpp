@@ -3,7 +3,6 @@ import logger;
 import bakers;
 import std;
 
-
 auto main(int argc, char *argv[]) -> std::int32_t
 try
 {
@@ -21,7 +20,8 @@ try
 		}
 
 		const auto &in_path = directory_iterator.path();
-		const auto out_path = std::format("{}.asset", in_path.c_str());
+		const std::string in_path_str = in_path.generic_string();
+		const auto out_path = std::format("{}.asset", in_path_str);
 
 		if (in_path.extension() == ".vert")
 		{
