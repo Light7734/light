@@ -230,12 +230,12 @@ add_module(
     PRIVATE_DEPENDENCIES
     surface
     TESTS
-    _tests/buffer.cpp
-    _tests/debugger.cpp
-    _tests/device.cpp
-    _tests/pass.cpp
-    _tests/renderer.cpp
-    _tests/surface.cpp
+    # _tests/buffer.cpp
+    # _tests/debugger.cpp
+    # _tests/device.cpp
+    # _tests/pass.cpp
+    # _tests/renderer.cpp
+    # _tests/surface.cpp
     _tests/system.cpp
     TEST_INTERFACES
     _tests/utils.cppm

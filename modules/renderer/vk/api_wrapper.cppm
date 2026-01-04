@@ -3207,19 +3207,7 @@ Surface::Surface(const Instance &instance, const CreateInfo &info)
 		.surface = info.surface,
 	};
 
-
-	log::debug(
-	    "Display proxy's version: {}",
-	    wl_proxy_get_version(std::bit_cast<wl_proxy *>(info.display))
-	);
-
-	log::debug(
-	    "Surface proxy's version: {}",
-	    wl_proxy_get_version(std::bit_cast<wl_proxy *>(info.surface))
-	);
-
 	vkc(api::create_wayland_surface_khr(instance.get_vk_handle(), &vk_info, nullptr, &m_surface));
-	log::debug("Wayland surface vulkan handle id is: {}", (size_t)m_surface);
 #elif defined(LIGHT_PLATFORM_WINDOWS)
 
 	const auto vk_info = VkWin32SurfaceCreateInfoKHR {
@@ -3868,17 +3856,13 @@ Device::Device(const Gpu &gpu, CreateInfo info)
 	}
 
 	vkc(api::create_device(gpu.m_physical_device, &vk_info, nullptr, &m_device));
-	log::debug("Created device: 0x{:x}", (size_t)m_device, (size_t)m_device);
 }
 
 Device::~Device()
 {
 	if (m_device)
 	{
-		log::debug("Destroying device {:x}...", (size_t)m_device);
 		api::destroy_device(m_device, nullptr);
-		log::debug("...Destroyed device");
-		std::cout << "D" << std::endl;
 	}
 }
 
@@ -4587,9 +4571,6 @@ Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
     : m_device(device.m_device.get())
     , m_swapchain()
 {
-	log::debug("Wayland surface vulkan handle id is now: 0x{:x}", (size_t)surface.m_surface);
-	log::debug("Got device for swapchain: 0x{:x}", (size_t)m_device);
-
 	auto vk_info = VkSwapchainCreateInfoKHR {
 		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 		.surface = surface.m_surface,
@@ -4608,36 +4589,20 @@ Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
 		.clipped = VK_TRUE,
 		.oldSwapchain = nullptr,
 	};
-	log::debug("Creating swapchain: 0x{:x}", (size_t)m_swapchain);
 	vkc(api::create_swapchain_khr(m_device, &vk_info, nullptr, &m_swapchain));
-	log::debug("Created swapchain: 0x{:x}", (size_t)m_swapchain);
 
 	if (info.name.empty())
 	{
 		info.name = "<unnamed>";
 	}
 	device.name(*this, "{}", info.name);
-
-	log::debug("Still got device for swapchain: 0x{:x}", (size_t)m_device);
 }
 
 Swapchain::~Swapchain()
 {
 	if (m_device)
 	{
-		log::debug("Destroyig swapchain...");
-		log::debug("device: 0x{:x}", (size_t)m_device);
-		log::debug("swapchain: 0x{:x}", (size_t)m_swapchain);
-		log::debug("vkDestroySwapchainKHR: 0x{:x}", (size_t)api::destroy_swapchain_khr);
 		api::destroy_swapchain_khr(m_device, m_swapchain, nullptr);
-		log::debug("...Destroyed swapchain");
-	}
-	else
-	{
-		log::debug(
-		    "Skipped destruction of Swapchain due to nulled device: 0{:x}",
-		    (size_t)m_device
-		);
 	}
 }
 
@@ -4694,9 +4659,10 @@ Buffer::Buffer(Device &device, CreateInfo info): m_device(device.m_device.get())
 
 Buffer::~Buffer()
 {
-	std::cout << "B" << std::endl;
-	api::destroy_buffer(m_device, m_buffer, nullptr);
-	std::cout << "C" << std::endl;
+	if (m_device)
+	{
+		api::destroy_buffer(m_device, m_buffer, nullptr);
+	}
 }
 
 [[nodiscard]] auto Buffer::get_memory_requirements() const -> MemoryRequirements
@@ -5104,8 +5070,10 @@ Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.g
 
 Messenger::~Messenger()
 {
-	api::destroy_debug_messenger(m_instance, m_messenger, nullptr);
-	std::cout << "C1" << std::endl;
+	if (m_instance)
+	{
+		api::destroy_debug_messenger(m_instance, m_messenger, nullptr);
+	}
 }
 
 [[nodiscard]]

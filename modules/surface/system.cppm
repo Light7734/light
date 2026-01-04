@@ -6,7 +6,6 @@ module;
 	#error "Unsupported platform"
 #endif
 
-import logger;
 export module surface.system;
 export import :components;
 import debug.assertions;
@@ -16,6 +15,7 @@ import math.vec2;
 import surface.requests;
 import memory.reference;
 import memory.null_on_move;
+import logger;
 import std;
 
 export namespace lt::surface {
@@ -50,13 +50,82 @@ public:
 
 private:
 #if defined(LIGHT_PLATFORM_LINUX)
-	static void handle_globals(
+	static void wayland_registry_listener(
 	    void *data,
 	    wl_registry *registry,
 	    std::uint32_t name,
 	    const char *interface,
 	    std::uint32_t version
 	);
+
+	static void wayland_seat_capabilities_listener(
+	    void *data,
+	    wl_seat *seat,
+	    std::uint32_t capabilities
+	);
+
+	static void wayland_pointer_leave_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t serial,
+	    wl_surface *surface
+	);
+
+	static void wayland_pointer_enter_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t serial,
+	    wl_surface *surface,
+	    wl_fixed_t surface_x,
+	    wl_fixed_t surface_y
+	);
+
+	static void wayland_pointer_motion_listener(
+	    void *data,
+	    wl_pointer *listener,
+	    std::uint32_t time,
+	    wl_fixed_t surface_x,
+	    wl_fixed_t surface_y
+	);
+
+	static void wayland_pointer_button_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t serial,
+	    std::uint32_t time,
+	    std::uint32_t button,
+	    std::uint32_t state
+	);
+
+	static void wayland_pointer_axis_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t time,
+	    std::uint32_t axis,
+	    wl_fixed_t value
+	);
+
+	static void wayland_pointer_axis_source_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t axis_source
+	);
+
+	static void wayland_pointer_axis_stop_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t time,
+	    std::uint32_t axis_source
+	);
+
+	static void wayland_pointer_axis_discrete_listener(
+	    void *data,
+	    wl_pointer *pointer,
+	    std::uint32_t axis,
+	    std::int32_t discrete
+	);
+
+	static void wayland_pointer_frame_listener(void *data, wl_pointer *pointer);
 #endif
 
 	void on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity);
@@ -81,18 +150,32 @@ private:
 
 	memory::Ref<ecs::Registry> m_registry;
 
-	app::TickResult m_last_tick_result;
+	app::TickResult m_last_tick_result {};
 
 #if defined(LIGHT_PLATFORM_LINUX)
 	memory::NullOnMove<wl_display *> m_wl_display {};
 
-	memory::NullOnMove<wl_registry *> m_wl_registry {};
+	wl_registry *m_wl_registry {};
 
 	wl_registry_listener m_wl_registry_listener {};
 
-	memory::NullOnMove<wl_compositor *> m_wl_compositor {};
+	wl_seat_listener m_wl_seat_listener {};
 
-	memory::NullOnMove<xdg_wm_base *> m_shell = {};
+	wl_pointer_listener m_wl_pointer_listener {};
+
+	wl_compositor *m_wl_compositor {};
+
+	xdg_wm_base *m_shell = {};
+
+	wl_seat *m_wl_seat {};
+
+	wl_keyboard *m_wl_keyboard {};
+
+	wl_pointer *m_wl_pointer {};
+
+	wl_touch *m_wl_touch {}; // TODO(Light): Add touch support
+
+
 #endif
 };
 
@@ -141,7 +224,143 @@ const auto toplevel_listener = xdg_toplevel_listener {
 	.close = &handle_toplevel_close,
 };
 
-void System::handle_globals(
+void wayland_pointer_leave_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t serial,
+    wl_surface *surface
+)
+{
+	void *system = std::bit_cast<System *>(data);
+}
+
+/* static */ void System::wayland_seat_capabilities_listener(
+    void *data,
+    wl_seat *seat,
+    std::uint32_t capabilities
+)
+{
+	std::ignore = seat;
+
+	auto *system = std::bit_cast<System *>(data);
+	const auto have_pointer = capabilities & WL_SEAT_CAPABILITY_POINTER;
+
+	if (have_pointer && !system->m_wl_pointer)
+	{
+		system->m_wl_pointer = wl_seat_get_pointer(system->m_wl_seat);
+		wl_pointer_add_listener(system->m_wl_pointer, &system->m_wl_pointer_listener, system);
+		log::info(
+		    "Added Wayland pointer (0x{:x})",
+		    std::bit_cast<std::size_t>(system->m_wl_pointer)
+		);
+	}
+	else if (!have_pointer && system->m_wl_pointer)
+	{
+		wl_pointer_release(system->m_wl_pointer);
+		system->m_wl_pointer = nullptr;
+
+		log::info(
+		    "Released Wayland pointer (0x{:x})",
+		    std::bit_cast<std::size_t>(system->m_wl_pointer)
+		);
+	}
+}
+
+/* static */ void System::wayland_pointer_leave_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t serial,
+    wl_surface *surface
+)
+{
+	log::debug("Pointer leave...");
+}
+
+/* static */ void System::wayland_pointer_enter_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t serial,
+    wl_surface *surface,
+    wl_fixed_t surface_x,
+    wl_fixed_t surface_y
+)
+{
+	log::debug("Pointer enter...");
+}
+
+/* static */ void System::wayland_pointer_motion_listener(
+    void *data,
+    wl_pointer *listener,
+    std::uint32_t time,
+    wl_fixed_t surface_x,
+    wl_fixed_t surface_y
+)
+{
+	log::debug("Pointer motion: [{} - {}]", surface_x, surface_y);
+}
+
+/* static */ void System::wayland_pointer_button_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t serial,
+    std::uint32_t time,
+    std::uint32_t button,
+    std::uint32_t state
+)
+{
+}
+
+/* static */ void System::wayland_pointer_axis_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t time,
+    std::uint32_t axis,
+    wl_fixed_t value
+)
+{
+}
+
+/* static */ void System::wayland_pointer_axis_source_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t axis_source
+)
+{
+}
+
+/* static */ void System::wayland_pointer_axis_stop_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t time,
+    std::uint32_t axis_source
+)
+{
+}
+
+/* static */ void System::wayland_pointer_axis_discrete_listener(
+    void *data,
+    wl_pointer *pointer,
+    std::uint32_t axis,
+    std::int32_t discrete
+)
+{
+}
+
+/* static */ void System::wayland_pointer_frame_listener(void *data, wl_pointer *pointer)
+{
+	log::debug("Pointer frame...");
+}
+
+void seat_name_listener(void *data, wl_seat *seat, const char *name)
+{
+	std::ignore = data;
+
+	log::info("Wayland seat:");
+	log::info("\tname: {}", name);
+	log::info("\taddr: 0x{:x}", std::bit_cast<std::size_t>(seat));
+}
+
+void System::wayland_registry_listener(
     void *data,
     wl_registry *registry,
     std::uint32_t name,
@@ -150,6 +369,8 @@ void System::handle_globals(
 )
 
 {
+	std::ignore = version;
+
 	auto *system = std::bit_cast<System *>(data);
 
 	if (std::strcmp(interface, wl_compositor_interface.name) == 0)
@@ -165,8 +386,17 @@ void System::handle_globals(
 		system->m_shell = std::bit_cast<xdg_wm_base *>(
 		    wl_registry_bind(registry, name, &xdg_wm_base_interface, 1)
 		);
-		xdg_wm_base_add_listener(system->m_shell, &shell_listener, {});
+		xdg_wm_base_add_listener(system->m_shell, &shell_listener, system);
 		log::info("Bound successfuly to the xdg_wm_base global");
+	}
+
+	if (std::strcmp(interface, wl_seat_interface.name) == 0)
+	{
+		system->m_wl_seat = std::bit_cast<wl_seat *>(
+		    wl_registry_bind(registry, name, &wl_seat_interface, 7u)
+		);
+		wl_seat_add_listener(system->m_wl_seat, &system->m_wl_seat_listener, system);
+		log::info("Bound successfuly to the wl_seat_interface global");
 	}
 }
 
@@ -179,11 +409,30 @@ void registry_handle_global_remove(void *data, wl_registry *registry, std::uint3
 System::System(memory::Ref<ecs::Registry> registry)
     : m_wl_registry_listener(
           {
-              .global = handle_globals,
+              .global = wayland_registry_listener,
               .global_remove = registry_handle_global_remove,
           }
       )
+    , m_wl_seat_listener(
+          wl_seat_listener {
+              .capabilities = &wayland_seat_capabilities_listener,
+              .name = &seat_name_listener,
+          }
+      )
     , m_registry(std::move(registry))
+    , m_wl_pointer_listener(
+          {
+              .enter = &wayland_pointer_enter_listener,
+              .leave = &wayland_pointer_leave_listener,
+              .motion = &wayland_pointer_motion_listener,
+              .button = &wayland_pointer_button_listener,
+              .axis = &wayland_pointer_axis_listener,
+              .frame = &wayland_pointer_frame_listener,
+              .axis_source = &wayland_pointer_axis_source_listener,
+              .axis_stop = &wayland_pointer_axis_stop_listener,
+              .axis_discrete = &wayland_pointer_axis_discrete_listener,
+          }
+      )
 {
 	// NOLINTNEXTLINE
 	m_wl_display = wl_display_connect({});
@@ -197,30 +446,30 @@ System::System(memory::Ref<ecs::Registry> registry)
 	wl_registry_add_listener(m_wl_registry, &m_wl_registry_listener, this);
 	wl_display_roundtrip(m_wl_display);
 
+	// Wayland seat gets named after the second roundtrip....
+	// For reasons beyond my fragile comprehension :(
+	wl_display_roundtrip(m_wl_display);
+
 	debug::ensure(m_wl_compositor, "Failed to bind to the Wayland's compositor global");
 	debug::ensure(m_shell, "Failed to bind to the Wayland's  XDG-shell global");
 }
 
 System::~System()
 {
-	if (m_wl_display)
+	if (!m_wl_display)
 	{
-		log::debug("Closing Wayland display...");
-		wl_display_disconnect(m_wl_display);
-		log::debug("Closed Wayland display");
-	}
-	else
-	{
-		log::debug("Wayland display nulled on move!");
+		return;
 	}
 }
 
 void System::on_register()
 {
+	log::info("surface::System::on_register");
 }
 
 void System::on_unregister()
 {
+	log::info("surface::System::on_unregister");
 }
 
 void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
@@ -258,6 +507,7 @@ void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::Cr
 
 void System::tick(app::TickInfo tick)
 {
+	wl_display_roundtrip(m_wl_display);
 }
 
 #endif

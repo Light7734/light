@@ -193,7 +193,7 @@ Renderer::Renderer(
 	frame_fence.reset();
 
 	map_buffers(frame_idx);
-	submit_scene();
+	// submit_scene();
 	record_cmd(cmd, image_idx);
 
 	auto &submit_semaphore = m_submit_semaphores[image_idx];
@@ -250,35 +250,35 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
 
 	m_staging_buffer.unmap();
 
-	if (m_current_sprite_idx)
-	{
-		cmd.copy(
-		    {
-		        .src_buffer = &m_staging_buffer.vk(),
-		        .dst_buffer = &m_vertex_buffer.vk(),
-		        .src_offset = m_staging_offset,
-		        .dst_offset = m_staging_offset,
-		        .size = m_current_sprite_idx * sizeof(components::Sprite::Vertex),
-		    }
-		);
-	}
+	// if (m_current_sprite_idx)
+	// {
+	// 	cmd.copy(
+	// 	    {
+	// 	        .src_buffer = &m_staging_buffer.vk(),
+	// 	        .dst_buffer = &m_vertex_buffer.vk(),
+	// 	        .src_offset = m_staging_offset,
+	// 	        .dst_offset = m_staging_offset,
+	// 	        .size = m_current_sprite_idx * sizeof(components::Sprite::Vertex),
+	// 	    }
+	// 	);
+	// }
 
-	cmd.push_constants(
-	    {
-	        .layout = &m_pass->get_pipeline_layout(),
-	        .shader_stages = vk::ShaderStageFlags::vertex_bit,
-	        .offset = 0u,
-	        .size = sizeof(FrameConstants),
-	        .data = &m_frame_constants,
-	    }
-	);
-
-	cmd.bind_descriptor_set(
-	    m_global_set,
-	    vk::Pipeline::BindPoint::graphics,
-	    m_pass->get_pipeline_layout(),
-	    0
-	);
+	// cmd.push_constants(
+	//     {
+	//         .layout = &m_pass->get_pipeline_layout(),
+	//         .shader_stages = vk::ShaderStageFlags::vertex_bit,
+	//         .offset = 0u,
+	//         .size = sizeof(FrameConstants),
+	//         .data = &m_frame_constants,
+	//     }
+	// );
+	//
+	// cmd.bind_descriptor_set(
+	//     m_global_set,
+	//     vk::Pipeline::BindPoint::graphics,
+	//     m_pass->get_pipeline_layout(),
+	//     0
+	// );
 
 	using AccessFlagBits = vk::CommandBuffer::ImageBarrierInfo::AccessFlagBits;
 	cmd.image_barrier(
@@ -310,25 +310,25 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
         }
 	    }
 	);
-	cmd.bind_pipeline(m_pass->get_pipeline(), vk::Pipeline::BindPoint::graphics);
-	cmd.set_viewport(
-	    {
-	        .origin = {},
-	        .extent = { static_cast<float>(m_resolution.x), static_cast<float>(m_resolution.y) },
-	        .min_depth = 0.0f,
-	        .max_depth = 1.0f,
-	    }
-	);
-	cmd.set_scissor({ .offset = {}, .extent = m_resolution });
-	cmd.draw(
-	    {
-	        .vertex_count = static_cast<std::uint32_t>(m_current_sprite_idx),
-	        .instance_count = 1u,
-	        .first_vertex = 0u,
-	        .first_instance = 0u,
-	    }
-	);
-
+	// cmd.bind_pipeline(m_pass->get_pipeline(), vk::Pipeline::BindPoint::graphics);
+	// cmd.set_viewport(
+	//     {
+	//         .origin = {},
+	//         .extent = { static_cast<float>(m_resolution.x), static_cast<float>(m_resolution.y) },
+	//         .min_depth = 0.0f,
+	//         .max_depth = 1.0f,
+	//     }
+	// );
+	// cmd.set_scissor({ .offset = {}, .extent = m_resolution });
+	// cmd.draw(
+	//     {
+	//         .vertex_count = static_cast<std::uint32_t>(m_current_sprite_idx),
+	//         .instance_count = 1u,
+	//         .first_vertex = 0u,
+	//         .first_instance = 0u,
+	//     }
+	// );
+	//
 	cmd.end_rendering();
 	cmd.image_barrier(
 	    {
