@@ -133,6 +133,8 @@ if(WIN32)
         logger
         lt_debug
         time
+        TESTS
+        system.test.cpp
     )
 
 elseif(UNIX)
@@ -151,16 +153,15 @@ elseif(UNIX)
         math
         memory
         input_codes
+        wayland-client
         PRIVATE_DEPENDENCIES
         X11
-        wayland-client
         logger
         lt_debug
         time
         TESTS
         system.test.cpp
     )
-
 
 function(add_wayland_protocol_target TARGET_NAME SPEC NAME)
     add_custom_target(wayland_${TARGET_NAME}_header COMMAND wayland-scanner client-header /usr/share/wayland-protocols${SPEC} ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.h)
@@ -218,7 +219,6 @@ add_module(
     vk/debugger.cppm
     DEPENDENCIES
     app
-    wayland-client
     ecs
     memory
     assets

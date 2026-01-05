@@ -2,6 +2,8 @@ module;
 #if defined(LIGHT_PLATFORM_LINUX)
 	#include <wayland-client.h>
 	#include <xdg-shell.h>
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	#include <Windows.h>
 #else
 	#error "Unsupported platform"
 #endif
@@ -16,6 +18,16 @@ import surface.requests;
 import memory.reference;
 import memory.null_on_move;
 import logger;
+import std;
+import surface.constants;
+import debug.assertions;
+import memory.reference;
+import surface.requests;
+import surface.events;
+import logger;
+import ecs.registry;
+import ecs.entity;
+import time;
 import std;
 
 export namespace lt::surface {
@@ -184,7 +196,7 @@ private:
 module :private;
 namespace lt::surface {
 
-#ifdef LIGHT_PLATFORM_LINUX
+#if defined(LIGHT_PLATFORM_LINUX)
 
 void handle_shell_ping(void *data, xdg_wm_base *shell, std::uint32_t serial)
 {
@@ -513,22 +525,6 @@ void System::tick(app::TickInfo tick)
 #endif
 
 #ifdef LIGHT_PLATFORM_WINDOWS
-
-module;
-	#include <Windows.h>
-module surface.system;
-import surface.constants;
-import debug.assertions;
-import memory.reference;
-import surface.requests;
-import surface.events;
-import logger;
-import ecs.registry;
-import ecs.entity;
-import time;
-import std;
-
-namespace lt::surface {
 
 template<class... Ts>
 struct overloads: Ts...
@@ -1038,7 +1034,6 @@ auto CALLBACK native_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 
-} // namespace lt::surface
 #endif
 
 } // namespace lt::surface

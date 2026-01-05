@@ -87,7 +87,6 @@ private:
 	System m_system { m_registry };
 };
 
-
 Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = Fixture {};
@@ -99,7 +98,6 @@ Suite raii = "raii"_suite = [] {
 		{
 			system.tick({});
 		}
-
 		lt::log::trace("Three seconds passed, quitting...");
 	};
 
