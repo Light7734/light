@@ -2,172 +2,288 @@ export module input.codes;
 import std;
 
 export enum class Key: std::uint16_t {
-	/* digits */
-	D0 = 48,
-	D1 = 49,
-	D2 = 50,
-	D3 = 51,
-	D4 = 52,
-	D5 = 53,
-	D6 = 54,
-	D7 = 55,
-	D8 = 56,
-	D9 = 57,
-	Semicolon = 59, // ;
-	Equal = 61,     // =
+	none = 0,
+
+	left_mouse_button,
+	right_mouse_button,
+	middle_mouse_button,
+
+	left_mouse = left_mouse_button,
+	right_mouse = right_mouse_button,
+	middle_mouse = middle_mouse_button,
+
+	l_mouse = left_mouse_button,
+	r_mouse = right_mouse_button,
+	m_mouse = middle_mouse_button,
+
+	backspace,
+	tab,
+	capslock,
+	enter,
+	space,
+	delete_,
+
+	shift,
+	left_shit = shift,
+	l_shift = shift,
+
+	right_shift,
+	r_shift = right_shift,
+
+	control,
+	left_control = control,
+	l_control = control,
+	ctrl = control,
+	left_ctrl = control,
+	l_ctrl = control,
+
+	right_control,
+	r_control = right_control,
+	right_ctrl = right_control,
+	r_ctrl = right_control,
+
+	alt,
+	left_alt = alt,
+	l_alt = alt,
+
+	right_alt,
+	r_alt = right_alt,
+
+	pageup,
+	pagedown,
+	home,
+	end,
+
+	left_arrow,
+	l_arrow = left_arrow,
+
+	up_arrow,
+	u_arrow = up_arrow,
+
+	right_arrow,
+	r_arrow = right_arrow,
+
+	down_arrow,
+	d_arrow = down_arrow,
+
+	cancel,
+	pause,
+	select,
+	print,
+	snapshot, // aka. print-screen
+	insert,
+	help,
+	sleep,
+	eep = sleep,
+
+	digit_0,
+	digit_1,
+	digit_2,
+	digit_3,
+	digit_4,
+	digit_5,
+	digit_6,
+	digit_7,
+	digit_8,
+	digit_9,
 
 	/* letters */
-	A = 65,
-	B = 66,
-	C = 67,
-	D = 68,
-	E = 69,
-	F = 70,
-	G = 71,
-	H = 72,
-	I = 73,
-	J = 74,
-	K = 75,
-	L = 76,
-	M = 77,
-	N = 78,
-	O = 79,
-	P = 80,
-	Q = 81,
-	R = 82,
-	S = 83,
-	t = 84,
-	U = 85,
-	V = 86,
-	W = 87,
-	X = 88,
-	Y = 89,
-	Z = 90,
+	a,
+	b,
+	c,
+	d,
+	e,
+	f,
+	g,
+	h,
+	i,
+	j,
+	k,
+	l,
+	m,
+	n,
+	o,
+	p,
+	q,
+	r,
+	s,
+	t,
+	u,
+	v,
+	w,
+	x,
+	y,
+	z,
 
-	/* brackets */
-	LeftBracket = 91,        // [
-	LBracket = LeftBracket,  // [
-	RightBracket = 93,       // ]
-	RBracket = RightBracket, // ]
+	super,
+	left_super = super,
+	l_super = super,
 
-	/* arrow */
-	Right = 262,
-	RightArrow = Right,
-	RArrow = Right,
-	Left = 263,
-	LeftArrow = Left,
-	LArrow = Left,
-	Down = 264,
-	DownArrow = Down,
-	DArrow = Down,
-	Up = 265,
-	UpArrow = Up,
-	UArrow = Up,
+	right_super,
+	r_super = right_super,
 
-	/* page */
-	PageUp = 266,
-	PageDown = 267,
-
-	/* home/end */
-	Home = 268,
-	end = 269,
-
-	/* toggles */
-	CapsLock = 280,
-	ScrollLock = 281,
-	NumLock = 282,
-	NumberLock = NumLock,
+	kp_0,
+	kp_1,
+	kp_2,
+	kp_3,
+	kp_4,
+	kp_5,
+	kp_6,
+	kp_7,
+	kp_8,
+	kp_9,
+	kp_decimal,
+	kp_divide,
+	kp_multiply,
+	kp_subtract,
+	kp_add,
+	kp_enter,
+	kp_equal,
 
 	/* function */
-	F1 = 290,
-	F2 = 291,
-	F3 = 292,
-	F4 = 293,
-	F5 = 294,
-	F6 = 295,
-	F7 = 296,
-	F8 = 297,
-	F9 = 298,
-	F10 = 299,
-	F11 = 300,
-	F12 = 301,
-	F13 = 302,
-	F14 = 303,
-	F15 = 304,
-	F16 = 305,
-	F17 = 306,
-	F18 = 307,
-	F19 = 308,
-	F20 = 309,
-	F21 = 310,
-	F22 = 311,
-	F23 = 312,
-	F24 = 313,
-	F25 = 314,
+	f1,
+	f2,
+	f3,
+	f4,
+	f5,
+	f6,
+	f7,
+	f8,
+	f9,
+	f10,
+	f11,
+	f12,
 
-	/* keypad */
-	Kp0 = 320,
-	Kp1 = 321,
-	Kp2 = 322,
-	Kp3 = 323,
-	Kp4 = 324,
-	Kp5 = 325,
-	Kp6 = 326,
-	Kp7 = 327,
-	Kp8 = 328,
-	Kp9 = 329,
-	KpDecimal = 330,
-	KpDivide = 331,
-	KpMultiply = 332,
-	KpSubstract = 333,
-	KpAdd = 334,
-	KpEnter = 335,
-	KpEqual = 336,
+	unknown,
+};
+
+export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
+{
+	using enum Key;
+	switch (key)
+	{
+	case none: return "<none>";
+
+	/* mouse */
+	case left_mouse_button: return "left_mouse_button";
+	case right_mouse_button: return "right_mouse_button";
+	case middle_mouse_button: return "middle_mouse_button";
+
+	/* editing / control */
+	case backspace: return "backspace";
+	case tab: return "tab";
+	case capslock: return "capslock";
+	case enter: return "enter";
+	case space: return "space";
+	case delete_: return "delete";
 
 	/* modifiers */
-	LeftShift = 340,
-	LShift = LeftShift,
-	LeftControl = 341,
-	LControl = LeftControl,
-	LeftAlt = 342,
-	LAlt = LeftAlt,
-	LeftSuper = 343,
-	LSuper = LeftSuper,
-	RightShift = 344,
-	RShift = 344,
-	RightControl = 345,
-	RControl = 345,
-	RightAlt = 346,
-	RAlt = 346,
-	RightSuper = 347,
-	RSuper = 347,
+	case shift: return "shift";
+	case control: return "control";
+	case right_control: return "right_control";
+	case alt: return "alt";
+	case right_alt: return "right_alt";
 
-	/* misc */
-	Space = 32,
-	Apostrophe = 39, // '
-	Quote = Apostrophe,
+	/* navigation */
+	case pageup: return "pageup";
+	case pagedown: return "pagedown";
+	case home: return "home";
+	case end: return "end";
 
-	Comma = 44,           // ,
-	Minus = 45,           // -
-	Period = 46,          // .
-	Slash = 47,           // /
-	ForwardSlash = Slash, // /
-	BackSlash = 92,       // \
+	case left_arrow: return "left_arrow";
+	case up_arrow: return "up_arrow";
+	case right_arrow: return "right_arrow";
+	case down_arrow: return "down_arrow";
 
-	GraveAccent = 96,     // `
-	Console = GraveAccent,
-	World1 = 161, // non-US #1
-	World2 = 162, // non-US #2
-	Escape = 256,
-	Esc = Escape,
-	Enter = 257,
-	Tab = 258,
-	BackSpace = 259,
-	Insert = 260,
-	Delete = 261,
+	/* system */
+	case cancel: return "cancel";
+	case pause: return "pause";
+	case select: return "select";
+	case print: return "print";
+	case snapshot: return "snapshot";
+	case insert: return "insert";
+	case help: return "help";
+	case sleep: return "sleep";
 
-	PrintScreen = 283,
-	Pause = 284,
+	/* digits */
+	case digit_0: return "0";
+	case digit_1: return "1";
+	case digit_2: return "2";
+	case digit_3: return "3";
+	case digit_4: return "4";
+	case digit_5: return "5";
+	case digit_6: return "6";
+	case digit_7: return "7";
+	case digit_8: return "8";
+	case digit_9: return "9";
 
-	Menu = 348,
-};
+	/* letters */
+	case a: return "a";
+	case b: return "b";
+	case c: return "c";
+	case d: return "d";
+	case e: return "e";
+	case f: return "f";
+	case g: return "g";
+	case h: return "h";
+	case i: return "i";
+	case j: return "j";
+	case k: return "k";
+	case l: return "l";
+	case m: return "m";
+	case n: return "n";
+	case o: return "o";
+	case p: return "p";
+	case q: return "q";
+	case r: return "r";
+	case s: return "s";
+	case t: return "t";
+	case u: return "u";
+	case v: return "v";
+	case w: return "w";
+	case x: return "x";
+	case y: return "y";
+	case z: return "z";
+
+	/* super / meta */
+	case super: return "super";
+	case right_super: return "right_super";
+
+	/* keypad */
+	case kp_0: return "kp_0";
+	case kp_1: return "kp_1";
+	case kp_2: return "kp_2";
+	case kp_3: return "kp_3";
+	case kp_4: return "kp_4";
+	case kp_5: return "kp_5";
+	case kp_6: return "kp_6";
+	case kp_7: return "kp_7";
+	case kp_8: return "kp_8";
+	case kp_9: return "kp_9";
+	case kp_decimal: return "kp_decimal";
+	case kp_divide: return "kp_divide";
+	case kp_multiply: return "kp_multiply";
+	case kp_subtract: return "kp_subtract";
+	case kp_add: return "kp_add";
+	case kp_enter: return "kp_enter";
+	case kp_equal: return "kp_equal";
+
+	/* function keys */
+	case f1: return "f1";
+	case f2: return "f2";
+	case f3: return "f3";
+	case f4: return "f4";
+	case f5: return "f5";
+	case f6: return "f6";
+	case f7: return "f7";
+	case f8: return "f8";
+	case f9: return "f9";
+	case f10: return "f10";
+	case f11: return "f11";
+	case f12: return "f12";
+
+	case unknown: return "<unknown>";
+	}
+
+	return "<invalid>";
+}
