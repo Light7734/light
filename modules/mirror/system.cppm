@@ -176,31 +176,41 @@ public:
 		);
 
 		auto &input = m_editor_registry->add<InputComponent>(m_window, {});
-		auto quit_action_key = input.add_action(input::InputAction {
-		    .name = "quit",
-		    .trigger = input::Trigger { .mapped_keycode = Key::Q },
-		});
+		auto quit_action_key = input.add_action(
+		    input::InputAction {
+		        .name = "quit",
+		        .trigger = input::Trigger { .mapped_keycode = Key::q },
+		    }
+		);
 
 		auto debug_action_keys = std::array<std::size_t, 4ul> {};
-		debug_action_keys[0] = input.add_action(input::InputAction {
-		    .name = "debug_1",
-		    .trigger = input::Trigger { .mapped_keycode = Key::D1 },
-		});
+		debug_action_keys[0] = input.add_action(
+		    input::InputAction {
+		        .name = "debug_1",
+		        .trigger = input::Trigger { .mapped_keycode = Key::digit_1 },
+		    }
+		);
 
-		debug_action_keys[1] = input.add_action(input::InputAction {
-		    .name = "debug_2",
-		    .trigger = input::Trigger { .mapped_keycode = Key::D2 },
-		});
+		debug_action_keys[1] = input.add_action(
+		    input::InputAction {
+		        .name = "debug_2",
+		        .trigger = input::Trigger { .mapped_keycode = Key::digit_2 },
+		    }
+		);
 
-		debug_action_keys[2] = input.add_action(input::InputAction {
-		    .name = "debug_3",
-		    .trigger = input::Trigger { .mapped_keycode = Key::D3 },
-		});
+		debug_action_keys[2] = input.add_action(
+		    input::InputAction {
+		        .name = "debug_3",
+		        .trigger = input::Trigger { .mapped_keycode = Key::digit_3 },
+		    }
+		);
 
-		debug_action_keys[3] = input.add_action(input::InputAction {
-		    .name = "debug_4",
-		    .trigger = input::Trigger { .mapped_keycode = Key::D4 },
-		});
+		debug_action_keys[3] = input.add_action(
+		    input::InputAction {
+		        .name = "debug_4",
+		        .trigger = input::Trigger { .mapped_keycode = Key::digit_4 },
+		    }
+		);
 
 		m_input_system = memory::create_ref<input::System>(m_editor_registry);
 		m_mirror_system = memory::create_ref<MirrorSystem>(
