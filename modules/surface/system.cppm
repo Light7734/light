@@ -14,6 +14,7 @@ import debug.assertions;
 import app.system;
 import ecs.registry;
 import math.vec2;
+import input.codes;
 import surface.requests;
 import memory.reference;
 import memory.null_on_move;
@@ -725,11 +726,15 @@ void System::handle_events(SurfaceComponent &surface)
 	queue.clear();
 
 	auto message = MSG {};
-	while (PeekMessage(&message, 0, {}, {}, PM_REMOVE))
+	while (PeekMessage(&message, surface.m_native_data.window, {}, {}, PM_REMOVE))
 	{
-		switch (message.message) {}
+		switch (message.message)
+		{
+		}
 
-		log::debug("Window message type: {}", std::uint32_t { message.message });
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+		// log::debug("Window message type: {}", std::uint32_t { message.message });
 	}
 
 	// auto event = XEvent {};
@@ -834,16 +839,15 @@ void System::handle_requests(SurfaceComponent &surface)
 		[&](const ModifyTitleRequest &request) { modify_title(surface, request); },
 		[&](const ModifyResolutionRequest &request) { modify_resolution(surface, request); },
 		[&](const ModifyPositionRequest &request) { modify_position(surface, request); },
-		[&](const ModifyVisibilityRequest &request) { modify_visiblity(surface, request); },
-		[&](const auto &) { log::error("Unknown surface request"); },
+		[&](const ModifyVisibilityRequest &request) {
+		    modify_visiblity(surface, request);
+		}
 	};
 
 	for (const auto &request : surface.peek_requests())
 	{
 		std::visit(visitor, request);
 	}
-
-	surface.m_requests.clear();
 }
 
 void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
@@ -1022,8 +1026,127 @@ void ensure_component_sanity(const SurfaceComponent &component)
 
 auto CALLBACK native_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT
 {
+	constexpr auto translate_key = [](auto code) -> Key {
+		switch (code)
+		{
+			using enum Key;
+		case VK_LBUTTON: return left_mouse_button;
+		case VK_RBUTTON: return right_mouse_button;
+		case VK_MBUTTON: return middle_mouse_button;
+
+		case VK_BACK: return backspace;
+		case VK_TAB: return tab;
+		case VK_CAPITAL: return capslock;
+		case VK_RETURN: enter;
+		case VK_SPACE: space;
+		case VK_DELETE: return delete_;
+
+		case VK_SHIFT: shift;
+		case VK_RSHIFT: right_shift;
+
+		case VK_CONTROL: control;
+		case VK_RCONTROL: right_control;
+
+		case VK_MENU: alt;
+		case VK_RMENU: right_alt;
+
+		case VK_PRIOR: return pageup;
+		case VK_NEXT: return pagedown;
+		case VK_END: return end;
+		case VK_HOME: return home;
+
+		case VK_LEFT: return left_arrow;
+		case VK_RIGHT: return right_arrow;
+		case VK_DOWN: return down_arrow;
+		case VK_UP: return up_arrow;
+
+		case VK_CANCEL: return cancel;
+		case VK_PAUSE: return pause;
+		case VK_SELECT: return select;
+		case VK_PRINT: return print;
+		case VK_SNAPSHOT: return snapshot;
+		case VK_INSERT: return insert;
+		case VK_HELP: return help;
+		case VK_SLEEP: return sleep;
+
+		case '0': return digit_0;
+		case '1': return digit_1;
+		case '2': return digit_2;
+		case '3': return digit_3;
+		case '4': return digit_4;
+		case '5': return digit_5;
+		case '6': return digit_6;
+		case '7': return digit_7;
+		case '8': return digit_8;
+		case '9': return digit_9;
+
+		case 'A': return a;
+		case 'B': return b;
+		case 'C': return c;
+		case 'D': return d;
+		case 'E': return e;
+		case 'F': return f;
+		case 'G': return g;
+		case 'H': return h;
+		case 'I': return i;
+		case 'J': return j;
+		case 'K': return k;
+		case 'L': return l;
+		case 'M': return m;
+		case 'N': return n;
+		case 'O': return o;
+		case 'P': return p;
+		case 'Q': return q;
+		case 'R': return r;
+		case 'S': return s;
+		case 'T': return t;
+		case 'U': return u;
+		case 'V': return v;
+		case 'W': return w;
+		case 'X': return x;
+		case 'Y': return y;
+		case 'Z': return z;
+
+		case VK_LWIN: return super;
+		case VK_RWIN: return right_super;
+
+		case VK_NUMPAD0: return kp_0;
+		case VK_NUMPAD1: return kp_1;
+		case VK_NUMPAD2: return kp_2;
+		case VK_NUMPAD3: return kp_3;
+		case VK_NUMPAD4: return kp_4;
+		case VK_NUMPAD5: return kp_5;
+		case VK_NUMPAD6: return kp_6;
+		case VK_NUMPAD7: return kp_7;
+		case VK_NUMPAD8: return kp_8;
+		case VK_NUMPAD9: return kp_9;
+
+		case VK_MULTIPLY: return kp_multiply;
+		case VK_ADD: return kp_add;
+		case VK_SUBTRACT: return kp_subtract;
+		case VK_DECIMAL: return kp_decimal;
+
+		case VK_F1: return f1;
+		case VK_F2: return f2;
+		case VK_F3: return f3;
+		case VK_F4: return f4;
+		case VK_F5: return f5;
+		case VK_F6: return f6;
+		case VK_F7: return f7;
+		case VK_F8: return f8;
+		case VK_F9: return f9;
+		case VK_F10: return f10;
+		case VK_F11: return f11;
+		case VK_F12: return f12;
+
+		default: return unknown;
+		}
+	};
+
 	switch (uMsg)
 	{
+	case WM_KEYDOWN: log::debug("Keydown: {}", to_string(translate_key(wParam)));
+	case WM_KEYUP: log::debug("Keyup__: {}", to_string(translate_key(wParam)));
 	case WM_DESTROY:
 	{
 		PostQuitMessage(0);
@@ -1031,6 +1154,9 @@ auto CALLBACK native_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	}
 	}
 
+
+	// log::debug("Window message type (window proc): {}", std::uint32_t { uMsg
+	// });
 	return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 
