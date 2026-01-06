@@ -1,3 +1,4 @@
+add_option(ENABLE_SANDBOX "Enables the building of the sandbox module for experimentation")
 add_option(ENABLE_UNIT_TESTS "Enables the building of the unit test modules")
 add_option(ENABLE_FUZZ_TESTS "Enables the building of the fuzz test modules")
 add_option(

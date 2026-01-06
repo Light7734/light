@@ -274,3 +274,7 @@ target_link_libraries(
 
 # add_executable_module(mirror entrypoint/mirror.cpp)
 # target_link_libraries(mirror PRIVATE libmirror input)
+
+if(ENABLE_SANDBOX)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sandbox/)
+endif()

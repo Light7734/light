@@ -1,0 +1,45 @@
+import test.test;
+import time;
+import test.expects;
+import surface.system;
+import surface.events;
+import surface.requests;
+import ecs.registry;
+import memory.scope;
+import memory.reference;
+import logger;
+import math.vec2;
+import app.system;
+import std;
+
+constexpr auto title = "TestWindow";
+constexpr auto width = 800u;
+constexpr auto height = 600u;
+constexpr auto vsync = true;
+constexpr auto visible = false;
+
+int main()
+{
+	auto registry = lt::memory::create_ref<lt::ecs::Registry>();
+	auto system = lt::surface::System { registry };
+
+	auto entity = registry->create_entity();
+
+	system.create_surface_component(
+	    entity,
+	    lt::surface::SurfaceComponent::CreateInfo {
+	        .title = title,
+	        .resolution = { width, height },
+	        .vsync = vsync,
+	        .visible = visible,
+	    }
+	);
+
+	auto timer = lt::time::Timer {};
+	lt::log::trace("Ticking for 3 seconds...");
+	while (timer.elapsed_time() < std::chrono::seconds { 3 })
+	{
+		system.tick({});
+	}
+	lt::log::trace("Three seconds passed, quitting...");
+}
