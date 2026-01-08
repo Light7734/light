@@ -1,5 +1,15 @@
-conan profile detect
-conan build . -s compiler.cppstd=20 -s build_type=Release
+# @ref https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-by-category
+
+rm -Force -Recurse ./build
+cmake `
+    -S . `
+    -B build `
+    -G Ninja `
+    -D ENABLE_UNIT_TESTS=ON `
+    -D CMAKE_BUILD_TYPE=Release `
+    -D CMAKE_CXX_FLAGS="/std:c++latest /EH /Zi /Oy- /WX /W4"
+
+cmake --build ./build
 
 $tests = Get-ChildItem -Path "./build" -Recurse -File | Where-Object {
     $_.Name -like "*_tests.exe"
