@@ -7,7 +7,7 @@ cmake `
     -G Ninja `
     -D ENABLE_UNIT_TESTS=ON `
     -D CMAKE_BUILD_TYPE=Release `
-    -D CMAKE_CXX_FLAGS="/std:c++latest /EH /Zi /Oy- /WX /W4"
+    -D CMAKE_CXX_FLAGS="/std:c++latest /EHsc /Zi /Oy- /WX /W4"
 
 cmake --build ./build
 
