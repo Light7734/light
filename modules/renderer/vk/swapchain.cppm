@@ -81,8 +81,6 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
     , m_gpu(static_cast<Gpu *>(gpu))
     , m_device(static_cast<Device *>(device))
 {
-	static auto idx = 0u;
-
 	auto capabilities = m_gpu->vk().get_surface_capabilities(m_surface->vk());
 	const auto formats = m_gpu->vk().get_surface_formats(m_surface->vk());
 
@@ -104,6 +102,7 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 		capabilities.current_extent.y = 600u;
 	}
 
+	static auto swapchain_idx = 0u;
 	m_swapchain = vk::Swapchain(
 	    m_device->vk(),
 	    m_surface->vk(),
@@ -116,7 +115,7 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	        .queue_family_indices = m_device->get_family_indices(),
 	        .present_mode = vk::Swapchain::PresentMode::mailbox,
 	        .pre_transform = capabilities.current_transform,
-	        .name = std::format("swapchain {}", idx++),
+	        .name = std::format("swapchain {}", swapchain_idx++),
 	    }
 	);
 	m_resolution = capabilities.current_extent;

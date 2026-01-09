@@ -59,16 +59,11 @@ public:
 			);
 			new_capacity = std::min(new_capacity, max_capacity);
 
-			// log::debug("Increasing sparse vector size:", m_dead_count);
-			// log::debug("\tdead_count: {}", m_dead_count);
-			// log::debug("\talive_count: {}", m_alive_count);
-			// log::debug("\tsparse.size: {} -> {}", m_sparse.size(), new_capacity);
-
 			m_sparse.resize(new_capacity, null_identifier);
 		}
 
 		++m_alive_count;
-		m_sparse[identifier] = m_dense.size();
+		m_sparse[identifier] = static_cast<Identifier_T>(m_dense.size());
 		return m_dense.emplace_back(identifier, std::move(value));
 	}
 

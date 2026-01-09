@@ -26,13 +26,15 @@ export void bake_shader(
 
 	// Don't bother linking to shaderc, just invoke the command with a system call.
 	// NOLINTNEXTLINE(concurrency-mt-unsafe)
-	std::system(std::format(
-	                "glslc --target-env=vulkan1.4 -std=450core -fshader-stage={} {} -o {}",
-	                type == vertex ? "vert" : "frag",
-	                glsl_path,
-	                spv_path
-	)
-	                .c_str());
+	std::system(
+	    std::format(
+	        "glslc --target-env=vulkan1.4 -std=450core -fshader-stage={} {} -o {}",
+	        type == vertex ? "vert" : "frag",
+	        glsl_path,
+	        spv_path
+	    )
+	        .c_str()
+	);
 
 	auto stream = std::ifstream(spv_path, std::ios::binary);
 	lt::debug::ensure(
@@ -48,7 +50,6 @@ export void bake_shader(
 	auto bytes = std::vector<std::byte>(size);
 	stream.seekg(0, std::ios::beg);
 	stream.read((char *)bytes.data(), size); // NOLINT
-	lt::log::debug("BYTES: {}", bytes.size());
 	stream.close();
 	std::filesystem::remove(spv_path);
 

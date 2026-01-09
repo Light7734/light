@@ -28,6 +28,7 @@ Suite raii = "raii"_suite = [] {
 	Case { "plenty" } = [] {
 		for (auto idx : std::views::iota(0, 100'001))
 		{
+			std::ignore = idx;
 			Timer {};
 		}
 	};

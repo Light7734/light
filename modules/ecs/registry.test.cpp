@@ -68,6 +68,7 @@ Suite raii = "raii"_suite = [] {
 	Case { "many won't freeze/throw" } = [] {
 		for (auto idx : std::views::iota(0, 100'000))
 		{
+			std::ignore = idx;
 			std::ignore = Registry {};
 		}
 	};
@@ -158,6 +159,7 @@ Suite callbacks = "callbacks"_suite = [] {
 
 	Case { "on_construct/on_destruct won't get called on unrelated component" } = [] {
 		auto registry = Registry {};
+
 		registry.connect_on_construct<Component>([&](Registry &, EntityId) {
 			expect_unreachable();
 		});
@@ -167,6 +169,7 @@ Suite callbacks = "callbacks"_suite = [] {
 
 		for (auto idx : std::views::iota(0, 100'000))
 		{
+			std::ignore = idx;
 			registry.add<Component_B>(registry.create_entity(), {});
 		}
 	};
@@ -188,6 +191,8 @@ Suite callbacks = "callbacks"_suite = [] {
 		expect_true(on_destruct_called.empty());
 		for (auto idx : std::views::iota(0, 100'000))
 		{
+			std::ignore = idx;
+
 			auto entity = all_entities.emplace_back(registry.create_entity());
 			registry.add<Component>(entity, {});
 		}

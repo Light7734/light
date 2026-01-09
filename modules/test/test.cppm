@@ -108,6 +108,9 @@ constexpr TestFuzzHarness::TestFuzzHarness(auto body)
 
 auto operator""_suite(const char *name, std::size_t size) -> TestSuite
 {
+	// TODO(Light): do we need the size parameter?
+	std::ignore = size;
+
 	Registry::set_last_suite_name(name);
 	return {};
 }

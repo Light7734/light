@@ -31,6 +31,7 @@ export void expect_unreachable(
 	};
 };
 
+/** @todo(Light7734): Check exception type. */
 export constexpr void expect_throw(
     std::invocable auto invocable,
     std::source_location source_location = std::source_location::current()
@@ -40,7 +41,7 @@ export constexpr void expect_throw(
 	{
 		invocable();
 	}
-	catch (const std::exception &exp)
+	catch (const std::exception &)
 	{
 		return;
 	}

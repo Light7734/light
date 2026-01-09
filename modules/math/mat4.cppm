@@ -74,7 +74,7 @@ struct mat4_impl
 		return vec4_impl<T> {};
 	}
 
-	std::array<Column_T, 4> values; // NOLINT
+	std::array<Column_T, 4u> values;
 };
 
 export template<typename T>

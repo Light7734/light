@@ -1,5 +1,6 @@
 export module assets.shader;
 import assets.metadata;
+import logger;
 import debug.assertions;
 
 import std;
@@ -109,6 +110,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
 	read(m_asset_metadata.type);
 	read(m_asset_metadata.version);
 	read(m_metadata.type);
+
 	read(m_code_blob_metadata.tag);
 	read(m_code_blob_metadata.offset);
 	read(m_code_blob_metadata.compression_type);

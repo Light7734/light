@@ -1,5 +1,6 @@
 import assets.metadata;
 import assets.shader;
+import logger;
 import test.test;
 import test.expects;
 import std;
@@ -38,7 +39,7 @@ Suite packing = "shader_pack"_suite = [] {
 	Case { "" } = [] {
 		const auto out_path = tmp_path / "shader_packing";
 		auto dummy_blob = lt::assets::Blob {};
-		for (auto idx : std::views::iota(0, 255))
+		for (auto idx : std::views::iota(0u, 255u))
 		{
 			dummy_blob.emplace_back(static_cast<std::byte>(idx));
 		}
@@ -72,7 +73,7 @@ Suite packing = "shader_pack"_suite = [] {
 		};
 		expect_true(stream.is_open());
 
-		stream.seekg(0, std::ios::end);
+		stream.seekg(0u, std::ios::end);
 		const auto file_size = static_cast<std::size_t>(stream.tellg());
 		expect_eq(file_size, expected_size);
 		stream.close();
@@ -87,9 +88,9 @@ Suite packing = "shader_pack"_suite = [] {
 		expect_eq(metadata.type, ShaderAsset::Type::vertex);
 
 		auto blob = shader_asset.unpack(ShaderAsset::BlobTag::code);
-		expect_eq(blob.size(), 255);
+		expect_eq(blob.size(), 255u);
 
-		for (auto idx : std::views::iota(0, 255))
+		for (auto idx : std::views::iota(0u, 255u))
 		{
 			expect_eq(blob[idx], static_cast<std::byte>(idx));
 		}

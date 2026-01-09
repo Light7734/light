@@ -46,6 +46,8 @@ add_module(
     vec3.cppm
     vec4.cppm
     components.cppm
+    DEPENDENCIES
+    lt_debug
 )
 
 add_module(

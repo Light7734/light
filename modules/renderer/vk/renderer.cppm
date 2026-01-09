@@ -35,9 +35,10 @@ public:
 		{
 			m_device->vk().wait_idle();
 		}
-		catch (std::exception &exp)
+		catch (const std::exception &exp)
 		{
-			log::error("Failed to wait idle on device in renderer destructor");
+			log::error("Failed to wait idle on device in renderer destructor:");
+			log::error("\twhat: {}", exp.what());
 		}
 	}
 
@@ -193,6 +194,9 @@ Renderer::Renderer(
 	frame_fence.reset();
 
 	map_buffers(frame_idx);
+
+	// WIP(Light): submit the scene!
+	std::ignore = submit_scene;
 	// submit_scene();
 	record_cmd(cmd, image_idx);
 

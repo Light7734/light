@@ -37,7 +37,7 @@ void renderer_callback(
 	std::ignore = message_type;
 	std::ignore = user_data;
 
-	log::debug("RENDERER CALLBACK: {}", std::string { data.message });
+	log::trace("< Renderer > ==> {}", std::string { data.message });
 }
 
 class MirrorSystem: public lt::app::ISystem

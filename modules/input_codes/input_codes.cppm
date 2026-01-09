@@ -4,17 +4,18 @@ import std;
 export enum class Key: std::uint16_t {
 	none = 0,
 
-	left_mouse_button,
-	right_mouse_button,
-	middle_mouse_button,
+	left_button,
+	l_button = left_button,
 
-	left_mouse = left_mouse_button,
-	right_mouse = right_mouse_button,
-	middle_mouse = middle_mouse_button,
+	right_button,
+	r_button = right_button,
 
-	l_mouse = left_mouse_button,
-	r_mouse = right_mouse_button,
-	m_mouse = middle_mouse_button,
+	middle_button,
+	m_button = middle_button,
+
+	// the buttons on the sidse of some mouses
+	x_button_1,
+	x_button_2,
 
 	backspace,
 	tab,
@@ -87,7 +88,6 @@ export enum class Key: std::uint16_t {
 	digit_8,
 	digit_9,
 
-	/* letters */
 	a,
 	b,
 	c,
@@ -140,7 +140,6 @@ export enum class Key: std::uint16_t {
 	kp_enter,
 	kp_equal,
 
-	/* function */
 	f1,
 	f2,
 	f3,
@@ -164,12 +163,13 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	{
 	case none: return "<none>";
 
-	/* mouse */
-	case left_mouse_button: return "left_mouse_button";
-	case right_mouse_button: return "right_mouse_button";
-	case middle_mouse_button: return "middle_mouse_button";
+	case left_button: return "left_button";
+	case right_button: return "right_button";
+	case middle_button: return "middle_button";
 
-	/* editing / control */
+	case x_button_1: return "x_button_1";
+	case x_button_2: return "x_button_2";
+
 	case backspace: return "backspace";
 	case tab: return "tab";
 	case capslock: return "capslock";
@@ -177,14 +177,12 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case space: return "space";
 	case delete_: return "delete";
 
-	/* modifiers */
 	case shift: return "shift";
 	case control: return "control";
 	case right_control: return "right_control";
 	case alt: return "alt";
 	case right_alt: return "right_alt";
 
-	/* navigation */
 	case pageup: return "pageup";
 	case pagedown: return "pagedown";
 	case home: return "home";
@@ -195,7 +193,6 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case right_arrow: return "right_arrow";
 	case down_arrow: return "down_arrow";
 
-	/* system */
 	case cancel: return "cancel";
 	case pause: return "pause";
 	case select: return "select";
@@ -205,7 +202,6 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case help: return "help";
 	case sleep: return "sleep";
 
-	/* digits */
 	case digit_0: return "0";
 	case digit_1: return "1";
 	case digit_2: return "2";
@@ -217,7 +213,6 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case digit_8: return "8";
 	case digit_9: return "9";
 
-	/* letters */
 	case a: return "a";
 	case b: return "b";
 	case c: return "c";
@@ -245,11 +240,9 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case y: return "y";
 	case z: return "z";
 
-	/* super / meta */
 	case super: return "super";
 	case right_super: return "right_super";
 
-	/* keypad */
 	case kp_0: return "kp_0";
 	case kp_1: return "kp_1";
 	case kp_2: return "kp_2";
@@ -268,7 +261,6 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case kp_enter: return "kp_enter";
 	case kp_equal: return "kp_equal";
 
-	/* function keys */
 	case f1: return "f1";
 	case f2: return "f2";
 	case f3: return "f3";

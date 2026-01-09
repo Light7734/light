@@ -2944,11 +2944,11 @@ void load_library()
 	    "Failed to load vulkan function: vkGetInstanceProcAddr"
 	);
 #elif defined(LIGHT_PLATFORM_WINDOWS)
-	auto library = LoadLibraryA("vulkan-1.dll");
+	library = LoadLibraryA("vulkan-1.dll");
 	lt::debug::ensure(library, "Failed to LoadLibraryA the vulkan-1.dll");
 
 	api::get_instance_proc_address = std::bit_cast<PFN_vkGetInstanceProcAddr>(
-	    GetProcAddress(library, "vkGetInstanceProcAddr")
+	    GetProcAddress(std::bit_cast<HMODULE>(library), "vkGetInstanceProcAddr")
 	);
 	lt::debug::ensure(
 	    api::get_instance_proc_address,
@@ -3883,7 +3883,7 @@ void Device::reset_fence(VkFence fence) const
 
 void Device::reset_fences(std::span<VkFence> fences) const
 {
-	vkc(api::reset_fences(m_device, fences.size(), fences.data()));
+	vkc(api::reset_fences(m_device, static_cast<uint32_t>(fences.size()), fences.data()));
 }
 
 auto Device::acquire_image(VkSwapchainKHR swapchain, VkSemaphore semaphore, uint64_t timeout)
@@ -3917,7 +3917,7 @@ void Device::wait_for_fences(std::span<VkFence> fences) const
 {
 	vkc(api::wait_for_fences(
 	    m_device,
-	    fences.size(),
+	    static_cast<uint32_t>(fences.size()),
 	    fences.data(),
 	    true,
 	    std::numeric_limits<uint64_t>::max()
@@ -4274,6 +4274,9 @@ void Queue::present(PresentInfo info) const
 
 Image::Image(Device &device, CreateInfo info): m_device(device.get_vk_handle()), m_image()
 {
+	// WIP(Light): use image create info's info
+
+	std::ignore = info;
 	auto vk_info = VkImageCreateInfo {};
 	vkc(api::create_image(m_device, &vk_info, nullptr, &m_image));
 }
@@ -4337,6 +4340,9 @@ CommandBuffer::CommandBuffer(VkCommandBuffer buffer): m_buffer(buffer)
 
 void CommandBuffer::begin(BeginInfo info /* = {} */)
 {
+	// WIP(Light): Use info
+	std::ignore = info;
+
 	auto vk_info = VkCommandBufferBeginInfo {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 		.pNext = {},
@@ -4937,10 +4943,11 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 
 	auto color_attachment_formats = std::vector<vk::Format> {};
 
+	// WIP(Light): use color attachments
 	for (auto &color_attachment : info.attachment_state.color_attachments)
 	{
+		std::ignore = color_attachment;
 	}
-
 
 	auto rendering_info = VkPipelineRenderingCreateInfoKHR {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,

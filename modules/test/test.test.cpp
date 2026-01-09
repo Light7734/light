@@ -24,7 +24,7 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_unreachable(); }
-		catch (const std::exception &exp) { unhappy = true; }
+		catch (const std::exception &) { unhappy = true; }
 		// clang-format on
 
 		if (!unhappy)
@@ -48,16 +48,16 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_true(where_oongaboonga_ptr); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_true(!true); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_true(false); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_true(0); } // NOLINT
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 		// clang-format on
 	};
 
@@ -66,27 +66,30 @@ Suite expects = "expects"_suite = []() {
 
 		expect_false(oongaboonga_is_slacking);
 		expect_false(false);
-		expect_false(0); // NOLINT
 	};
 
 	Case { "expect_false - unhappy" } = [] {
-		auto oongaboonga = int {};
 		auto *oonga_oonga_can_rest_now = (int *)nullptr;
 		auto unhappy_counter = 0u;
 
 		// clang-format off
 		try { expect_false(oonga_oonga_can_rest_now); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_false(true); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_false(!false); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
-		try { expect_false(1);  } // NOLINT
-        catch (const std::exception& exp) { ++unhappy_counter; }
+		try { expect_false(!!1);  }
+        catch (const std::exception&) { ++unhappy_counter; }
 		// clang-format on
+
+		if (unhappy_counter != 4)
+		{
+			throw std::runtime_error { "expect_false - unhappy" };
+		}
 	};
 
 	Case { "expect_true - unhappy" } = [] {
@@ -95,23 +98,28 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_true(where_oongaboonga_ptr); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_true(!true); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
 		try { expect_true(false); }
-        catch (const std::exception& exp) { ++unhappy_counter; }
+        catch (const std::exception&) { ++unhappy_counter; }
 
-		try { expect_true(0); } // NOLINT
-        catch (const std::exception& exp) { ++unhappy_counter; }
+		try { expect_true(!!0); } 
+        catch (const std::exception&) { ++unhappy_counter; }
 		// clang-format on
+
+		if (unhappy_counter != 4)
+		{
+			throw std::runtime_error { "expect_true - unhappy" };
+		}
 	};
 
 	Case { "expect_eq - happy" } = [] {
 		expect_eq(5, 5);
 		expect_eq(20.0, 20.0);
-		expect_eq(true, 1);
+		expect_eq(true, true);
 	};
 
 	Case { "expect_eq - unhappy" } = [] {
@@ -119,7 +127,7 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_eq(true, false); }
-		catch (const std::exception &exp) { unhappy = true; }
+		catch (const std::exception &) { unhappy = true; }
 		// clang-format on
 
 		if (!unhappy)
@@ -131,7 +139,8 @@ Suite expects = "expects"_suite = []() {
 	Case { "expect_ne - happy " } = [] {
 		expect_ne(5, 5.0000001);
 		expect_ne(20.0, 69.0);
-		expect_ne(true, 0);
+		expect_ne(true, true);
+		expect_ne(false, false);
 	};
 
 	Case { "expect_ne - unhappy" } = [] {
@@ -139,16 +148,19 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_ne(5, 5); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		catch (const std::exception &) { ++unhappy_counter; }
 
 		try { expect_ne(20.0, 20.0); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		catch (const std::exception &) { ++unhappy_counter; }
 
-		try { expect_ne(true, 1); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		try { expect_ne(true, true); }
+		catch (const std::exception &) { ++unhappy_counter; }
+
+		try { expect_ne(false, false); }
+		catch (const std::exception &) { ++unhappy_counter; }
 		// clang-format on
 
-		if (unhappy_counter != 3)
+		if (unhappy_counter != 4)
 		{
 			throw std::runtime_error { "expect_ne unhappy" };
 		}
@@ -163,7 +175,7 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_throw([] {}); }
-		catch (const std::exception &exp) { unhappy = true; }
+		catch (const std::exception &) { unhappy = true; }
 		// clang-format on
 
 		if (!unhappy)
@@ -175,7 +187,7 @@ Suite expects = "expects"_suite = []() {
 	Case { "expect_le - happy" } = [] {
 		expect_le(69, 420);
 		expect_le(19.694206942069420, 20.0);
-		expect_le(false, 1);
+		expect_le(false, !!1);
 	};
 
 	Case { "expect_le - unhappy" } = [] {
@@ -183,16 +195,16 @@ Suite expects = "expects"_suite = []() {
 
 		// clang-format off
 		try { expect_le(20020619 + 23, 20020619 ); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		catch (const std::exception &) { ++unhappy_counter; }
 
 		try { expect_le(420, 69); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		catch (const std::exception &) { ++unhappy_counter; }
 
 		try { expect_le(20.0, 19.694206942069420); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		catch (const std::exception &) { ++unhappy_counter; }
 
-		try { expect_le(1, false); }
-		catch (const std::exception &exp) { ++unhappy_counter; }
+		try { expect_le(true, false); }
+		catch (const std::exception &) { ++unhappy_counter; }
 		// clang-format on
 
 		if (unhappy_counter != 4)

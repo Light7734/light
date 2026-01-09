@@ -527,6 +527,125 @@ void System::tick(app::TickInfo tick)
 
 #ifdef LIGHT_PLATFORM_WINDOWS
 
+constexpr auto translate_key(auto code) -> Key
+{
+	using enum Key;
+
+	switch (code)
+	{
+	case VK_LBUTTON: return left_button;
+	case VK_RBUTTON: return right_button;
+	case VK_MBUTTON: return middle_button;
+
+	case VK_BACK: return backspace;
+	case VK_TAB: return tab;
+	case VK_CAPITAL: return capslock;
+	case VK_RETURN: return enter;
+	case VK_SPACE: return space;
+	case VK_DELETE: return delete_;
+
+	case VK_SHIFT: return shift;
+	case VK_RSHIFT: return right_shift;
+
+	case VK_CONTROL: return control;
+	case VK_RCONTROL: return right_control;
+
+	case VK_MENU: return alt;
+	case VK_RMENU: return right_alt;
+
+	case VK_PRIOR: return pageup;
+	case VK_NEXT: return pagedown;
+	case VK_END: return end;
+	case VK_HOME: return home;
+
+	case VK_LEFT: return left_arrow;
+	case VK_RIGHT: return right_arrow;
+	case VK_DOWN: return down_arrow;
+	case VK_UP: return up_arrow;
+
+	case VK_CANCEL: return cancel;
+	case VK_PAUSE: return pause;
+	case VK_SELECT: return select;
+	case VK_PRINT: return print;
+	case VK_SNAPSHOT: return snapshot;
+	case VK_INSERT: return insert;
+	case VK_HELP: return help;
+	case VK_SLEEP: return sleep;
+
+	case '0': return digit_0;
+	case '1': return digit_1;
+	case '2': return digit_2;
+	case '3': return digit_3;
+	case '4': return digit_4;
+	case '5': return digit_5;
+	case '6': return digit_6;
+	case '7': return digit_7;
+	case '8': return digit_8;
+	case '9': return digit_9;
+
+	case 'A': return a;
+	case 'B': return b;
+	case 'C': return c;
+	case 'D': return d;
+	case 'E': return e;
+	case 'F': return f;
+	case 'G': return g;
+	case 'H': return h;
+	case 'I': return i;
+	case 'J': return j;
+	case 'K': return k;
+	case 'L': return l;
+	case 'M': return m;
+	case 'N': return n;
+	case 'O': return o;
+	case 'P': return p;
+	case 'Q': return q;
+	case 'R': return r;
+	case 'S': return s;
+	case 'T': return t;
+	case 'U': return u;
+	case 'V': return v;
+	case 'W': return w;
+	case 'X': return x;
+	case 'Y': return y;
+	case 'Z': return z;
+
+	case VK_LWIN: return super;
+	case VK_RWIN: return right_super;
+
+	case VK_NUMPAD0: return kp_0;
+	case VK_NUMPAD1: return kp_1;
+	case VK_NUMPAD2: return kp_2;
+	case VK_NUMPAD3: return kp_3;
+	case VK_NUMPAD4: return kp_4;
+	case VK_NUMPAD5: return kp_5;
+	case VK_NUMPAD6: return kp_6;
+	case VK_NUMPAD7: return kp_7;
+	case VK_NUMPAD8: return kp_8;
+	case VK_NUMPAD9: return kp_9;
+
+	case VK_MULTIPLY: return kp_multiply;
+	case VK_ADD: return kp_add;
+	case VK_SUBTRACT: return kp_subtract;
+	case VK_DECIMAL: return kp_decimal;
+
+	case VK_F1: return f1;
+	case VK_F2: return f2;
+	case VK_F3: return f3;
+	case VK_F4: return f4;
+	case VK_F5: return f5;
+	case VK_F6: return f6;
+	case VK_F7: return f7;
+	case VK_F8: return f8;
+	case VK_F9: return f9;
+	case VK_F10: return f10;
+	case VK_F11: return f11;
+	case VK_F12: return f12;
+
+	default: return unknown;
+	}
+};
+
 template<class... Ts>
 struct overloads: Ts...
 {
@@ -535,7 +654,7 @@ struct overloads: Ts...
 
 void ensure_component_sanity(const SurfaceComponent &component);
 
-auto CALLBACK native_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT;
+auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
@@ -553,7 +672,7 @@ System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(regist
 	);
 
 	auto window_class = WNDCLASS {
-		.lpfnWndProc = native_window_proc,
+		.lpfnWndProc = window_proc,
 		.hInstance = GetModuleHandle(nullptr),
 		.lpszClassName = constants::class_name,
 	};
@@ -602,11 +721,17 @@ void System::on_unregister()
 void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
 try
 {
+	// WIP(Light): use ignored local variables...
 	auto &component = m_registry->add<SurfaceComponent>(entity, info);
+	std::ignore = component;
+
 	auto &surface = m_registry->get<SurfaceComponent>(entity);
+	ensure_component_sanity(surface);
+
 	const auto &resolution = surface.get_resolution();
 	const auto &position = surface.get_position();
-	ensure_component_sanity(surface);
+	std::ignore = resolution;
+	std::ignore = position;
 
 	surface.m_native_data.window = CreateWindowEx(
 	    0,
@@ -625,6 +750,9 @@ try
 	debug::ensure(surface.m_native_data.window, "Failed to create Windows surface component");
 
 	ShowWindow(surface.m_native_data.window, SW_NORMAL);
+	// SetWindowLongPtrA(surface.m_native_data.window, 0, this);
+	// SetWindowLongPtrA(surface.m_native_data.window, 1, entity);
+
 
 	// TODO(Light): refactor "environment" into standalone module
 	// NOLINTNEXTLINE(concurrency-mt-unsafe)
@@ -726,15 +854,65 @@ void System::handle_events(SurfaceComponent &surface)
 	queue.clear();
 
 	auto message = MSG {};
-	while (PeekMessage(&message, surface.m_native_data.window, {}, {}, PM_REMOVE))
+	while (PeekMessage(&message, {}, {}, {}, PM_REMOVE))
 	{
+		TranslateMessage(&message);
+
+		const auto wParam = message.wParam;
 		switch (message.message)
 		{
+		case WM_SETFOCUS: log::debug("Window setfocus"); break;
+		case WM_KILLFOCUS: log::debug("Window killfocus"); break;
+		case WM_ACTIVATE:
+			log::debug("Window activate: {}", static_cast<std::size_t>(LOWORD(wParam)));
+			break;
+		case WM_MOUSEWHEEL:
+		{
+			const auto delta = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+			log::debug("wheel delta: {}", static_cast<std::int64_t>(delta));
+			break;
 		}
 
-		TranslateMessage(&message);
+		case WM_LBUTTONDOWN:
+			log::debug("Left button down: {}", to_string(translate_key(wParam)));
+			break;
+		case WM_LBUTTONUP: log::debug("Left button up {}", to_string(translate_key(wParam))); break;
+
+		case WM_RBUTTONDOWN:
+			log::debug("Right button down {}", to_string(translate_key(wParam)));
+			break;
+		case WM_RBUTTONUP:
+			log::debug("Right button up {}", to_string(translate_key(wParam)));
+			break;
+
+		case WM_MBUTTONDOWN:
+			log::debug("Middle button down {}", to_string(translate_key(wParam)));
+			break;
+		case WM_MBUTTONUP:
+			log::debug("Middle button up {}", to_string(translate_key(wParam)));
+			break;
+
+		case WM_XBUTTONDOWN:
+		{
+			const auto key = static_cast<Key>(
+			    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
+			);
+			log::debug("xbutn: {}", std::to_underlying(key));
+			break;
+		}
+		case WM_XBUTTONUP:
+		{
+			const auto key = static_cast<Key>(
+			    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
+			);
+			log::debug("xbutn: {}", std::to_underlying(key));
+			break;
+		}
+		case WM_KEYDOWN: log::debug("Keydown: {}", to_string(translate_key(wParam))); break;
+		case WM_KEYUP: log::debug("Keyup__: {}", to_string(translate_key(wParam))); break;
+		}
+
 		DispatchMessage(&message);
-		// log::debug("Window message type: {}", std::uint32_t { message.message });
 	}
 
 	// auto event = XEvent {};
@@ -852,6 +1030,10 @@ void System::handle_requests(SurfaceComponent &surface)
 
 void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
 {
+	// WIP(Light):
+	std::ignore = surface;
+	std::ignore = request;
+
 	surface.m_title = request.title;
 
 	// const auto &[display, window, _] = surface.get_native_data();
@@ -860,6 +1042,10 @@ void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &r
 
 void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
 {
+	// WIP(Light):
+	std::ignore = surface;
+	std::ignore = request;
+
 	// surface.m_resolution = request.resolution;
 
 	// auto &[display, window, _] = surface.m_native_data;
@@ -922,6 +1108,10 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
+	// WIP(Light): Use ignored local-variables
+	std::ignore = surface;
+	std::ignore = request;
+
 	// surface.m_position = request.position;
 
 	// auto &[display, window, _] = surface.m_native_data;
@@ -961,6 +1151,10 @@ void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequ
 
 void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
 {
+	// WIP(Light): Use ignored local-variables
+	std::ignore = surface;
+	std::ignore = request;
+
 	// const auto &[display, window, _] = surface.get_native_data();
 	// surface.m_visible = request.visible;
 
@@ -1024,139 +1218,27 @@ void ensure_component_sanity(const SurfaceComponent &component)
 	);
 }
 
-auto CALLBACK native_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT
+auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT
 {
-	constexpr auto translate_key = [](auto code) -> Key {
-		switch (code)
-		{
-			using enum Key;
-		case VK_LBUTTON: return left_mouse_button;
-		case VK_RBUTTON: return right_mouse_button;
-		case VK_MBUTTON: return middle_mouse_button;
-
-		case VK_BACK: return backspace;
-		case VK_TAB: return tab;
-		case VK_CAPITAL: return capslock;
-		case VK_RETURN: enter;
-		case VK_SPACE: space;
-		case VK_DELETE: return delete_;
-
-		case VK_SHIFT: shift;
-		case VK_RSHIFT: right_shift;
-
-		case VK_CONTROL: control;
-		case VK_RCONTROL: right_control;
-
-		case VK_MENU: alt;
-		case VK_RMENU: right_alt;
-
-		case VK_PRIOR: return pageup;
-		case VK_NEXT: return pagedown;
-		case VK_END: return end;
-		case VK_HOME: return home;
-
-		case VK_LEFT: return left_arrow;
-		case VK_RIGHT: return right_arrow;
-		case VK_DOWN: return down_arrow;
-		case VK_UP: return up_arrow;
-
-		case VK_CANCEL: return cancel;
-		case VK_PAUSE: return pause;
-		case VK_SELECT: return select;
-		case VK_PRINT: return print;
-		case VK_SNAPSHOT: return snapshot;
-		case VK_INSERT: return insert;
-		case VK_HELP: return help;
-		case VK_SLEEP: return sleep;
-
-		case '0': return digit_0;
-		case '1': return digit_1;
-		case '2': return digit_2;
-		case '3': return digit_3;
-		case '4': return digit_4;
-		case '5': return digit_5;
-		case '6': return digit_6;
-		case '7': return digit_7;
-		case '8': return digit_8;
-		case '9': return digit_9;
-
-		case 'A': return a;
-		case 'B': return b;
-		case 'C': return c;
-		case 'D': return d;
-		case 'E': return e;
-		case 'F': return f;
-		case 'G': return g;
-		case 'H': return h;
-		case 'I': return i;
-		case 'J': return j;
-		case 'K': return k;
-		case 'L': return l;
-		case 'M': return m;
-		case 'N': return n;
-		case 'O': return o;
-		case 'P': return p;
-		case 'Q': return q;
-		case 'R': return r;
-		case 'S': return s;
-		case 'T': return t;
-		case 'U': return u;
-		case 'V': return v;
-		case 'W': return w;
-		case 'X': return x;
-		case 'Y': return y;
-		case 'Z': return z;
-
-		case VK_LWIN: return super;
-		case VK_RWIN: return right_super;
-
-		case VK_NUMPAD0: return kp_0;
-		case VK_NUMPAD1: return kp_1;
-		case VK_NUMPAD2: return kp_2;
-		case VK_NUMPAD3: return kp_3;
-		case VK_NUMPAD4: return kp_4;
-		case VK_NUMPAD5: return kp_5;
-		case VK_NUMPAD6: return kp_6;
-		case VK_NUMPAD7: return kp_7;
-		case VK_NUMPAD8: return kp_8;
-		case VK_NUMPAD9: return kp_9;
-
-		case VK_MULTIPLY: return kp_multiply;
-		case VK_ADD: return kp_add;
-		case VK_SUBTRACT: return kp_subtract;
-		case VK_DECIMAL: return kp_decimal;
-
-		case VK_F1: return f1;
-		case VK_F2: return f2;
-		case VK_F3: return f3;
-		case VK_F4: return f4;
-		case VK_F5: return f5;
-		case VK_F6: return f6;
-		case VK_F7: return f7;
-		case VK_F8: return f8;
-		case VK_F9: return f9;
-		case VK_F10: return f10;
-		case VK_F11: return f11;
-		case VK_F12: return f12;
-
-		default: return unknown;
-		}
-	};
-
 	switch (uMsg)
 	{
-	case WM_KEYDOWN: log::debug("Keydown: {}", to_string(translate_key(wParam)));
-	case WM_KEYUP: log::debug("Keyup__: {}", to_string(translate_key(wParam)));
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
+	case WM_KILLFOCUS:
+	case WM_SETFOCUS: log::debug("GOT FOCUS IN WIN PROC");
+	case WM_ACTIVATE:
+	case WM_MOUSEWHEEL:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_XBUTTONDOWN:
+	case WM_XBUTTONUP:
+	case WM_KEYDOWN:
+	case WM_KEYUP: return 0;
+	case WM_DESTROY: PostQuitMessage(0); return 0;
 	}
 
-
-	// log::debug("Window message type (window proc): {}", std::uint32_t { uMsg
-	// });
 	return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 

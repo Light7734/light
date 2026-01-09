@@ -35,10 +35,10 @@ constexpr auto frames_in_flight = std::uint32_t { 3u };
 
 
 void noop_messenger_callback(
-    lt::renderer::IDebugger::MessageSeverity severity,
-    lt::renderer::IDebugger::MessageType type,
-    const lt::renderer::IDebugger::MessageData &data,
-    std::any &user_data
+    lt::renderer::IDebugger::MessageSeverity,
+    lt::renderer::IDebugger::MessageType,
+    const lt::renderer::IDebugger::MessageData &,
+    std::any &
 )
 {
 }

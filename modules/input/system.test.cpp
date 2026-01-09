@@ -79,6 +79,7 @@ Suite raii = "raii"_suite = "raii"_suite = [] {
 		auto fixture = Fixture {};
 		for (auto idx : std::views::iota(0, 10'000))
 		{
+			std::ignore = idx;
 			ignore = System { fixture.registry() };
 		}
 	};
@@ -115,7 +116,7 @@ Suite registry_events = "registry_events"_suite = [] {
 		auto registry = fixture.registry();
 		auto system = System { registry };
 
-		const auto &entity = fixture.add_input_component();
+		fixture.add_input_component();
 		expect_eq(registry->view<InputComponent>().get_size(), 1);
 	};
 
@@ -162,7 +163,7 @@ Suite tick = "tick"_suite = [] {
 		auto action_key = input.add_action(
 		    {
 		        .name { "test" },
-		        .trigger = { .mapped_keycode = Key::A },
+		        .trigger = { .mapped_keycode = Key::a },
 		    }
 		);
 
@@ -170,7 +171,7 @@ Suite tick = "tick"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
 
-		surface.push_event(surface::KeyPressedEvent(Key::A));
+		surface.push_event(surface::KeyPressedEvent(Key::a));
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::triggered);
 
@@ -182,28 +183,8 @@ Suite tick = "tick"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
 
-		surface.push_event(surface::KeyReleasedEvent(Key::A));
+		surface.push_event(surface::KeyReleasedEvent(Key::a));
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
-	};
-
-	Case { "Tick triggers" } = [] {
-		auto fixture = Fixture {};
-		auto registry = fixture.registry();
-		auto system = System { fixture.registry() };
-
-		auto surface_entity = fixture.add_surface_component();
-		auto &surface = registry->get<surface::SurfaceComponent>(surface_entity);
-
-		auto input_entity = fixture.add_input_component();
-		auto &input = registry->get<InputComponent>(input_entity);
-
-
-		auto action_key = input.add_action(
-		    {
-		        .name { "test" },
-		        .trigger = { .mapped_keycode = Key::A },
-		    }
-		);
 	};
 };

@@ -37,7 +37,7 @@ int main()
 
 	auto timer = lt::time::Timer {};
 	lt::log::trace("Ticking for 3 seconds...");
-	while (timer.elapsed_time() < std::chrono::seconds { 3 })
+	while (timer.elapsed_time() < std::chrono::seconds { 30 })
 	{
 		system.tick({});
 	}

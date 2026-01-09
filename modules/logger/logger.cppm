@@ -48,7 +48,7 @@ struct [[maybe_unused]] print
 	    Args &&...arguments
 	) noexcept
 	{
-		constexpr auto to_string = [](Level level, auto location) {
+		constexpr auto to_string = [](Level level) {
 			// clang-format off
 			switch (level)
 			{
@@ -70,7 +70,7 @@ struct [[maybe_unused]] print
 
 		std::println(
 		    "{} {} ==> {}",
-		    to_string(level, location),
+		    to_string(level),
 		    std::format("{}:{}", path.filename().string(), location.line()),
 		    std::format(format, std::forward<Args>(arguments)...)
 		);

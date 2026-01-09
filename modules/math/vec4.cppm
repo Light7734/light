@@ -1,5 +1,6 @@
 export module math.vec4;
 import math.vec2;
+import debug.assertions;
 import math.vec3;
 import std;
 
@@ -8,6 +9,8 @@ namespace lt::math {
 export template<typename T = float>
 struct vec4_impl
 {
+	static constexpr auto num_elements = 4u;
+
 	constexpr vec4_impl(): x(), y(), z(), w()
 	{
 	}
@@ -40,14 +43,18 @@ struct vec4_impl
 		};
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::size_t idx) -> T &
+	[[nodiscard]] constexpr auto operator[](std::uint8_t idx) -> T &
 	{
-		return values[idx];
+		// TODO(Light): Use contract
+		debug::ensure(idx <= num_elements, "vec4 out of bound: {}", idx);
+		return ((T *)this)[idx];
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::size_t idx) const -> const T &
+	[[nodiscard]] constexpr auto operator[](std::uint8_t idx) const -> const T &
 	{
-		return values[idx];
+		// TODO(Light): Use contract
+		debug::ensure(idx < num_elements, "vec4 out of bound: {}", idx);
+		return ((T *)this)[idx];
 	}
 
 	friend auto operator<<(std::ostream &stream, vec4_impl<T> value) -> std::ostream &
@@ -56,34 +63,13 @@ struct vec4_impl
 		return stream;
 	}
 
-	// NOLINTNEXTLINE
-	union
-	{
-		struct
-		{
-			T x;
+	T x;
 
-			T y;
+	T y;
 
-			T z;
+	T z;
 
-			T w;
-		};
-		struct
-		{
-			T r;
-
-			T g;
-
-			T b;
-
-			T a;
-		};
-		struct
-		{
-			std::array<T, 4> values;
-		};
-	};
+	T w;
 };
 
 export using vec4 = vec4_impl<float>;

@@ -12,7 +12,8 @@ using ::lt::test::expect_true;
 using ::lt::test::Suite;
 using ::lt::test::operator""_suite;
 
-using Set = lt::ecs::SparseSet<int>;
+using Value_T = int;
+using Set = lt::ecs::SparseSet<Value_T>;
 constexpr auto capacity = 100;
 
 Suite raii = "raii"_suite = [] {
@@ -97,7 +98,7 @@ Suite element_raii = "element_raii"_suite = [] {
 
 		for (auto &[identifier, value] : set)
 		{
-			expect_eq(identifier, value);
+			expect_eq(static_cast<Value_T>(identifier), value);
 			expect_ne(value, 0);
 			expect_ne(value, 32);
 			expect_ne(value, 69);
@@ -129,7 +130,7 @@ Suite getters = "getters"_suite = [] {
 
 		expect_eq(set.get_capacity(), 10'000);
 
-		set.insert(set.get_size(), {});
+		set.insert(static_cast<Value_T>(set.get_size()), {});
 		expect_ne(set.get_capacity(), 10'000);
 	};
 
