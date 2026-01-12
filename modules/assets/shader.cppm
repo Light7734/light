@@ -89,7 +89,8 @@ constexpr auto total_metadata_size =         //
     + sizeof(BlobMetadata::compressed_size)  //
     + sizeof(BlobMetadata::uncompressed_size);
 
-ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path)
+ShaderAsset::ShaderAsset(const std::filesystem::path &path)
+    : m_stream(path, std::ios::beg | std::ios::binary)
 {
 	debug::ensure(m_stream.is_open(), "Failed to open shader asset at: {}", path.string());
 	const auto read = [this](auto &field) {
@@ -210,10 +211,10 @@ void ShaderAsset::unpack_to(BlobTag tag, std::span<std::byte> destination) const
 	    m_code_blob_metadata.uncompressed_size
 	);
 
-	m_stream.seekg(static_cast<long long>(m_code_blob_metadata.offset));
+	m_stream.seekg(static_cast<long long>(m_code_blob_metadata.offset), std::ifstream::beg);
 	m_stream.read(
 	    std::bit_cast<char *>(destination.data()),
-	    static_cast<long long>(m_code_blob_metadata.uncompressed_size)
+	    m_code_blob_metadata.uncompressed_size
 	);
 }
 

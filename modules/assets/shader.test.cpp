@@ -1,6 +1,7 @@
 import assets.metadata;
 import assets.shader;
 import logger;
+import logger;
 import test.test;
 import test.expects;
 import std;
@@ -23,18 +24,34 @@ Suite raii = "shader_raii"_suite = [] {
 	std::filesystem::create_directories(tmp_path);
 
 	Case { "happy path won't throw" } = [] {
-
+		auto shader_asset = ShaderAsset { "triangle.frag.asset" };
 	};
 
 	Case { "many won't freeze/throw" } = [] {
+		for (auto idx : std::views::iota(0u, 1'000u))
+		{
+			std::ignore = idx;
+			auto shader_asset = ShaderAsset { "triangle.frag.asset" };
+		}
 	};
 
 	Case { "unhappy path throws" } = [] {
-		expect_throw([] { ShaderAsset { "random_path" }; });
+		// non-existent file
+		expect_throw([] { ShaderAsset { "path" }; });
+
+		// incompatible type
+		expect_throw([] { ShaderAsset { "dummytext" }; });
+
+		// random stressing
+		expect_throw([] {
+			for (auto idx : std::views::iota(0u, 1'000u))
+			{
+				auto shader_asset = ShaderAsset { std::to_string(idx) };
+			}
+		});
 	};
 };
 
-// NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
 Suite packing = "shader_pack"_suite = [] {
 	Case { "" } = [] {
 		const auto out_path = tmp_path / "shader_packing";
