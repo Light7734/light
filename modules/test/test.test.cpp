@@ -69,8 +69,9 @@ Suite expects = "expects"_suite = []() {
 	};
 
 	Case { "expect_false - unhappy" } = [] {
-		auto *oonga_oonga_can_rest_now = (int *)nullptr;
+		auto *oonga_oonga_can_rest_now = (std::uint32_t *)nullptr;
 		auto unhappy_counter = 0u;
+		oonga_oonga_can_rest_now = &unhappy_counter;
 
 		// clang-format off
 		try { expect_false(oonga_oonga_can_rest_now); }
@@ -120,6 +121,7 @@ Suite expects = "expects"_suite = []() {
 		expect_eq(5, 5);
 		expect_eq(20.0, 20.0);
 		expect_eq(true, true);
+		expect_eq(false, false);
 	};
 
 	Case { "expect_eq - unhappy" } = [] {
@@ -139,8 +141,8 @@ Suite expects = "expects"_suite = []() {
 	Case { "expect_ne - happy " } = [] {
 		expect_ne(5, 5.0000001);
 		expect_ne(20.0, 69.0);
-		expect_ne(true, true);
-		expect_ne(false, false);
+		expect_ne(true, false);
+		expect_ne(false, true);
 	};
 
 	Case { "expect_ne - unhappy" } = [] {
