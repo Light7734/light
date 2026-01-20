@@ -7,6 +7,7 @@ import math.vec3;
 namespace lt::math {
 
 export template<typename T = f32>
+    requires(std::is_arithmetic_v<T>)
 struct vec4_impl
 {
 	static constexpr auto num_elements = 4u;
@@ -23,6 +24,26 @@ struct vec4_impl
 	{
 	}
 
+	constexpr vec4_impl(vec2_impl<T> xy, T z, T w): x(xy.x), y(xy.y), z(z), w(w)
+	{
+	}
+
+	constexpr vec4_impl(T x, T y, vec2_impl<T> zw): x(x), y(y), z(zw.z), w(zw.w)
+	{
+	}
+
+	constexpr vec4_impl(vec2_impl<T> xy, vec2_impl<T> zw): x(xy.x), y(xy.y), z(zw.z), w(zw.w)
+	{
+	}
+
+	constexpr vec4_impl(vec3_impl<T> xyz, T w): x(xyz.x), y(xyz.y), z(xyz.z), w(w)
+	{
+	}
+
+	constexpr vec4_impl(T x, vec3_impl<T> yzw): x(x), y(yzw.y), z(yzw.z), w(yzw.w)
+	{
+	}
+
 	[[nodiscard]] auto operator==(const vec4_impl<T> &other) const -> bool
 	{
 		return x == other.x && y == other.y && z == other.z && w == other.w;
@@ -31,6 +52,16 @@ struct vec4_impl
 	[[nodiscard]] auto operator!=(const vec4_impl<T> &other) const -> bool
 	{
 		return !(*this == other);
+	}
+
+	[[nodiscard]] constexpr auto operator+(const vec4_impl<T> &other) const -> vec4_impl
+	{
+		return {
+			x + other.x,
+			y + other.y,
+			z + other.z,
+			w + other.w,
+		};
 	}
 
 	[[nodiscard]] constexpr auto operator-(const vec4_impl<T> &other) const -> vec4_impl
@@ -43,17 +74,35 @@ struct vec4_impl
 		};
 	}
 
+	[[nodiscard]] constexpr auto operator*(const vec4_impl<T> &other) const -> vec4_impl
+	{
+		return {
+			x * other.x,
+			y * other.y,
+			z * other.z,
+			w * other.w,
+		};
+	}
+
+	[[nodiscard]] constexpr auto operator/(const vec4_impl<T> &other) const -> vec4_impl
+	{
+		return {
+			x / other.x,
+			y / other.y,
+			z / other.z,
+			w / other.w,
+		};
+	}
+
 	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
 	{
-		// TODO(Light): Use contract
-		ensure(idx <= num_elements, "vec4 out of bound: {}", idx);
+		debug_check(idx <= num_elements, "vec4 out of bound: {}", idx);
 		return ((T *)this)[idx];
 	}
 
 	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
 	{
-		// TODO(Light): Use contract
-		ensure(idx < num_elements, "vec4 out of bound: {}", idx);
+		debug_check(idx < num_elements, "vec4 out of bound: {}", idx);
 		return ((T *)this)[idx];
 	}
 

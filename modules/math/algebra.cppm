@@ -1,6 +1,7 @@
 export module math.algebra;
+
+import preliminary;
 import math.mat4;
-import std;
 
 export namespace lt::math {
 
@@ -35,6 +36,7 @@ export namespace lt::math {
  * https://www.youtube.com/watch?v=EqNcqBdrNyI
  */
 template<typename T>
+    requires(std::is_arithmetic_v<T>)
 constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far)
 {
 	const T half_fov_tan = std::tan(field_of_view / static_cast<T>(2));

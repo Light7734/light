@@ -5,8 +5,11 @@ import preliminary;
 namespace lt::math {
 
 export template<typename T = f32>
+    requires(std::is_arithmetic_v<T>)
 struct vec2_impl
 {
+	static constexpr auto num_elements = 2u;
+
 	constexpr vec2_impl(): x(), y()
 	{
 	}
@@ -29,15 +32,15 @@ struct vec2_impl
 		return !(*this == other);
 	}
 
-	[[nodiscard]] auto operator*(const vec2_impl<T> &other) const -> vec2_impl
+	[[nodiscard]] constexpr auto operator+(const vec2_impl<T> &other) const -> vec2_impl
 	{
 		return {
-			x * other.x,
-			y * other.y,
+			x + other.x,
+			y + other.y,
 		};
 	}
 
-	[[nodiscard]] auto operator-(const vec2_impl<T> &other) const -> vec2_impl
+	[[nodiscard]] constexpr auto operator-(const vec2_impl<T> &other) const -> vec2_impl
 	{
 		return {
 			x - other.x,
@@ -45,17 +48,43 @@ struct vec2_impl
 		};
 	}
 
-	[[nodiscard]] auto operator*(f32 scalar) const -> vec2_impl
+	[[nodiscard]] constexpr auto operator*(const vec2_impl<T> &other) const -> vec2_impl
 	{
 		return {
-			x * scalar,
-			y * scalar,
+			x * other.x,
+			y * other.y,
 		};
 	}
 
-	T x; // NOLINT
+	[[nodiscard]] constexpr auto operator/(const vec2_impl<T> &other) const -> vec2_impl
+	{
+		return {
+			x / other.x,
+			y / other.y,
+		};
+	}
 
-	T y; // NOLINT
+	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
+	{
+		debug_check(idx <= num_elements, "vec2 out of bound: {}", idx);
+		return ((T *)this)[idx];
+	}
+
+	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
+	{
+		debug_check(idx < num_elements, "vec2 out of bound: {}", idx);
+		return ((T *)this)[idx];
+	}
+
+	friend auto operator<<(std::ostream &stream, vec2_impl<T> value) -> std::ostream &
+	{
+		stream << value.x << ", " << value.y;
+		return stream;
+	}
+
+	T x;
+
+	T y;
 };
 
 
