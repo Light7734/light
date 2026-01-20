@@ -3,7 +3,6 @@ export module assets.shader;
 import preliminary;
 import assets.metadata;
 import logger;
-import debug.assertions;
 
 export namespace lt::assets {
 
@@ -55,7 +54,7 @@ public:
 
 	[[nodiscard]] auto get_blob_metadata(BlobTag tag) const -> const BlobMetadata &
 	{
-		debug::ensure(
+		ensure(
 		    tag == BlobTag::code,
 		    "Invalid blob tag for shader asset: {}",
 		    std::to_underlying(tag)
@@ -92,14 +91,14 @@ constexpr auto total_metadata_size =         //
 ShaderAsset::ShaderAsset(const std::filesystem::path &path)
     : m_stream(path, std::ios::beg | std::ios::binary)
 {
-	debug::ensure(m_stream.is_open(), "Failed to open shader asset at: {}", path.string());
+	ensure(m_stream.is_open(), "Failed to open shader asset at: {}", path.string());
 	const auto read = [this](auto &field) {
 		m_stream.read(std::bit_cast<char *>(&field), sizeof(field));
 	};
 
 	m_stream.seekg(0, std::ifstream::end);
 	const auto file_size = static_cast<size_t>(m_stream.tellg());
-	debug::ensure(
+	ensure(
 	    file_size > total_metadata_size,
 	    "Failed to open shader asset at: {}, file smaller than metadata: {} < {}",
 	    path.string(),
@@ -118,7 +117,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 	read(m_code_blob_metadata.compressed_size);
 	read(m_code_blob_metadata.uncompressed_size);
 
-	debug::ensure(
+	ensure(
 	    m_asset_metadata.type == asset_type_identifier,
 	    "Failed to open shader asset at: {}, incorrect asset type: {} != {}",
 	    path.string(),
@@ -126,7 +125,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 	    asset_type_identifier
 	);
 
-	debug::ensure(
+	ensure(
 	    m_asset_metadata.version == current_version,
 	    "Failed to open shader asset at: {}, version mismatch: {} != {}",
 	    path.string(),
@@ -134,21 +133,21 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 	    current_version
 	);
 
-	debug::ensure(
+	ensure(
 	    std::to_underlying(m_metadata.type) <= std::to_underlying(Type::compute),
 	    "Failed to open shader asset at: {}, invalid shader type: {}",
 	    path.string(),
 	    std::to_underlying(m_metadata.type)
 	);
 
-	debug::ensure(
+	ensure(
 	    m_code_blob_metadata.tag == std::to_underlying(BlobTag::code),
 	    "Failed to open shader asset at: {}, invalid blob tag: {}",
 	    path.string(),
 	    m_code_blob_metadata.tag
 	);
 
-	debug::ensure(
+	ensure(
 	    m_code_blob_metadata.offset + m_code_blob_metadata.compressed_size <= file_size,
 	    "Failed to open shader asset at: {}, file smaller than blob: {} > {} + {}",
 	    path.string(),
@@ -178,7 +177,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 		.uncompressed_size = code_blob.size(),
 	};
 
-	debug::ensure(stream.is_open(), "Failed to pack shader asset to {}", destination.string());
+	ensure(stream.is_open(), "Failed to pack shader asset to {}", destination.string());
 	const auto write = [&stream](auto &field) {
 		stream.write(std::bit_cast<char *>(&field), sizeof(field));
 	};
@@ -195,13 +194,9 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 
 void ShaderAsset::unpack_to(BlobTag tag, std::span<byte> destination) const
 {
-	debug::ensure(
-	    tag == BlobTag::code,
-	    "Invalid blob tag for shader asset: {}",
-	    std::to_underlying(tag)
-	);
+	ensure(tag == BlobTag::code, "Invalid blob tag for shader asset: {}", std::to_underlying(tag));
 
-	debug::ensure(
+	ensure(
 	    destination.size() >= m_code_blob_metadata.uncompressed_size,
 	    "Failed to unpack shader blob {} to destination ({}) of size {} since it's smaller "
 	    "than the blobl's uncompressed size: {}",
@@ -220,11 +215,7 @@ void ShaderAsset::unpack_to(BlobTag tag, std::span<byte> destination) const
 
 [[nodiscard]] auto ShaderAsset::unpack(BlobTag tag) const -> Blob
 {
-	debug::ensure(
-	    tag == BlobTag::code,
-	    "Invalid blob tag for shader asset: {}",
-	    std::to_underlying(tag)
-	);
+	ensure(tag == BlobTag::code, "Invalid blob tag for shader asset: {}", std::to_underlying(tag));
 
 	auto blob = Blob(m_code_blob_metadata.uncompressed_size);
 	unpack_to(tag, blob);

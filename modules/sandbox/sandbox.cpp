@@ -18,7 +18,7 @@ constexpr auto height = 600u;
 constexpr auto vsync = true;
 constexpr auto visible = false;
 
-auto main() -> int32_t
+auto main() -> i32
 try
 {
 	auto registry = lt::memory::create_ref<lt::ecs::Registry>();

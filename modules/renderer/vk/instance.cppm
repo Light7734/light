@@ -1,7 +1,6 @@
 export module renderer.vk.instance;
 
 import preliminary;
-import debug.assertions;
 import renderer.frontend;
 import renderer.vk.api_wrapper;
 

@@ -3,7 +3,6 @@ export module renderer.vk.gpu;
 import preliminary;
 import renderer.vk.api_wrapper;
 import logger;
-import debug.assertions;
 import renderer.frontend;
 import renderer.vk.instance;
 import memory.null_on_move;
@@ -66,7 +65,7 @@ Gpu::Gpu(IInstance *instance)
 	}
 
 	// No suitable GPU is fonud...
-	debug::ensure(m_gpu, "Failed to find any suitable Vulkan physical device");
+	ensure(m_gpu, "Failed to find any suitable Vulkan physical device");
 
 	m_memory_properties = m_gpu.get_memory_properties();
 	m_queue_family_properties = m_gpu.get_queue_family_properties();

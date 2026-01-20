@@ -1,7 +1,6 @@
 export module bakers;
 
 import preliminary;
-import debug.assertions;
 import assets.metadata;
 import assets.shader;
 import logger;
@@ -37,7 +36,7 @@ export void bake_shader(
 	);
 
 	auto stream = std::ifstream(spv_path, std::ios::binary);
-	lt::debug::ensure(
+	ensure(
 	    stream.is_open(),
 	    "Failed to open compiled {} shader at: {}",
 	    type == vertex ? "vert" : "frag",

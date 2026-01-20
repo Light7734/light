@@ -2,7 +2,6 @@ export module renderer.system;
 
 import preliminary;
 import logger;
-import debug.assertions;
 import math.mat4;
 import renderer.factory;
 import app.system;
@@ -126,8 +125,8 @@ System::System(CreateInfo info)
     , m_instance(get_instance(m_api))
     , m_max_frames_in_flight(info.config.max_frames_in_flight)
 {
-	debug::ensure(m_registry, "Failed to initialize renderer::System: null registry");
-	debug::ensure(
+	ensure(m_registry, "Failed to initialize renderer::System: null registry");
+	ensure(
 	    std::clamp(
 	        info.config.max_frames_in_flight,
 	        frames_in_flight_lower_limit,

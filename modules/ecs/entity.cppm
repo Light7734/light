@@ -1,7 +1,6 @@
 export module ecs.entity;
 
 import preliminary;
-import debug.assertions;
 import memory.reference;
 import ecs.registry;
 
@@ -15,7 +14,7 @@ public:
 	    : m_registry(std::move(registry))
 	    , m_identifier(identifier)
 	{
-		debug::ensure(m_registry, "Failed to create Entity ({}): null registry", m_identifier);
+		ensure(m_registry, "Failed to create Entity ({}): null registry", m_identifier);
 	}
 
 	template<typename Component_T>

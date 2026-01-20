@@ -3,7 +3,6 @@ export module math.vec4;
 import preliminary;
 import math.vec2;
 import math.vec3;
-import debug.assertions;
 
 namespace lt::math {
 
@@ -47,14 +46,14 @@ struct vec4_impl
 	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
 	{
 		// TODO(Light): Use contract
-		debug::ensure(idx <= num_elements, "vec4 out of bound: {}", idx);
+		ensure(idx <= num_elements, "vec4 out of bound: {}", idx);
 		return ((T *)this)[idx];
 	}
 
 	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
 	{
 		// TODO(Light): Use contract
-		debug::ensure(idx < num_elements, "vec4 out of bound: {}", idx);
+		ensure(idx < num_elements, "vec4 out of bound: {}", idx);
 		return ((T *)this)[idx];
 	}
 

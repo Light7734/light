@@ -11,7 +11,6 @@ export import renderer.vk.gpu;
 export import renderer.vk.debugger;
 export import renderer.vk.surface;
 export import memory.scope;
-export import debug.assertions;
 export import ecs.entity;
 
 import preliminary;
@@ -83,7 +82,7 @@ namespace lt::renderer {
     const lt::ecs::Entity &surface_entity
 ) -> memory::Scope<ISurface>
 {
-	debug::ensure(instance, "Failed to create renderer::ISurface: null instance");
+	ensure(instance, "Failed to create renderer::ISurface: null instance");
 
 	switch (target_api)
 	{
@@ -112,8 +111,8 @@ namespace lt::renderer {
 [[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface)
     -> memory::Scope<IDevice>
 {
-	debug::ensure(gpu, "Failed to create renderer::IDevice: null gpu");
-	debug::ensure(surface, "Failed to create renderer::IDevice: null surface");
+	ensure(gpu, "Failed to create renderer::IDevice: null gpu");
+	ensure(surface, "Failed to create renderer::IDevice: null surface");
 
 	switch (target_api)
 	{
@@ -147,9 +146,9 @@ namespace lt::renderer {
     const IBuffer::CreateInfo &info
 ) -> memory::Scope<IBuffer>
 {
-	debug::ensure(device, "Failed to create renderer::IBuffer: null device");
-	debug::ensure(gpu, "Failed to create renderer::IBuffer: null gpu");
-	debug::ensure(info.size > 0, "Failed to create renderer::IBuffer: null size");
+	ensure(device, "Failed to create renderer::IBuffer: null device");
+	ensure(gpu, "Failed to create renderer::IBuffer: null gpu");
+	ensure(info.size > 0, "Failed to create renderer::IBuffer: null size");
 
 	switch (target_api)
 	{
@@ -170,7 +169,7 @@ namespace lt::renderer {
     const lt::assets::ShaderAsset &fragment_shader
 ) -> memory::Scope<IPass>
 {
-	debug::ensure(device, "Failed to create renderer::IPass: null device");
+	ensure(device, "Failed to create renderer::IPass: null device");
 
 	switch (target_api)
 	{
@@ -192,10 +191,10 @@ namespace lt::renderer {
     u32 max_frames_in_flight
 ) -> memory::Scope<IRenderer>
 {
-	debug::ensure(gpu, "Failed to create renderer::IRenderer: null gpu");
-	debug::ensure(device, "Failed to create renderer::IRenderer: null device");
-	debug::ensure(swapchain, "Failed to create renderer::IRenderer: null swapchain");
-	debug::ensure(
+	ensure(gpu, "Failed to create renderer::IRenderer: null gpu");
+	ensure(device, "Failed to create renderer::IRenderer: null device");
+	ensure(swapchain, "Failed to create renderer::IRenderer: null swapchain");
+	ensure(
 	    std::clamp(
 	        max_frames_in_flight,
 	        IRenderer::frames_in_flight_lower_limit,
@@ -224,17 +223,17 @@ namespace lt::renderer {
 [[nodiscard]] auto create_debugger(Api target_api, IInstance *instance, IDebugger::CreateInfo info)
     -> memory::Scope<IDebugger>
 {
-	debug::ensure(
+	ensure(
 	    info.severities != IDebugger::MessageSeverity::none,
 	    "Failed to create renderer::IDebugger: severities == none"
 	);
 
-	debug::ensure(
+	ensure(
 	    info.types != IDebugger::MessageType::none,
 	    "Failed to create renderer::IDebugger: types == none"
 	);
 
-	debug::ensure(info.callback, "Failed to create vk::Messenger: null callback");
+	ensure(info.callback, "Failed to create vk::Messenger: null callback");
 
 	switch (target_api)
 	{

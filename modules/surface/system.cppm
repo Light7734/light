@@ -12,7 +12,6 @@ export module surface.system;
 export import :components;
 
 import preliminary;
-import debug.assertions;
 import app.system;
 import ecs.registry;
 import math.vec2;
@@ -23,7 +22,6 @@ import memory.null_on_move;
 import logger;
 import preliminary;
 import surface.constants;
-import debug.assertions;
 import memory.reference;
 import surface.requests;
 import surface.events;
@@ -175,7 +173,7 @@ private:
 
 	wl_compositor *m_wl_compositor {};
 
-	xdg_wm_base *m_shell = {};
+	xdg_wm_base *m_shell {};
 
 	wl_seat *m_wl_seat {};
 
@@ -440,11 +438,11 @@ System::System(memory::Ref<ecs::Registry> registry)
 {
 	// NOLINTNEXTLINE
 	m_wl_display = wl_display_connect({});
-	debug::ensure(m_wl_display, "Failed to connect to Wayland display");
+	ensure(m_wl_display, "Failed to connect to Wayland display");
 
 	// NOLINTNEXTLINE
 	m_wl_registry = wl_display_get_registry(m_wl_display);
-	debug::ensure(m_wl_registry, "Failed to get Wayland display's registry");
+	ensure(m_wl_registry, "Failed to get Wayland display's registry");
 
 	// TODO(Light): "this" could be moved around... replace with a pointer to some heap allocation
 	wl_registry_add_listener(m_wl_registry, &m_wl_registry_listener, this);
@@ -454,8 +452,8 @@ System::System(memory::Ref<ecs::Registry> registry)
 	// For reasons beyond my fragile comprehension :(
 	wl_display_roundtrip(m_wl_display);
 
-	debug::ensure(m_wl_compositor, "Failed to bind to the Wayland's compositor global");
-	debug::ensure(m_shell, "Failed to bind to the Wayland's  XDG-shell global");
+	ensure(m_wl_compositor, "Failed to bind to the Wayland's compositor global");
+	ensure(m_shell, "Failed to bind to the Wayland's  XDG-shell global");
 }
 
 System::~System()
@@ -488,14 +486,14 @@ void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::Cr
 	auto *shell_toplevel = (xdg_toplevel *)nullptr;
 
 	wayland_surface = wl_compositor_create_surface(m_wl_compositor);
-	debug::ensure(wayland_surface, "Failed to create Wayland surface");
+	ensure(wayland_surface, "Failed to create Wayland surface");
 
 	shell_surface = xdg_wm_base_get_xdg_surface(m_shell, wayland_surface);
-	debug::ensure(shell_surface, "Failed to get XDG-shell surface");
+	ensure(shell_surface, "Failed to get XDG-shell surface");
 	xdg_surface_add_listener(shell_surface, &shell_surface_listener, {});
 
 	shell_toplevel = xdg_surface_get_toplevel(shell_surface);
-	debug::ensure(shell_toplevel, "Failed to get XDG-shell toplevel");
+	ensure(shell_toplevel, "Failed to get XDG-shell toplevel");
 	xdg_toplevel_add_listener(shell_toplevel, &toplevel_listener, {});
 
 	xdg_toplevel_set_title(shell_toplevel, "Wayland Vulkan Example");
@@ -649,9 +647,9 @@ auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ->
 
 System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
-	debug::ensure(m_registry, "Failed to initialize surface system: null registry");
+	ensure(m_registry, "Failed to initialize surface system: null registry");
 
-	debug::ensure(
+	ensure(
 	    m_registry->view<SurfaceComponent>().get_size() == 0,
 	    "Failed to initialize surface system: registry has surface component(s)"
 	);
@@ -738,7 +736,7 @@ try
 	    GetModuleHandle(nullptr),
 	    nullptr
 	);
-	debug::ensure(surface.m_native_data.window, "Failed to create Windows surface component");
+	ensure(surface.m_native_data.window, "Failed to create Windows surface component");
 
 	ShowWindow(surface.m_native_data.window, SW_NORMAL);
 	// SetWindowLongPtrA(surface.m_native_data.window, 0, this);
@@ -748,10 +746,10 @@ try
 	// TODO(Light): refactor "environment" into standalone module
 	// NOLINTNEXTLINE(concurrency-mt-unsafe)
 	// auto *display_env = std::getenv("DISPLAY");
-	// debug::ensure(display_env != nullptr, "DISPLAY env var not found!");
+	// ensure(display_env != nullptr, "DISPLAY env var not found!");
 	//
 	// auto *display = XOpenDisplay(display_env);
-	// debug::ensure(display, "Failed to open XDisplay with DISPLAY: {}", display_env);
+	// ensure(display, "Failed to open XDisplay with DISPLAY: {}", display_env);
 	//
 	// auto root_window = XDefaultRootWindow(display);
 	//
@@ -1151,29 +1149,25 @@ void ensure_component_sanity(const SurfaceComponent &component)
 {
 	auto [width, height] = component.get_resolution();
 
-	debug::ensure(width != 0u, "Received bad values for surface component: width({}) == 0", width);
+	ensure(width != 0u, "Received bad values for surface component: width({}) == 0", width);
 
-	debug::ensure(
-	    height != 0u,
-	    "Received bad values for surface component: height({}) == 0",
-	    height
-	);
+	ensure(height != 0u, "Received bad values for surface component: height({}) == 0", height);
 
-	debug::ensure(
+	ensure(
 	    width < SurfaceComponent::max_dimension,
 	    "Received bad values for surface component: width({}) > max_dimension({})",
 	    width,
 	    SurfaceComponent::max_dimension
 	);
 
-	debug::ensure(
+	ensure(
 	    height < SurfaceComponent::max_dimension,
 	    "Received bad values for surface component: height({}) > max_dimension({})",
 	    height,
 	    SurfaceComponent::max_dimension
 	);
 
-	debug::ensure(
+	ensure(
 	    component.get_title().size() < SurfaceComponent::max_title_length,
 	    "Received bad values for surface component: title.size({}) > max_title_length({})",
 	    component.get_title().size(),

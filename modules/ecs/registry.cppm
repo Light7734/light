@@ -1,7 +1,6 @@
 export module ecs.registry;
 
 import preliminary;
-import debug.assertions;
 import ecs.sparse_set;
 import memory.scope;
 
@@ -243,7 +242,7 @@ private:
 
 		auto *base_set = m_sparsed_sets[type_id].get();
 		auto *derived_set = dynamic_cast<SparseSet<T, EntityId> *>(base_set);
-		debug::ensure(derived_set, "Failed to downcast to derived set");
+		ensure(derived_set, "Failed to downcast to derived set");
 
 		return *derived_set;
 	}

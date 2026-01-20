@@ -1,6 +1,7 @@
-add_module(NAME preliminary INTERFACES module.cppm fundumental_types.cppm)
-
+add_module(NAME preliminary INTERFACES module.cppm fundumental_types.cppm assertions.cppm build_constants.cppm)
 add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp DEPENDENCIES preliminary)
+add_module(NAME tracer INTERFACES tracer.cppm DEPENDENCIES preliminary logger)
+
 add_module(NAME bitwise INTERFACES operations.cppm DEPENDENCIES preliminary)
 add_module(NAME env INTERFACES constants.cppm DEPENDENCIES preliminary)
 add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
@@ -28,19 +29,6 @@ add_module(
 
 add_module(
     NAME
-    lt_debug
-    ROOT_DIR
-    ${CMAKE_CURRENT_SOURCE_DIR}/debug
-    INTERFACES
-    instrumentor.cppm
-    assertions.cppm
-    DEPENDENCIES
-    preliminary
-    logger
-)
-
-add_module(
-    NAME
     math
     INTERFACES
     algebra.cppm
@@ -52,7 +40,6 @@ add_module(
     components.cppm
     DEPENDENCIES
     preliminary
-    lt_debug
 )
 
 add_module(
@@ -64,7 +51,6 @@ add_module(
     DEPENDENCIES
     preliminary
     logger
-    lt_debug
     TESTS
     shader.test.cpp
 )
@@ -82,7 +68,6 @@ add_module(
     preliminary
     assets
     logger
-    lt_debug
 )
 
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
@@ -100,7 +85,6 @@ add_module(
     preliminary
     memory
     PRIVATE_DEPENDENCIES
-    lt_debug
 )
 
 add_module(
@@ -112,7 +96,6 @@ add_module(
     entity.cppm
     DEPENDENCIES
     logger
-    lt_debug
     memory
     TESTS
     registry.test.cpp
@@ -140,7 +123,6 @@ if(WIN32)
         input_codes
         PRIVATE_DEPENDENCIES
         logger
-        lt_debug
         time
         TESTS
         system.test.cpp
@@ -167,7 +149,6 @@ elseif(UNIX)
         PRIVATE_DEPENDENCIES
         X11
         logger
-        lt_debug
         time
         TESTS
         system.test.cpp

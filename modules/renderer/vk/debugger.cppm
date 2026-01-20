@@ -5,7 +5,6 @@ import renderer.vk.instance;
 import renderer.frontend;
 import renderer.vk.api_wrapper;
 import memory.null_on_move;
-import debug.assertions;
 import logger;
 
 export namespace lt::renderer::vkb {
@@ -156,7 +155,7 @@ void Debugger::native_callback(
 {
 	try
 	{
-		debug::ensure(user_data, "Null vulkan_user_data received in messenger callback");
+		ensure(user_data, "Null vulkan_user_data received in messenger callback");
 
 		auto *messenger = std::bit_cast<Debugger *>(user_data);
 		messenger->m_user_callback(

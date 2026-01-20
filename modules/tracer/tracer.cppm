@@ -1,23 +1,25 @@
+// @todo(Light): Implement...
+
 export module debug.instrumentor;
 
 import preliminary;
 import logger;
 
-namespace lt::debug {
+namespace lt::tracer {
 
-struct ScopeProfileResult
+struct ScopeTraceResult
 {
 	std::string name;
 	u64 start, duration;
 	u32 threadID;
 };
 
-class Instrumentor
+class Tracer
 {
 public:
-	static auto instance() -> Instrumentor &
+	static auto instance() -> Tracer &
 	{
-		static auto instance = Instrumentor {};
+		static auto instance = Tracer {};
 		return instance;
 	}
 
@@ -30,7 +32,7 @@ public:
 		instance().end_session_impl();
 	}
 
-	static void submit_scope_profile(const ScopeProfileResult &profileResult)
+	static void submit_scope_profile(const ScopeTraceResult &profileResult)
 	{
 		instance().submit_scope_profile_impl(profileResult);
 	}
@@ -40,46 +42,46 @@ private:
 
 	unsigned int m_current_session_count { 0u };
 
-	Instrumentor() = default;
+	Tracer() = default;
 
 	void begin_session_impl(const std::string &outputPath);
 
 	void end_session_impl();
 
-	void submit_scope_profile_impl(const ScopeProfileResult &profileResult);
+	void submit_scope_profile_impl(const ScopeTraceResult &profileResult);
 };
 
-class InstrumentorTimer
+class TracerTimer
 {
 public:
-	InstrumentorTimer(const std::string &scopeName);
+	TracerTimer(const std::string &scopeName);
 
-	~InstrumentorTimer();
+	~TracerTimer();
 
 private:
-	ScopeProfileResult m_result;
+	ScopeTraceResult m_result;
 
 	std::chrono::time_point<std::chrono::steady_clock> m_start;
 };
 
-} // namespace lt::debug
+} // namespace lt::tracer
 
 /* scope */
-#define lt_profile_scope(name)                        lt_profile_scope_no_redifinition(name, __LINE__)
-#define lt_profile_scope_no_redifinition(name, line)  lt_profile_scope_no_redifinition2(name, line)
-#define lt_profile_scope_no_redifinition2(name, line) InstrumentorTimer timer##line(name)
+#define lt_trace_scope(name)                        lt_profile_scope_no_redifinition(name, __LINE__)
+#define lt_trace_scope_no_redifinition(name, line)  lt_profile_scope_no_redifinition2(name, line)
+#define lt_trace_scope_no_redifinition2(name, line) InstrumentorTimer timer##line(name)
 
 /* function */
-#define LT_PROFILE_FUNCTION lt_profile_scope(__FUNCSIG__)
+#define lt_trace_function lt_profile_scope(__FUNCSIG__)
 
 /* session */
-#define lt_profile_begin_session(outputPath) ::lt::Instrumentor::begin_session(outputPath)
-#define lt_profile_end_session()             ::lt::Instrumentor::end_session()
+#define lt_trace_begin_session(outputPath) ::lt::Instrumentor::begin_session(outputPath)
+#define lt_trace_end_session()             ::lt::Instrumentor::end_session()
 
 module :private;
-namespace lt::debug {
+namespace lt::tracer {
 
-void Instrumentor::begin_session_impl(const std::string &outputPath)
+void Tracer::begin_session_impl(const std::string &outputPath)
 {
 	std::filesystem::create_directory(outputPath.substr(0, outputPath.find_last_of('/') + 1));
 
@@ -87,7 +89,7 @@ void Instrumentor::begin_session_impl(const std::string &outputPath)
 	m_output_file_stream << "{\"traceEvents\":[";
 }
 
-void Instrumentor::end_session_impl()
+void Tracer::end_session_impl()
 {
 	if (m_current_session_count == 0u)
 	{
@@ -101,7 +103,7 @@ void Instrumentor::end_session_impl()
 	m_output_file_stream.close();
 }
 
-void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileResult)
+void Tracer::submit_scope_profile_impl(const ScopeTraceResult &profileResult)
 {
 	if (m_current_session_count++ == 0u)
 	{
@@ -122,13 +124,13 @@ void Instrumentor::submit_scope_profile_impl(const ScopeProfileResult &profileRe
 	m_output_file_stream << "}";
 }
 
-InstrumentorTimer::InstrumentorTimer(const std::string &scopeName)
+TracerTimer::TracerTimer(const std::string &scopeName)
     : m_result({ .name = scopeName, .start = 0, .duration = 0, .threadID = 0 })
     , m_start(std::chrono::steady_clock::now())
 {
 }
 
-InstrumentorTimer::~InstrumentorTimer()
+TracerTimer::~TracerTimer()
 {
 	auto end = std::chrono::steady_clock::now();
 
@@ -141,6 +143,6 @@ InstrumentorTimer::~InstrumentorTimer()
 	                        .count()
 	                    - m_result.start;
 
-	Instrumentor::submit_scope_profile(m_result);
+	Tracer::submit_scope_profile(m_result);
 }
-} // namespace lt::debug
+} // namespace lt::tracer

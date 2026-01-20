@@ -3,7 +3,6 @@ export module renderer.vk.renderer;
 import preliminary;
 import logger;
 import assets.shader;
-import debug.assertions;
 import renderer.vk.api_wrapper;
 import memory.reference;
 import memory.null_on_move;
@@ -171,7 +170,7 @@ Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_fr
 
 [[nodiscard]] auto Renderer::frame(u32 frame_idx, std::function<void()> submit_scene) -> Result
 {
-	debug::ensure(
+	ensure(
 	    frame_idx < m_max_frames_in_flight,
 	    "Failed to draw: frame_idx >= max_frames_in_flight ({} >= {})",
 	    frame_idx,

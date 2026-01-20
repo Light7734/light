@@ -2,7 +2,6 @@ export module input.system;
 export import :components;
 import logger;
 import app.system;
-import debug.assertions;
 import ecs.registry;
 import memory.reference;
 import surface.system;
@@ -69,7 +68,7 @@ struct overloads: Ts...
 
 System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
-	debug::ensure(m_registry, "Failed to initialize input system: null registry");
+	ensure(m_registry, "Failed to initialize input system: null registry");
 }
 
 void System::tick(app::TickInfo tick)

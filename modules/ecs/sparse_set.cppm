@@ -1,7 +1,6 @@
 export module ecs.sparse_set;
 
 import preliminary;
-import debug.assertions;
 
 export namespace lt::ecs {
 
@@ -39,7 +38,7 @@ public:
 
 	explicit SparseSet(size_t initial_capacity = 1)
 	{
-		debug::ensure(
+		ensure(
 		    initial_capacity <= max_capacity,
 		    "Failed to create SparseSet: capacity too large ({} > {})",
 		    initial_capacity,

@@ -3,7 +3,6 @@ export module renderer.vk.device;
 import preliminary;
 import memory.null_on_move;
 import logger;
-import debug.assertions;
 import renderer.vk.instance;
 import renderer.frontend;
 import renderer.vk.api_wrapper;
@@ -71,7 +70,7 @@ Device::Device(IGpu *gpu, ISurface *surface)
     : m_gpu(static_cast<Gpu *>(gpu))
     , m_surface(static_cast<Surface *>(surface))
 {
-	debug::ensure(m_surface->vk(), "Failed to initialize vk::Device: null vulkan surface");
+	ensure(m_surface->vk(), "Failed to initialize vk::Device: null vulkan surface");
 
 	initialize_queue_indices();
 	initialize_logical_device();
@@ -146,12 +145,12 @@ void Device::initialize_queue_indices()
 		++idx;
 	}
 
-	debug::ensure(
+	ensure(
 	    m_graphics_queue_family_index != vk::constants::queue_family_ignored,
 	    "Failed to find graphics queue family"
 	);
 
-	debug::ensure(
+	ensure(
 	    m_present_queue_family_index != vk::constants::queue_family_ignored,
 	    "Failed to find presentation queue family"
 	);

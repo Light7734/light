@@ -44,7 +44,6 @@ import preliminary;
 import memory.null_on_move;
 import math.vec3;
 import math.vec2;
-import debug.assertions;
 import logger;
 
 template<class... Ts>
@@ -2930,24 +2929,21 @@ void load_library()
 	{
 		library = dlopen("libvulkan.so", runtime_loader_flags);
 	}
-	lt::debug::ensure(library, "Failed to dlopen the libvulkan.so");
+	ensure(library, "Failed to dlopen the libvulkan.so");
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	api::get_instance_proc_address = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
 	    dlsym(library, "vkGetInstanceProcAddr")
 	);
-	lt::debug::ensure(
-	    api::get_instance_proc_address,
-	    "Failed to load vulkan function: vkGetInstanceProcAddr"
-	);
+	ensure(api::get_instance_proc_address, "Failed to load vulkan function: vkGetInstanceProcAddr");
 #elif defined(LIGHT_PLATFORM_WINDOWS)
 	library = LoadLibraryA("vulkan-1.dll");
-	lt::debug::ensure(library, "Failed to LoadLibraryA the vulkan-1.dll");
+	ensure(library, "Failed to LoadLibraryA the vulkan-1.dll");
 
 	api::get_instance_proc_address = std::bit_cast<PFN_vkGetInstanceProcAddr>(
 	    GetProcAddress(std::bit_cast<HMODULE>(library), "vkGetInstanceProcAddr")
 	);
-	lt::debug::ensure(
+	ensure(
 	    api::get_instance_proc_address,
 	    "Failed to get vkGetInstanceProcAddr function pointer from vulkan-1.dll"
 	);
@@ -2977,7 +2973,7 @@ void load_global_functions()
 {
 	constexpr auto load_fn = []<typename T>(T &pfn, const char *fn_name) {
 		pfn = std::bit_cast<T>(api::get_instance_proc_address(nullptr, fn_name));
-		lt::debug::ensure(pfn, "Failed to load vulkan global function: {}", fn_name);
+		ensure(pfn, "Failed to load vulkan global function: {}", fn_name);
 	};
 
 	load_fn(api::create_instance, "vkCreateInstance");
@@ -2989,7 +2985,7 @@ void Instance::load_functions()
 {
 	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
 		pfn = std::bit_cast<T>(api::get_instance_proc_address(m_instance, fn_name));
-		lt::debug::ensure(pfn, "Failed to load vulkan instance function: {}", fn_name);
+		ensure(pfn, "Failed to load vulkan instance function: {}", fn_name);
 	};
 
 	load_fn(api::destroy_instance, "vkDestroyInstance");
@@ -3039,7 +3035,7 @@ void Device::load_functions()
 {
 	const auto load_fn = [this]<typename T>(T &pfn, const char *fn_name) {
 		pfn = std::bit_cast<T>(api::get_device_proc_address(m_device, fn_name));
-		lt::debug::ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
+		ensure(pfn, "Failed to load vulkan device function: {}", fn_name);
 	};
 
 	load_fn(api::get_device_queue, "vkGetDeviceQueue");
@@ -3149,7 +3145,7 @@ Instance::Instance(CreateInfo info)
 				values = std::bit_cast<const void *>(&std::get<2>(setting.values));
 			}
 
-			debug::ensure(values, "Failed to get variant from setting.values");
+			ensure(values, "Failed to get variant from setting.values");
 
 			layer_settings.emplace_back(
 			    VkLayerSettingEXT {
@@ -3189,7 +3185,7 @@ Instance::Instance(CreateInfo info)
 	};
 
 	vkc(api::create_instance(&vk_info, nullptr, &m_instance));
-	debug::ensure(m_instance, "Failed to create vulkan instance");
+	ensure(m_instance, "Failed to create vulkan instance");
 }
 
 Surface::Surface(const Instance &instance, const CreateInfo &info)
@@ -3235,7 +3231,7 @@ Surface::~Surface()
 {
 	auto count = 0u;
 	vkc(api::enumerate_physical_devices(instance.m_instance, &count, nullptr));
-	debug::ensure(count != 0u, "Failed to find any gpus with Vulkan support");
+	ensure(count != 0u, "Failed to find any gpus with Vulkan support");
 
 	auto vk_gpus = std::vector<VkPhysicalDevice>(count);
 	vkc(api::enumerate_physical_devices(instance.m_instance, &count, vk_gpus.data()));
@@ -3926,7 +3922,7 @@ void Device::wait_for_fences(std::span<VkFence> fences) const
 {
 	auto count = uint32_t { 0u };
 	vkc(api::get_swapchain_images_khr(m_device, swapchain, &count, nullptr));
-	debug::ensure(count != 0u, "Failed to get swapchain images");
+	ensure(count != 0u, "Failed to get swapchain images");
 
 	auto images = std::vector<VkImage>(count);
 	vkc(api::get_swapchain_images_khr(m_device, swapchain, &count, images.data()));

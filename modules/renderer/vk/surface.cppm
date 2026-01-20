@@ -1,7 +1,6 @@
 export module renderer.vk.surface;
 
 import preliminary;
-import debug.assertions;
 import ecs.entity;
 import ecs.registry;
 import memory.null_on_move;
@@ -43,11 +42,11 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 
 
 #if defined(LIGHT_PLATFORM_LINUX)
-	debug::ensure(
+	ensure(
 	    component.get_native_data().display,
 	    "Failed to initialize vk::Surface: null Wayland display"
 	);
-	debug::ensure(
+	ensure(
 	    component.get_native_data().surface,
 	    "Failed to initialize vk::Surface: null Wayland surface"
 	);
@@ -61,7 +60,7 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 	);
 
 #elif defined(LIGHT_PLATFORM_WINDOWS)
-	debug::ensure(
+	ensure(
 	    component.get_native_data().window,
 	    "Failed to initialize vk::Surface: null win32 window handle"
 	);
