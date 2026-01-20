@@ -1,12 +1,7 @@
-import logger;
-import test.test;
+import test;
 import test.registry;
 
-import preliminary;
-
-using namespace ::lt::test;
-
-void parse_option(std::string_view argument, Registry::Options &options)
+void parse_option(std::string_view argument, lt::test::Registry::Options &options)
 {
 	constexpr auto case_str = std::string_view { "--case=" };
 	constexpr auto suite_str = std::string_view { "--suite=" };
@@ -19,7 +14,7 @@ void parse_option(std::string_view argument, Registry::Options &options)
 
 	if (argument.starts_with("--mode=") && argument.substr(7ul) == "stats")
 	{
-		options.execution_policy = Registry::ExecutionPolicy::stats;
+		options.execution_policy = lt::test::Registry::ExecutionPolicy::stats;
 		return;
 	}
 
@@ -56,7 +51,7 @@ try
 {
 	auto raw_arguments = std::span<char *>(argv, argc);
 
-	auto options = Registry::Options {};
+	auto options = lt::test::Registry::Options {};
 	for (auto idx = 0; auto &raw_argument : raw_arguments)
 	{
 		// First argument is the "cwd'
@@ -83,7 +78,7 @@ try
 		}
 	}
 
-	return static_cast<i32>(Registry::run_all(options));
+	return static_cast<i32>(lt::test::Registry::run_all(options));
 }
 catch (const std::exception &exp)
 {

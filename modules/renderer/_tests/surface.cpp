@@ -2,7 +2,7 @@ import renderer.frontend;
 import renderer.test_utils;
 
 Suite raii = "surface"_suite = [] {
-	Case { "happy path won't throw" } = [&] {
+	Case { "happy paths" } = [&] {
 		auto fixture = Fixture_SurfaceSystem {};
 
 		const auto surface = lt::renderer::create_surface(
@@ -16,7 +16,7 @@ Suite raii = "surface"_suite = [] {
 		expect_eq(y, constants::resolution.y);
 	};
 
-	Case { "unhappy path throws" } = [&] {
+	Case { "unhappy paths" } = [&] {
 		auto registry = lt::memory::create_ref<lt::ecs::Registry>();
 		auto entity = lt::ecs::Entity { registry, registry->create_entity() };
 		auto system = lt::surface::System(registry);

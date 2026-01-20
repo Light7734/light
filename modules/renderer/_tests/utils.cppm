@@ -1,12 +1,9 @@
 export module renderer.test_utils;
 
-export import preliminary;
-export import logger;
+export import test;
 export import surface.system;
 export import ecs.registry;
 export import renderer.factory;
-export import test.test;
-export import test.expects;
 export import memory.reference;
 export import renderer.frontend;
 export import renderer.system;
@@ -14,15 +11,6 @@ export import math.vec2;
 export import math.vec3;
 export import math.vec4;
 export import math.mat4;
-
-export using ::lt::test::Case;
-export using ::lt::test::expect_eq;
-export using ::lt::test::expect_false;
-export using ::lt::test::expect_not_nullptr;
-export using ::lt::test::expect_throw;
-export using ::lt::test::operator""_suite;
-export using ::lt::test::expect_true;
-export using ::lt::test::Suite;
 
 export namespace constants {
 

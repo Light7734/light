@@ -1,31 +1,22 @@
-import preliminary;
+import test;
 import time;
-import test.test;
-import test.expects;
 
-using ::lt::test::Case;
-using ::lt::test::expect_le;
-using ::lt::test::operator""_suite;
-using ::lt::test::Suite;
 using ::lt::time::Timer;
 
-// error margin is high since run-time may slow down extremely due to
-// sanitization/debugging or execution through valgrind...
-//
-// <1us error margin is tested manually in release builds and it works fine.
+/* @note: error margin is high since run-time may slow down extremely due to
+ * sanitization/debugging or execution through valgrind...
+ * <1us error margin is tested manually in release builds and it works fine.
+ **/
 constexpr auto max_error_margin = std::chrono::milliseconds { 1 };
 
 Suite raii = "raii"_suite = [] {
 	using std::chrono::microseconds;
 
-	Case { "default" } = [] {
+	Case { "happy paths" } = [] {
 		Timer {};
 	};
 
-	Case { "unhappy path throws" } = [] {
-	};
-
-	Case { "plenty" } = [] {
+	Case { "many" } = [] {
 		for (auto idx : std::views::iota(0, 100'001))
 		{
 			ignore = idx;
@@ -38,7 +29,7 @@ Suite reset_and_elapsed_time = "reset_and_elapsed_time"_suite = [] {
 	using std::chrono::hours;
 	using std::chrono::microseconds;
 
-	Case { "won't throw" } = [] {
+	Case { "happy path" } = [] {
 		Timer {}.reset();
 		ignore = Timer {}.elapsed_time();
 	};

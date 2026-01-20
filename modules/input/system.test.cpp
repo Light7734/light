@@ -1,9 +1,6 @@
-import std;
+import test;
 import input.system;
 import input.codes;
-import std;
-import test.test;
-import test.expects;
 import surface.events;
 import memory.scope;
 import memory.reference;
@@ -12,22 +9,10 @@ import ecs.entity;
 import ecs.registry;
 import surface.system;
 
+using ::lt::input::InputComponent;
+using ::lt::input::System;
 
-// NOLINTBEGIN
-using namespace lt;
-using input::InputComponent;
-using input::System;
-using test::Case;
-using test::expect_eq;
-using test::expect_false;
-using test::expect_ne;
-using test::expect_not_nullptr;
-using test::operator""_suite;
-using test::expect_throw;
-using test::Suite;
-// NOLINTEND
-
-[[nodiscard]] auto tick_info() -> app::TickInfo
+[[nodiscard]] auto tick_info() -> lt::app::TickInfo
 {
 	return {
 		.delta_time = std::chrono::milliseconds { 16 },
@@ -39,12 +24,12 @@ using test::Suite;
 class Fixture
 {
 public:
-	[[nodiscard]] auto registry() -> memory::Ref<ecs::Registry>
+	[[nodiscard]] auto registry() -> lt::memory::Ref<lt::ecs::Registry>
 	{
 		return m_registry;
 	}
 
-	auto add_input_component() -> ecs::EntityId
+	auto add_input_component() -> lt::ecs::EntityId
 	{
 		auto entity = m_registry->create_entity();
 		m_registry->add<InputComponent>(entity, {});
@@ -52,7 +37,7 @@ public:
 		return entity;
 	}
 
-	auto add_surface_component() -> ecs::EntityId
+	auto add_surface_component() -> lt::ecs::EntityId
 	{
 		auto entity = m_registry->create_entity();
 		m_surface_system.create_surface_component(
@@ -64,27 +49,27 @@ public:
 	}
 
 private:
-	memory::Ref<ecs::Registry> m_registry = memory::create_ref<ecs::Registry>();
+	lt::memory::Ref<lt::ecs::Registry> m_registry = lt::memory::create_ref<lt::ecs::Registry>();
 
-	surface::System m_surface_system = surface::System { m_registry };
+	lt::surface::System m_surface_system = lt::surface::System { m_registry };
 };
 
 Suite raii = "raii"_suite = "raii"_suite = [] {
-	Case { "happy path won't throw" } = [&] {
+	Case { "happy paths" } = [&] {
 		System { Fixture {}.registry() };
 	};
 
-	Case { "many won't freeze/throw" } = [&] {
+	Case { "unhappy paths" } = [] {
+		expect_throw([] { ignore = System { {} }; });
+	};
+
+	Case { "many" } = [&] {
 		auto fixture = Fixture {};
 		for (auto idx : std::views::iota(0, 10'000))
 		{
 			ignore = idx;
 			ignore = System { fixture.registry() };
 		}
-	};
-
-	Case { "unhappy path throws" } = [] {
-		expect_throw([] { ignore = System { {} }; });
 	};
 };
 
@@ -122,7 +107,7 @@ Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_destrroy<InputComponent>" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = memory::create_scope<System>(registry);
+		auto system = lt::memory::create_scope<System>(registry);
 
 		auto entity_a = fixture.add_input_component();
 		auto entity_b = fixture.add_input_component();
@@ -154,7 +139,7 @@ Suite tick = "tick"_suite = [] {
 		auto system = System { fixture.registry() };
 
 		auto surface_entity = fixture.add_surface_component();
-		auto &surface = registry->get<surface::SurfaceComponent>(surface_entity);
+		auto &surface = registry->get<lt::surface::SurfaceComponent>(surface_entity);
 
 		auto input_entity = fixture.add_input_component();
 		auto &input = registry->get<InputComponent>(input_entity);
@@ -166,24 +151,25 @@ Suite tick = "tick"_suite = [] {
 		    }
 		);
 
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
+		using enum ::lt::input::InputAction::State;
+		expect_eq(input.get_action(action_key).state, inactive);
 		system.tick(tick_info());
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
+		expect_eq(input.get_action(action_key).state, inactive);
 
-		surface.push_event(surface::KeyPressedEvent(Key::a));
+		surface.push_event(lt::surface::KeyPressedEvent(Key::a));
 		system.tick(tick_info());
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::triggered);
-
-		system.tick(tick_info());
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
+		expect_eq(input.get_action(action_key).state, triggered);
 
 		system.tick(tick_info());
-		system.tick(tick_info());
-		system.tick(tick_info());
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::active);
+		expect_eq(input.get_action(action_key).state, active);
 
-		surface.push_event(surface::KeyReleasedEvent(Key::a));
 		system.tick(tick_info());
-		expect_eq(input.get_action(action_key).state, input::InputAction::State::inactive);
+		system.tick(tick_info());
+		system.tick(tick_info());
+		expect_eq(input.get_action(action_key).state, active);
+
+		surface.push_event(lt::surface::KeyReleasedEvent(Key::a));
+		system.tick(tick_info());
+		expect_eq(input.get_action(action_key).state, inactive);
 	};
 };

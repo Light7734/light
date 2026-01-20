@@ -5,9 +5,10 @@ import math.vec2;
 import math.vec3;
 import math.vec4;
 
-namespace lt::math {
+export namespace lt::math {
 
-export template<typename T = f32>
+template<typename T = f32>
+    requires(std::is_arithmetic_v<T>)
 struct mat4_impl
 {
 	using Column_T = vec4_impl<T>;
@@ -79,34 +80,38 @@ struct mat4_impl
 	std::array<Column_T, 4u> values;
 };
 
-export template<typename T>
+/** @todo(Light): Implement */
+template<typename T>
 [[nodiscard]] auto translate(const vec3_impl<T> &value) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export template<typename T>
+/** @todo(Light): Implement */
+template<typename T>
 [[nodiscard]] auto rotate(f32 value, const vec3_impl<T> &xyz) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export template<typename T>
+/** @todo(Light): Implement */
+template<typename T>
 [[nodiscard]] auto scale(const vec3_impl<T> &value) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export template<typename T>
+/** @todo(Light): Implement */
+template<typename T>
 [[nodiscard]] auto inverse(const mat4_impl<T> &value) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
 
-export using mat4 = mat4_impl<f32>;
+using mat4 = mat4_impl<f32>;
 
-export using imat4 = mat4_impl<i32>;
+using imat4 = mat4_impl<i32>;
 
-export using umat4 = mat4_impl<u32>;
+using umat4 = mat4_impl<u32>;
 
 } // namespace lt::math

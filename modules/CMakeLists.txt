@@ -14,6 +14,7 @@ add_module(
     NAME
     test
     INTERFACES
+    module.cppm
     test.cppm
     expects.cppm
     registry.cppm
@@ -39,6 +40,8 @@ add_module(
     components.cppm
     DEPENDENCIES
     preliminary
+    TESTS
+    vec2.test.cpp
 )
 
 add_module(

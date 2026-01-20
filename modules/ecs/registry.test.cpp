@@ -1,17 +1,8 @@
-import preliminary;
+import test;
 import ecs.registry;
-import test.test;
-import test.expects;
 
 using ::lt::ecs::EntityId;
 using ::lt::ecs::Registry;
-using ::lt::test::Case;
-using ::lt::test::expect_eq;
-using ::lt::test::expect_false;
-using ::lt::test::expect_true;
-using ::lt::test::expect_unreachable;
-using ::lt::test::Suite;
-using ::lt::test::operator""_suite;
 
 struct Component
 {
@@ -61,19 +52,19 @@ struct std::formatter<Component_B>
 };
 
 Suite raii = "raii"_suite = [] {
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		ignore = Registry {};
 	};
 
-	Case { "many won't freeze/throw" } = [] {
+	Case { "unhappy paths" } = [] {
+	};
+
+	Case { "many" } = [] {
 		for (auto idx : std::views::iota(0, 100'000))
 		{
 			ignore = idx;
 			ignore = Registry {};
 		}
-	};
-
-	Case { "unhappy path throws" } = [] {
 	};
 
 	Case { "post construct has correct state" } = [] {
@@ -227,7 +218,7 @@ Suite each = "each"_suite = [] {
 		component_map_a[entity] = component;
 	}
 
-	auto component_map_b = std::unordered_map<lt::ecs::EntityId, Component_B> {};
+	auto component_map_b = std::unordered_map<EntityId, Component_B> {};
 	for (auto idx : std::views::iota(0, 10'000))
 	{
 		auto entity = EntityId {};

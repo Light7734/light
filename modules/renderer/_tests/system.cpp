@@ -18,7 +18,7 @@ struct RendererContext
 };
 
 Suite raii = "system_raii"_suite = [] {
-	Case { "happy path has no errors" } = [] {
+	Case { "happy paths" } = [] {
 		auto fixture = Fixture_RendererSystem {};
 		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger::MessageSeverity::error));
 		expect_false(
@@ -26,7 +26,7 @@ Suite raii = "system_raii"_suite = [] {
 		);
 	};
 
-	Case { "unhappy path throws" } = [] {
+	Case { "unhappy paths" } = [] {
 		auto fixture = Fixture_SurfaceSystem {};
 		auto empty_entity = lt::ecs::Entity { fixture.registry(),
 			                                  fixture.registry()->create_entity() };

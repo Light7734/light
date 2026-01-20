@@ -1099,6 +1099,7 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
+	log::debug("Setting window position to: {}, {}", request.position.x, request.position.y);
 	SetWindowPos(
 	    surface.m_native_data.window,
 	    {},

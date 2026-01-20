@@ -51,6 +51,8 @@ public:
 
 	auto insert(Identifier_T identifier, Value_T value) -> Dense_T &
 	{
+		ensure(identifier < max_capacity, "SparseSet::insert: identifier < max_capacity");
+
 		if (m_sparse.size() < identifier + 1)
 		{
 			auto new_capacity = std::max(static_cast<size_t>(identifier + 1), m_sparse.size() * 2);
@@ -70,7 +72,27 @@ public:
 	 */
 	void remove(Identifier_T identifier) override
 	{
+		ensure(
+		    identifier < m_sparse.size(),
+		    "Failed to ensure: identifier < m_sparse.size() [{} < {}]",
+		    identifier,
+		    m_sparse.size()
+		);
+
 		auto &idx = m_sparse[identifier];
+		ensure(
+		    idx != null_identifier,
+		    "Failed to ensure: idx != null_identifier [{} != {}]",
+		    idx,
+		    null_identifier
+		);
+		ensure(
+		    idx < m_dense.size(),
+		    "Failed to ensure: idx < m_dense.size() [{} < {}]",
+		    idx,
+		    m_dense.size()
+		);
+
 		auto &[entity, component] = m_dense[idx];
 
 		auto &[last_entity, last_component] = m_dense.back();

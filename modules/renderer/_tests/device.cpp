@@ -2,12 +2,12 @@ import renderer.frontend;
 import renderer.test_utils;
 
 Suite raii = "device_raii"_suite = [] {
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		auto fixture = Fixture_SurfaceGpu {};
 		ignore = lt::renderer::create_device(constants::api, fixture.gpu(), fixture.surface());
 	};
 
-	Case { "unhappy path throws" } = [] {
+	Case { "unhappy paths" } = [] {
 		auto fixture = Fixture_SurfaceGpu {};
 
 		expect_throw([&] {

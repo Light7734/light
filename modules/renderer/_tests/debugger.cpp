@@ -2,7 +2,7 @@ import renderer.frontend;
 import renderer.test_utils;
 
 Suite raii = "debugger_raii"_suite = [] {
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		ignore = lt::renderer::create_debugger(
 		    lt::renderer::Api::vulkan,
 		    lt::renderer::get_instance(lt::renderer::Api::vulkan),
@@ -14,7 +14,7 @@ Suite raii = "debugger_raii"_suite = [] {
 		);
 	};
 
-	Case { "unhappy path throws" } = [] {
+	Case { "unhappy paths" } = [] {
 		expect_throw([] {
 			ignore = lt::renderer::create_debugger(
 			    lt::renderer::Api::vulkan,

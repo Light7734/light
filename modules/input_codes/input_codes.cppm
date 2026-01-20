@@ -5,7 +5,7 @@
  *
  * Hence, both `Surface` and `Input` needs to agree to the same input codes, while `Input` depends
  * on `Surface`. The simplest solution is to keep the codes in a 3rd module and make both depend on
- * it.
+ * it. (I did not want to give `Surface` the responsibility of defining input codes...)
  */
 export module input.codes;
 

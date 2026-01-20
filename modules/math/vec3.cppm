@@ -3,9 +3,9 @@ export module math.vec3;
 import preliminary;
 import math.vec2;
 
-namespace lt::math {
+export namespace lt::math {
 
-export template<typename T = f32>
+template<typename T = f32>
     requires(std::is_arithmetic_v<T>)
 struct vec3_impl
 {
@@ -102,11 +102,11 @@ struct vec3_impl
 	T z;
 };
 
-export using vec3 = vec3_impl<f32>;
+using vec3 = vec3_impl<f32>;
 
-export using ivec3 = vec3_impl<i32>;
+using ivec3 = vec3_impl<i32>;
 
-export using uvec3 = vec3_impl<u32>;
+using uvec3 = vec3_impl<u32>;
 
 } // namespace lt::math
 

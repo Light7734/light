@@ -1,29 +1,26 @@
-import preliminary;
+import test;
 import ecs.sparse_set;
-import test.test;
-import test.expects;
-
-using ::lt::test::Case;
-using ::lt::test::expect_eq;
-using ::lt::test::expect_false;
-using ::lt::test::expect_ne;
-using ::lt::test::expect_throw;
-using ::lt::test::expect_true;
-using ::lt::test::Suite;
-using ::lt::test::operator""_suite;
 
 using Value_T = i32;
 using Set = lt::ecs::SparseSet<Value_T>;
+
 constexpr auto capacity = 100;
 
 Suite raii = "raii"_suite = [] {
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		ignore = Set {};
 		ignore = Set { Set::max_capacity };
 	};
 
-	Case { "unhappy path throws" } = [] {
+	Case { "unhappy paths" } = [] {
 		expect_throw([] { ignore = Set { Set::max_capacity + 1 }; });
+	};
+
+	Case { "many" } = [] {
+		for (auto idx : std::views::iota(0, 1'000))
+		{
+			ignore = Set { static_cast<size_t>(idx) };
+		}
 	};
 
 	Case { "post construct has correct state" } = [&] {
@@ -34,7 +31,29 @@ Suite raii = "raii"_suite = [] {
 };
 
 Suite element_raii = "element_raii"_suite = [] {
-	Case { "many inserts/removes won't freeze/throw" } = [] {
+	Case { "happy paths" } = [] {
+		auto set = Set { capacity };
+		set.insert(0, {});
+		set.remove(0);
+	};
+
+	Case { "unhappy paths" } = [] {
+		expect_throw([] {
+			auto set = Set { capacity };
+			set.insert(Set::max_capacity + 1, {});
+		});
+
+		expect_throw([] {
+			auto set = Set { capacity };
+			set.insert(0, {});
+			set.insert(1, {});
+			set.insert(2, {});
+
+			set.remove(3);
+		});
+	};
+
+	Case { "many" } = [] {
 		auto set = Set {};
 		for (auto idx : std::views::iota(0, 10'000))
 		{
@@ -160,5 +179,10 @@ Suite clear = "clear"_suite = [] {
 
 		set.clear();
 		expect_eq(set.get_size(), 0);
+
+		for (auto idx : std::views::iota(0, 10'000))
+		{
+			expect_throw([&] { ignore = set.at(idx); });
+		}
 	};
 };

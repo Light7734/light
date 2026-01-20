@@ -4,9 +4,9 @@ import preliminary;
 import math.vec2;
 import math.vec3;
 
-namespace lt::math {
+export namespace lt::math {
 
-export template<typename T = f32>
+template<typename T = f32>
     requires(std::is_arithmetic_v<T>)
 struct vec4_impl
 {
@@ -121,11 +121,11 @@ struct vec4_impl
 	T w;
 };
 
-export using vec4 = vec4_impl<f32>;
+using vec4 = vec4_impl<f32>;
 
-export using ivec4 = vec4_impl<i32>;
+using ivec4 = vec4_impl<i32>;
 
-export using uvec4 = vec4_impl<u32>;
+using uvec4 = vec4_impl<u32>;
 
 } // namespace lt::math
 

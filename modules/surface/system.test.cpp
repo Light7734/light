@@ -1,26 +1,16 @@
-import preliminary;
-import test.test;
+import test;
 import time;
-import test.expects;
 import surface.system;
 import surface.events;
 import surface.requests;
 import ecs.registry;
 import memory.scope;
 import memory.reference;
-import logger;
 import math.vec2;
 import app.system;
 
 using ::lt::surface::SurfaceComponent;
 using ::lt::surface::System;
-using ::lt::test::Case;
-using ::lt::test::expect_eq;
-using ::lt::test::expect_ne;
-using ::lt::test::expect_not_nullptr;
-using ::lt::test::expect_throw;
-using ::lt::test::Suite;
-using ::lt::test::operator""_suite;
 
 [[nodiscard]] auto tick_info() -> lt::app::TickInfo
 {
@@ -87,22 +77,22 @@ private:
 };
 
 Suite raii = "raii"_suite = [] {
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 	};
 
-	Case { "many won't freeze/throw" } = [] {
+	Case { "unhappy paths" } = [] {
+		expect_throw([] { ignore = System { {} }; });
+	};
+
+	Case { "many" } = [] {
 		auto fixture = Fixture {};
 		for (auto idx : std::views::iota(0, 250))
 		{
 			ignore = idx;
 			ignore = System { fixture.registry() };
 		}
-	};
-
-	Case { "unhappy path throws" } = [] {
-		expect_throw([] { ignore = System { {} }; });
 	};
 
 	Case { "post construct has correct state" } = [] {
@@ -269,15 +259,5 @@ Suite tick_handles_requests = "tick_handles_requests"_suite = [] {
 		expect_eq(surface.get_title(), title);
 		expect_eq(surface.get_position(), position);
 		expect_eq(surface.get_resolution(), resolution);
-
-		lt::log::debug("EVENT COUNT: {}", surface.peek_events().size());
-		for (const auto &event : surface.peek_events())
-		{
-			const auto visitor = overloads {
-				[&](auto event) { lt::log::debug("event: {}", event.to_string()); },
-			};
-
-			std::visit(visitor, event);
-		}
 	};
 };

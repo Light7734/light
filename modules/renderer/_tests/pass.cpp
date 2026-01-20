@@ -2,7 +2,7 @@ import renderer.frontend;
 import renderer.test_utils;
 
 Suite raii = "pass_raii"_suite = [] {
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		ignore = lt::renderer::create_pass(
 		    constants::api,
@@ -17,7 +17,7 @@ Suite raii = "pass_raii"_suite = [] {
 		);
 	};
 
-	Case { "unhappy path throws" } = [] {
+	Case { "unhappy paths" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		expect_throw([&] {
 			ignore = lt::renderer::create_pass(

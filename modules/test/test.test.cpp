@@ -1,20 +1,6 @@
-import preliminary;
-import test.test;
-import test.expects;
-
-using lt::test::Case;
-using lt::test::Suite;
-using lt::test::operator""_suite;
+import test;
 
 Suite expects = "expects"_suite = []() {
-	using lt::test::expect_unreachable;
-	using lt::test::expect_true;
-	using lt::test::expect_false;
-	using lt::test::expect_eq;
-	using lt::test::expect_ne;
-	using lt::test::expect_le;
-	using lt::test::expect_throw;
-
 	Case { "" } = [] {
 	};
 

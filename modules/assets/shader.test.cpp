@@ -1,48 +1,42 @@
-import preliminary;
+import test;
 import assets.metadata;
 import assets.shader;
-import logger;
-import logger;
-import test.test;
-import test.expects;
 
 using ::lt::assets::AssetMetadata;
+using ::lt::assets::Blob;
 using ::lt::assets::BlobMetadata;
 using ::lt::assets::ShaderAsset;
-using ::lt::test::Case;
-using ::lt::test::expect_eq;
-using ::lt::test::expect_throw;
-using ::lt::test::expect_true;
-using ::lt::test::Suite;
-using ::lt::test::operator""_suite;
 
 const auto test_data_path = std::filesystem::path { "./data/test_assets" };
 const auto tmp_path = std::filesystem::path { "/tmp/lt_assets_tests/" };
+
+[[nodiscard]] auto generate_blob(size_t size) -> Blob
+{
+	auto blob = Blob {};
+	for (auto idx : std::views::iota(0u, size))
+	{
+		blob.emplace_back(static_cast<byte>(idx));
+	}
+
+	return blob;
+}
 
 Suite raii = "shader_raii"_suite = [] {
 	std::filesystem::current_path(test_data_path);
 	std::filesystem::create_directories(tmp_path);
 
-	Case { "happy path won't throw" } = [] {
+	Case { "happy paths" } = [] {
 		auto shader_asset = ShaderAsset { "triangle.frag.asset" };
 	};
 
-	Case { "many won't freeze/throw" } = [] {
-		for (auto idx : std::views::iota(0u, 1'000u))
-		{
-			ignore = idx;
-			auto shader_asset = ShaderAsset { "triangle.frag.asset" };
-		}
-	};
-
-	Case { "unhappy path throws" } = [] {
+	Case { "unhappy paths" } = [] {
 		// non-existent file
 		expect_throw([] { ShaderAsset { "path" }; });
 
 		// incompatible type
 		expect_throw([] { ShaderAsset { "dummytext" }; });
 
-		// random stressing
+		// some random stressing
 		expect_throw([] {
 			for (auto idx : std::views::iota(0u, 1'000u))
 			{
@@ -50,16 +44,22 @@ Suite raii = "shader_raii"_suite = [] {
 			}
 		});
 	};
+
+	Case { "many" } = [] {
+		for (auto idx : std::views::iota(0u, 1'000u))
+		{
+			ignore = idx;
+			auto shader_asset = ShaderAsset { "triangle.frag.asset" };
+		}
+	};
 };
 
 Suite packing = "shader_pack"_suite = [] {
-	Case { "" } = [] {
+	Case { "Unpacking packed data returns the same data" } = [] {
 		const auto out_path = tmp_path / "shader_packing";
-		auto dummy_blob = lt::assets::Blob {};
-		for (auto idx : std::views::iota(0u, 255u))
-		{
-			dummy_blob.emplace_back(static_cast<byte>(idx));
-		}
+		constexpr auto blob_size = size_t { 255u };
+
+		auto blob = generate_blob(blob_size);
 
 		const auto expected_size =                    //
 		    sizeof(AssetMetadata::type)               //
@@ -70,7 +70,7 @@ Suite packing = "shader_pack"_suite = [] {
 		    + sizeof(BlobMetadata::compression_type)  //
 		    + sizeof(BlobMetadata::compressed_size)   //
 		    + sizeof(BlobMetadata::uncompressed_size) //
-		    + dummy_blob.size();
+		    + blob.size();
 
 		ShaderAsset::pack(
 		    out_path,
@@ -81,7 +81,7 @@ Suite packing = "shader_pack"_suite = [] {
 		    ShaderAsset::Metadata {
 		        .type = ShaderAsset::Type::vertex,
 		    },
-		    std::move(dummy_blob)
+		    std::move(blob)
 		);
 
 		auto stream = std::ifstream {
@@ -104,12 +104,12 @@ Suite packing = "shader_pack"_suite = [] {
 		const auto &metadata = shader_asset.get_metadata();
 		expect_eq(metadata.type, ShaderAsset::Type::vertex);
 
-		auto blob = shader_asset.unpack(ShaderAsset::BlobTag::code);
-		expect_eq(blob.size(), 255u);
+		auto unpakced_blob = shader_asset.unpack(ShaderAsset::BlobTag::code);
+		expect_eq(unpakced_blob.size(), blob_size);
 
-		for (auto idx : std::views::iota(0u, 255u))
+		for (auto idx : std::views::iota(0u, blob_size))
 		{
-			expect_eq(blob[idx], static_cast<byte>(idx));
+			expect_eq(unpakced_blob[idx], static_cast<byte>(idx));
 		}
 	};
 };

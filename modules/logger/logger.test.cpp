@@ -1,11 +1,7 @@
-import logger;
-import test.test;
-
-using ::lt::test::Case;
-using ::lt::test::Suite;
+import test;
 
 Suite suite = [] {
-	Case { "no format" } = [] {
+	Case { "formatless" } = [] {
 		lt::log::trace("trace");
 		lt::log::debug("debug");
 		lt::log::info("info");
