@@ -3,7 +3,6 @@ add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp DEPENDENCIES
 add_module(NAME tracer INTERFACES tracer.cppm DEPENDENCIES preliminary logger)
 
 add_module(NAME bitwise INTERFACES operations.cppm DEPENDENCIES preliminary)
-add_module(NAME env INTERFACES constants.cppm DEPENDENCIES preliminary)
 add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
     DEPENDENCIES
     preliminary
