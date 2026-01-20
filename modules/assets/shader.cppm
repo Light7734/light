@@ -1,9 +1,9 @@
 export module assets.shader;
+
+import preliminary;
 import assets.metadata;
 import logger;
 import debug.assertions;
-
-import std;
 
 export namespace lt::assets {
 
@@ -17,7 +17,7 @@ public:
 		code,
 	};
 
-	enum class Type : std::uint8_t
+	enum class Type : u8
 	{
 		vertex,
 		fragment,
@@ -39,7 +39,7 @@ public:
 
 	ShaderAsset(const std::filesystem::path &path);
 
-	void unpack_to(BlobTag tag, std::span<std::byte> destination) const;
+	void unpack_to(BlobTag tag, std::span<byte> destination) const;
 
 	[[nodiscard]] auto unpack(BlobTag tag) const -> Blob;
 
@@ -98,7 +98,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 	};
 
 	m_stream.seekg(0, std::ifstream::end);
-	const auto file_size = static_cast<std::size_t>(m_stream.tellg());
+	const auto file_size = static_cast<size_t>(m_stream.tellg());
 	debug::ensure(
 	    file_size > total_metadata_size,
 	    "Failed to open shader asset at: {}, file smaller than metadata: {} < {}",
@@ -193,7 +193,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path)
 	stream.write(std::bit_cast<char *>(code_blob.data()), static_cast<long long>(code_blob.size()));
 }
 
-void ShaderAsset::unpack_to(BlobTag tag, std::span<std::byte> destination) const
+void ShaderAsset::unpack_to(BlobTag tag, std::span<byte> destination) const
 {
 	debug::ensure(
 	    tag == BlobTag::code,
@@ -206,7 +206,7 @@ void ShaderAsset::unpack_to(BlobTag tag, std::span<std::byte> destination) const
 	    "Failed to unpack shader blob {} to destination ({}) of size {} since it's smaller "
 	    "than the blobl's uncompressed size: {}",
 	    std::to_underlying(tag),
-	    std::bit_cast<std::size_t>(destination.data()),
+	    std::bit_cast<size_t>(destination.data()),
 	    destination.size(),
 	    m_code_blob_metadata.uncompressed_size
 	);

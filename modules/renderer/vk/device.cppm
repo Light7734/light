@@ -1,4 +1,6 @@
 export module renderer.vk.device;
+
+import preliminary;
 import memory.null_on_move;
 import logger;
 import debug.assertions;
@@ -7,11 +9,10 @@ import renderer.frontend;
 import renderer.vk.api_wrapper;
 import renderer.vk.gpu;
 import renderer.vk.surface;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Device: public IDevice
+class Device: public IDevice
 {
 public:
 	Device(IGpu *gpu, ISurface *surface);
@@ -21,7 +22,7 @@ public:
 		return m_device;
 	}
 
-	[[nodiscard]] auto get_family_indices() const -> std::vector<std::uint32_t>
+	[[nodiscard]] auto get_family_indices() const -> std::vector<u32>
 	{
 		return { m_graphics_queue_family_index, m_present_queue_family_index };
 	}
@@ -43,7 +44,7 @@ private:
 
 	void initialize_queue_indices();
 
-	[[nodiscard]] auto find_suitable_queue_family() const -> std::uint32_t;
+	[[nodiscard]] auto find_suitable_queue_family() const -> u32;
 
 	vkb::Gpu *m_gpu {};
 
@@ -55,9 +56,9 @@ private:
 
 	vk::Queue m_present_queue {};
 
-	std::uint32_t m_graphics_queue_family_index = vk::constants::queue_family_ignored;
+	u32 m_graphics_queue_family_index = vk::constants::queue_family_ignored;
 
-	std::uint32_t m_present_queue_family_index = vk::constants::queue_family_ignored;
+	u32 m_present_queue_family_index = vk::constants::queue_family_ignored;
 };
 
 } // namespace lt::renderer::vkb
@@ -124,7 +125,7 @@ void Device::initialize_logical_device()
 void Device::initialize_queue_indices()
 {
 	auto properties = m_gpu->vk().get_queue_family_properties();
-	for (auto idx = std::uint32_t { 0u }; const auto &property : properties)
+	for (auto idx = u32 { 0u }; const auto &property : properties)
 	{
 		if (property.queue_flags & vk::QueueFlags::graphics_bit)
 		{

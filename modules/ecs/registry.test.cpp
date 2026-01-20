@@ -1,7 +1,7 @@
+import preliminary;
 import ecs.registry;
 import test.test;
 import test.expects;
-import std;
 
 using ::lt::ecs::EntityId;
 using ::lt::ecs::Registry;
@@ -15,7 +15,7 @@ using ::lt::test::operator""_suite;
 
 struct Component
 {
-	int m_int {};
+	i32 m_int {};
 	std::string m_string;
 
 	[[nodiscard]] friend auto operator==(const Component &lhs, const Component &rhs) -> bool
@@ -39,7 +39,7 @@ struct std::formatter<Component>
 
 struct Component_B
 {
-	float m_float {};
+	f32 m_float {};
 
 	[[nodiscard]] friend auto operator==(const Component_B lhs, const Component_B &rhs) -> bool
 	{
@@ -62,14 +62,14 @@ struct std::formatter<Component_B>
 
 Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
-		std::ignore = Registry {};
+		ignore = Registry {};
 	};
 
 	Case { "many won't freeze/throw" } = [] {
 		for (auto idx : std::views::iota(0, 100'000))
 		{
-			std::ignore = idx;
-			std::ignore = Registry {};
+			ignore = idx;
+			ignore = Registry {};
 		}
 	};
 
@@ -169,7 +169,7 @@ Suite callbacks = "callbacks"_suite = [] {
 
 		for (auto idx : std::views::iota(0, 100'000))
 		{
-			std::ignore = idx;
+			ignore = idx;
 			registry.add<Component_B>(registry.create_entity(), {});
 		}
 	};
@@ -191,7 +191,7 @@ Suite callbacks = "callbacks"_suite = [] {
 		expect_true(on_destruct_called.empty());
 		for (auto idx : std::views::iota(0, 100'000))
 		{
-			std::ignore = idx;
+			ignore = idx;
 
 			auto entity = all_entities.emplace_back(registry.create_entity());
 			registry.add<Component>(entity, {});
@@ -242,7 +242,7 @@ Suite each = "each"_suite = [] {
 		}
 		auto &component = registry.add<Component_B>(
 		    entity,
-		    { .m_float = static_cast<float>(idx) / 2.0f }
+		    { .m_float = static_cast<f32>(idx) / 2.0f }
 		);
 
 		component_map_b[entity] = component;
@@ -313,7 +313,7 @@ Suite views = "views"_suite = [] {
 		}
 		auto &component = registry.add<Component_B>(
 		    entity,
-		    { .m_float = static_cast<float>(idx) / 2.0f }
+		    { .m_float = static_cast<f32>(idx) / 2.0f }
 		);
 
 		component_map_b[entity] = component;

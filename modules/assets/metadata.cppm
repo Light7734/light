@@ -1,19 +1,20 @@
 export module assets.metadata;
-import std;
+
+import preliminary;
 
 export namespace lt::assets {
 
 using Type_T = std::array<const char, 16>;
 
-using Tag_T = std::uint8_t;
+using Tag_T = u8;
 
-using Version = std::uint8_t;
+using Version = u8;
 
-using Blob = std::vector<std::byte>;
+using Blob = std::vector<byte>;
 
 constexpr auto current_version = Version { 1u };
 
-enum class CompressionType : std::uint8_t
+enum class CompressionType : u8
 {
 	none,
 	lz4,
@@ -31,13 +32,13 @@ struct BlobMetadata
 {
 	Tag_T tag;
 
-	std::size_t offset;
+	size_t offset;
 
 	CompressionType compression_type;
 
-	std::size_t compressed_size;
+	size_t compressed_size;
 
-	std::size_t uncompressed_size;
+	size_t uncompressed_size;
 };
 
 } // namespace lt::assets

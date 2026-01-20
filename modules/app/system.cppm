@@ -1,17 +1,18 @@
 export module app.system;
-import logger;
-import std;
 
-namespace lt::app {
+import preliminary;
+import logger;
+
+export namespace lt::app {
 
 /** Information required to tick a system.
  * @note May be used across an entire application-frame (consisting of multiple systems ticking)
  */
-export struct TickInfo
+struct TickInfo
 {
 	using Timepoint_T = std::chrono::time_point<std::chrono::steady_clock>;
 
-	using Duration_T = std::chrono::duration<double>;
+	using Duration_T = std::chrono::duration<f64>;
 
 	/** Duration since previous tick's end_time to current tick's start_time. */
 	Duration_T delta_time {};
@@ -30,11 +31,11 @@ export struct TickInfo
 };
 
 /** Information about how a system's tick performed */
-export struct TickResult
+struct TickResult
 {
 	using Timepoint_T = std::chrono::time_point<std::chrono::steady_clock>;
 
-	using Duration_T = std::chrono::duration<double>;
+	using Duration_T = std::chrono::duration<f64>;
 
 	/** The info supplied to the system for ticking. */
 	TickInfo info;
@@ -46,9 +47,9 @@ export struct TickResult
 	Timepoint_T end_time;
 };
 
-export struct SystemDiagnosis
+struct SystemDiagnosis
 {
-	enum class Severity : std::uint8_t
+	enum class Severity : u8
 	{
 		verbose,
 		info,
@@ -64,7 +65,7 @@ export struct SystemDiagnosis
 	Severity severity;
 };
 
-export class SystemStats
+class SystemStats
 {
 public:
 	void push_diagnosis(SystemDiagnosis &&diagnosis)
@@ -83,7 +84,7 @@ private:
 	std::vector<SystemDiagnosis> m_diagnosis;
 };
 
-export class ISystem
+class ISystem
 {
 public:
 	ISystem() = default;

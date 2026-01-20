@@ -1,3 +1,4 @@
+import preliminary;
 import test.test;
 import time;
 import test.expects;
@@ -10,7 +11,6 @@ import memory.reference;
 import logger;
 import math.vec2;
 import app.system;
-import std;
 
 constexpr auto title = "TestWindow";
 constexpr auto width = 800u;
@@ -18,7 +18,8 @@ constexpr auto height = 600u;
 constexpr auto vsync = true;
 constexpr auto visible = false;
 
-int main()
+auto main() -> int32_t
+try
 {
 	auto registry = lt::memory::create_ref<lt::ecs::Registry>();
 	auto system = lt::surface::System { registry };
@@ -42,4 +43,13 @@ int main()
 		system.tick({});
 	}
 	lt::log::trace("Three seconds passed, quitting...");
+}
+catch (const std::exception &exp)
+{
+	lt::log::critical("Aborting due to uncaught std::exception:");
+	lt::log::critical("\twhat: {}", exp.what());
+}
+catch (...)
+{
+	lt::log::critical("Aborting due to uncaught non std::exception!");
 }

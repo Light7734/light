@@ -1,4 +1,6 @@
 export module renderer.vk.renderer;
+
+import preliminary;
 import logger;
 import assets.shader;
 import debug.assertions;
@@ -14,19 +16,17 @@ import renderer.vk.buffer;
 import renderer.vk.pass;
 import renderer.data;
 import renderer.frontend;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-// NOLINTNEXTLINE
-export class Renderer: public IRenderer
+class Renderer: public IRenderer
 {
 public:
 	Renderer(
 	    class IGpu *gpu,
 	    class IDevice *device,
 	    class ISwapchain *swapchain,
-	    std::uint32_t max_frames_in_flight
+	    u32 max_frames_in_flight
 	);
 
 	~Renderer() override
@@ -42,8 +42,7 @@ public:
 		}
 	}
 
-	[[nodiscard]] auto frame(std::uint32_t frame_idx, std::function<void()> submit_scene)
-	    -> Result override;
+	[[nodiscard]] auto frame(u32 frame_idx, std::function<void()> submit_scene) -> Result override;
 
 	void replace_swapchain(ISwapchain *swapchain) override;
 
@@ -58,11 +57,11 @@ public:
 	) override;
 
 private:
-	void record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx);
+	void record_cmd(vk::CommandBuffer &cmd, u32 image_idx);
 
-	void map_buffers(std::uint32_t frame_idx);
+	void map_buffers(u32 frame_idx);
 
-	std::uint32_t m_max_frames_in_flight {};
+	u32 m_max_frames_in_flight {};
 
 	Device *m_device {};
 
@@ -88,13 +87,13 @@ private:
 
 	Buffer m_staging_buffer;
 
-	std::size_t m_staging_offset;
+	size_t m_staging_offset;
 
-	std::span<std::byte> m_staging_map;
+	std::span<byte> m_staging_map;
 
 	std::span<components::Sprite::Vertex> m_sprite_vertex_map;
 
-	std::size_t m_current_sprite_idx;
+	size_t m_current_sprite_idx;
 
 	vk::DescriptorPool m_global_set_pool;
 
@@ -106,12 +105,7 @@ private:
 module :private;
 namespace lt::renderer::vkb {
 
-Renderer::Renderer(
-    IGpu *gpu,
-    IDevice *device,
-    ISwapchain *swapchain,
-    std::uint32_t max_frames_in_flight
-)
+Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_frames_in_flight)
     : m_device(static_cast<Device *>(device))
     , m_swapchain(static_cast<Swapchain *>(swapchain))
     , m_resolution(m_swapchain->get_resolution())
@@ -175,8 +169,7 @@ Renderer::Renderer(
 	}
 };
 
-[[nodiscard]] auto Renderer::frame(std::uint32_t frame_idx, std::function<void()> submit_scene)
-    -> Result
+[[nodiscard]] auto Renderer::frame(u32 frame_idx, std::function<void()> submit_scene) -> Result
 {
 	debug::ensure(
 	    frame_idx < m_max_frames_in_flight,
@@ -196,7 +189,7 @@ Renderer::Renderer(
 	map_buffers(frame_idx);
 
 	// WIP(Light): submit the scene!
-	std::ignore = submit_scene;
+	ignore = submit_scene;
 	// submit_scene();
 	record_cmd(cmd, image_idx);
 
@@ -229,7 +222,7 @@ void Renderer::replace_swapchain(ISwapchain *swapchain)
 	m_resolution = m_swapchain->get_resolution();
 }
 
-void Renderer::map_buffers(std::uint32_t frame_idx)
+void Renderer::map_buffers(u32 frame_idx)
 {
 	using components::Sprite;
 
@@ -246,7 +239,7 @@ void Renderer::map_buffers(std::uint32_t frame_idx)
 	);
 }
 
-void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
+void Renderer::record_cmd(vk::CommandBuffer &cmd, u32 image_idx)
 {
 	m_staging_map = {};
 	m_sprite_vertex_map = {};
@@ -318,7 +311,7 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
 	// cmd.set_viewport(
 	//     {
 	//         .origin = {},
-	//         .extent = { static_cast<float>(m_resolution.x), static_cast<float>(m_resolution.y) },
+	//         .extent = { static_cast<f32>(m_resolution.x), static_cast<f32>(m_resolution.y) },
 	//         .min_depth = 0.0f,
 	//         .max_depth = 1.0f,
 	//     }
@@ -326,7 +319,7 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, std::uint32_t image_idx)
 	// cmd.set_scissor({ .offset = {}, .extent = m_resolution });
 	// cmd.draw(
 	//     {
-	//         .vertex_count = static_cast<std::uint32_t>(m_current_sprite_idx),
+	//         .vertex_count = static_cast<u32>(m_current_sprite_idx),
 	//         .instance_count = 1u,
 	//         .first_vertex = 0u,
 	//         .first_instance = 0u,

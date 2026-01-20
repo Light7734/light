@@ -1,4 +1,6 @@
 export module renderer.vk.surface;
+
+import preliminary;
 import debug.assertions;
 import ecs.entity;
 import ecs.registry;
@@ -9,9 +11,9 @@ import renderer.frontend;
 import renderer.vk.instance;
 import renderer.vk.api_wrapper;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Surface: public ISurface
+class Surface: public ISurface
 {
 public:
 	Surface(IInstance *instance, const ecs::Entity &surface_entity);

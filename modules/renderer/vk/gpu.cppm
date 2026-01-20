@@ -1,51 +1,19 @@
 export module renderer.vk.gpu;
+
+import preliminary;
 import renderer.vk.api_wrapper;
 import logger;
 import debug.assertions;
 import renderer.frontend;
 import renderer.vk.instance;
 import memory.null_on_move;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Gpu: public IGpu
+class Gpu: public IGpu
 {
 public:
 	Gpu(IInstance *instance);
-
-	// [[nodiscard]] auto queue_family_supports_presentation(
-	//     VkSurfaceKHR surface,
-	//     uint32_t queue_family_idx
-	// ) -> bool;
-	//
-	// [[nodiscard]] auto get_surface_capabilities(VkSurfaceKHR surface) const
-	//     -> VkSurfaceCapabilitiesKHR;
-	//
-	// [[nodiscard]] auto get_surface_formats(VkSurfaceKHR surface) const
-	//     -> std::vector<VkSurfaceFormatKHR>;
-	//
-	// [[nodiscard]] auto get_properties() const -> VkPhysicalDeviceProperties
-	// {
-	// 	return m_properties;
-	// }
-	//
-	// [[nodiscard]] auto get_descriptor_indexing_features() const
-	//     -> VkPhysicalDeviceDescriptorIndexingFeatures
-	// {
-	// 	return m_descriptor_indexing_features;
-	// }
-	//
-	// [[nodiscard]] auto get_memory_properties() const -> VkPhysicalDeviceMemoryProperties
-	// {
-	// 	return m_memory_properties;
-	// }
-	//
-	// [[nodiscard]] auto get_queue_family_properties() const ->
-	// std::vector<VkQueueFamilyProperties>
-	// {
-	// 	return m_queue_family_properties;
-	// }
 
 	[[nodiscard]] auto vk() -> vk::Gpu &;
 
@@ -53,8 +21,6 @@ private:
 	vk::Gpu m_gpu;
 
 	vk::Gpu::Properties m_properties {};
-
-	// VkPhysicalDeviceDescriptorIndexingFeatures m_descriptor_indexing_features;
 
 	vk::Gpu::MemoryProperties m_memory_properties {};
 
@@ -110,43 +76,5 @@ Gpu::Gpu(IInstance *instance)
 {
 	return m_gpu;
 }
-
-// [[nodiscard]] auto Gpu::queue_family_supports_presentation(
-//     VkSurfaceKHR surface,
-//     uint32_t queue_family_idx
-// ) -> bool
-// {
-// 	auto supported = VkBool32 { false };
-// 	vkc(vk_get_physical_device_surface_support(m_gpu, queue_family_idx, surface, &supported));
-//
-// 	return supported;
-// }
-//
-// [[nodiscard]] auto Gpu::get_surface_capabilities(VkSurfaceKHR surface) const
-//     -> VkSurfaceCapabilitiesKHR
-// {
-// 	auto capabilities = VkSurfaceCapabilitiesKHR {};
-// 	vkc(vk_get_physical_device_surface_capabilities(m_gpu, surface, &capabilities));
-// 	return capabilities;
-// }
-//
-// [[nodiscard]] auto Gpu::get_surface_formats(VkSurfaceKHR surface) const
-//     -> std::vector<VkSurfaceFormatKHR>
-// {
-// 	auto count = uint32_t { 0u };
-// 	vkc(vk_get_physical_device_surface_formats(m_gpu, surface, &count, nullptr));
-//
-// 	auto formats = std::vector<VkSurfaceFormatKHR>(count);
-// 	vkc(vk_get_physical_device_surface_formats(m_gpu, surface, &count, formats.data()));
-//
-// 	return formats;
-// }
-
-// [[nodiscard]] auto Gpu::create_device(VkDeviceCreateInfo info) const -> VkDevice
-// {
-// 	auto *device = VkDevice {};
-// 	vkc(vk_create_device(m_gpu, &info, nullptr, &device));
-// 	return device;
-// }
 
 } // namespace lt::renderer::vkb

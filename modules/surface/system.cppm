@@ -10,6 +10,8 @@ module;
 
 export module surface.system;
 export import :components;
+
+import preliminary;
 import debug.assertions;
 import app.system;
 import ecs.registry;
@@ -19,7 +21,7 @@ import surface.requests;
 import memory.reference;
 import memory.null_on_move;
 import logger;
-import std;
+import preliminary;
 import surface.constants;
 import debug.assertions;
 import memory.reference;
@@ -29,7 +31,6 @@ import logger;
 import ecs.registry;
 import ecs.entity;
 import time;
-import std;
 
 export namespace lt::surface {
 
@@ -66,28 +67,24 @@ private:
 	static void wayland_registry_listener(
 	    void *data,
 	    wl_registry *registry,
-	    std::uint32_t name,
+	    u32 name,
 	    const char *interface,
-	    std::uint32_t version
+	    u32 version
 	);
 
-	static void wayland_seat_capabilities_listener(
-	    void *data,
-	    wl_seat *seat,
-	    std::uint32_t capabilities
-	);
+	static void wayland_seat_capabilities_listener(void *data, wl_seat *seat, u32 capabilities);
 
 	static void wayland_pointer_leave_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t serial,
+	    u32 serial,
 	    wl_surface *surface
 	);
 
 	static void wayland_pointer_enter_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t serial,
+	    u32 serial,
 	    wl_surface *surface,
 	    wl_fixed_t surface_x,
 	    wl_fixed_t surface_y
@@ -96,7 +93,7 @@ private:
 	static void wayland_pointer_motion_listener(
 	    void *data,
 	    wl_pointer *listener,
-	    std::uint32_t time,
+	    u32 time,
 	    wl_fixed_t surface_x,
 	    wl_fixed_t surface_y
 	);
@@ -104,38 +101,38 @@ private:
 	static void wayland_pointer_button_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t serial,
-	    std::uint32_t time,
-	    std::uint32_t button,
-	    std::uint32_t state
+	    u32 serial,
+	    u32 time,
+	    u32 button,
+	    u32 state
 	);
 
 	static void wayland_pointer_axis_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t time,
-	    std::uint32_t axis,
+	    u32 time,
+	    u32 axis,
 	    wl_fixed_t value
 	);
 
 	static void wayland_pointer_axis_source_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t axis_source
+	    u32 axis_source
 	);
 
 	static void wayland_pointer_axis_stop_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t time,
-	    std::uint32_t axis_source
+	    u32 time,
+	    u32 axis_source
 	);
 
 	static void wayland_pointer_axis_discrete_listener(
 	    void *data,
 	    wl_pointer *pointer,
-	    std::uint32_t axis,
-	    std::int32_t discrete
+	    u32 axis,
+	    i32 discrete
 	);
 
 	static void wayland_pointer_frame_listener(void *data, wl_pointer *pointer);
@@ -199,18 +196,18 @@ namespace lt::surface {
 
 #if defined(LIGHT_PLATFORM_LINUX)
 
-void handle_shell_ping(void *data, xdg_wm_base *shell, std::uint32_t serial)
+void handle_shell_ping(void *data, xdg_wm_base *shell, u32 serial)
 {
-	std::ignore = data;
+	ignore = data;
 	xdg_wm_base_pong(shell, serial);
 }
 const auto shell_listener = xdg_wm_base_listener {
 	.ping = &handle_shell_ping,
 };
 
-void handle_shell_surface_configure(void *data, xdg_surface *shell_surface, std::uint32_t serial)
+void handle_shell_surface_configure(void *data, xdg_surface *shell_surface, u32 serial)
 {
-	std::ignore = data;
+	ignore = data;
 
 	xdg_surface_ack_configure(shell_surface, serial);
 }
@@ -221,8 +218,8 @@ const auto shell_surface_listener = xdg_surface_listener {
 void handle_toplevel_configure(
     void *data,
     xdg_toplevel *toplevel,
-    std::int32_t width,
-    std::int32_t height,
+    i32 width,
+    i32 height,
     wl_array *states
 )
 {
@@ -240,7 +237,7 @@ const auto toplevel_listener = xdg_toplevel_listener {
 void wayland_pointer_leave_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t serial,
+    u32 serial,
     wl_surface *surface
 )
 {
@@ -250,10 +247,10 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_seat_capabilities_listener(
     void *data,
     wl_seat *seat,
-    std::uint32_t capabilities
+    u32 capabilities
 )
 {
-	std::ignore = seat;
+	ignore = seat;
 
 	auto *system = std::bit_cast<System *>(data);
 	const auto have_pointer = capabilities & WL_SEAT_CAPABILITY_POINTER;
@@ -262,27 +259,21 @@ void wayland_pointer_leave_listener(
 	{
 		system->m_wl_pointer = wl_seat_get_pointer(system->m_wl_seat);
 		wl_pointer_add_listener(system->m_wl_pointer, &system->m_wl_pointer_listener, system);
-		log::info(
-		    "Added Wayland pointer (0x{:x})",
-		    std::bit_cast<std::size_t>(system->m_wl_pointer)
-		);
+		log::info("Added Wayland pointer (0x{:x})", std::bit_cast<size_t>(system->m_wl_pointer));
 	}
 	else if (!have_pointer && system->m_wl_pointer)
 	{
 		wl_pointer_release(system->m_wl_pointer);
 		system->m_wl_pointer = nullptr;
 
-		log::info(
-		    "Released Wayland pointer (0x{:x})",
-		    std::bit_cast<std::size_t>(system->m_wl_pointer)
-		);
+		log::info("Released Wayland pointer (0x{:x})", std::bit_cast<size_t>(system->m_wl_pointer));
 	}
 }
 
 /* static */ void System::wayland_pointer_leave_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t serial,
+    u32 serial,
     wl_surface *surface
 )
 {
@@ -292,7 +283,7 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_enter_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t serial,
+    u32 serial,
     wl_surface *surface,
     wl_fixed_t surface_x,
     wl_fixed_t surface_y
@@ -304,7 +295,7 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_motion_listener(
     void *data,
     wl_pointer *listener,
-    std::uint32_t time,
+    u32 time,
     wl_fixed_t surface_x,
     wl_fixed_t surface_y
 )
@@ -315,10 +306,10 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_button_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t serial,
-    std::uint32_t time,
-    std::uint32_t button,
-    std::uint32_t state
+    u32 serial,
+    u32 time,
+    u32 button,
+    u32 state
 )
 {
 }
@@ -326,8 +317,8 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_axis_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t time,
-    std::uint32_t axis,
+    u32 time,
+    u32 axis,
     wl_fixed_t value
 )
 {
@@ -336,7 +327,7 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_axis_source_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t axis_source
+    u32 axis_source
 )
 {
 }
@@ -344,8 +335,8 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_axis_stop_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t time,
-    std::uint32_t axis_source
+    u32 time,
+    u32 axis_source
 )
 {
 }
@@ -353,8 +344,8 @@ void wayland_pointer_leave_listener(
 /* static */ void System::wayland_pointer_axis_discrete_listener(
     void *data,
     wl_pointer *pointer,
-    std::uint32_t axis,
-    std::int32_t discrete
+    u32 axis,
+    i32 discrete
 )
 {
 }
@@ -366,23 +357,23 @@ void wayland_pointer_leave_listener(
 
 void seat_name_listener(void *data, wl_seat *seat, const char *name)
 {
-	std::ignore = data;
+	ignore = data;
 
 	log::info("Wayland seat:");
 	log::info("\tname: {}", name);
-	log::info("\taddr: 0x{:x}", std::bit_cast<std::size_t>(seat));
+	log::info("\taddr: 0x{:x}", std::bit_cast<size_t>(seat));
 }
 
 void System::wayland_registry_listener(
     void *data,
     wl_registry *registry,
-    std::uint32_t name,
+    u32 name,
     const char *interface,
-    std::uint32_t version
+    u32 version
 )
 
 {
-	std::ignore = version;
+	ignore = version;
 
 	auto *system = std::bit_cast<System *>(data);
 
@@ -413,7 +404,7 @@ void System::wayland_registry_listener(
 	}
 }
 
-void registry_handle_global_remove(void *data, wl_registry *registry, std::uint32_t name)
+void registry_handle_global_remove(void *data, wl_registry *registry, u32 name)
 {
 	log::trace("Registry global remove:");
 	log::trace("\tname: {}", name);
@@ -723,15 +714,15 @@ try
 {
 	// WIP(Light): use ignored local variables...
 	auto &component = m_registry->add<SurfaceComponent>(entity, info);
-	std::ignore = component;
+	ignore = component;
 
 	auto &surface = m_registry->get<SurfaceComponent>(entity);
 	ensure_component_sanity(surface);
 
 	const auto &resolution = surface.get_resolution();
 	const auto &position = surface.get_position();
-	std::ignore = resolution;
-	std::ignore = position;
+	ignore = resolution;
+	ignore = position;
 
 	surface.m_native_data.window = CreateWindowEx(
 	    0,
@@ -765,7 +756,7 @@ try
 	// auto root_window = XDefaultRootWindow(display);
 	//
 	// auto border_width = 0;
-	// auto depth = std::int32_t { CopyFromParent };
+	// auto depth = i32 { CopyFromParent };
 	// auto window_class = CopyFromParent;
 	// auto *visual = (Visual *)CopyFromParent;
 	//
@@ -831,7 +822,7 @@ try
 catch (const std::exception &exp)
 {
 	log::error("Exception thrown when on_constructing surface component");
-	log::error("\tentity: {}", std::uint32_t { entity });
+	log::error("\tentity: {}", u32 { entity });
 	log::error("\twhat: {}", exp.what());
 	m_registry->remove<SurfaceComponent>(entity);
 }
@@ -864,12 +855,12 @@ void System::handle_events(SurfaceComponent &surface)
 		case WM_SETFOCUS: log::debug("Window setfocus"); break;
 		case WM_KILLFOCUS: log::debug("Window killfocus"); break;
 		case WM_ACTIVATE:
-			log::debug("Window activate: {}", static_cast<std::size_t>(LOWORD(wParam)));
+			log::debug("Window activate: {}", static_cast<size_t>(LOWORD(wParam)));
 			break;
 		case WM_MOUSEWHEEL:
 		{
 			const auto delta = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
-			log::debug("wheel delta: {}", static_cast<std::int64_t>(delta));
+			log::debug("wheel delta: {}", static_cast<i64>(delta));
 			break;
 		}
 
@@ -928,14 +919,14 @@ void System::handle_events(SurfaceComponent &surface)
 	// 	case KeyPress:
 	// 	{
 	// 		queue.emplace_back<KeyPressedEvent>(
-	// 		    static_cast<std::uint32_t>(XLookupKeysym(&event.xkey, 0))
+	// 		    static_cast<u32>(XLookupKeysym(&event.xkey, 0))
 	// 		);
 	// 		break;
 	// 	}
 	// 	case KeyRelease:
 	// 	{
 	// 		queue.emplace_back<KeyReleasedEvent>(
-	// 		    static_cast<std::uint32_t>(XLookupKeysym(&event.xkey, 0))
+	// 		    static_cast<u32>(XLookupKeysym(&event.xkey, 0))
 	// 		);
 	// 		break;
 	// 	}
@@ -971,8 +962,8 @@ void System::handle_events(SurfaceComponent &surface)
 	// 	case MotionNotify:
 	// 	{
 	// 		queue.emplace_back<MouseMovedEvent>(MouseMovedEvent {
-	// 		    static_cast<float>(event.xmotion.x),
-	// 		    static_cast<float>(event.xmotion.y),
+	// 		    static_cast<f32>(event.xmotion.x),
+	// 		    static_cast<f32>(event.xmotion.y),
 	// 		});
 	// 		break;
 	// 	}
@@ -986,8 +977,8 @@ void System::handle_events(SurfaceComponent &surface)
 	// 			surface.m_resolution.x = new_width;
 	// 			surface.m_resolution.y = new_height;
 	// 			queue.emplace_back<ResizedEvent>(ResizedEvent {
-	// 			    static_cast<std::uint32_t>(new_width),
-	// 			    static_cast<std::uint32_t>(new_height),
+	// 			    static_cast<u32>(new_width),
+	// 			    static_cast<u32>(new_height),
 	// 			});
 	// 		}
 	//
@@ -1026,13 +1017,15 @@ void System::handle_requests(SurfaceComponent &surface)
 	{
 		std::visit(visitor, request);
 	}
+
+	surface.m_requests.clear();
 }
 
 void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
 {
 	// WIP(Light):
-	std::ignore = surface;
-	std::ignore = request;
+	ignore = surface;
+	ignore = request;
 
 	surface.m_title = request.title;
 
@@ -1043,8 +1036,8 @@ void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &r
 void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
 {
 	// WIP(Light):
-	std::ignore = surface;
-	std::ignore = request;
+	ignore = surface;
+	ignore = request;
 
 	// surface.m_resolution = request.resolution;
 
@@ -1059,8 +1052,8 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 	// XResizeWindow(
 	//     display,
 	//     window,
-	//     static_cast<std::uint32_t>(width),
-	//     static_cast<std::uint32_t>(height)
+	//     static_cast<u32>(width),
+	//     static_cast<u32>(height)
 	// );
 	//
 	// // flush output queue and wait for X server to processes the request
@@ -1108,52 +1101,22 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
-	// WIP(Light): Use ignored local-variables
-	std::ignore = surface;
-	std::ignore = request;
-
-	// surface.m_position = request.position;
-
-	// auto &[display, window, _] = surface.m_native_data;
-	// const auto &[x, y] = request.position;
-	//
-	// // get baseline serial number for X requests generated from XResizeWindow
-	// auto serial = NextRequest(display);
-	// XMoveWindow(display, window, static_cast<int>(x), static_cast<int>(y));
-	//
-	// // flush output queue and wait for X server to processes the request
-	// XSync(display, False);
-	// constexpr auto lifespan = std::chrono::milliseconds { 10 };
-	// auto timer = time::Timer {};
-	// auto event = XEvent {};
-	// while (!XCheckIfEvent(
-	//            display,
-	//            &event,
-	//            XEventTypeEquals<ConfigureNotify>,
-	//            reinterpret_cast<XPointer>(&window) // NOLINT
-	//        )
-	//        || event.xconfigure.serial < serial)
-	// {
-	// 	std::this_thread::sleep_for(std::chrono::microseconds { 100 });
-	// 	if (timer.elapsed_time() > lifespan)
-	// 	{
-	// 		log::error("Timed out waiting for XMoveWindow's event");
-	// 		return;
-	// 	}
-	// }
-	// // We don't need to update the component's state and handle the event in this funcion.
-	// // Since handle_requests is called before handle_events.
-	// // So we just put the event back into the queue and move on.
-	// XPutBackEvent(display, &event);
-	// XSync(display, False);
-	// XFlush(display);
+	SetWindowPos(
+	    surface.m_native_data.window,
+	    {},
+	    request.position.x,
+	    request.position.y,
+	    {},
+	    {},
+	    {}
+	);
 }
 
 void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
 {
 	// WIP(Light): Use ignored local-variables
-	std::ignore = surface;
-	std::ignore = request;
+	ignore = surface;
+	ignore = request;
 
 	// const auto &[display, window, _] = surface.get_native_data();
 	// surface.m_visible = request.visible;
@@ -1223,7 +1186,8 @@ auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ->
 	switch (uMsg)
 	{
 	case WM_KILLFOCUS:
-	case WM_SETFOCUS: log::debug("GOT FOCUS IN WIN PROC");
+	case WM_MOVE:
+	case WM_SETFOCUS:
 	case WM_ACTIVATE:
 	case WM_MOUSEWHEEL:
 	case WM_LBUTTONDOWN:

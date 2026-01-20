@@ -1,12 +1,13 @@
 export module math.vec4;
+
+import preliminary;
 import math.vec2;
-import debug.assertions;
 import math.vec3;
-import std;
+import debug.assertions;
 
 namespace lt::math {
 
-export template<typename T = float>
+export template<typename T = f32>
 struct vec4_impl
 {
 	static constexpr auto num_elements = 4u;
@@ -43,14 +44,14 @@ struct vec4_impl
 		};
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::uint8_t idx) -> T &
+	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
 	{
 		// TODO(Light): Use contract
 		debug::ensure(idx <= num_elements, "vec4 out of bound: {}", idx);
 		return ((T *)this)[idx];
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::uint8_t idx) const -> const T &
+	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
 	{
 		// TODO(Light): Use contract
 		debug::ensure(idx < num_elements, "vec4 out of bound: {}", idx);
@@ -72,11 +73,11 @@ struct vec4_impl
 	T w;
 };
 
-export using vec4 = vec4_impl<float>;
+export using vec4 = vec4_impl<f32>;
 
-export using ivec4 = vec4_impl<std::int32_t>;
+export using ivec4 = vec4_impl<i32>;
 
-export using uvec4 = vec4_impl<std::uint32_t>;
+export using uvec4 = vec4_impl<u32>;
 
 } // namespace lt::math
 

@@ -1,10 +1,10 @@
 export module bakers;
 
+import preliminary;
 import debug.assertions;
 import assets.metadata;
 import assets.shader;
 import logger;
-import std;
 
 export void bake_shader(
     const std::filesystem::path &in_path,
@@ -47,7 +47,7 @@ export void bake_shader(
 	stream.seekg(0, std::ios::end);
 	const auto size = stream.tellg();
 
-	auto bytes = std::vector<std::byte>(size);
+	auto bytes = std::vector<byte>(size);
 	stream.seekg(0, std::ios::beg);
 	stream.read((char *)bytes.data(), size); // NOLINT
 	stream.close();

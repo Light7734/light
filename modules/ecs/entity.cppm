@@ -1,13 +1,14 @@
 export module ecs.entity;
+
+import preliminary;
 import debug.assertions;
 import memory.reference;
 import ecs.registry;
-import std;
 
-namespace lt::ecs {
+export namespace lt::ecs {
 
 /** High-level entity convenience wrapper */
-export class Entity
+class Entity
 {
 public:
 	Entity(memory::Ref<Registry> registry, EntityId identifier)
@@ -50,6 +51,5 @@ private:
 
 	EntityId m_identifier;
 };
-
 
 } // namespace lt::ecs

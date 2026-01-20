@@ -1,7 +1,8 @@
 export module surface.events;
+
+import preliminary;
 import input.codes;
 import math.vec2;
-import std;
 
 export namespace lt::surface {
 
@@ -92,7 +93,7 @@ private:
 class MouseMovedEvent
 {
 public:
-	MouseMovedEvent(float x, float y): m_position(x, y)
+	MouseMovedEvent(f32 x, f32 y): m_position(x, y)
 	{
 	}
 
@@ -101,12 +102,12 @@ public:
 		return m_position;
 	}
 
-	[[nodiscard]] auto get_x() const -> float
+	[[nodiscard]] auto get_x() const -> f32
 	{
 		return m_position.x;
 	}
 
-	[[nodiscard]] auto get_y() const -> float
+	[[nodiscard]] auto get_y() const -> f32
 	{
 		return m_position.y;
 	}
@@ -123,11 +124,11 @@ private:
 class WheelScrolledEvent
 {
 public:
-	WheelScrolledEvent(float offset): m_offset(offset)
+	WheelScrolledEvent(f32 offset): m_offset(offset)
 	{
 	}
 
-	[[nodiscard]] auto get_offset() const -> float
+	[[nodiscard]] auto get_offset() const -> f32
 	{
 		return m_offset;
 	}
@@ -140,7 +141,7 @@ public:
 	}
 
 private:
-	float m_offset;
+	f32 m_offset;
 };
 
 class ButtonPressedEvent
@@ -197,7 +198,7 @@ public:
 class MovedEvent
 {
 public:
-	MovedEvent(std::int32_t x, std::int32_t y): m_position(x, y)
+	MovedEvent(i32 x, i32 y): m_position(x, y)
 	{
 	}
 
@@ -218,7 +219,7 @@ private:
 class ResizedEvent
 {
 public:
-	ResizedEvent(std::uint32_t width, std::uint32_t height): m_size(width, height)
+	ResizedEvent(u32 width, u32 height): m_size(width, height)
 	{
 	}
 

@@ -22,7 +22,7 @@ Suite raii = "surface"_suite = [] {
 		auto system = lt::surface::System(registry);
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_surface(
+			ignore = lt::renderer::create_surface(
 			    constants::api,
 			    lt::renderer::get_instance(constants::api),
 			    entity
@@ -38,11 +38,11 @@ Suite raii = "surface"_suite = [] {
 		);
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_surface(constants::api, nullptr, entity);
+			ignore = lt::renderer::create_surface(constants::api, nullptr, entity);
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_surface(
+			ignore = lt::renderer::create_surface(
 			    lt::renderer::Api::none,
 			    lt::renderer::get_instance(constants::api),
 			    entity
@@ -50,7 +50,7 @@ Suite raii = "surface"_suite = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_surface(
+			ignore = lt::renderer::create_surface(
 			    lt::renderer::Api::direct_x,
 			    lt::renderer::get_instance(constants::api),
 			    entity
@@ -58,7 +58,7 @@ Suite raii = "surface"_suite = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_surface(
+			ignore = lt::renderer::create_surface(
 			    lt::renderer::Api::metal,
 			    lt::renderer::get_instance(constants::api),
 			    entity
@@ -66,7 +66,7 @@ Suite raii = "surface"_suite = [] {
 		});
 
 		// Ensure base creation info is non-throwing
-		std::ignore = lt::renderer::create_surface(
+		ignore = lt::renderer::create_surface(
 		    constants::api,
 		    lt::renderer::get_instance(constants::api),
 		    entity

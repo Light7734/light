@@ -1,15 +1,16 @@
 export module renderer.vk.debugger;
+
+import preliminary;
 import renderer.vk.instance;
 import renderer.frontend;
 import renderer.vk.api_wrapper;
 import memory.null_on_move;
 import debug.assertions;
 import logger;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Debugger: public IDebugger
+class Debugger: public IDebugger
 {
 public:
 	Debugger(IInstance *instance, CreateInfo info);

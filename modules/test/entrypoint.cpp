@@ -2,7 +2,7 @@ import logger;
 import test.test;
 import test.registry;
 
-import std;
+import preliminary;
 
 using namespace ::lt::test;
 
@@ -51,7 +51,7 @@ void print_help()
 	std::println("--help | -h    --> ~You just used it! :D");
 }
 
-auto main(std::int32_t argc, char **argv) -> std::int32_t
+auto main(i32 argc, char **argv) -> i32
 try
 {
 	auto raw_arguments = std::span<char *>(argv, argc);
@@ -83,7 +83,7 @@ try
 		}
 	}
 
-	return static_cast<std::int32_t>(Registry::run_all(options));
+	return static_cast<i32>(Registry::run_all(options));
 }
 catch (const std::exception &exp)
 {

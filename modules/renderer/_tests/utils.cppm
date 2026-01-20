@@ -1,5 +1,6 @@
 export module renderer.test_utils;
 
+export import preliminary;
 export import logger;
 export import surface.system;
 export import ecs.registry;
@@ -13,7 +14,6 @@ export import math.vec2;
 export import math.vec3;
 export import math.vec4;
 export import math.mat4;
-export import std;
 
 export using ::lt::test::Case;
 export using ::lt::test::expect_eq;
@@ -23,18 +23,17 @@ export using ::lt::test::expect_throw;
 export using ::lt::test::operator""_suite;
 export using ::lt::test::expect_true;
 export using ::lt::test::Suite;
-export using ::std::ignore;
 
 export namespace constants {
 
 constexpr auto api = lt::renderer::Api::vulkan;
 constexpr auto resolution = lt::math::uvec2 { 800u, 600u };
-constexpr auto frames_in_flight = std::uint32_t { 3u };
+constexpr auto frames_in_flight = u32 { 3u };
 
 } // namespace constants
 
 
-void noop_messenger_callback(
+export void noop_callback(
     lt::renderer::IDebugger::MessageSeverity,
     lt::renderer::IDebugger::MessageType,
     const lt::renderer::IDebugger::MessageData &,
@@ -69,7 +68,7 @@ public:
                 .debug_callback_info = {
                     .severities = lt::renderer::IDebugger::MessageSeverity::all,
                     .types= lt::renderer::IDebugger::MessageType::all,
-                    .callback = noop_messenger_callback,
+                    .callback = noop_callback,
                     .user_data = {},
                 }
 		    } ;
@@ -157,7 +156,7 @@ public:
 	}
 
 	[[nodiscard]] auto has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity severity) const
-	    -> std::uint32_t
+	    -> u32
 	{
 		return m_user_data->m_severity_counter.contains(severity);
 	}
@@ -173,8 +172,8 @@ private:
 		// I know this makes the tests too verbose...
 		// but makes it easier to figure out what the problem is when things fail on ci
 		lt::log::trace("vulkan: {}", std::string { data.message });
-		std::ignore = data;
-		std::ignore = type;
+		ignore = data;
+		ignore = type;
 
 		auto *fixture = std::any_cast<UserData *>(user_data);
 		fixture->m_has_any_messages = true;
@@ -183,8 +182,7 @@ private:
 
 	struct UserData
 	{
-		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, std::uint32_t>
-		    m_severity_counter;
+		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, u32> m_severity_counter;
 
 		bool m_has_any_messages {};
 	};
@@ -227,7 +225,7 @@ public:
 	}
 
 	[[nodiscard]] auto has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity severity) const
-	    -> std::uint32_t
+	    -> u32
 	{
 		return m_user_data->m_severity_counter.contains(severity);
 	}
@@ -244,8 +242,8 @@ private:
 		// but makes it easier to figure out what the problem is when things fail on ci
 		lt::log::trace("vulkan: {}", std::string { data.message });
 
-		std::ignore = data;
-		std::ignore = type;
+		ignore = data;
+		ignore = type;
 
 		auto *fixture = std::any_cast<UserData *>(user_data);
 		fixture->m_has_any_messages = true;
@@ -254,8 +252,7 @@ private:
 
 	struct UserData
 	{
-		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, std::uint32_t>
-		    m_severity_counter;
+		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, u32> m_severity_counter;
 
 		bool m_has_any_messages {};
 	};

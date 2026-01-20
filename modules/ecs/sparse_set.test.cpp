@@ -1,7 +1,7 @@
+import preliminary;
 import ecs.sparse_set;
 import test.test;
 import test.expects;
-import std;
 
 using ::lt::test::Case;
 using ::lt::test::expect_eq;
@@ -12,18 +12,18 @@ using ::lt::test::expect_true;
 using ::lt::test::Suite;
 using ::lt::test::operator""_suite;
 
-using Value_T = int;
+using Value_T = i32;
 using Set = lt::ecs::SparseSet<Value_T>;
 constexpr auto capacity = 100;
 
 Suite raii = "raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
-		std::ignore = Set {};
-		std::ignore = Set { Set::max_capacity };
+		ignore = Set {};
+		ignore = Set { Set::max_capacity };
 	};
 
 	Case { "unhappy path throws" } = [] {
-		expect_throw([] { std::ignore = Set { Set::max_capacity + 1 }; });
+		expect_throw([] { ignore = Set { Set::max_capacity + 1 }; });
 	};
 
 	Case { "post construct has correct state" } = [&] {
@@ -78,7 +78,7 @@ Suite element_raii = "element_raii"_suite = [] {
 
 			expect_eq(set.get_size(), 10'000 - (idx + 1));
 			expect_false(set.contains(idx));
-			expect_throw([&] { std::ignore = set.at(idx); });
+			expect_throw([&] { ignore = set.at(idx); });
 		}
 	};
 
@@ -141,12 +141,12 @@ Suite getters = "getters"_suite = [] {
 		{
 			expect_throw([&] {
 				set.insert(idx, {});
-				std::ignore = set.at(50);
+				ignore = set.at(50);
 			});
 		}
 
 		set.insert(50, {});
-		std::ignore = set.at(50); // should not throw
+		ignore = set.at(50); // should not throw
 	};
 };
 

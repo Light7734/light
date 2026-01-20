@@ -17,7 +17,6 @@ import surface.system;
 using namespace lt;
 using input::InputComponent;
 using input::System;
-using std::ignore;
 using test::Case;
 using test::expect_eq;
 using test::expect_false;
@@ -79,7 +78,7 @@ Suite raii = "raii"_suite = "raii"_suite = [] {
 		auto fixture = Fixture {};
 		for (auto idx : std::views::iota(0, 10'000))
 		{
-			std::ignore = idx;
+			ignore = idx;
 			ignore = System { fixture.registry() };
 		}
 	};

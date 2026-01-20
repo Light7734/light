@@ -1,6 +1,6 @@
 export module memory.reference;
 
-import std;
+import preliminary;
 
 namespace lt::memory {
 

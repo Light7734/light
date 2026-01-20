@@ -1,17 +1,18 @@
 export module input.system:components;
+
+import preliminary;
 import input.codes;
-import std;
 
-namespace lt::input {
+export namespace lt::input {
 
-export struct Trigger
+struct Trigger
 {
 	Key mapped_keycode;
 };
 
-export struct InputAction
+struct InputAction
 {
-	enum class State : std::uint8_t
+	enum class State : u8
 	{
 		inactive,
 		active,
@@ -26,18 +27,18 @@ export struct InputAction
 	Trigger trigger;
 };
 
-export class InputComponent
+class InputComponent
 {
 public:
 	InputComponent() = default;
 
-	auto add_action(InputAction action) -> std::size_t
+	auto add_action(InputAction action) -> size_t
 	{
 		m_actions.emplace_back(std::move(action));
 		return m_actions.size() - 1;
 	}
 
-	auto get_action(std::size_t idx) -> const InputAction &
+	auto get_action(size_t idx) -> const InputAction &
 	{
 		return m_actions[idx];
 	}

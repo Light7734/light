@@ -1,10 +1,10 @@
 export module env;
 
-import std;
+import preliminary;
 
-namespace lt {
+export namespace lt {
 
-enum class Platform : std::uint8_t
+enum class Platform : u8
 {
 	/** The GNU/Linux platform.
 	 * Tested on the following distros: arch-x86_64
@@ -26,7 +26,7 @@ enum class Platform : std::uint8_t
 };
 
 /** The compiler that was used for compiling the project. */
-enum class Compiler : std::uint8_t
+enum class Compiler : u8
 {
 	clang,
 	gcc,
@@ -57,12 +57,13 @@ constexpr auto platform_name = "mac";
 
 #endif
 
+/** @TODO(Light): Handle other compilers... */
 #ifdef __clang__
 constexpr auto compiler = Compiler::clang;
 constexpr auto compiler_name = "clang";
 
-/** @todo(Light): insert the full identifier, including version information and such */
-constexpr auto full_compiler_identifier = "clang";
+/** @TODO(Light): insert the full identifier, including version information and such */
+constexpr auto compiler_identifier = "clang";
 #endif
 
 } // namespace constants

@@ -1,10 +1,10 @@
 export module math.vec2;
 
-import std;
+import preliminary;
 
 namespace lt::math {
 
-export template<typename T = float>
+export template<typename T = f32>
 struct vec2_impl
 {
 	constexpr vec2_impl(): x(), y()
@@ -45,7 +45,7 @@ struct vec2_impl
 		};
 	}
 
-	[[nodiscard]] auto operator*(float scalar) const -> vec2_impl
+	[[nodiscard]] auto operator*(f32 scalar) const -> vec2_impl
 	{
 		return {
 			x * scalar,
@@ -59,11 +59,11 @@ struct vec2_impl
 };
 
 
-export using vec2 = vec2_impl<float>;
+export using vec2 = vec2_impl<f32>;
 
-export using ivec2 = vec2_impl<std::int32_t>;
+export using ivec2 = vec2_impl<i32>;
 
-export using uvec2 = vec2_impl<std::uint32_t>;
+export using uvec2 = vec2_impl<u32>;
 
 } // namespace lt::math
 

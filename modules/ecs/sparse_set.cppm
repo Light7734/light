@@ -1,13 +1,14 @@
 export module ecs.sparse_set;
-import debug.assertions;
-import std;
 
-namespace lt::ecs {
+import preliminary;
+import debug.assertions;
+
+export namespace lt::ecs {
 
 /**
  * @ref https://programmingpraxis.com/2012/03/09/sparse-sets/
  */
-export template<typename Identifier_T = std::uint32_t>
+template<typename Identifier_T = u32>
 class TypeErasedSparseSet
 {
 public:
@@ -26,17 +27,17 @@ public:
 	virtual void remove(Identifier_T identifier) = 0;
 };
 
-export template<typename Value_T, typename Identifier_T = std::uint32_t>
+template<typename Value_T, typename Identifier_T = u32>
 class SparseSet: public TypeErasedSparseSet<Identifier_T>
 {
 public:
 	using Dense_T = std::pair<Identifier_T, Value_T>;
 
-	static constexpr auto max_capacity = std::size_t { 1'000'000 };
+	static constexpr auto max_capacity = size_t { 1'000'000 };
 
 	static constexpr auto null_identifier = std::numeric_limits<Identifier_T>().max();
 
-	explicit SparseSet(std::size_t initial_capacity = 1)
+	explicit SparseSet(size_t initial_capacity = 1)
 	{
 		debug::ensure(
 		    initial_capacity <= max_capacity,
@@ -53,10 +54,7 @@ public:
 	{
 		if (m_sparse.size() < identifier + 1)
 		{
-			auto new_capacity = std::max(
-			    static_cast<std::size_t>(identifier + 1),
-			    m_sparse.size() * 2
-			);
+			auto new_capacity = std::max(static_cast<size_t>(identifier + 1), m_sparse.size() * 2);
 			new_capacity = std::min(new_capacity, max_capacity);
 
 			m_sparse.resize(new_capacity, null_identifier);
@@ -144,12 +142,12 @@ public:
 		return std::forward<Self_T>(self).m_dense[std::forward<Self_T>(self).m_sparse[identifier]];
 	}
 
-	[[nodiscard]] auto get_size() const noexcept -> std::size_t
+	[[nodiscard]] auto get_size() const noexcept -> size_t
 	{
 		return m_alive_count;
 	}
 
-	[[nodiscard]] auto get_capacity() const noexcept -> std::size_t
+	[[nodiscard]] auto get_capacity() const noexcept -> size_t
 	{
 		return m_sparse.capacity();
 	}
@@ -164,9 +162,9 @@ private:
 
 	std::vector<Identifier_T> m_sparse;
 
-	std::size_t m_alive_count {};
+	size_t m_alive_count {};
 
-	std::size_t m_dead_count {};
+	size_t m_dead_count {};
 };
 
 } // namespace lt::ecs

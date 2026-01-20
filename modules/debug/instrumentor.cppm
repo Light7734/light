@@ -1,6 +1,6 @@
 export module debug.instrumentor;
 
-import std;
+import preliminary;
 import logger;
 
 namespace lt::debug {
@@ -8,8 +8,8 @@ namespace lt::debug {
 struct ScopeProfileResult
 {
 	std::string name;
-	long long start, duration;
-	std::uint32_t threadID;
+	u64 start, duration;
+	u32 threadID;
 };
 
 class Instrumentor

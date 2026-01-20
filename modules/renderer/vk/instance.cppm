@@ -1,10 +1,11 @@
 export module renderer.vk.instance;
+
+import preliminary;
 import debug.assertions;
 import renderer.frontend;
 import renderer.vk.api_wrapper;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
 /**
  * Responsible for dynamically loading Vulkan library/functions.
@@ -15,7 +16,7 @@ namespace lt::renderer::vkb {
  * https://www.xfree86.org/4.7.0/DRI11.html
  * https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues/1894
  */
-export class Instance: public IInstance
+class Instance: public IInstance
 {
 public:
 	static auto get() -> IInstance *
@@ -27,20 +28,6 @@ public:
 	{
 		return m_instance;
 	}
-
-	// /* create functions */
-	// [[nodiscard]] auto create_xlib_surface(VkXlibSurfaceCreateInfoKHR info) const ->
-	// VkSurfaceKHR;
-	//
-	// [[nodiscard]] auto create_messenger(VkDebugUtilsMessengerCreateInfoEXT info) const
-	//     -> VkDebugUtilsMessengerEXT;
-	//
-	// /* destroy functions */
-	// void destroy_surface(VkSurfaceKHR surface) const;
-	//
-	// void destroy_messenger(VkDebugUtilsMessengerEXT messenger) const;
-	//
-	// [[nodiscard]] auto enumerate_gpus() const -> std::vector<VkPhysicalDevice>;
 
 private:
 	static auto instance() -> IInstance &
@@ -81,14 +68,13 @@ Instance::Instance()
 		Setting { .name = "enable_message_limit", .values = true },
 		Setting {
 		    .name = "duplicate_message_limit",
-		    .values = std::numeric_limits<std::uint32_t>::max(),
+		    .values = std::numeric_limits<u32>::max(),
 		},
 		Setting {
 		    .name = "report_flags",
 		    .values = std::vector<const char *> { "info", "warn", "perf", "error", "verbose" },
 		},
 	};
-
 
 	using Layer = vk::Instance::Layer;
 	m_instance = vk::Instance(
@@ -109,42 +95,5 @@ Instance::Instance()
 
 	m_instance.load_functions();
 }
-
-// auto Instance::enumerate_gpus() const -> std::vector<VkPhysicalDevice>
-// {
-// 	auto count = 0u;
-// 	vkc(vk_enumerate_physical_devices(m_instance, &count, nullptr));
-// 	debug::ensure(count != 0u, "Failed to find any gpus with Vulkan support");
-//
-// 	auto gpus = std::vector<VkPhysicalDevice>(count);
-// 	vkc(vk_enumerate_physical_devices(m_instance, &count, gpus.data()));
-// 	return gpus;
-// }
-//
-// auto Instance::create_xlib_surface(VkXlibSurfaceCreateInfoKHR info) const -> VkSurfaceKHR
-// {
-// 	auto *value = VkSurfaceKHR {};
-// 	vk_create_xlib_surface_khr(m_instance, &info, m_allocator, &value);
-//
-// 	return value;
-// }
-//
-// [[nodiscard]] auto Instance::create_messenger(VkDebugUtilsMessengerCreateInfoEXT info) const
-//     -> VkDebugUtilsMessengerEXT
-// {
-// 	auto *messenger = VkDebugUtilsMessengerEXT {};
-// 	vkc(vk_create_debug_messenger(m_instance, &info, m_allocator, &messenger));
-// 	return messenger;
-// }
-//
-// void Instance::destroy_surface(VkSurfaceKHR surface) const
-// {
-// 	vk_destroy_surface_khr(m_instance, surface, m_allocator);
-// }
-//
-// void Instance::destroy_messenger(VkDebugUtilsMessengerEXT messenger) const
-// {
-// 	vk_destroy_debug_messenger(m_instance, messenger, m_allocator);
-// }
 
 } // namespace lt::renderer::vkb

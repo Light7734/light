@@ -1,4 +1,6 @@
 export module renderer.system;
+
+import preliminary;
 import logger;
 import debug.assertions;
 import math.mat4;
@@ -16,9 +18,8 @@ import renderer.components;
 import math.components;
 import math.algebra;
 import math.trig;
-import std;
 
-namespace lt::renderer {
+export namespace lt::renderer {
 
 /** The main rendering engine.
  *
@@ -27,9 +28,11 @@ namespace lt::renderer {
  * - Connecting the context to the physical devices (select gpu, create surface, logical device)
  * - Rendering the scene represented in registry via lt::renderer::components.
  */
-export class System: public app::ISystem
+class System: public app::ISystem
 {
 public:
+	// TODO(Light): this is some horrible design... fix it :(
+
 	/** config.max_frames_in_flight should not be higher than this value. */
 	static constexpr auto frames_in_flight_upper_limit = 5u;
 
@@ -40,7 +43,7 @@ public:
 	{
 		Api target_api;
 
-		std::uint32_t max_frames_in_flight;
+		u32 max_frames_in_flight;
 	};
 
 	struct CreateInfo
@@ -106,9 +109,9 @@ private:
 
 	app::TickResult m_last_tick_result {};
 
-	std::uint32_t m_frame_idx {};
+	u32 m_frame_idx {};
 
-	std::uint32_t m_max_frames_in_flight {};
+	u32 m_max_frames_in_flight {};
 };
 
 } // namespace lt::renderer
@@ -162,7 +165,7 @@ void System::on_unregister()
 
 void System::tick(app::TickInfo tick)
 {
-	std::ignore = tick;
+	ignore = tick;
 
 	handle_surface_resized_events();
 	auto frame_result = m_renderer->frame(m_frame_idx, [this] { submit_scene(); });

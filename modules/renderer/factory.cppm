@@ -13,7 +13,8 @@ export import renderer.vk.surface;
 export import memory.scope;
 export import debug.assertions;
 export import ecs.entity;
-export import std;
+
+import preliminary;
 
 export namespace lt::renderer {
 
@@ -48,7 +49,7 @@ export namespace lt::renderer {
     IGpu *gpu,
     IDevice *device,
     ISwapchain *swapchain,
-    std::uint32_t max_frames_in_flight
+    u32 max_frames_in_flight
 ) -> memory::Scope<IRenderer>;
 
 [[nodiscard]] auto create_buffer(
@@ -188,7 +189,7 @@ namespace lt::renderer {
     IGpu *gpu,
     IDevice *device,
     ISwapchain *swapchain,
-    std::uint32_t max_frames_in_flight
+    u32 max_frames_in_flight
 ) -> memory::Scope<IRenderer>
 {
 	debug::ensure(gpu, "Failed to create renderer::IRenderer: null gpu");

@@ -7,18 +7,19 @@ struct wl_surface;
 #endif
 
 export module surface.system:components;
-import std;
+
+import preliminary;
 import math.vec2;
 import surface.events;
 import surface.requests;
 
-namespace lt::surface {
+export namespace lt::surface {
 
 /** Represents a platform's surface (eg. a Window).
  *
  * @note This is a "system component"
  */
-export class SurfaceComponent
+class SurfaceComponent
 {
 public:
 	friend class System;
@@ -59,6 +60,8 @@ public:
 
 	static constexpr auto max_title_length = 256;
 
+	// TODO(Light): add `center_to_screen` flag
+	// TODO(Light): add `screen_mode` flag (windowed/full_screen/windowed_full_screen)
 	struct CreateInfo
 	{
 		std::string_view title;

@@ -1,6 +1,6 @@
 export module memory.scope;
 
-import std;
+import preliminary;
 
 namespace lt::memory {
 

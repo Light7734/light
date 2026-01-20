@@ -1,9 +1,9 @@
+import preliminary;
 import assets.shader;
 import logger;
 import bakers;
-import std;
 
-auto main(int argc, char *argv[]) -> std::int32_t
+auto main(i32 argc, char *argv[]) -> i32
 try
 {
 	if (argc != 2)

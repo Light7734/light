@@ -1,19 +1,20 @@
 export module renderer.components;
+
+import preliminary;
 import assets.shader;
 import math.vec3;
 import memory.reference;
-import std;
 
 export namespace lt::renderer::components {
 
-enum class VertexFormat : std::uint8_t
+enum class VertexFormat : u8
 {
 	r32_g32_b32_sfloat,
 
 	r32_g32_sfloat,
 };
 
-enum class VertexInputRate : std::uint8_t
+enum class VertexInputRate : u8
 {
 	per_vertex,
 
@@ -22,20 +23,20 @@ enum class VertexInputRate : std::uint8_t
 
 struct VertexInputAttributeDescriptipn
 {
-	std::uint32_t location;
+	u32 location;
 
-	std::uint32_t binding;
+	u32 binding;
 
-	std::uint32_t offset;
+	u32 offset;
 
 	VertexFormat format;
 };
 
 struct VertexInputBindingDescription
 {
-	std::uint32_t binding;
+	u32 binding;
 
-	std::uint32_t stride;
+	u32 stride;
 };
 
 /** Requires a math::components::Transform component on the same entity to be functional. */

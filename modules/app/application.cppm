@@ -1,16 +1,17 @@
 export module app;
+
+import preliminary;
 import app.system;
 import memory.reference;
 import memory.scope;
-import std;
 
-namespace lt::app {
+export namespace lt::app {
 
 /** The main application class.
  * Think of this like an aggregate of systems, you register systems through this interface.
  * Then they'll tick every "application frame".
  */
-export class Application
+class Application
 {
 public:
 	Application(const Application &) = delete;
@@ -54,11 +55,13 @@ void Application::game_loop()
 			const auto &last_tick = system->get_last_tick_result();
 			const auto now = std::chrono::steady_clock::now();
 
-			system->tick(TickInfo {
-			    .delta_time = now - last_tick.end_time,
-			    .budget = std::chrono::milliseconds { 10 },
-			    .start_time = now,
-			});
+			system->tick(
+			    TickInfo {
+			        .delta_time = now - last_tick.end_time,
+			        .budget = std::chrono::milliseconds { 10 },
+			        .start_time = now,
+			    }
+			);
 		}
 
 		for (auto &system : m_systems_to_be_registered)

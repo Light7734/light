@@ -1,11 +1,11 @@
 export module math.vec3;
 
+import preliminary;
 import math.vec2;
-import std;
 
 namespace lt::math {
 
-export template<typename T = float>
+export template<typename T = f32>
 struct vec3_impl
 {
 	constexpr vec3_impl(): x(), y(), z()
@@ -61,11 +61,11 @@ struct vec3_impl
 	T z; // NOLINT
 };
 
-export using vec3 = vec3_impl<float>;
+export using vec3 = vec3_impl<f32>;
 
-export using ivec3 = vec3_impl<std::int32_t>;
+export using ivec3 = vec3_impl<i32>;
 
-export using uvec3 = vec3_impl<std::uint32_t>;
+export using uvec3 = vec3_impl<u32>;
 
 } // namespace lt::math
 

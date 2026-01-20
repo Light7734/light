@@ -1,12 +1,14 @@
-add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp)
-add_module(NAME bitwise INTERFACES operations.cppm)
-add_module(NAME env INTERFACES constants.cppm)
-add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
+add_module(NAME preliminary INTERFACES module.cppm fundumental_types.cppm)
 
+add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp DEPENDENCIES preliminary)
+add_module(NAME bitwise INTERFACES operations.cppm DEPENDENCIES preliminary)
+add_module(NAME env INTERFACES constants.cppm DEPENDENCIES preliminary)
+add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
     DEPENDENCIES
+    preliminary
     logger
 )
-add_module(NAME time INTERFACES timer.cppm TESTS timer.test.cpp)
+add_module(NAME time INTERFACES timer.cppm TESTS timer.test.cpp DEPENDENCIES preliminary)
 
 add_module(
     NAME
@@ -18,6 +20,7 @@ add_module(
     SOURCES
     entrypoint.cpp
     DEPENDENCIES
+    preliminary
     logger
     TESTS
     test.test.cpp
@@ -32,6 +35,7 @@ add_module(
     instrumentor.cppm
     assertions.cppm
     DEPENDENCIES
+    preliminary
     logger
 )
 
@@ -40,13 +44,14 @@ add_module(
     math
     INTERFACES
     algebra.cppm
-    mat4.cppm
     trig.cppm
     vec2.cppm
     vec3.cppm
     vec4.cppm
+    mat4.cppm
     components.cppm
     DEPENDENCIES
+    preliminary
     lt_debug
 )
 
@@ -57,6 +62,7 @@ add_module(
     shader.cppm
     metadata.cppm
     DEPENDENCIES
+    preliminary
     logger
     lt_debug
     TESTS
@@ -73,17 +79,16 @@ add_module(
     ENTRYPOINT
     entrypoint.cpp
     DEPENDENCIES
+    preliminary
     assets
     logger
     lt_debug
-    TESTS
-    bakers.test.cpp
 )
 
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
 # PRIVATE libasset_baker)
 
-add_module(NAME camera INTERFACES components.cppm DEPENDENCIES math)
+add_module(NAME camera INTERFACES components.cppm DEPENDENCIES preliminary math)
 
 add_module(
     NAME
@@ -92,6 +97,7 @@ add_module(
     application.cppm
     system.cppm
     DEPENDENCIES
+    preliminary
     memory
     PRIVATE_DEPENDENCIES
     lt_debug
@@ -113,7 +119,7 @@ add_module(
     sparse_set.test.cpp
 )
 
-add_module(NAME input_codes INTERFACES input_codes.cppm)
+add_module(NAME input_codes INTERFACES input_codes.cppm DEPENDENCIES preliminary)
 
 if(WIN32)
     add_module(
@@ -126,6 +132,7 @@ if(WIN32)
         events.cppm
         components.cppm
         DEPENDENCIES
+        preliminary
         ecs
         app
         math
@@ -150,6 +157,7 @@ elseif(UNIX)
         events.cppm
         components.cppm
         DEPENDENCIES
+        preliminary
         ecs
         app
         math
@@ -190,6 +198,7 @@ add_module(
     components.cppm
     events.cppm
     DEPENDENCIES
+    preliminary
     input_codes
     surface
     math
@@ -220,6 +229,7 @@ add_module(
     vk/renderer.cppm
     vk/debugger.cppm
     DEPENDENCIES
+    preliminary
     app
     ecs
     memory
@@ -232,12 +242,12 @@ add_module(
     PRIVATE_DEPENDENCIES
     surface
     TESTS
-    # _tests/buffer.cpp
-    # _tests/debugger.cpp
-    # _tests/device.cpp
-    # _tests/pass.cpp
-    # _tests/renderer.cpp
-    # _tests/surface.cpp
+    _tests/buffer.cpp
+    _tests/debugger.cpp
+    _tests/device.cpp
+    _tests/pass.cpp
+    _tests/renderer.cpp
+    _tests/surface.cpp
     _tests/system.cpp
     TEST_INTERFACES
     _tests/utils.cppm
@@ -258,24 +268,7 @@ add_module(
     surface
     renderer
     camera
-    # TESTS system.test.cpp
 )
-
-add_executable(exectest ${CMAKE_CURRENT_SOURCE_DIR}/mirror/entrypoint.cpp)
-
-target_link_libraries(
-    exectest
-    PRIVATE mirror
-            app
-            time
-            input
-            surface
-            renderer
-            camera
-)
-
-# add_executable_module(mirror entrypoint/mirror.cpp)
-# target_link_libraries(mirror PRIVATE libmirror input)
 
 if(ENABLE_SANDBOX)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sandbox/)

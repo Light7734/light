@@ -1,7 +1,6 @@
+import preliminary;
 import test.test;
 import test.expects;
-
-import std;
 
 using lt::test::Case;
 using lt::test::Suite;
@@ -69,7 +68,7 @@ Suite expects = "expects"_suite = []() {
 	};
 
 	Case { "expect_false - unhappy" } = [] {
-		auto *oonga_oonga_can_rest_now = (std::uint32_t *)nullptr;
+		auto *oonga_oonga_can_rest_now = (u32 *)nullptr;
 		auto unhappy_counter = 0u;
 		oonga_oonga_can_rest_now = &unhappy_counter;
 

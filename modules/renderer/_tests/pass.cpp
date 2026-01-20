@@ -4,7 +4,7 @@ import renderer.test_utils;
 Suite raii = "pass_raii"_suite = [] {
 	Case { "happy path won't throw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
-		std::ignore = lt::renderer::create_pass(
+		ignore = lt::renderer::create_pass(
 		    constants::api,
 		    fixture.device(),
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
@@ -20,7 +20,7 @@ Suite raii = "pass_raii"_suite = [] {
 	Case { "unhappy path throws" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_pass(
+			ignore = lt::renderer::create_pass(
 			    constants::api,
 			    nullptr,
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
@@ -29,7 +29,7 @@ Suite raii = "pass_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_pass(
+			ignore = lt::renderer::create_pass(
 			    lt::renderer::Api::none,
 			    fixture.device(),
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
@@ -38,7 +38,7 @@ Suite raii = "pass_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_pass(
+			ignore = lt::renderer::create_pass(
 			    lt::renderer::Api::direct_x,
 			    fixture.device(),
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
@@ -47,7 +47,7 @@ Suite raii = "pass_raii"_suite = [] {
 		});
 
 		expect_throw([&] {
-			std::ignore = lt::renderer::create_pass(
+			ignore = lt::renderer::create_pass(
 			    lt::renderer::Api::metal,
 			    fixture.device(),
 			    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },

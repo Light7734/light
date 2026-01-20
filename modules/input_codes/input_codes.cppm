@@ -1,7 +1,17 @@
+/**
+ * @note: The reason this is a separate module, rather than being in the `Input` module is that
+ * the input is received from the hardware through the `Surface` module, and it is further parsed
+ * inside the `Input` module, USING the `Surface` module's events.
+ *
+ * Hence, both `Surface` and `Input` needs to agree to the same input codes, while `Input` depends
+ * on `Surface`. The simplest solution is to keep the codes in a 3rd module and make both depend on
+ * it.
+ */
 export module input.codes;
-import std;
 
-export enum class Key: std::uint16_t {
+import preliminary;
+
+export enum class Key: u16 {
 	none = 0,
 
 	left_button,
@@ -153,6 +163,7 @@ export enum class Key: std::uint16_t {
 	f11,
 	f12,
 
+	/** Input was received but was none of the above. */
 	unknown,
 };
 

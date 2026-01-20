@@ -1,8 +1,8 @@
 export module test.test;
 
-import std;
 import test.expects;
 import test.registry;
+import preliminary;
 
 ///////////////////////////////////////
 // ----------* INTERFACE *--------- //
@@ -38,7 +38,7 @@ struct TestFuzzHarness
 export using Case = const TestCase;
 export using Suite = const TestSuite;
 export using FuzzHarness = const TestFuzzHarness;
-export auto operator""_suite(const char *name, std::size_t size) -> TestSuite;
+export auto operator""_suite(const char *name, size_t size) -> TestSuite;
 
 ///////////////////////////////////////
 // * IMPLEMENTATION -- TEMPLATES *  //
@@ -106,10 +106,10 @@ constexpr TestFuzzHarness::TestFuzzHarness(auto body)
 #endif
 };
 
-auto operator""_suite(const char *name, std::size_t size) -> TestSuite
+auto operator""_suite(const char *name, size_t size) -> TestSuite
 {
 	// TODO(Light): do we need the size parameter?
-	std::ignore = size;
+	ignore = size;
 
 	Registry::set_last_suite_name(name);
 	return {};

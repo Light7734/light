@@ -1,11 +1,13 @@
 export module math.mat4;
+
+import preliminary;
+import math.vec2;
 import math.vec3;
 import math.vec4;
-import std;
 
 namespace lt::math {
 
-export template<typename T = float>
+export template<typename T = f32>
 struct mat4_impl
 {
 	using Column_T = vec4_impl<T>;
@@ -54,12 +56,12 @@ struct mat4_impl
 		};
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::size_t idx) -> Column_T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) -> Column_T &
 	{
 		return values[idx];
 	}
 
-	[[nodiscard]] constexpr auto operator[](std::size_t idx) const -> const Column_T &
+	[[nodiscard]] constexpr auto operator[](size_t idx) const -> const Column_T &
 	{
 		return values[idx];
 	}
@@ -84,7 +86,7 @@ export template<typename T>
 }
 
 export template<typename T>
-[[nodiscard]] auto rotate(float value, const vec3_impl<T> &xyz) -> mat4_impl<T>
+[[nodiscard]] auto rotate(f32 value, const vec3_impl<T> &xyz) -> mat4_impl<T>
 {
 	return mat4_impl<T> {};
 }
@@ -101,10 +103,10 @@ export template<typename T>
 	return mat4_impl<T> {};
 }
 
-export using mat4 = mat4_impl<float>;
+export using mat4 = mat4_impl<f32>;
 
-export using imat4 = mat4_impl<std::int32_t>;
+export using imat4 = mat4_impl<i32>;
 
-export using umat4 = mat4_impl<std::uint32_t>;
+export using umat4 = mat4_impl<u32>;
 
 } // namespace lt::math

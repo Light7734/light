@@ -1,5 +1,6 @@
 export module math.components;
 
+import preliminary;
 import math.vec3;
 
 namespace lt::math::components {

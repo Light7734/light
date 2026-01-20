@@ -1,11 +1,11 @@
 export module logger;
 
-import std;
+import preliminary;
 
 namespace lt::log {
 
 /** Severity of a log message. */
-enum class Level : std::uint8_t
+enum class Level : u8
 {
 	/** Lowest and most vebose log level, for tracing execution paths and events */
 	trace = 0,
@@ -31,9 +31,9 @@ enum class Level : std::uint8_t
 
 namespace details {
 
-inline auto thread_hash_id() noexcept -> std::uint64_t
+inline auto thread_hash_id() noexcept -> u64
 {
-	return static_cast<std::uint64_t>(std::hash<std::thread::id> {}(std::this_thread::get_id()));
+	return static_cast<u64>(std::hash<std::thread::id> {}(std::this_thread::get_id()));
 }
 
 } // namespace details

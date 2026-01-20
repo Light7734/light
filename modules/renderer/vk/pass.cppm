@@ -1,4 +1,6 @@
 export module renderer.vk.pass;
+
+import preliminary;
 import renderer.data;
 import renderer.vk.api_wrapper;
 import renderer.vk.device;
@@ -7,11 +9,10 @@ import assets.shader;
 import assets.metadata;
 import memory.null_on_move;
 import renderer.frontend;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Pass: public IPass
+class Pass: public IPass
 {
 public:
 	Pass(
@@ -51,10 +52,8 @@ private:
 
 } // namespace lt::renderer::vkb
 
-
 module :private;
-using namespace ::lt::renderer::vkb;
-using namespace ::lt::renderer;
+namespace lt::renderer::vkb {
 
 using enum vk::DescriptorSetLayout::Binding::FlagBits;
 
@@ -80,36 +79,6 @@ Pass::Pass(
         .push_constant_ranges = { {  vk::ShaderStageFlags::vertex_bit,  0u,  sizeof(FrameConstants) } }
     }))
 {
-	// auto pool_size = VkDescriptorPoolSize {
-	// 	.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-	// 	.descriptorCount = descriptor_count,
-	// };
-	//
-	// m_descriptor_pool = m_device->create_desscriptor_pool(
-	//     {
-	//         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-	//         .poolSizeCount = 1u,
-	//         .pPoolSizes = &pool_size,
-	//     }
-	// );
-	//
-	// auto descriptor_set_variable_descriptor_count_info
-	//     = VkDescriptorSetVariableDescriptorCountAllocateInfo {
-	// 	      .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO,
-	// 	      .descriptorSetCount = 1u,
-	// 	      .pDescriptorCounts = &descriptor_count,
-	//       };
-	//
-	// m_vertices_descriptor_set = m_device->allocate_descriptor_set(
-	//     VkDescriptorSetAllocateInfo {
-	//         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-	//         .pNext = &descriptor_set_variable_descriptor_count_info,
-	//         .descriptorPool = m_descriptor_pool,
-	//         .descriptorSetCount = 1u,
-	//         .pSetLayouts = &m_vertices_descriptor_set_layout,
-	//     }
-	// );
-
 	auto shaders = std::vector<std::pair<vk::ShaderModule, vk::ShaderStageFlags::T>> {};
 	shaders.emplace_back(
 	    vk::ShaderModule(
@@ -152,3 +121,5 @@ Pass::Pass(
 	    }
 	);
 }
+
+} // namespace lt::renderer::vkb

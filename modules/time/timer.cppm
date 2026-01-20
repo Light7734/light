@@ -1,15 +1,16 @@
 export module time;
-import std;
 
-namespace lt::time {
+import preliminary;
+
+export namespace lt::time {
 
 /** Simple timer class to keep track of the elapsed time. */
-export class Timer
+class Timer
 {
 public:
 	using Clock = std::chrono::steady_clock;
 
-	using Duration = std::chrono::duration<double>;
+	using Duration = std::chrono::duration<f64>;
 
 	using Timepoint = std::chrono::time_point<std::chrono::steady_clock>;
 

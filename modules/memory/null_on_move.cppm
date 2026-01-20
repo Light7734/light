@@ -2,7 +2,7 @@ export module memory.null_on_move;
 
 import logger;
 
-import std;
+import preliminary;
 
 namespace lt::memory {
 
@@ -81,9 +81,9 @@ public:
 		return m_value;
 	}
 
-	operator std::uint64_t() const
+	operator u64() const
 	{
-		return (std::uint64_t)m_value;
+		return (u64)m_value;
 	}
 
 	[[nodiscard]] auto get() -> Underlying_T &

@@ -2,10 +2,9 @@ export module renderer.data;
 
 import math.mat4;
 
+export namespace lt::renderer {
 
-namespace lt::renderer {
-
-export struct FrameConstants
+struct FrameConstants
 {
 	math::mat4 view_projection;
 };

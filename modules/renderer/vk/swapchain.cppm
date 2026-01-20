@@ -1,4 +1,6 @@
 export module renderer.vk.swapchain;
+
+import preliminary;
 import renderer.vk.api_wrapper;
 import renderer.vk.surface;
 import renderer.vk.device;
@@ -8,11 +10,10 @@ import renderer.frontend;
 import math.vec2;
 import memory.null_on_move;
 import logger;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Swapchain: public ISwapchain
+class Swapchain: public ISwapchain
 {
 public:
 	Swapchain(ISurface *surface, IGpu *gpu, IDevice *device);
@@ -32,17 +33,17 @@ public:
 		return m_format;
 	}
 
-	[[nodiscard]] auto get_image_count() const -> std::size_t
+	[[nodiscard]] auto get_image_count() const -> size_t
 	{
 		return m_images.size();
 	}
 
-	[[nodiscard]] auto get_image_view(std::uint32_t idx) -> vk::ImageView &
+	[[nodiscard]] auto get_image_view(u32 idx) -> vk::ImageView &
 	{
 		return m_image_views[idx];
 	}
 
-	[[nodiscard]] auto get_image(std::uint32_t idx) -> vk::Image &
+	[[nodiscard]] auto get_image(u32 idx) -> vk::Image &
 	{
 		return m_images[idx];
 	}
@@ -50,8 +51,8 @@ public:
 private:
 	[[nodiscard]] auto get_optimal_image_count(
 	    vk::Surface::Capabilities capabilities,
-	    std::uint32_t desired_image_count
-	) const -> std::uint32_t;
+	    u32 desired_image_count
+	) const -> u32;
 
 	Gpu *m_gpu;
 
@@ -72,7 +73,6 @@ private:
 
 } // namespace lt::renderer::vkb
 
-
 module :private;
 namespace lt::renderer::vkb {
 
@@ -85,11 +85,11 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	const auto formats = m_gpu->vk().get_surface_formats(m_surface->vk());
 
 	// TODO(Light): parameterize
-	constexpr auto desired_image_count = std::uint32_t { 3u };
+	constexpr auto desired_image_count = u32 { 3u };
 	const auto surface_format = formats.front();
 	m_format = surface_format.format;
 
-	if (capabilities.current_extent.x == std::numeric_limits<std::uint32_t>::max())
+	if (capabilities.current_extent.x == std::numeric_limits<u32>::max())
 	{
 		log::info(
 		    "Vulkan surface capabilities current extent is uint32 max... This indicates that the "
@@ -155,8 +155,8 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 
 [[nodiscard]] auto Swapchain::get_optimal_image_count(
     vk::Surface::Capabilities capabilities,
-    std::uint32_t desired_image_count
-) const -> std::uint32_t
+    u32 desired_image_count
+) const -> u32
 {
 	const auto min_image_count = capabilities.min_image_count;
 	const auto max_image_count = capabilities.max_image_count;

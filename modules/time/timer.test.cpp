@@ -1,7 +1,7 @@
+import preliminary;
 import time;
 import test.test;
 import test.expects;
-import std;
 
 using ::lt::test::Case;
 using ::lt::test::expect_le;
@@ -28,7 +28,7 @@ Suite raii = "raii"_suite = [] {
 	Case { "plenty" } = [] {
 		for (auto idx : std::views::iota(0, 100'001))
 		{
-			std::ignore = idx;
+			ignore = idx;
 			Timer {};
 		}
 	};
@@ -40,7 +40,7 @@ Suite reset_and_elapsed_time = "reset_and_elapsed_time"_suite = [] {
 
 	Case { "won't throw" } = [] {
 		Timer {}.reset();
-		std::ignore = Timer {}.elapsed_time();
+		ignore = Timer {}.elapsed_time();
 	};
 
 	Case { "elapsed time is sane" } = [] {

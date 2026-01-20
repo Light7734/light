@@ -1,14 +1,15 @@
 export module ecs.registry;
+
+import preliminary;
 import debug.assertions;
 import ecs.sparse_set;
 import memory.scope;
-import std;
 
-namespace lt::ecs {
+export namespace lt::ecs {
 
-export using EntityId = std::uint32_t;
+using EntityId = u32;
 
-export constexpr auto null_entity = std::numeric_limits<EntityId>::max();
+constexpr auto null_entity = std::numeric_limits<EntityId>::max();
 
 /** A registry of components, the heart of an ECS architecture.
  *
@@ -23,7 +24,7 @@ export constexpr auto null_entity = std::numeric_limits<EntityId>::max();
  * @ref https://github.com/skypjack/entt
  * @ref https://github.com/SanderMertens/flecs
  */
-export class Registry
+class Registry
 {
 public:
 	using UnderlyingSparseSet_T = TypeErasedSparseSet<EntityId>;
@@ -190,25 +191,25 @@ public:
 		}
 	};
 
-	[[nodiscard]] auto get_entity_count() const -> std::size_t
+	[[nodiscard]] auto get_entity_count() const -> size_t
 	{
-		return static_cast<std::size_t>(m_entity_count);
+		return static_cast<size_t>(m_entity_count);
 	}
 
 private:
-	using TypeId = std::size_t;
+	using TypeId = size_t;
 
 	static consteval auto hash_cstr(const char *str) -> TypeId
 	{
-		constexpr auto fnv_offset_basis = std::size_t { 14695981039346656037ull };
-		constexpr auto fnv_prime = std::size_t { 1099511628211ull };
+		constexpr auto fnv_offset_basis = size_t { 14695981039346656037ull };
+		constexpr auto fnv_prime = size_t { 1099511628211ull };
 
 		auto hash = fnv_offset_basis;
 
 		for (const auto &ch : std::string_view { str })
 		{
 			hash *= fnv_prime;
-			hash ^= static_cast<std::uint8_t>(ch);
+			hash ^= static_cast<u8>(ch);
 		}
 
 		return hash;

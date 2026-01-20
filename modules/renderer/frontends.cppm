@@ -1,4 +1,6 @@
 export module renderer.frontend;
+
+import preliminary;
 import renderer.data;
 import renderer.components;
 import bitwise;
@@ -7,11 +9,10 @@ import assets.shader;
 import ecs.entity;
 import math.vec2;
 import memory.scope;
-import std;
 
 export namespace lt::renderer {
 
-enum class Api : std::uint8_t
+enum class Api : u8
 {
 	none = 0u,
 
@@ -65,7 +66,7 @@ public:
 class IBuffer
 {
 public:
-	enum class Usage : std::uint8_t
+	enum class Usage : u8
 	{
 		vertex,
 
@@ -80,27 +81,27 @@ public:
 	{
 		Usage usage;
 
-		std::size_t size;
+		size_t size;
 
 		std::string debug_name;
 	};
 
 	struct CopyInfo
 	{
-		std::size_t offset;
+		size_t offset;
 
-		std::size_t size;
+		size_t size;
 	};
 
 	IBuffer() = default;
 
 	virtual ~IBuffer() = default;
 
-	[[nodiscard]] virtual auto map() -> std::span<std::byte> = 0;
+	[[nodiscard]] virtual auto map() -> std::span<byte> = 0;
 
 	virtual void unmap() = 0;
 
-	[[nodiscard]] virtual auto get_size() const -> std::size_t = 0;
+	[[nodiscard]] virtual auto get_size() const -> size_t = 0;
 
 private:
 };
@@ -120,7 +121,7 @@ public:
 
 	static constexpr auto frames_in_flight_lower_limit = 1u;
 
-	enum class Result : std::uint8_t
+	enum class Result : u8
 	{
 		success = 0,
 		invalid_swapchain,
@@ -131,7 +132,7 @@ public:
 
 	virtual ~IRenderer() = default;
 
-	virtual auto frame(std::uint32_t frame_idx, std::function<void()> submit_scene) -> Result = 0;
+	virtual auto frame(u32 frame_idx, std::function<void()> submit_scene) -> Result = 0;
 
 	virtual void replace_swapchain(class ISwapchain *swapchain) = 0;
 
@@ -146,7 +147,7 @@ public:
 class IDebugger
 {
 public:
-	enum class MessageSeverity : std::uint8_t
+	enum class MessageSeverity : u8
 	{
 		none = 0u,
 
@@ -158,7 +159,7 @@ public:
 		all = verbose | info | warning | error,
 	};
 
-	enum class MessageType : std::uint8_t
+	enum class MessageType : u8
 	{
 		none = 0u,
 		general = bitwise::bit(0u),

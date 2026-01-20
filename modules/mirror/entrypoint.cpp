@@ -7,12 +7,12 @@ import mirror.system;
 import renderer.factory;
 
 /** The ultimate entrypoint. */
-auto main(int argc, char *argv[]) -> std::int32_t
+auto main(i32 argc, char *argv[]) -> i32
 {
 	try
 	{
-		std::ignore = argc;
-		std::ignore = argv;
+		ignore = argc;
+		ignore = argv;
 
 		auto application = lt::memory::create_scope<lt::Mirror>();
 		if (!application)

@@ -1,13 +1,14 @@
 export module renderer.vk.buffer;
+
+import preliminary;
 import renderer.vk.device;
 import renderer.vk.gpu;
 import renderer.vk.api_wrapper;
 import renderer.frontend;
-import std;
 
-namespace lt::renderer::vkb {
+export namespace lt::renderer::vkb {
 
-export class Buffer: public IBuffer
+class Buffer: public IBuffer
 {
 public:
 	Buffer(class IDevice *device, class IGpu *gpu, const CreateInfo &info);
@@ -16,7 +17,7 @@ public:
 
 	void unmap() override;
 
-	[[nodiscard]] auto get_size() const -> std::size_t override
+	[[nodiscard]] auto get_size() const -> size_t override
 	{
 		return m_size;
 	}
@@ -34,12 +35,11 @@ private:
 	[[nodiscard]] auto to_native_memory_properties(Usage usage) const -> vk::Memory::PropertyFlags;
 
 
-	[[nodiscard]] auto has_correct_memory_type_bit(std::uint32_t type_bits, std::uint32_t type_idx)
-	    const -> bool;
+	[[nodiscard]] auto has_correct_memory_type_bit(u32 type_bits, u32 type_idx) const -> bool;
 
 	[[nodiscard]] auto has_required_memory_properties(
-	    std::uint32_t required_properties,
-	    std::uint32_t property_flags
+	    u32 required_properties,
+	    u32 property_flags
 	) const -> bool;
 
 	Device *m_device {};
@@ -51,14 +51,13 @@ private:
 	vk::Memory m_memory;
 
 	// TODO(Light): should this reflect the allocation size instead?
-	std::size_t m_size {};
+	size_t m_size {};
 };
 
 } // namespace lt::renderer::vkb
 
 module :private;
-using namespace ::lt::renderer;
-using namespace ::lt::renderer::vkb;
+namespace lt::renderer::vkb {
 
 Buffer::Buffer(IDevice *device, IGpu *gpu, const CreateInfo &info)
     : m_device(static_cast<Device *>(device))
@@ -145,18 +144,17 @@ void Buffer::unmap() /* override */
 	std::unreachable();
 }
 
-[[nodiscard]] auto Buffer::has_correct_memory_type_bit(
-    std::uint32_t type_bits,
-    std::uint32_t type_idx
-) const -> bool
+[[nodiscard]] auto Buffer::has_correct_memory_type_bit(u32 type_bits, u32 type_idx) const -> bool
 {
 	return type_bits & (1 << type_idx);
 }
 
 [[nodiscard]] auto Buffer::has_required_memory_properties(
-    std::uint32_t required_properties,
-    std::uint32_t property_flags
+    u32 required_properties,
+    u32 property_flags
 ) const -> bool
 {
 	return (property_flags & required_properties) == required_properties;
 }
+
+} // namespace lt::renderer::vkb

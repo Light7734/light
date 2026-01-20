@@ -1,6 +1,6 @@
 export module test.registry;
 
-import std;
+import preliminary;
 import test.expects;
 
 ///////////////////////////////////////
@@ -11,7 +11,7 @@ namespace lt::test {
 export class Registry
 {
 public:
-	enum class ExecutionPolicy : std::uint8_t
+	enum class ExecutionPolicy : u8
 	{
 		normal,
 		stats,
@@ -28,7 +28,7 @@ public:
 		std::string case_regex;
 	};
 
-	using FuzzFunction = std::int32_t (*)(const std::uint8_t *, std::size_t);
+	using FuzzFunction = i32 (*)(const u8 *, size_t);
 
 	using SuiteFunction = void (*)();
 
@@ -36,9 +36,9 @@ public:
 
 	static void register_fuzz_harness(FuzzFunction suite);
 
-	static auto run_all(Options options) -> std::int32_t;
+	static auto run_all(Options options) -> i32;
 
-	static auto process_fuzz_input(const std::uint8_t *data, std::size_t size) -> std::int32_t;
+	static auto process_fuzz_input(const u8 *data, size_t size) -> i32;
 
 	static void set_last_suite_name(const char *name);
 
@@ -73,7 +73,7 @@ private:
 
 	[[nodiscard]] static auto instance() -> Registry &;
 
-	auto run_all_impl() -> std::int32_t;
+	auto run_all_impl() -> i32;
 
 	void print_options();
 
@@ -83,25 +83,25 @@ private:
 
 	FuzzFunction m_fuzz_harness {};
 
-	std::int32_t m_total_case_count {};
+	i32 m_total_case_count {};
 
-	std::int32_t m_passed_case_count {};
+	i32 m_passed_case_count {};
 
-	std::int32_t m_failed_case_count {};
+	i32 m_failed_case_count {};
 
-	std::int32_t m_matched_case_count {};
+	i32 m_matched_case_count {};
 
-	std::int32_t m_skipped_case_count {};
+	i32 m_skipped_case_count {};
 
-	std::int32_t m_total_suite_count {};
+	i32 m_total_suite_count {};
 
-	std::int32_t m_passed_suite_count {};
+	i32 m_passed_suite_count {};
 
-	std::int32_t m_failed_suite_count {};
+	i32 m_failed_suite_count {};
 
-	std::int32_t m_matched_suite_count {};
+	i32 m_matched_suite_count {};
 
-	std::int32_t m_skipped_suite_count {};
+	i32 m_skipped_suite_count {};
 
 	std::regex m_case_regex;
 };
@@ -131,14 +131,13 @@ namespace lt::test {
 	instance().m_fuzz_harness = suite;
 }
 
-/* static */ auto Registry::run_all(Options options) -> std::int32_t
+/* static */ auto Registry::run_all(Options options) -> i32
 {
 	instance().m_options = std::move(options);
 	return instance().run_all_impl();
 }
 
-/* static */ auto Registry::process_fuzz_input(const std::uint8_t *data, std::size_t size)
-    -> std::int32_t
+/* static */ auto Registry::process_fuzz_input(const u8 *data, size_t size) -> i32
 {
 	if (!instance().m_fuzz_harness)
 	{
@@ -220,7 +219,7 @@ namespace lt::test {
 	return instance().m_case_regex;
 }
 
-auto Registry::run_all_impl() -> std::int32_t
+auto Registry::run_all_impl() -> i32
 {
 	print_options();
 	m_case_regex = std::regex(m_options.case_regex);

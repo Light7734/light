@@ -40,11 +40,11 @@ struct wl_surface;
 #endif
 
 export module renderer.vk.api_wrapper;
+import preliminary;
 import memory.null_on_move;
 import math.vec3;
 import math.vec2;
 import debug.assertions;
-import std;
 import logger;
 
 template<class... Ts>
@@ -490,57 +490,57 @@ enum class Format : std::underlying_type_t<VkFormat>
 	r16_sscaled = VK_FORMAT_R16_SSCALED,
 	r16_uint = VK_FORMAT_R16_UINT,
 	r16_sint = VK_FORMAT_R16_SINT,
-	r16_sfloat = VK_FORMAT_R16_SFLOAT,
+	r16_sf32 = VK_FORMAT_R16_SFLOAT,
 	r16g16_unorm = VK_FORMAT_R16G16_UNORM,
 	r16g16_snorm = VK_FORMAT_R16G16_SNORM,
 	r16g16_uscaled = VK_FORMAT_R16G16_USCALED,
 	r16g16_sscaled = VK_FORMAT_R16G16_SSCALED,
 	r16g16_uint = VK_FORMAT_R16G16_UINT,
 	r16g16_sint = VK_FORMAT_R16G16_SINT,
-	r16g16_sfloat = VK_FORMAT_R16G16_SFLOAT,
+	r16g16_sf32 = VK_FORMAT_R16G16_SFLOAT,
 	r16g16b16_unorm = VK_FORMAT_R16G16B16_UNORM,
 	r16g16b16_snorm = VK_FORMAT_R16G16B16_SNORM,
 	r16g16b16_uscaled = VK_FORMAT_R16G16B16_USCALED,
 	r16g16b16_sscaled = VK_FORMAT_R16G16B16_SSCALED,
 	r16g16b16_uint = VK_FORMAT_R16G16B16_UINT,
 	r16g16b16_sint = VK_FORMAT_R16G16B16_SINT,
-	r16g16b16_sfloat = VK_FORMAT_R16G16B16_SFLOAT,
+	r16g16b16_sf32 = VK_FORMAT_R16G16B16_SFLOAT,
 	r16g16b16a16_unorm = VK_FORMAT_R16G16B16A16_UNORM,
 	r16g16b16a16_snorm = VK_FORMAT_R16G16B16A16_SNORM,
 	r16g16b16a16_uscaled = VK_FORMAT_R16G16B16A16_USCALED,
 	r16g16b16a16_sscaled = VK_FORMAT_R16G16B16A16_SSCALED,
 	r16g16b16a16_uint = VK_FORMAT_R16G16B16A16_UINT,
 	r16g16b16a16_sint = VK_FORMAT_R16G16B16A16_SINT,
-	r16g16b16a16_sfloat = VK_FORMAT_R16G16B16A16_SFLOAT,
+	r16g16b16a16_sf32 = VK_FORMAT_R16G16B16A16_SFLOAT,
 	r32_uint = VK_FORMAT_R32_UINT,
 	r32_sint = VK_FORMAT_R32_SINT,
-	r32_sfloat = VK_FORMAT_R32_SFLOAT,
+	r32_sf32 = VK_FORMAT_R32_SFLOAT,
 	r32g32_uint = VK_FORMAT_R32G32_UINT,
 	r32g32_sint = VK_FORMAT_R32G32_SINT,
-	r32g32_sfloat = VK_FORMAT_R32G32_SFLOAT,
+	r32g32_sf32 = VK_FORMAT_R32G32_SFLOAT,
 	r32g32b32_uint = VK_FORMAT_R32G32B32_UINT,
 	r32g32b32_sint = VK_FORMAT_R32G32B32_SINT,
-	r32g32b32_sfloat = VK_FORMAT_R32G32B32_SFLOAT,
+	r32g32b32_sf32 = VK_FORMAT_R32G32B32_SFLOAT,
 	r32g32b32a32_uint = VK_FORMAT_R32G32B32A32_UINT,
 	r32g32b32a32_sint = VK_FORMAT_R32G32B32A32_SINT,
-	r32g32b32a32_sfloat = VK_FORMAT_R32G32B32A32_SFLOAT,
+	r32g32b32a32_sf32 = VK_FORMAT_R32G32B32A32_SFLOAT,
 	r64_uint = VK_FORMAT_R64_UINT,
 	r64_sint = VK_FORMAT_R64_SINT,
-	r64_sfloat = VK_FORMAT_R64_SFLOAT,
+	r64_sf32 = VK_FORMAT_R64_SFLOAT,
 	r64g64_uint = VK_FORMAT_R64G64_UINT,
 	r64g64_sint = VK_FORMAT_R64G64_SINT,
-	r64g64_sfloat = VK_FORMAT_R64G64_SFLOAT,
+	r64g64_sf32 = VK_FORMAT_R64G64_SFLOAT,
 	r64g64b64_uint = VK_FORMAT_R64G64B64_UINT,
 	r64g64b64_sint = VK_FORMAT_R64G64B64_SINT,
-	r64g64b64_sfloat = VK_FORMAT_R64G64B64_SFLOAT,
+	r64g64b64_sf32 = VK_FORMAT_R64G64B64_SFLOAT,
 	r64g64b64a64_uint = VK_FORMAT_R64G64B64A64_UINT,
 	r64g64b64a64_sint = VK_FORMAT_R64G64B64A64_SINT,
-	r64g64b64a64_sfloat = VK_FORMAT_R64G64B64A64_SFLOAT,
+	r64g64b64a64_sf32 = VK_FORMAT_R64G64B64A64_SFLOAT,
 	b10g11r11_ufloat_pack32 = VK_FORMAT_B10G11R11_UFLOAT_PACK32,
 	e5b9g9r9_ufloat_pack32 = VK_FORMAT_E5B9G9R9_UFLOAT_PACK32,
 	d16_unorm = VK_FORMAT_D16_UNORM,
 	x8_d24_unorm_pack32 = VK_FORMAT_X8_D24_UNORM_PACK32,
-	d32_sfloat = VK_FORMAT_D32_SFLOAT,
+	d32_sf32 = VK_FORMAT_D32_SFLOAT,
 	s8_uint = VK_FORMAT_S8_UINT,
 	d16_unorm_s8_uint = VK_FORMAT_D16_UNORM_S8_UINT,
 	d24_unorm_s8_uint = VK_FORMAT_D24_UNORM_S8_UINT,
@@ -696,9 +696,9 @@ struct Viewport
 
 	math::vec2 extent;
 
-	float min_depth {};
+	f32 min_depth {};
 
-	float max_depth {};
+	f32 max_depth {};
 };
 
 struct Rect2d
@@ -724,7 +724,7 @@ public:
 		struct Setting
 		{
 			std::string name;
-			std::variant<std::vector<const char *>, std::uint32_t, bool> values;
+			std::variant<std::vector<const char *>, u32, bool> values;
 		};
 
 		std::string name;
@@ -806,9 +806,9 @@ public:
 
 	struct Capabilities
 	{
-		std::uint32_t min_image_count;
+		u32 min_image_count;
 
-		std::uint32_t max_image_count;
+		u32 max_image_count;
 
 		math::uvec2 current_extent;
 
@@ -816,7 +816,7 @@ public:
 
 		math::uvec2 max_image_extent;
 
-		std::uint32_t max_image_array_layers;
+		u32 max_image_array_layers;
 
 		std::underlying_type_t<Transform> supported_transforms;
 
@@ -974,112 +974,112 @@ public:
 
 	struct Limits
 	{
-		std::uint32_t max_image_dimension_1d;
-		std::uint32_t max_image_dimension_2d;
-		std::uint32_t max_image_dimension_3d;
-		std::uint32_t max_image_dimension_cube;
-		std::uint32_t max_image_array_layers;
-		std::uint32_t max_texel_buffer_elements;
-		std::uint32_t max_uniform_buffer_range;
-		std::uint32_t max_storage_buffer_range;
-		std::uint32_t max_push_constants_size;
-		std::uint32_t max_memory_allocation_count;
-		std::uint32_t max_sampler_allocation_count;
-		std::size_t buffer_image_granularity;
-		std::size_t sparse_address_space_size;
-		std::uint32_t max_bound_descriptor_sets;
-		std::uint32_t max_per_stage_descriptor_samplers;
-		std::uint32_t max_per_stage_descriptor_uniform_buffers;
-		std::uint32_t max_per_stage_descriptor_storage_buffers;
-		std::uint32_t max_per_stage_descriptor_sampled_images;
-		std::uint32_t max_per_stage_descriptor_storage_images;
-		std::uint32_t max_per_stage_descriptor_input_attachments;
-		std::uint32_t max_per_stage_resources;
-		std::uint32_t max_descriptor_set_samplers;
-		std::uint32_t max_descriptor_set_uniform_buffers;
-		std::uint32_t max_descriptor_set_uniform_buffers_dynamic;
-		std::uint32_t max_descriptor_set_storage_buffers;
-		std::uint32_t max_descriptor_set_storage_buffers_dynamic;
-		std::uint32_t max_descriptor_set_sampled_images;
-		std::uint32_t max_descriptor_set_storage_images;
-		std::uint32_t max_descriptor_set_input_attachments;
-		std::uint32_t max_vertex_input_attributes;
-		std::uint32_t max_vertex_input_bindings;
-		std::uint32_t max_vertex_input_attribute_offset;
-		std::uint32_t max_vertex_input_binding_stride;
-		std::uint32_t max_vertex_output_components;
-		std::uint32_t max_tessellation_generation_level;
-		std::uint32_t max_tessellation_patch_size;
-		std::uint32_t max_tessellation_control_per_vertex_input_components;
-		std::uint32_t max_tessellation_control_per_vertex_output_components;
-		std::uint32_t max_tessellation_control_per_patch_output_components;
-		std::uint32_t max_tessellation_control_total_output_components;
-		std::uint32_t max_tessellation_evaluation_input_components;
-		std::uint32_t max_tessellation_evaluation_output_components;
-		std::uint32_t max_geometry_shader_invocations;
-		std::uint32_t max_geometry_input_components;
-		std::uint32_t max_geometry_output_components;
-		std::uint32_t max_geometry_output_vertices;
-		std::uint32_t max_geometry_total_output_components;
-		std::uint32_t max_fragment_input_components;
-		std::uint32_t max_fragment_output_attachments;
-		std::uint32_t max_fragment_dual_src_attachments;
-		std::uint32_t max_fragment_combined_output_resources;
-		std::uint32_t max_compute_shared_memory_size;
-		std::array<std::uint32_t, 3> max_compute_work_group_count;
-		std::uint32_t max_compute_work_group_invocations;
-		std::array<std::uint32_t, 3> max_compute_work_group_size;
-		std::uint32_t sub_pixel_precision_bits;
-		std::uint32_t sub_texel_precision_bits;
-		std::uint32_t mipmap_precision_bits;
-		std::uint32_t max_draw_indexed_index_value;
-		std::uint32_t max_draw_indirect_count;
-		float max_sampler_lod_bias;
-		float max_sampler_anisotropy;
-		std::uint32_t max_viewports;
-		std::array<std::uint32_t, 2> max_viewport_dimensions;
-		std::array<float, 2> viewport_bounds_range;
-		std::uint32_t viewport_sub_pixel_bits;
-		std::size_t min_memory_map_alignment;
+		u32 max_image_dimension_1d;
+		u32 max_image_dimension_2d;
+		u32 max_image_dimension_3d;
+		u32 max_image_dimension_cube;
+		u32 max_image_array_layers;
+		u32 max_texel_buffer_elements;
+		u32 max_uniform_buffer_range;
+		u32 max_storage_buffer_range;
+		u32 max_push_constants_size;
+		u32 max_memory_allocation_count;
+		u32 max_sampler_allocation_count;
+		size_t buffer_image_granularity;
+		size_t sparse_address_space_size;
+		u32 max_bound_descriptor_sets;
+		u32 max_per_stage_descriptor_samplers;
+		u32 max_per_stage_descriptor_uniform_buffers;
+		u32 max_per_stage_descriptor_storage_buffers;
+		u32 max_per_stage_descriptor_sampled_images;
+		u32 max_per_stage_descriptor_storage_images;
+		u32 max_per_stage_descriptor_input_attachments;
+		u32 max_per_stage_resources;
+		u32 max_descriptor_set_samplers;
+		u32 max_descriptor_set_uniform_buffers;
+		u32 max_descriptor_set_uniform_buffers_dynamic;
+		u32 max_descriptor_set_storage_buffers;
+		u32 max_descriptor_set_storage_buffers_dynamic;
+		u32 max_descriptor_set_sampled_images;
+		u32 max_descriptor_set_storage_images;
+		u32 max_descriptor_set_input_attachments;
+		u32 max_vertex_input_attributes;
+		u32 max_vertex_input_bindings;
+		u32 max_vertex_input_attribute_offset;
+		u32 max_vertex_input_binding_stride;
+		u32 max_vertex_output_components;
+		u32 max_tessellation_generation_level;
+		u32 max_tessellation_patch_size;
+		u32 max_tessellation_control_per_vertex_input_components;
+		u32 max_tessellation_control_per_vertex_output_components;
+		u32 max_tessellation_control_per_patch_output_components;
+		u32 max_tessellation_control_total_output_components;
+		u32 max_tessellation_evaluation_input_components;
+		u32 max_tessellation_evaluation_output_components;
+		u32 max_geometry_shader_invocations;
+		u32 max_geometry_input_components;
+		u32 max_geometry_output_components;
+		u32 max_geometry_output_vertices;
+		u32 max_geometry_total_output_components;
+		u32 max_fragment_input_components;
+		u32 max_fragment_output_attachments;
+		u32 max_fragment_dual_src_attachments;
+		u32 max_fragment_combined_output_resources;
+		u32 max_compute_shared_memory_size;
+		std::array<u32, 3> max_compute_work_group_count;
+		u32 max_compute_work_group_invocations;
+		std::array<u32, 3> max_compute_work_group_size;
+		u32 sub_pixel_precision_bits;
+		u32 sub_texel_precision_bits;
+		u32 mipmap_precision_bits;
+		u32 max_draw_indexed_index_value;
+		u32 max_draw_indirect_count;
+		f32 max_sampler_lod_bias;
+		f32 max_sampler_anisotropy;
+		u32 max_viewports;
+		std::array<u32, 2> max_viewport_dimensions;
+		std::array<f32, 2> viewport_bounds_range;
+		u32 viewport_sub_pixel_bits;
+		size_t min_memory_map_alignment;
 		VkDeviceSize min_texel_buffer_offset_alignment;
 		VkDeviceSize min_uniform_buffer_offset_alignment;
 		VkDeviceSize min_storage_buffer_offset_alignment;
-		std::int32_t min_texel_offset;
-		std::uint32_t max_texel_offset;
-		std::int32_t min_texel_gather_offset;
-		std::uint32_t max_texel_gather_offset;
-		float min_interpolation_offset;
-		float max_interpolation_offset;
-		std::uint32_t sub_pixel_interpolation_offset_bits;
-		std::uint32_t max_framebuffer_width;
-		std::uint32_t max_framebuffer_height;
-		std::uint32_t max_framebuffer_layers;
+		i32 min_texel_offset;
+		u32 max_texel_offset;
+		i32 min_texel_gather_offset;
+		u32 max_texel_gather_offset;
+		f32 min_interpolation_offset;
+		f32 max_interpolation_offset;
+		u32 sub_pixel_interpolation_offset_bits;
+		u32 max_framebuffer_width;
+		u32 max_framebuffer_height;
+		u32 max_framebuffer_layers;
 		VkSampleCountFlags framebuffer_color_sample_counts;
 		VkSampleCountFlags framebuffer_depth_sample_counts;
 		VkSampleCountFlags framebuffer_stencil_sample_counts;
 		VkSampleCountFlags framebuffer_no_attachments_sample_counts;
-		std::uint32_t max_color_attachments;
+		u32 max_color_attachments;
 		VkSampleCountFlags sampled_image_color_sample_counts;
 		VkSampleCountFlags sampled_image_integer_sample_counts;
 		VkSampleCountFlags sampled_image_depth_sample_counts;
 		VkSampleCountFlags sampled_image_stencil_sample_counts;
 		VkSampleCountFlags storage_image_sample_counts;
-		std::uint32_t max_sample_mask_words;
+		u32 max_sample_mask_words;
 		Bool32 timestamp_compute_and_graphics;
-		float timestamp_period;
-		std::uint32_t max_clip_distances;
-		std::uint32_t max_cull_distances;
-		std::uint32_t max_combined_clip_and_cull_distances;
-		std::uint32_t discrete_queue_priorities;
-		std::array<float, 2> point_size_range;
-		std::array<float, 2> line_width_range;
-		float point_size_granularity;
-		float line_width_granularity;
+		f32 timestamp_period;
+		u32 max_clip_distances;
+		u32 max_cull_distances;
+		u32 max_combined_clip_and_cull_distances;
+		u32 discrete_queue_priorities;
+		std::array<f32, 2> point_size_range;
+		std::array<f32, 2> line_width_range;
+		f32 point_size_granularity;
+		f32 line_width_granularity;
 		Bool32 strict_lines;
 		Bool32 standard_sample_locations;
-		std::size_t optimal_buffer_copy_offset_alignment;
-		std::size_t optimal_buffer_copy_row_pitch_alignment;
-		std::size_t non_coherent_atom_size;
+		size_t optimal_buffer_copy_offset_alignment;
+		size_t optimal_buffer_copy_row_pitch_alignment;
+		size_t non_coherent_atom_size;
 	};
 
 	struct SparseProperties
@@ -1093,13 +1093,13 @@ public:
 
 	struct Properties
 	{
-		std::uint32_t api_version;
-		std::uint32_t driver_version;
-		std::uint32_t vendor_id;
-		std::uint32_t device_id;
+		u32 api_version;
+		u32 driver_version;
+		u32 vendor_id;
+		u32 device_id;
 		Type device_type;
 		std::array<char, constants::max_physical_device_name> device_name;
-		std::array<std::uint8_t, constants::uuid_size> pipeline_cache_uuid;
+		std::array<u8, constants::uuid_size> pipeline_cache_uuid;
 		Limits limits;
 		SparseProperties sparse_properties;
 	};
@@ -1107,12 +1107,12 @@ public:
 	struct MemoryType
 	{
 		MemoryPropertyFlags::T property_flags;
-		std::uint32_t heap_idx;
+		u32 heap_idx;
 	};
 
 	struct MemoryHeap
 	{
-		std::size_t size;
+		size_t size;
 		MemoryHeapFlags::T flags;
 	};
 
@@ -1125,8 +1125,8 @@ public:
 	struct QueueFamilyProperties
 	{
 		QueueFlags::T queue_flags {};
-		std::uint32_t queue_count {};
-		std::uint32_t timestamp_valid_bits {};
+		u32 queue_count {};
+		u32 timestamp_valid_bits {};
 		math::uvec3 min_image_transfer_granularity;
 	};
 
@@ -1163,7 +1163,7 @@ public:
 
 	[[nodiscard]] auto queue_family_supports_surface(
 	    const Surface &surface,
-	    std::uint32_t queue_family_idx
+	    u32 queue_family_idx
 	) const -> bool;
 
 	[[nodiscard]] auto get_surface_capabilities(Surface &surface) const -> Surface::Capabilities;
@@ -1201,7 +1201,7 @@ public:
 
 	struct CreateInfo
 	{
-		std::set<std::uint32_t> queue_indices;
+		std::set<u32> queue_indices;
 
 		std::vector<std::string> extensions;
 
@@ -1258,7 +1258,7 @@ public:
 	void bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset = 0u) const;
 
 	[[nodiscard]] auto map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
-	    -> std::span<std::byte>;
+	    -> std::span<byte>;
 
 	void unmap_memory(VkDeviceMemory memory);
 
@@ -1498,14 +1498,14 @@ public:
 
 	struct MemoryRequirements
 	{
-		std::size_t size;
-		std::size_t alignment;
-		std::uint32_t memory_type_bits;
+		size_t size;
+		size_t alignment;
+		u32 memory_type_bits;
 	};
 
 	struct CreateInfo
 	{
-		std::size_t size;
+		size_t size;
 
 		UsageFlags usage;
 
@@ -1640,10 +1640,10 @@ public:
 	struct Range
 	{
 		Image::AspectFlags aspect_flags;
-		std::uint32_t base_mip_level;
-		std::uint32_t level_count;
-		std::uint32_t base_array_layer;
-		std::uint32_t layer_count;
+		u32 base_mip_level;
+		u32 level_count;
+		u32 base_array_layer;
+		u32 layer_count;
 	};
 
 	static constexpr auto full_color_range = Range {
@@ -1764,7 +1764,7 @@ public:
 
 	struct CreateInfo
 	{
-		std::vector<std::byte> code;
+		std::vector<byte> code;
 
 		std::string_view name;
 	};
@@ -1874,9 +1874,9 @@ public:
 
 		Flags flags;
 
-		std::uint32_t idx;
+		u32 idx;
 
-		std::uint32_t count;
+		u32 count;
 
 		DescriptorSet::Type type;
 
@@ -1945,14 +1945,14 @@ public:
 	{
 		DescriptorSet::Type type;
 
-		std::uint32_t count;
+		u32 count;
 	};
 
 	struct CreateInfo
 	{
 		std::vector<Size> sizes;
 
-		std::uint32_t max_sets;
+		u32 max_sets;
 
 		std::string_view name;
 	};
@@ -2009,9 +2009,9 @@ public:
 
 	struct ViewportState
 	{
-		std::uint32_t viewport_count;
+		u32 viewport_count;
 
-		std::uint32_t scissor_count;
+		u32 scissor_count;
 	};
 
 	struct RasterizationState
@@ -2028,13 +2028,13 @@ public:
 
 		bool depth_bias_enabled;
 
-		float depth_bias_constant_factor;
+		f32 depth_bias_constant_factor;
 
-		float depth_bias_clamp;
+		f32 depth_bias_clamp;
 
-		float depth_bias_slope_factor;
+		f32 depth_bias_slope_factor;
 
-		float line_width;
+		f32 line_width;
 	};
 
 	struct MultisamplingState
@@ -2043,7 +2043,7 @@ public:
 
 		bool sample_shading_enabled;
 
-		float min_sample_shading;
+		f32 min_sample_shading;
 
 		bool alpha_to_coverage_enabled;
 
@@ -2134,8 +2134,8 @@ public:
 	struct PushConstantRange
 	{
 		ShaderStageFlags::T shader_stages;
-		std::uint32_t offset;
-		std::uint32_t size;
+		u32 offset;
+		u32 size;
 	};
 
 	struct CreateInfo
@@ -2189,11 +2189,11 @@ public:
 
 		Buffer *dst_buffer;
 
-		std::size_t src_offset;
+		size_t src_offset;
 
-		std::size_t dst_offset;
+		size_t dst_offset;
 
-		std::size_t size;
+		size_t size;
 	};
 
 	struct PushConstantsInfo
@@ -2202,9 +2202,9 @@ public:
 
 		vk::ShaderStageFlags::T shader_stages;
 
-		std::uint32_t offset;
+		u32 offset;
 
-		std::uint32_t size;
+		u32 size;
 
 		void *data;
 	};
@@ -2298,11 +2298,11 @@ public:
 
 			StoreOperation store_operation;
 
-			std::array<float, 4> color_clear_values;
+			std::array<f32, 4> color_clear_values;
 
-			float depth_clear_value;
+			f32 depth_clear_value;
 
-			std::uint32_t stencil_clear_value;
+			u32 stencil_clear_value;
 
 			Flags resolve_mode_flags;
 		};
@@ -2316,13 +2316,13 @@ public:
 
 	struct DrawInfo
 	{
-		std::uint32_t vertex_count;
+		u32 vertex_count;
 
-		std::uint32_t instance_count;
+		u32 instance_count;
 
-		std::uint32_t first_vertex;
+		u32 first_vertex;
 
-		std::uint32_t first_instance;
+		u32 first_instance;
 	};
 
 	CommandBuffer() = default;
@@ -2462,7 +2462,7 @@ public:
 
 		math::uvec2 extent;
 
-		std::uint32_t min_image_count;
+		u32 min_image_count;
 
 		std::vector<uint32_t> queue_family_indices;
 
@@ -2491,8 +2491,7 @@ public:
 
 	[[nodiscard]] auto get_images() -> std::vector<Image>;
 
-	[[nodiscard]] auto acquire_image(Semaphore &semaphore, std::uint64_t timeout = 100'000'000)
-	    -> std::uint32_t;
+	[[nodiscard]] auto acquire_image(Semaphore &semaphore, u64 timeout = 100'000'000) -> u32;
 
 private:
 	[[nodiscard]] auto get_vk_handle() -> VkSwapchainKHR
@@ -2590,9 +2589,9 @@ public:
 
 	struct AllocateInfo
 	{
-		std::size_t size;
+		size_t size;
 
-		std::uint32_t memory_type_idx;
+		u32 memory_type_idx;
 
 		std::string_view name;
 	};
@@ -2609,7 +2608,7 @@ public:
 
 	auto operator=(const Memory &) -> Memory & = delete;
 
-	[[nodiscard]] auto map(std::size_t size, std::size_t offset) -> std::span<std::byte>;
+	[[nodiscard]] auto map(size_t size, size_t offset) -> std::span<byte>;
 
 	void unmap();
 
@@ -2755,11 +2754,9 @@ constexpr auto to_string(VkResult result) noexcept -> std::string_view
 	case VK_PIPELINE_BINARY_MISSING_KHR: return "VK_PIPELINE_BINARY_MISSING_KHR";
 	case VK_ERROR_NOT_ENOUGH_SPACE_KHR: return "VK_ERROR_NOT_ENOUGH_SPACE_KHR";
     case VK_RESULT_MAX_ENUM: return "VK_RESULT_MAX_ENUM";
-    default: return"<unknown>";
+    default: return "<unknown>";
 		// clang-format on
 	}
-
-	std::unreachable();
 }
 
 void vkc(VkResult result)
@@ -3114,13 +3111,13 @@ Instance::Instance(CreateInfo info)
 {
 	const auto layer_setting_type_visitor = overloads {
 		[](const std::vector<const char *> &) { return VK_LAYER_SETTING_TYPE_STRING_EXT; },
-		[](std::uint32_t) { return VK_LAYER_SETTING_TYPE_UINT32_EXT; },
+		[](u32) { return VK_LAYER_SETTING_TYPE_UINT32_EXT; },
 		[](bool) { return VK_LAYER_SETTING_TYPE_BOOL32_EXT; },
 	};
 
 	const auto layer_setting_value_visitor = overloads {
 		[](std::vector<const char *> values) { return std::bit_cast<void *>(values.data()); },
-		[](std::uint32_t value) { return std::bit_cast<void *>(&value); },
+		[](u32 value) { return std::bit_cast<void *>(&value); },
 		[](bool value) { return std::bit_cast<void *>(&value); },
 	};
 
@@ -3403,7 +3400,7 @@ Surface::~Surface()
 
 	std::memcpy(
 	    properties.pipeline_cache_uuid.data(),
-	    static_cast<std::uint8_t *>(vk_properties.pipelineCacheUUID),
+	    static_cast<u8 *>(vk_properties.pipelineCacheUUID),
 	    constants::uuid_size
 	);
 
@@ -3559,7 +3556,7 @@ Surface::~Surface()
 
 [[nodiscard]] auto Gpu::get_queue_family_properties() const -> std::vector<QueueFamilyProperties>
 {
-	auto count = std::uint32_t {};
+	auto count = u32 {};
 
 	api::get_physical_device_queue_family_properties(m_physical_device, &count, {});
 
@@ -3591,7 +3588,7 @@ Surface::~Surface()
 
 [[nodiscard]] auto Gpu::queue_family_supports_surface(
     const Surface &surface,
-    std::uint32_t queue_family_idx
+    u32 queue_family_idx
 ) const -> bool
 {
 	auto supported = VkBool32 { false };
@@ -3949,11 +3946,11 @@ void Device::bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset /
 }
 
 [[nodiscard]] auto Device::map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
-    -> std::span<std::byte>
+    -> std::span<byte>
 {
 	void *data = {};
 	vkc(api::map_memory(m_device, memory, offset, size, {}, &data));
-	return { std::bit_cast<std::byte *>(data), size };
+	return { std::bit_cast<byte *>(data), size };
 }
 
 void Device::unmap_memory(VkDeviceMemory memory)
@@ -4276,7 +4273,7 @@ Image::Image(Device &device, CreateInfo info): m_device(device.get_vk_handle()),
 {
 	// WIP(Light): use image create info's info
 
-	std::ignore = info;
+	ignore = info;
 	auto vk_info = VkImageCreateInfo {};
 	vkc(api::create_image(m_device, &vk_info, nullptr, &m_image));
 }
@@ -4341,7 +4338,7 @@ CommandBuffer::CommandBuffer(VkCommandBuffer buffer): m_buffer(buffer)
 void CommandBuffer::begin(BeginInfo info /* = {} */)
 {
 	// WIP(Light): Use info
-	std::ignore = info;
+	ignore = info;
 
 	auto vk_info = VkCommandBufferBeginInfo {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -4449,7 +4446,7 @@ void CommandBuffer::begin_rendering(RenderingInfo info)
 			.extent = {info.area_extent.x, info.area_extent.y},
 		},
         .layerCount = 1u,
-        .colorAttachmentCount = static_cast<std::uint32_t>(vk_color_attachments.size()),
+        .colorAttachmentCount = static_cast<u32>(vk_color_attachments.size()),
         .pColorAttachments= vk_color_attachments.data(),
     };
 
@@ -4587,7 +4584,7 @@ Swapchain::Swapchain(Device &device, Surface &surface, CreateInfo info)
 		.imageArrayLayers = 1u,
 		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		.queueFamilyIndexCount = static_cast<std::uint32_t>(info.queue_family_indices.size()),
+		.queueFamilyIndexCount = static_cast<u32>(info.queue_family_indices.size()),
 		.pQueueFamilyIndices = info.queue_family_indices.data(),
 		.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(info.pre_transform),
 		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
@@ -4629,10 +4626,9 @@ Swapchain::~Swapchain()
 	return images;
 }
 
-[[nodiscard]] auto Swapchain::acquire_image(Semaphore &semaphore, std::uint64_t timeout)
-    -> std::uint32_t
+[[nodiscard]] auto Swapchain::acquire_image(Semaphore &semaphore, u64 timeout) -> u32
 {
-	auto idx = std::uint32_t {};
+	auto idx = u32 {};
 	vkc(api::acquire_next_image_khr(
 	    m_device,
 	    m_swapchain,
@@ -4706,11 +4702,11 @@ Memory::~Memory()
 	api::free_memory(m_device, m_memory, nullptr);
 }
 
-[[nodiscard]] auto Memory::map(std::size_t size, std::size_t offset) -> std::span<std::byte>
+[[nodiscard]] auto Memory::map(size_t size, size_t offset) -> std::span<byte>
 {
 	void *data = {};
 	vkc(api::map_memory(m_device, m_memory, offset, size, {}, &data));
-	return { std::bit_cast<std::byte *>(data), size };
+	return { std::bit_cast<byte *>(data), size };
 }
 
 void Memory::unmap()
@@ -4725,7 +4721,7 @@ ShaderModule::ShaderModule(Device &device, CreateInfo info): m_device(device.get
 		.pNext = {},
 		.flags = {},
 		.codeSize = info.code.size(),
-		.pCode = std::bit_cast<std::uint32_t *>(info.code.data()),
+		.pCode = std::bit_cast<u32 *>(info.code.data()),
 	};
 	vkc(api::create_shader_module(m_device, &vk_info, nullptr, &m_shader_module));
 
@@ -4770,7 +4766,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device &device, CreateInfo info)
 	auto vk_binding_flags_info = VkDescriptorSetLayoutBindingFlagsCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
 		.pNext = {},
-		.bindingCount = static_cast<std::uint32_t>(vk_binding_flag_values.size()),
+		.bindingCount = static_cast<u32>(vk_binding_flag_values.size()),
 		.pBindingFlags = vk_binding_flag_values.data(),
 	};
 
@@ -4778,7 +4774,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device &device, CreateInfo info)
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.pNext = &vk_binding_flags_info,
 		.flags = info.flags,
-		.bindingCount = static_cast<std::uint32_t>(vk_bindings.size()),
+		.bindingCount = static_cast<u32>(vk_bindings.size()),
 		.pBindings = vk_bindings.data(),
 	};
 	vkc(api::create_descriptor_set_layout(m_device, &vk_info, nullptr, &m_descriptor_set_layout));
@@ -4817,7 +4813,7 @@ DescriptorPool::DescriptorPool(Device &device, CreateInfo info): m_device(device
 		.pNext = {},
 		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
 		.maxSets = info.max_sets,
-		.poolSizeCount = static_cast<std::uint32_t>(vk_sizes.size()),
+		.poolSizeCount = static_cast<u32>(vk_sizes.size()),
 		.pPoolSizes = vk_sizes.data(),
 	};
 
@@ -4946,7 +4942,7 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 	// WIP(Light): use color attachments
 	for (auto &color_attachment : info.attachment_state.color_attachments)
 	{
-		std::ignore = color_attachment;
+		ignore = color_attachment;
 	}
 
 	auto rendering_info = VkPipelineRenderingCreateInfoKHR {
@@ -5025,9 +5021,9 @@ PipelineLayout::PipelineLayout(Device &device, CreateInfo info): m_device(device
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 		.pNext = {},
 		.flags = {},
-		.setLayoutCount = static_cast<std::uint32_t>(vk_set_layouts.size()),
+		.setLayoutCount = static_cast<u32>(vk_set_layouts.size()),
 		.pSetLayouts = vk_set_layouts.data(),
-		.pushConstantRangeCount = static_cast<std::uint32_t>(vk_push_constant_ranges.size()),
+		.pushConstantRangeCount = static_cast<u32>(vk_push_constant_ranges.size()),
 		.pPushConstantRanges = vk_push_constant_ranges.data()
 	};
 	vkc(api::create_pipeline_layout(m_device, &vk_info, nullptr, &m_pipeline_layout));

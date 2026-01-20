@@ -1,10 +1,10 @@
+import preliminary;
 import assets.metadata;
 import assets.shader;
 import logger;
 import logger;
 import test.test;
 import test.expects;
-import std;
 
 using ::lt::assets::AssetMetadata;
 using ::lt::assets::BlobMetadata;
@@ -30,7 +30,7 @@ Suite raii = "shader_raii"_suite = [] {
 	Case { "many won't freeze/throw" } = [] {
 		for (auto idx : std::views::iota(0u, 1'000u))
 		{
-			std::ignore = idx;
+			ignore = idx;
 			auto shader_asset = ShaderAsset { "triangle.frag.asset" };
 		}
 	};
@@ -58,7 +58,7 @@ Suite packing = "shader_pack"_suite = [] {
 		auto dummy_blob = lt::assets::Blob {};
 		for (auto idx : std::views::iota(0u, 255u))
 		{
-			dummy_blob.emplace_back(static_cast<std::byte>(idx));
+			dummy_blob.emplace_back(static_cast<byte>(idx));
 		}
 
 		const auto expected_size =                    //
@@ -91,7 +91,7 @@ Suite packing = "shader_pack"_suite = [] {
 		expect_true(stream.is_open());
 
 		stream.seekg(0u, std::ios::end);
-		const auto file_size = static_cast<std::size_t>(stream.tellg());
+		const auto file_size = static_cast<size_t>(stream.tellg());
 		expect_eq(file_size, expected_size);
 		stream.close();
 
@@ -109,7 +109,7 @@ Suite packing = "shader_pack"_suite = [] {
 
 		for (auto idx : std::views::iota(0u, 255u))
 		{
-			expect_eq(blob[idx], static_cast<std::byte>(idx));
+			expect_eq(blob[idx], static_cast<byte>(idx));
 		}
 	};
 };

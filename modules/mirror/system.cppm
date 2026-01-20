@@ -1,4 +1,6 @@
 export module mirror.system;
+
+import preliminary;
 import math.vec3;
 import camera.components;
 import surface.requests;
@@ -22,7 +24,6 @@ import app;
 import app.system;
 import ecs.entity;
 import ecs.registry;
-import std;
 
 namespace lt {
 
@@ -33,9 +34,9 @@ void renderer_callback(
     std::any &user_data
 )
 {
-	std::ignore = message_severity;
-	std::ignore = message_type;
-	std::ignore = user_data;
+	ignore = message_severity;
+	ignore = message_type;
+	ignore = user_data;
 
 	log::trace("< Renderer > ==> {}", std::string { data.message });
 }
@@ -45,8 +46,8 @@ class MirrorSystem: public lt::app::ISystem
 public:
 	MirrorSystem(
 	    memory::Ref<ecs::Registry> registry,
-	    std::size_t quit_action_key,
-	    std::array<std::size_t, 4ul> debug_action_keys
+	    size_t quit_action_key,
+	    std::array<size_t, 4ul> debug_action_keys
 	)
 	    : m_registry(std::move(registry))
 	    , m_quit_action_key(quit_action_key)
@@ -84,7 +85,7 @@ public:
 				for (auto &[id, camera] :
 				     m_registry->view<lt::camera::components::PerspectiveCamera>())
 				{
-					camera.vertical_fov += (static_cast<float>(tick.delta_time.count()) * 40.0f);
+					camera.vertical_fov += (static_cast<f32>(tick.delta_time.count()) * 40.0f);
 				}
 			}
 
@@ -128,9 +129,9 @@ public:
 private:
 	memory::Ref<ecs::Registry> m_registry;
 
-	std::size_t m_quit_action_key;
+	size_t m_quit_action_key;
 
-	std::array<std::size_t, 4ul> m_debug_action_keys {};
+	std::array<size_t, 4ul> m_debug_action_keys {};
 
 	app::TickResult m_last_tick_result {};
 };
@@ -183,7 +184,7 @@ public:
 		    }
 		);
 
-		auto debug_action_keys = std::array<std::size_t, 4ul> {};
+		auto debug_action_keys = std::array<size_t, 4ul> {};
 		debug_action_keys[0] = input.add_action(
 		    input::InputAction {
 		        .name = "debug_1",
