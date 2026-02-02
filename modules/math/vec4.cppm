@@ -10,6 +10,8 @@ template<typename T = f32>
     requires(std::is_arithmetic_v<T>)
 struct vec4_impl
 {
+	using Underlying_T = T;
+
 	static constexpr auto num_elements = 4u;
 
 	constexpr vec4_impl(): x(), y(), z(), w()
@@ -28,11 +30,15 @@ struct vec4_impl
 	{
 	}
 
-	constexpr vec4_impl(T x, T y, vec2_impl<T> zw): x(x), y(y), z(zw.z), w(zw.w)
+	constexpr vec4_impl(T x, vec2_impl<T> yz, T w): x(x), y(yz.x), z(yz.y), w(w)
 	{
 	}
 
-	constexpr vec4_impl(vec2_impl<T> xy, vec2_impl<T> zw): x(xy.x), y(xy.y), z(zw.z), w(zw.w)
+	constexpr vec4_impl(T x, T y, vec2_impl<T> zw): x(x), y(y), z(zw.x), w(zw.y)
+	{
+	}
+
+	constexpr vec4_impl(vec2_impl<T> xy, vec2_impl<T> zw): x(xy.x), y(xy.y), z(zw.x), w(zw.y)
 	{
 	}
 
@@ -40,7 +46,7 @@ struct vec4_impl
 	{
 	}
 
-	constexpr vec4_impl(T x, vec3_impl<T> yzw): x(x), y(yzw.y), z(yzw.z), w(yzw.w)
+	constexpr vec4_impl(T x, vec3_impl<T> yzw): x(x), y(yzw.x), z(yzw.y), w(yzw.z)
 	{
 	}
 
@@ -96,13 +102,13 @@ struct vec4_impl
 
 	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
 	{
-		debug_check(idx <= num_elements, "vec4 out of bound: {}", idx);
+		debug_check(idx < num_elements, "vec4 out of bound access: {}", idx);
 		return ((T *)this)[idx];
 	}
 
 	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
 	{
-		debug_check(idx < num_elements, "vec4 out of bound: {}", idx);
+		debug_check(idx < num_elements, "vec4 out of bound access: {}", idx);
 		return ((T *)this)[idx];
 	}
 
@@ -123,9 +129,18 @@ struct vec4_impl
 
 using vec4 = vec4_impl<f32>;
 
-using ivec4 = vec4_impl<i32>;
+using vec4_f32 = vec4;
+using vec4_f64 = vec4_impl<f64>;
 
-using uvec4 = vec4_impl<u32>;
+using vec4_i8 = vec4_impl<i8>;
+using vec4_i16 = vec4_impl<i16>;
+using vec4_i32 = vec4_impl<i32>;
+using vec4_i64 = vec4_impl<i64>;
+
+using vec4_u8 = vec4_impl<u8>;
+using vec4_u16 = vec4_impl<u16>;
+using vec4_u32 = vec4_impl<u32>;
+using vec4_u64 = vec4_impl<u64>;
 
 } // namespace lt::math
 

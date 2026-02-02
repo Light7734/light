@@ -8,6 +8,8 @@ template<typename T = f32>
     requires(std::is_arithmetic_v<T>)
 struct vec2_impl
 {
+	using Underlying_T = T;
+
 	static constexpr auto num_elements = 2u;
 
 	constexpr vec2_impl(): x(), y()
@@ -66,20 +68,14 @@ struct vec2_impl
 
 	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
 	{
-		debug_check(idx <= num_elements, "vec2 out of bound: {}", idx);
+		debug_check(idx < num_elements, "vec2 out of bound access: {}", idx);
 		return ((T *)this)[idx];
 	}
 
 	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
 	{
-		debug_check(idx < num_elements, "vec2 out of bound: {}", idx);
+		debug_check(idx < num_elements, "vec2 out of bound access: {}", idx);
 		return ((T *)this)[idx];
-	}
-
-	friend auto operator<<(std::ostream &stream, vec2_impl<T> value) -> std::ostream &
-	{
-		stream << value.x << ", " << value.y;
-		return stream;
 	}
 
 	T x;
@@ -87,12 +83,20 @@ struct vec2_impl
 	T y;
 };
 
-
 using vec2 = vec2_impl<f32>;
 
-using ivec2 = vec2_impl<i32>;
+using vec2_f32 = vec2;
+using vec2_f64 = vec2_impl<f64>;
 
-using uvec2 = vec2_impl<u32>;
+using vec2_i8 = vec2_impl<i8>;
+using vec2_i16 = vec2_impl<i16>;
+using vec2_i32 = vec2_impl<i32>;
+using vec2_i64 = vec2_impl<i64>;
+
+using vec2_u8 = vec2_impl<u8>;
+using vec2_u16 = vec2_impl<u16>;
+using vec2_u32 = vec2_impl<u32>;
+using vec2_u64 = vec2_impl<u64>;
 
 } // namespace lt::math
 

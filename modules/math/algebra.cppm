@@ -32,12 +32,12 @@ export namespace lt::math {
  *
  * the 1 at [z][3] is to save the Z axis into the resulting W for perspective division.
  *
- * @ref Thanks to pikuma for explaining the math behind this:
+ * @ref Thanks to @pikuma for explaining the math behind this:
  * https://www.youtube.com/watch?v=EqNcqBdrNyI
  */
 template<typename T>
     requires(std::is_arithmetic_v<T>)
-constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far)
+constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far) -> mat4_impl<T>
 {
 	const T half_fov_tan = std::tan(field_of_view / static_cast<T>(2));
 

@@ -41,7 +41,11 @@ add_module(
     DEPENDENCIES
     preliminary
     TESTS
+    trig.test.cpp
     vec2.test.cpp
+    vec3.test.cpp
+    vec4.test.cpp
+    mat4.test.cpp
 )
 
 add_module(
