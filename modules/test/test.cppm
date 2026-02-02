@@ -3,6 +3,8 @@ export module test.test;
 import test.expects;
 import test.registry;
 import preliminary;
+import logger;
+
 
 ///////////////////////////////////////
 // ----------* INTERFACE *--------- //
@@ -12,7 +14,7 @@ namespace lt::test {
 class TestCase
 {
 public:
-	TestCase(std::string_view name);
+	TestCase(std::string name);
 
 	// NOLINTNEXTLINE(misc-unconventional-assign-operator)
 	auto operator=(std::invocable auto test) const -> void;
@@ -21,7 +23,7 @@ private:
 	void run_normal(std::invocable auto test) const;
 
 private:
-	std::string_view m_name;
+	std::string m_name;
 };
 
 struct TestSuite
@@ -68,16 +70,26 @@ void TestCase::run_normal(std::invocable auto test) const
 	}
 	Registry::increment_matched_case_count();
 
-	std::println("[Running-----------] --> ");
-	std::println("{}", m_name);
+	auto padding = std::string {};
+	padding.resize(79 - m_name.size());
+	for (auto &ch : padding)
+	{
+		ch = ' ';
+	}
+
 	try
 	{
 		test();
 	}
 	catch (const std::exception &exp)
 	{
-		std::println("{}", exp.what());
-		std::println("[-----------FAIL !!]");
+		log::test(
+		    "\033[1;31m{}{} | {}\033[0m",
+		    std::string_view { m_name },
+		    std::string { padding },
+		    std::string { exp.what() }
+		);
+
 		Registry::increment_failed_case_count();
 
 		if (Registry::should_return_on_failure())
@@ -89,7 +101,9 @@ void TestCase::run_normal(std::invocable auto test) const
 	}
 
 	Registry::increment_passed_case_count();
-	std::println("[--------SUCCESS :D]");
+
+
+	log::test("{}{} | \033[1;32mpass\033[0m", std::string_view { m_name }, std::string { padding });
 }
 
 TestSuite::TestSuite(auto body)
@@ -123,8 +137,13 @@ auto operator""_suite(const char *name, size_t size) -> TestSuite
 module :private;
 namespace lt::test {
 
-TestCase::TestCase(std::string_view name): m_name(name)
+TestCase::TestCase(std::string name): m_name(name)
 {
+	if (m_name.size() > 79u)
+	{
+		m_name.resize(79u - 3);
+		m_name.append("...");
+	}
 }
 
 } // namespace lt::test

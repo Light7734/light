@@ -24,8 +24,7 @@ export void expect_unreachable(
 {
 	throw std::runtime_error {
 		std::format(
-		    "Failed unreachable expectation:\n"
-		    "\tlocation: {}:{}",
+		    "unreachable reached: {}:{}",
 		    source_location.file_name(),
 		    source_location.line()
 		),
@@ -48,12 +47,7 @@ export constexpr void expect_throw(
 	}
 
 	throw std::runtime_error {
-		std::format(
-		    "Failed throwing expectation:\n"
-		    "\tlocation: {}:{}",
-		    source_location.file_name(),
-		    source_location.line()
-		),
+		std::format("did not throw: {}:{}", source_location.file_name(), source_location.line()),
 	};
 }
 
@@ -69,10 +63,7 @@ export constexpr void expect_eq(
 		{
 			throw std::runtime_error {
 				std::format(
-				    "Failed equality expectation:\n"
-				    "\tactual: {}\n"
-				    "\texpected: {}\n"
-				    "\tlocation: {}:{}",
+				    "expect_eq: {} == {} @ {}:{}",
 				    std::to_underlying<decltype(lhs)>(lhs),
 				    std::to_underlying<decltype(rhs)>(rhs),
 				    source_location.file_name(),
@@ -85,10 +76,7 @@ export constexpr void expect_eq(
 	{
 		throw std::runtime_error {
 			std::format(
-			    "Failed equality expectation:\n"
-			    "\tactual: {}\n"
-			    "\texpected: {}\n"
-			    "\tlocation: {}:{}",
+			    "expect_eq: {} == {} @ {}:{}",
 			    lhs,
 			    rhs,
 			    source_location.file_name(),
@@ -108,10 +96,47 @@ export constexpr void expect_ne(
 	{
 		throw std::runtime_error {
 			std::format(
-			    "Failed un-equality expectation:\n"
-			    "\tactual: {}\n"
-			    "\texpected: {}\n"
-			    "\tlocation: {}:{}",
+			    "expect_ne: {} != {} @ {}:{}",
+			    lhs,
+			    rhs,
+			    source_location.file_name(),
+			    source_location.line()
+			),
+		};
+	}
+}
+
+export constexpr void expect_le(
+    Testable auto lhs,
+    Testable auto rhs,
+    std::source_location source_location = std::source_location::current()
+)
+{
+	if (lhs > rhs)
+	{
+		throw std::runtime_error {
+			std::format(
+			    "expect_le: {} <= {} @ {}:{}",
+			    lhs,
+			    rhs,
+			    source_location.file_name(),
+			    source_location.line()
+			),
+		};
+	}
+}
+
+export constexpr void expect_ge(
+    Testable auto lhs,
+    Testable auto rhs,
+    std::source_location source_location = std::source_location::current()
+)
+{
+	if (lhs < rhs)
+	{
+		throw std::runtime_error {
+			std::format(
+			    "expect_ge: {} >= {} @ {}:{}",
 			    lhs,
 			    rhs,
 			    source_location.file_name(),
@@ -130,10 +155,7 @@ export constexpr void expect_true(
 	{
 		throw std::runtime_error {
 			std::format(
-			    "Failed true expectation:\n"
-			    "\tactual: {}\n"
-			    "\texpected: true\n"
-			    "\tlocation: {}:{}",
+			    "expect_true: {} @ {}:{}",
 			    expression,
 			    source_location.file_name(),
 			    source_location.line()
@@ -151,10 +173,7 @@ export constexpr void expect_false(
 	{
 		throw std::runtime_error {
 			std::format(
-			    "Failed false expectation:\n"
-			    "\tactual: {}\n"
-			    "\texpected: true\n"
-			    "\tlocation: {}:{}",
+			    "expect_false: {} @ {}:{}",
 			    expression,
 			    source_location.file_name(),
 			    source_location.line()
@@ -172,34 +191,7 @@ export constexpr void expect_not_nullptr(
 	{
 		throw std::runtime_error {
 			std::format(
-			    "Failed true expectation:\n"
-			    "\tactual: nullptr\n"
-			    "\texpected: not nullptr\n"
-			    "\tlocation: {}:{}",
-			    source_location.file_name(),
-			    source_location.line()
-			),
-		};
-	}
-}
-
-
-export constexpr void expect_le(
-    Testable auto lhs,
-    Testable auto rhs,
-    std::source_location source_location = std::source_location::current()
-)
-{
-	if (lhs > rhs)
-	{
-		throw std::runtime_error {
-			std::format(
-			    "Failed false expectation:\n"
-			    "\tactual: {}\n"
-			    "\texpected: >= {}\n"
-			    "\tlocation: {}:{}",
-			    lhs,
-			    rhs,
+			    "expect_not_nullptr: @ {}:{}",
 			    source_location.file_name(),
 			    source_location.line()
 			),

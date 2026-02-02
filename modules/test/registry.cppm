@@ -1,5 +1,6 @@
 export module test.registry;
 
+import logger;
 import preliminary;
 import test.expects;
 
@@ -204,17 +205,17 @@ namespace lt::test {
 	++instance().m_failed_case_count;
 }
 
-[[nodiscard]] /* static */ auto Registry::should_return_on_failure() -> bool
+/* static */ [[nodiscard]] auto Registry::should_return_on_failure() -> bool
 {
 	return instance().m_options.stop_on_fail;
 }
 
-[[nodiscard]] /* static */ auto Registry::get_options() -> const Options &
+/* static */ [[nodiscard]] auto Registry::get_options() -> const Options &
 {
 	return instance().m_options;
 }
 
-[[nodiscard]] /* static */ auto Registry::get_case_regex() -> const std::regex &
+/* static */ [[nodiscard]] auto Registry::get_case_regex() -> const std::regex &
 {
 	return instance().m_case_regex;
 }
@@ -231,6 +232,30 @@ auto Registry::run_all_impl() -> i32
 		{
 			if (std::regex_search(name, regex))
 			{
+				auto padding_left = std::string {};
+				padding_left.resize((79 - std::strlen(name)) / 2u - 1u);
+				for (auto &ch : padding_left)
+				{
+					ch = '-';
+				}
+
+				auto padding_right = std::string {};
+				padding_right.resize((79 - std::strlen(name)) / 2u);
+				if (std::strlen(name) % 2 == 0)
+				{
+					padding_right.resize(padding_right.size() + 1);
+				}
+				for (auto &ch : padding_right)
+				{
+					ch = '-';
+				}
+
+				log::test(
+				    "\033[1;33m*{}{}{}-*\033[0m",
+				    std::string { padding_left },
+				    std::string_view { name },
+				    std::string { padding_right }
+				);
 				suite();
 				increment_matched_suite_count();
 			}
@@ -245,12 +270,12 @@ auto Registry::run_all_impl() -> i32
 		{
 			if (m_options.stop_on_fail)
 			{
-				std::println("Quitting due to options.stop_on_fail == true");
+				log::info("Quitting due to options.stop_on_fail == true");
 				break;
 			}
 
-			std::println("Uncaught exception when running suite:");
-			std::println("\twhat: {}", exp.what());
+			log::test("Uncaught exception when running suite:");
+			log::test("\twhat: {}", exp.what());
 			break;
 		}
 	}
@@ -259,32 +284,32 @@ auto Registry::run_all_impl() -> i32
 	{
 	case ExecutionPolicy::normal:
 	{
-		std::println("[-------STATS------]");
+		// log::test("[-------STATS------]");
+		//
+		// log::test("suites:");
+		// log::test("\ttotal: {}", (i32)m_total_suite_count);
+		// log::test("\tpassed: {}", (i32)m_passed_suite_count);
+		// log::test("\tfailed: {}", (i32)m_failed_suite_count);
+		// log::test("\tmatched: {}", (i32)m_matched_suite_count);
+		// log::test("\tskipped: {}", (i32)m_skipped_suite_count);
+		//
+		// log::test("tests:");
+		// log::test("\ttotal: {}", (i32)m_total_case_count);
+		// log::test("\tpassed: {}", (i32)m_passed_case_count);
+		// log::test("\tfailed: {}", (i32)m_failed_case_count);
+		// log::test("\tmatched: {}", (i32)m_matched_case_count);
+		// log::test("\tskipped: {}", (i32)m_skipped_case_count);
 
-		std::println("suites:");
-		std::println("\ttotal: {}", m_total_suite_count);
-		std::println("\tpassed: {}", m_passed_suite_count);
-		std::println("\tfailed: {}", m_failed_suite_count);
-		std::println("\tmatched: {}", m_matched_suite_count);
-		std::println("\tskipped: {}", m_skipped_suite_count);
-
-		std::println("tests:");
-		std::println("\ttotal: {}", m_total_case_count);
-		std::println("\tpassed: {}", m_passed_case_count);
-		std::println("\tfailed: {}", m_failed_case_count);
-		std::println("\tmatched: {}", m_matched_case_count);
-		std::println("\tskipped: {}", m_skipped_case_count);
-
-		std::println("________________________________________________________________");
+		// log::test("________________________________________________________________");
 
 		return m_failed_case_count;
 	}
 	case ExecutionPolicy::stats:
 	{
-		std::println("[-------STATS------]");
-		std::println("Total suite count: {}", m_total_suite_count);
-		std::println("Total test count: {}", m_total_case_count);
-		std::println("________________________________________________________________");
+		log::test("[-------STATS------]");
+		log::test("Total suite count: {}", (i32)m_total_suite_count);
+		log::test("Total test count: {}", (i32)m_total_case_count);
+		log::test("________________________________________________________________");
 
 		return 0;
 	}
@@ -295,12 +320,12 @@ auto Registry::run_all_impl() -> i32
 
 void Registry::print_options()
 {
-	std::println("stop-on-failure: {}", m_options.stop_on_fail);
+	// log::info("stop-on-failure: {}", static_cast<bool>(m_options.stop_on_fail));
 }
 
 Registry::Registry()
 {
-	std::println("________________________________________________________________");
+	// log::info("________________________________________________________________");
 }
 
 [[nodiscard]] /* static */ auto Registry::instance() -> Registry &

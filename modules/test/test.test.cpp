@@ -1,7 +1,14 @@
 import test;
 
 Suite expects = "expects"_suite = []() {
-	Case { "" } = [] {
+	// should be truncated...
+	Case { "berryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy "
+		   "long name" }
+	= [] {
+	  };
+
+	Case { "this emptiness machine" } = [] {
+		expect_le(9, 6);
 	};
 
 	Case { "expect_unreachable" } = [] {

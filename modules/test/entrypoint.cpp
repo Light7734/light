@@ -49,6 +49,7 @@ void print_help()
 auto main(i32 argc, char **argv) -> i32
 try
 {
+	lt::log::set_min_severity(lt::log::Level::test);
 	auto raw_arguments = std::span<char *>(argv, argc);
 
 	auto options = lt::test::Registry::Options {};
