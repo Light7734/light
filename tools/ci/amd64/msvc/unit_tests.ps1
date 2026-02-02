@@ -1,6 +1,9 @@
 # @ref https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-by-category
 
-rm -Force -Recurse ./build
+if (Test-Path "./build") {
+    Remove-Item "./build" -r -force
+}
+
 cmake `
     -S . `
     -B build `
