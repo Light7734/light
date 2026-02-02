@@ -6,7 +6,8 @@ cmake `
     -B build `
     -G Ninja `
     -D ENABLE_UNIT_TESTS=ON `
-    -D CMAKE_BUILD_TYPE=Release `
+    -D CMAKE_BUILD_TYPE=Debug `
+    -D CMAKE_EXPORT_COMPILE_COMMANDS=True `
     -D CMAKE_CXX_FLAGS="/std:c++latest /EHsc /Zi /Oy- /WX /W4"
 
 cmake --build ./build
@@ -16,7 +17,8 @@ $tests = Get-ChildItem -Path "./build" -Recurse -File | Where-Object {
 }
 
 foreach ($test in $tests) {
-    Write-Host "Running $($test.FullName)"
+    Write-Host ""
+    Write-Host "| $($test.BaseName) |"
     & $test.FullName
     if ($LASTEXITCODE -ne 0) {
       Write-Error "Test $($test.Name) failed! T_T"
