@@ -13,7 +13,7 @@ platform:
 
 steps:
 - name: unit tests
-  shell: powershell
+  shell: 'C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\Tools\VsDevCmd.bat'
   commands: 
     - ./tools/ci/amd64/msvc/unit_tests.ps1
 
