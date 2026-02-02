@@ -150,9 +150,9 @@ private:
 
 	void modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request);
 
-	void modify_position(ecs::EntityId surface_entity, const math::ivec2 &new_size);
+	void modify_position(ecs::EntityId surface_entity, const math::vec2_i32 &new_size);
 
-	void modify_position(ecs::EntityId surface_entity, const math::uvec2 &new_size);
+	void modify_position(ecs::EntityId surface_entity, const math::vec2_u32 &new_size);
 
 	void set_visibility(ecs::EntityId surface_entity, bool visible);
 

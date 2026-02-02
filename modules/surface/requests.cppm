@@ -12,12 +12,12 @@ struct ModifyTitleRequest
 
 struct ModifyResolutionRequest
 {
-	math::uvec2 resolution;
+	math::vec2_u32 resolution;
 };
 
 struct ModifyPositionRequest
 {
-	math::ivec2 position;
+	math::vec2_i32 position;
 };
 
 struct ModifyVisibilityRequest

@@ -10,7 +10,7 @@ namespace lt::input {
 export class AnalogEvent
 {
 public:
-	AnalogEvent(Key key, math::uvec2 pointer_position)
+	AnalogEvent(Key key, math::vec2_u32 pointer_position)
 	    : m_key(key)
 	    , m_pointer_position(pointer_position)
 	{
@@ -21,7 +21,7 @@ public:
 		return m_key;
 	};
 
-	[[nodiscard]] auto get_pointer_position() const -> math::uvec2
+	[[nodiscard]] auto get_pointer_position() const -> math::vec2_u32
 	{
 		return m_pointer_position;
 	}
@@ -35,7 +35,7 @@ public:
 private:
 	Key m_key;
 
-	math::uvec2 m_pointer_position;
+	math::vec2_u32 m_pointer_position;
 };
 
 } // namespace lt::input

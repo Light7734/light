@@ -23,7 +23,7 @@ public:
 		return m_swapchain;
 	}
 
-	[[nodiscard]] auto get_resolution() const -> math::uvec2
+	[[nodiscard]] auto get_resolution() const -> math::vec2_u32
 	{
 		return m_resolution;
 	}
@@ -66,7 +66,7 @@ private:
 
 	std::vector<vk::ImageView> m_image_views;
 
-	math::uvec2 m_resolution {};
+	math::vec2_u32 m_resolution {};
 
 	vk::Format m_format {};
 };

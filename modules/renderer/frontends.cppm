@@ -52,7 +52,7 @@ public:
 
 	virtual ~ISurface() = default;
 
-	[[nodiscard]] virtual auto get_framebuffer_size() const -> math::uvec2 = 0;
+	[[nodiscard]] virtual auto get_framebuffer_size() const -> math::vec2_u32 = 0;
 };
 
 class ISwapchain

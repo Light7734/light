@@ -66,7 +66,7 @@ public:
 	{
 		std::string_view title;
 
-		math::uvec2 resolution;
+		math::vec2_u32 resolution;
 
 		bool vsync;
 
@@ -78,12 +78,12 @@ public:
 		return m_title;
 	}
 
-	[[nodiscard]] auto get_resolution() const -> const math::uvec2 &
+	[[nodiscard]] auto get_resolution() const -> const math::vec2_u32 &
 	{
 		return m_resolution;
 	}
 
-	[[nodiscard]] auto get_position() const -> const math::ivec2 &
+	[[nodiscard]] auto get_position() const -> const math::vec2_i32 &
 	{
 		return m_position;
 	}
@@ -136,9 +136,9 @@ private:
 
 	std::string m_title;
 
-	math::uvec2 m_resolution;
+	math::vec2_u32 m_resolution;
 
-	math::ivec2 m_position;
+	math::vec2_i32 m_position;
 
 	bool m_vsync;
 

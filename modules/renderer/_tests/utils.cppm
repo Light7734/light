@@ -15,7 +15,7 @@ export import math.mat4;
 export namespace constants {
 
 constexpr auto api = lt::renderer::Api::vulkan;
-constexpr auto resolution = lt::math::uvec2 { 800u, 600u };
+constexpr auto resolution = lt::math::vec2_u32 { 800u, 600u };
 constexpr auto frames_in_flight = u32 { 3u };
 
 } // namespace constants

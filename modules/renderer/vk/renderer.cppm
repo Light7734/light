@@ -78,7 +78,7 @@ private:
 
 	std::vector<vk::Semaphore> m_submit_semaphores;
 
-	math::uvec2 m_resolution;
+	math::vec2_u32 m_resolution;
 
 	FrameConstants m_frame_constants;
 

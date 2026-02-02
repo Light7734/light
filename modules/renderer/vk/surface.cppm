@@ -22,7 +22,7 @@ public:
 		return m_surface;
 	}
 
-	[[nodiscard]] auto get_framebuffer_size() const -> math::uvec2 override;
+	[[nodiscard]] auto get_framebuffer_size() const -> math::vec2_u32 override;
 
 private:
 	vk::Surface m_surface;
@@ -78,7 +78,7 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 #endif
 }
 
-[[nodiscard]] auto Surface::get_framebuffer_size() const -> math::uvec2
+[[nodiscard]] auto Surface::get_framebuffer_size() const -> math::vec2_u32
 {
 	return m_surface_entity.get<surface::SurfaceComponent>().get_resolution();
 }

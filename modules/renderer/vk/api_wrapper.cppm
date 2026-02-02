@@ -702,9 +702,9 @@ struct Viewport
 
 struct Rect2d
 {
-	math::ivec2 offset;
+	math::vec2_i32 offset;
 
-	math::uvec2 extent;
+	math::vec2_u32 extent;
 };
 
 /** There is no global state in Vulkan and all per-application state is stored in a VkInstance
@@ -809,11 +809,11 @@ public:
 
 		u32 max_image_count;
 
-		math::uvec2 current_extent;
+		math::vec2_u32 current_extent;
 
-		math::uvec2 min_image_extent;
+		math::vec2_u32 min_image_extent;
 
-		math::uvec2 max_image_extent;
+		math::vec2_u32 max_image_extent;
 
 		u32 max_image_array_layers;
 
@@ -1126,7 +1126,7 @@ public:
 		QueueFlags::T queue_flags {};
 		u32 queue_count {};
 		u32 timestamp_valid_bits {};
-		math::uvec3 min_image_transfer_granularity;
+		math::vec3_u32 min_image_transfer_granularity;
 	};
 
 	[[nodiscard]]
@@ -2306,9 +2306,9 @@ public:
 			Flags resolve_mode_flags;
 		};
 
-		math::ivec2 area_offset;
+		math::vec2_i32 area_offset;
 
-		math::uvec2 area_extent;
+		math::vec2_u32 area_extent;
 
 		std::vector<AttachmentInfo> color_attachments;
 	};
@@ -2459,7 +2459,7 @@ public:
 
 		ColorSpace color_space;
 
-		math::uvec2 extent;
+		math::vec2_u32 extent;
 
 		u32 min_image_count;
 
@@ -3571,7 +3571,7 @@ Surface::~Surface()
 			.queue_flags = static_cast<QueueFlags::T>(vk_property.queueFlags),
 			.queue_count = vk_property.queueCount,
 			.timestamp_valid_bits = vk_property.timestampValidBits,
-			.min_image_transfer_granularity = math::uvec3{
+			.min_image_transfer_granularity = math::vec3_u32{
                 vk_property.minImageTransferGranularity.width,
                 vk_property.minImageTransferGranularity.height,
                 vk_property.minImageTransferGranularity.depth,

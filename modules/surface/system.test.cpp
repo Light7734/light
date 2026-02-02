@@ -227,8 +227,8 @@ Suite tick = "ticking"_suite = [] {
 		auto system = System { fixture.registry() };
 		auto &surface = **fixture.create_component();
 
-		constexpr auto position = lt::math::ivec2 { 50, 50 };
-		constexpr auto resolution = lt::math::uvec2 { width, height };
+		constexpr auto position = lt::math::vec2_i32 { 50, 50 };
+		constexpr auto resolution = lt::math::vec2_u32 { width, height };
 
 		expect_eq(surface.peek_requests().size(), 0);
 

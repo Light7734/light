@@ -202,7 +202,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] auto get_position() const -> const math::ivec2 &
+	[[nodiscard]] auto get_position() const -> const math::vec2_i32 &
 	{
 		return m_position;
 	}
@@ -213,7 +213,7 @@ public:
 	}
 
 private:
-	math::ivec2 m_position;
+	math::vec2_i32 m_position;
 };
 
 class ResizedEvent
@@ -223,7 +223,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] auto get_size() const -> const math::uvec2 &
+	[[nodiscard]] auto get_size() const -> const math::vec2_u32 &
 	{
 		return m_size;
 	}
@@ -234,7 +234,7 @@ public:
 	}
 
 private:
-	math::uvec2 m_size;
+	math::vec2_u32 m_size;
 };
 
 class LostFocusEvent

@@ -255,7 +255,7 @@ public:
 		m_editor_registry->add(
 		    m_camera_id,
 		    camera::components::PerspectiveCamera {
-		        .vertical_fov = math::radians(90.0f),
+		        .vertical_fov = math::to_radians(90.0f),
 		        .near_plane = 0.1f,
 		        .far_plane = 30.0,
 		        .aspect_ratio = 1.0f,
