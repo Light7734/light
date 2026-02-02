@@ -133,7 +133,7 @@ Suite system_events = "system_events"_suite = [] {
 };
 
 Suite registry_events = "registry_events"_suite = [] {
-	Case { "on_construct<SurfaceComponent> initializes component" } = [] {
+	Case { "on_construct initializes component" } = [] {
 		auto fixture = Fixture {};
 
 		const auto &component = fixture.create_component();
@@ -141,7 +141,7 @@ Suite registry_events = "registry_events"_suite = [] {
 		fixture.check_values(*component);
 	};
 
-	Case { "unhappy on_construct<SurfaceComponent> throws" } = [] {
+	Case { "unhappy on_construct throws" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 
@@ -168,7 +168,7 @@ Suite registry_events = "registry_events"_suite = [] {
 		});
 	};
 
-	Case { "unhappy on_construct<SurfaceComponent> removes component" } = [] {
+	Case { "unhappy on_construct removes component" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 
@@ -176,7 +176,7 @@ Suite registry_events = "registry_events"_suite = [] {
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
-	Case { "on_destrroy<SurfaceComponent> cleans up component" } = [] {
+	Case { "on_destroy cleans up component" } = [] {
 		auto fixture = Fixture {};
 		auto system = lt::memory::create_scope<System>(fixture.registry());
 
@@ -189,23 +189,21 @@ Suite registry_events = "registry_events"_suite = [] {
 	};
 };
 
-Suite tick = "tick"_suite = [] {
-	Case { "ticking on empty registry won't throw" } = [] {
+Suite tick = "ticking"_suite = [] {
+	Case { "on empty registry won't throw" } = [] {
 		auto fixture = Fixture {};
 		System { fixture.registry() }.tick(tick_info());
 	};
 
-	Case { "ticking on non-empty registry won't throw" } = [] {
+	Case { "on non-empty registry won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 
 		fixture.create_component();
 		system.tick(tick_info());
 	};
-};
 
-Suite tick_handles_events = "tick_handles_events"_suite = [] {
-	Case { "ticking clears previous tick's events" } = [] {
+	Case { "clears previous tick's events" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 		auto &surface = **fixture.create_component();
@@ -223,10 +221,8 @@ Suite tick_handles_events = "tick_handles_events"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(surface.peek_events().size(), 0);
 	};
-};
 
-Suite tick_handles_requests = "tick_handles_requests"_suite = [] {
-	Case { "ticking clears requests" } = [] {
+	Case { "clears requests" } = [] {
 		auto fixture = Fixture {};
 		auto system = System { fixture.registry() };
 		auto &surface = **fixture.create_component();

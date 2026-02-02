@@ -1,6 +1,6 @@
 import preliminary;
 import time;
-import test.expects;
+import logger;
 import surface.system;
 import surface.events;
 import surface.requests;
@@ -20,6 +20,10 @@ constexpr auto visible = false;
 auto main() -> i32
 try
 {
+	for (auto idx = 0; idx < 100; ++idx)
+	{
+		std::println("{}: \033[1;{}m| color |\033[0m", idx, idx);
+	}
 	auto registry = lt::memory::create_ref<lt::ecs::Registry>();
 	auto system = lt::surface::System { registry };
 
