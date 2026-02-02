@@ -1,5 +1,9 @@
 # @ref https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-by-category
 
+# @todo(Light): fetch path and uuid from environment
+Import-Module 'C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
+Enter-VsDevShell 1a3e2aa7 -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
+
 if (Test-Path "./build") {
     Remove-Item "./build" -r -force
 }
