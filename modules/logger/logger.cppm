@@ -2,7 +2,7 @@ export module logger;
 
 import preliminary;
 
-namespace lt::log {
+export namespace lt::log {
 
 /** Severity of a log message. */
 enum class Level : u8
@@ -25,18 +25,24 @@ enum class Level : u8
 	/** Unrecoverable errors */
 	critical = 5,
 
+	/**
+	 * Logs from the testing-framework.
+	 * Highest so we still get them while turning off all logs from the code under test.
+	 *
+	 * @note: log::test does NOT include source_location
+	 */
+	test = 6,
+
 	/** No logging */
-	off = 6,
+	off = 7,
 };
 
-namespace details {
+auto min_severity = Level::trace;
 
-inline auto thread_hash_id() noexcept -> u64
+auto set_min_severity(Level severity)
 {
-	return static_cast<u64>(std::hash<std::thread::id> {}(std::this_thread::get_id()));
+	min_severity = severity;
 }
-
-} // namespace details
 
 template<typename... Args>
 struct [[maybe_unused]] print
@@ -48,6 +54,11 @@ struct [[maybe_unused]] print
 	    Args &&...arguments
 	) noexcept
 	{
+		if (std::to_underlying(level) < std::to_underlying(min_severity))
+		{
+			return;
+		}
+
 		constexpr auto to_string = [](Level level) {
 			// clang-format off
 			switch (level)
@@ -75,13 +86,45 @@ struct [[maybe_unused]] print
 		    std::format(format, std::forward<Args>(arguments)...)
 		);
 	}
+
+	[[maybe_unused]] print(
+	    Level level,
+	    std::format_string<Args...> format,
+	    Args &&...arguments
+	) noexcept
+	{
+		constexpr auto to_string = [](Level level) {
+			// clang-format off
+			switch (level)
+			{
+			using enum ::lt::log::Level;
+			case trace   : return "\033[1;37m| trc |\033[0m";
+			case debug   : return "\033[1;36m| dbg |\033[0m";
+			case info    : return "\033[1;32m| inf |\033[0m";
+			case warn    : return "\033[1;33m| wrn |\033[0m";
+			case error   : return "\033[1;31m| err |\033[0m";
+			case critical: return "\033[1;41m| crt |\033[0m";
+			case test    : return "\033[1;33m| test |\033[0m";
+			case off     : return "";
+			}
+			// clang-format on
+
+			std::unreachable();
+		};
+
+		std::println(
+		    "{} {}",
+		    to_string(level),
+		    std::format(format, std::forward<Args>(arguments)...)
+		);
+	}
 };
 
 template<typename... Args>
 print(Level, const std::source_location &, std::format_string<Args...>, Args &&...) noexcept
     -> print<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] trace
 {
 	[[maybe_unused]] trace(
@@ -94,10 +137,10 @@ struct [[maybe_unused]] trace
 	}
 };
 
-export template<typename... Args>
+template<typename... Args>
 trace(std::format_string<Args...>, Args &&...) noexcept -> trace<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] debug
 {
 	[[maybe_unused]] debug(
@@ -110,10 +153,11 @@ struct [[maybe_unused]] debug
 	}
 };
 
-export template<typename... Args>
+template<typename... Args>
 debug(std::format_string<Args...>, Args &&...) noexcept -> debug<Args...>;
 
-export template<typename... Args>
+
+template<typename... Args>
 struct [[maybe_unused]] info
 {
 	[[maybe_unused]] info(
@@ -126,10 +170,10 @@ struct [[maybe_unused]] info
 	}
 };
 
-export template<typename... Args>
+template<typename... Args>
 info(std::format_string<Args...>, Args &&...) noexcept -> info<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] warn
 {
 	[[maybe_unused]] warn(
@@ -142,10 +186,10 @@ struct [[maybe_unused]] warn
 	}
 };
 
-export template<typename... Args>
+template<typename... Args>
 warn(std::format_string<Args...>, Args &&...) noexcept -> warn<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] error
 {
 	[[maybe_unused]] error(
@@ -158,10 +202,10 @@ struct [[maybe_unused]] error
 	}
 };
 
-export template<typename... Args>
+template<typename... Args>
 error(std::format_string<Args...>, Args &&...) noexcept -> error<Args...>;
 
-export template<typename... Args>
+template<typename... Args>
 struct [[maybe_unused]] critical
 {
 	[[maybe_unused]] critical(
@@ -174,7 +218,13 @@ struct [[maybe_unused]] critical
 	}
 };
 
-export template<typename... Args>
+template<typename... Args>
 critical(std::format_string<Args...>, Args &&...) noexcept -> critical<Args...>;
+
+template<typename... Args>
+void test(std::format_string<Args...> format, Args &&...arguments) noexcept
+{
+	print(Level::test, format, std::forward<Args>(arguments)...);
+}
 
 } // namespace lt::log
