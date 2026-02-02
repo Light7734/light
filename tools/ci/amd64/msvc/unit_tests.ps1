@@ -4,6 +4,12 @@
 Import-Module 'C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
 Enter-VsDevShell 1a3e2aa7 -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
 
+$env:VULKAN_SDK = "C:\VulkanSDK\1.4.335.0"
+$env:PATH = "$env:VULKAN_SDK\Bin;$env:PATH"
+$env:INCLUDE = "$env:VULKAN_SDK\Include;$env:INCLUDE"
+$env:LIB = "$env:VULKAN_SDK\Lib;$env:LIB"
+$env:LIBPATH = "$env:VULKAN_SDK\Lib;$env:LIBPATH"
+
 if (Test-Path "./build") {
     Remove-Item "./build" -r -force
 }
