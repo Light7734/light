@@ -1,7 +1,7 @@
 # @ref https://learn.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-by-category
 
-# @todo(Light): Pull this from an environment variable
-& "C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\Tools\VsDevCmd.bat"
+# @todo(Light): Pull the path from an environment variable
+cmd /c '"C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\Tools\VsDevCmd.bat" && powershell -NoProfile -Command "."'
 
 if (Test-Path "./build") {
     Remove-Item "./build" -r -force
