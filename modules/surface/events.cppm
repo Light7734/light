@@ -27,27 +27,6 @@ private:
 	Key m_key;
 };
 
-class KeyRepeatEvent
-{
-public:
-	KeyRepeatEvent(Key key): m_key(key)
-	{
-	}
-
-	[[nodiscard]] auto get_key() const -> Key
-	{
-		return m_key;
-	}
-
-	[[nodiscard]] auto to_string() const -> std::string
-	{
-		return std::format("KeyRepeated: {}", std::to_underlying(m_key));
-	}
-
-private:
-	Key m_key;
-};
-
 class KeyReleasedEvent
 {
 public:
@@ -90,10 +69,10 @@ private:
 	Key m_character;
 };
 
-class MouseMovedEvent
+class PointerEvent
 {
 public:
-	MouseMovedEvent(f32 x, f32 y): m_position(x, y)
+	PointerEvent(f32 x, f32 y): m_position(x, y)
 	{
 	}
 
@@ -114,7 +93,7 @@ public:
 
 	[[nodiscard]] auto to_string() const -> std::string
 	{
-		return std::format("MouseMoved: {}, {}", m_position.x, m_position.y);
+		return std::format("Pointer: {}, {}", m_position.x, m_position.y);
 	}
 
 private:
@@ -142,48 +121,6 @@ public:
 
 private:
 	f32 m_offset;
-};
-
-class ButtonPressedEvent
-{
-public:
-	ButtonPressedEvent(Key button): m_button(button)
-	{
-	}
-
-	[[nodiscard]] auto get_button() const -> Key
-	{
-		return m_button;
-	}
-
-	[[nodiscard]] auto to_string() const -> std::string
-	{
-		return std::format("ButtonPressed: {}", std::to_underlying(m_button));
-	}
-
-private:
-	Key m_button;
-};
-
-class ButtonReleasedEvent
-{
-public:
-	ButtonReleasedEvent(Key button): m_button(button)
-	{
-	}
-
-	[[nodiscard]] auto get_button() const -> Key
-	{
-		return m_button;
-	}
-
-	[[nodiscard]] auto to_string() const -> std::string
-	{
-		return std::format("ButtonReleased: {}", std::to_underlying(m_button));
-	}
-
-private:
-	Key m_button;
 };
 
 class ClosedEvent

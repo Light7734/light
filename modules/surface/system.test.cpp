@@ -1,5 +1,16 @@
+#if defined(LIGHT_PLATFORM_LINUX)
+#elif defined(LIGHT_PLATFORM_WINDOWS)
+	#include <Windows.h>
+	#include <Winuser.h>
+
+#else
+	#error "Unsupported platform"
+#endif
+
 import test;
 import time;
+import input.codes;
+import logger;
 import surface.system;
 import surface.events;
 import surface.requests;
@@ -21,9 +32,26 @@ using ::lt::surface::System;
 	};
 }
 
+
+// void simulate_key_down(lt::surface::SurfaceComponent &surface, lt::Key key)
+// {
+// #if defined(LIGHT_PLATFORM_LINUX)
+// #elif defined(LIGHT_PLATFORM_WINDOWS)
+// #endif
+// }
+//
+// void simulate_key_up(lt::Key key)
+// {
+// #if defined(LIGHT_PLATFORM_LINUX)
+// #elif defined(LIGHT_PLATFORM_WINDOWS)
+// #endif
+// }
+
 constexpr auto title = "TestWindow";
 constexpr auto width = 800u;
 constexpr auto height = 600u;
+constexpr auto position_x = 100;
+constexpr auto position_y = 200;
 constexpr auto vsync = true;
 constexpr auto visible = false;
 
@@ -44,6 +72,7 @@ public:
 	auto create_component(
 	    SurfaceComponent::CreateInfo info = SurfaceComponent::CreateInfo {
 	        .title = title,
+	        .position = { position_x, position_y },
 	        .resolution = { width, height },
 	        .vsync = vsync,
 	        .visible = visible,
@@ -215,7 +244,7 @@ Suite tick = "ticking"_suite = [] {
 		surface.push_event(lt::surface::MovedEvent({}, {}));
 		expect_eq(surface.peek_events().size(), 1);
 
-		surface.push_event(lt::surface::ButtonPressedEvent({}));
+		surface.push_event(lt::surface::KeyPressedEvent({}));
 		expect_eq(surface.peek_events().size(), 2);
 
 		system.tick(tick_info());
@@ -257,3 +286,125 @@ Suite tick = "ticking"_suite = [] {
 		expect_eq(surface.get_resolution(), resolution);
 	};
 };
+
+#if defined(LIGHT_PLATFORM_WINDOWS)
+
+Suite windows_window_proc = "windows_window_proc"_suite = [] {
+	auto fixture = Fixture {};
+	auto system = System { fixture.registry() };
+	auto &surface = **fixture.create_component();
+	auto [hwnd] = surface.get_native_data();
+	const auto &events = surface.peek_events();
+
+	system.tick({});
+	Case { "WM_SETFOCUS" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_SETFOCUS, {}, {});
+		expect_eq(events.size(), 1u);
+
+		ignore = std::get<lt::surface::GainFocusEvent>(events.front());
+	};
+
+	system.tick({});
+	Case { "WM_KILLFOCUS" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_KILLFOCUS, {}, {});
+		expect_eq(events.size(), 1u);
+
+		ignore = std::get<lt::surface::LostFocusEvent>(events.front());
+	};
+
+	system.tick({});
+	Case { "WM_SIZE" } = [&] {
+		const auto new_width = width + 50;
+		const auto new_height = height + 60;
+
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_SIZE, {}, MAKELPARAM(new_width, new_height));
+		expect_eq(events.size(), 1u);
+
+		const auto &event = std::get<lt::surface::ResizedEvent>(events.front());
+		expect_eq(event.get_size().x, new_width);
+		expect_eq(event.get_size().y, new_height);
+
+		expect_eq(surface.get_resolution().x, new_width);
+		expect_eq(surface.get_resolution().y, new_height);
+	};
+
+	system.tick({});
+	Case { "WM_MOVE" } = [&] {
+		const auto new_x = position_x + 120;
+		const auto new_y = position_y + 150;
+
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_MOVE, {}, MAKELPARAM(new_x, new_y));
+		expect_eq(events.size(), 1u);
+
+		const auto &event = std::get<lt::surface::MovedEvent>(events.front());
+		expect_eq(event.get_position().x, new_x);
+		expect_eq(event.get_position().y, new_y);
+
+		expect_eq(surface.get_position().x, new_x);
+		expect_eq(surface.get_position().y, new_y);
+	};
+
+	system.tick({});
+	Case { "WM_MOUSEWHEEL" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_LBUTTONDOWN" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_LBUTTONUP" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_RBUTTONDOWN" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_RBUTTONUP" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_MBUTTONDOWN" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_MBUTTONUP" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_XBUTTONDOWN" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_XBUTTONUP" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_KEYDOWN" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_KEYDOWN, System::to_native_key(lt::Key::escape), {});
+		expect_eq(events.size(), 1u);
+
+		const auto &event = std::get<lt::surface::KeyPressedEvent>(events.front());
+		expect_eq(event.get_key(), lt::Key::escape);
+	};
+
+	system.tick({});
+	Case { "WM_KEYUP" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_CLOSE" } = [&] {
+	};
+
+	system.tick({});
+	Case { "WM_DESTROY" } = [&] {
+	};
+};
+
+#endif

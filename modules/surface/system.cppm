@@ -3,7 +3,13 @@ module;
 	#include <wayland-client.h>
 	#include <xdg-shell.h>
 #elif defined(LIGHT_PLATFORM_WINDOWS)
+	#include <ShellScalingApi.h>
 	#include <Windows.h>
+	#include <comdef.h>
+
+	#if defined(UNICODE) || defined(_UNICODE)
+		#error "Unicode is not turned off"
+	#endif
 #else
 	#error "Unsupported platform"
 #endif
@@ -59,6 +65,13 @@ public:
 	{
 		return m_last_tick_result;
 	}
+
+#if defined(LIGHT_PLATFORM_WINDOWS)
+	static auto to_native_key(Key code) noexcept -> i64;
+
+	static auto to_engine_key(int code) noexcept -> Key;
+
+#endif
 
 private:
 #if defined(LIGHT_PLATFORM_LINUX)
@@ -134,6 +147,10 @@ private:
 	);
 
 	static void wayland_pointer_frame_listener(void *data, wl_pointer *pointer);
+#endif
+
+#if defined(LIGHT_PLATFORM_WINDOWS)
+	static auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 #endif
 
 	void on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity);
@@ -516,125 +533,6 @@ void System::tick(app::TickInfo tick)
 
 #ifdef LIGHT_PLATFORM_WINDOWS
 
-constexpr auto translate_key(auto code) -> Key
-{
-	using enum Key;
-
-	switch (code)
-	{
-	case VK_LBUTTON: return left_button;
-	case VK_RBUTTON: return right_button;
-	case VK_MBUTTON: return middle_button;
-
-	case VK_BACK: return backspace;
-	case VK_TAB: return tab;
-	case VK_CAPITAL: return capslock;
-	case VK_RETURN: return enter;
-	case VK_SPACE: return space;
-	case VK_DELETE: return delete_;
-
-	case VK_SHIFT: return shift;
-	case VK_RSHIFT: return right_shift;
-
-	case VK_CONTROL: return control;
-	case VK_RCONTROL: return right_control;
-
-	case VK_MENU: return alt;
-	case VK_RMENU: return right_alt;
-
-	case VK_PRIOR: return pageup;
-	case VK_NEXT: return pagedown;
-	case VK_END: return end;
-	case VK_HOME: return home;
-
-	case VK_LEFT: return left_arrow;
-	case VK_RIGHT: return right_arrow;
-	case VK_DOWN: return down_arrow;
-	case VK_UP: return up_arrow;
-
-	case VK_CANCEL: return cancel;
-	case VK_PAUSE: return pause;
-	case VK_SELECT: return select;
-	case VK_PRINT: return print;
-	case VK_SNAPSHOT: return snapshot;
-	case VK_INSERT: return insert;
-	case VK_HELP: return help;
-	case VK_SLEEP: return sleep;
-
-	case '0': return digit_0;
-	case '1': return digit_1;
-	case '2': return digit_2;
-	case '3': return digit_3;
-	case '4': return digit_4;
-	case '5': return digit_5;
-	case '6': return digit_6;
-	case '7': return digit_7;
-	case '8': return digit_8;
-	case '9': return digit_9;
-
-	case 'A': return a;
-	case 'B': return b;
-	case 'C': return c;
-	case 'D': return d;
-	case 'E': return e;
-	case 'F': return f;
-	case 'G': return g;
-	case 'H': return h;
-	case 'I': return i;
-	case 'J': return j;
-	case 'K': return k;
-	case 'L': return l;
-	case 'M': return m;
-	case 'N': return n;
-	case 'O': return o;
-	case 'P': return p;
-	case 'Q': return q;
-	case 'R': return r;
-	case 'S': return s;
-	case 'T': return t;
-	case 'U': return u;
-	case 'V': return v;
-	case 'W': return w;
-	case 'X': return x;
-	case 'Y': return y;
-	case 'Z': return z;
-
-	case VK_LWIN: return super;
-	case VK_RWIN: return right_super;
-
-	case VK_NUMPAD0: return kp_0;
-	case VK_NUMPAD1: return kp_1;
-	case VK_NUMPAD2: return kp_2;
-	case VK_NUMPAD3: return kp_3;
-	case VK_NUMPAD4: return kp_4;
-	case VK_NUMPAD5: return kp_5;
-	case VK_NUMPAD6: return kp_6;
-	case VK_NUMPAD7: return kp_7;
-	case VK_NUMPAD8: return kp_8;
-	case VK_NUMPAD9: return kp_9;
-
-	case VK_MULTIPLY: return kp_multiply;
-	case VK_ADD: return kp_add;
-	case VK_SUBTRACT: return kp_subtract;
-	case VK_DECIMAL: return kp_decimal;
-
-	case VK_F1: return f1;
-	case VK_F2: return f2;
-	case VK_F3: return f3;
-	case VK_F4: return f4;
-	case VK_F5: return f5;
-	case VK_F6: return f6;
-	case VK_F7: return f7;
-	case VK_F8: return f8;
-	case VK_F9: return f9;
-	case VK_F10: return f10;
-	case VK_F11: return f11;
-	case VK_F12: return f12;
-
-	default: return unknown;
-	}
-};
-
 template<class... Ts>
 struct overloads: Ts...
 {
@@ -643,7 +541,9 @@ struct overloads: Ts...
 
 void ensure_component_sanity(const SurfaceComponent &component);
 
-auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT;
+[[nodiscard]] auto get_error_message() -> std::string;
+
+void check_hresult(HRESULT result);
 
 System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
@@ -661,7 +561,7 @@ System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(regist
 	);
 
 	auto window_class = WNDCLASS {
-		.lpfnWndProc = window_proc,
+		.lpfnWndProc = System::window_proc,
 		.hInstance = GetModuleHandle(nullptr),
 		.lpszClassName = constants::class_name,
 	};
@@ -707,115 +607,72 @@ void System::on_unregister()
 {
 }
 
+/** Selects a monitor from a point and returns the dpi of that monitor. */
+auto get_dpi_from_point(math::vec2_i32 point) -> ::UINT
+{
+	auto target_monitor = MonitorFromPoint(
+	    ::POINT { .x = point.x, .y = point.y },
+	    MONITOR_DEFAULTTONEAREST
+	);
+	ensure(target_monitor, "Failed to get target monitor from MonitorFromPoint (point: {})", point);
+
+	auto dpi_x = ::UINT {};
+	auto dpi_y = ::UINT {};
+	check_hresult(::GetDpiForMonitor(target_monitor, MDT_EFFECTIVE_DPI, &dpi_x, &dpi_y));
+
+	ensure(
+	    dpi_x == dpi_y,
+	    "Assumption that dpi_x == dpi_y does not hold true ({} == {})",
+	    dpi_x,
+	    dpi_y
+	);
+
+	return dpi_x;
+}
+
 void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
 try
 {
-	// WIP(Light): use ignored local variables...
-	auto &component = m_registry->add<SurfaceComponent>(entity, info);
-	ignore = component;
-
-	auto &surface = m_registry->get<SurfaceComponent>(entity);
+	auto &surface = m_registry->add<SurfaceComponent>(entity, info);
 	ensure_component_sanity(surface);
 
-	const auto &resolution = surface.get_resolution();
-	const auto &position = surface.get_position();
-	ignore = resolution;
-	ignore = position;
+	const auto style = WS_OVERLAPPEDWINDOW;
+	const auto ex_style = ::DWORD {};
+	const auto dpi = get_dpi_from_point(info.position);
 
-	surface.m_native_data.window = CreateWindowEx(
+	auto client_area_rectangle = ::RECT {
+		.left = info.position.x,
+		.top = info.position.y,
+		.right = static_cast<::LONG>(info.position.x + info.resolution.x),
+		.bottom = static_cast<::LONG>(info.position.y + info.resolution.y),
+	};
+	ensure(
+	    ::AdjustWindowRectExForDpi(&client_area_rectangle, style, false, ex_style, dpi),
+	    "Failed ::AdjustWindowRectExForDpi: {}",
+	    get_error_message()
+	);
+
+	auto hwnd = ::CreateWindowEx(
 	    0,
 	    constants::class_name,
 	    info.title.data(),
 	    WS_OVERLAPPEDWINDOW,
-	    CW_USEDEFAULT,
-	    CW_USEDEFAULT,
-	    CW_USEDEFAULT,
-	    CW_USEDEFAULT,
+	    client_area_rectangle.left,
+	    client_area_rectangle.top,
+	    client_area_rectangle.right - client_area_rectangle.left,
+	    client_area_rectangle.bottom - client_area_rectangle.top,
 	    nullptr,
 	    nullptr,
-	    GetModuleHandle(nullptr),
-	    nullptr
+	    ::GetModuleHandle(nullptr),
+	    /** @todo(Light): Component's address may change as the underlying ECS storage provides no
+	     * pointer-stability guarantees; Figure out a way to make this safe. */
+	    std::bit_cast<LPVOID>(&surface)
 	);
-	ensure(surface.m_native_data.window, "Failed to create Windows surface component");
+	ensure(hwnd, "Failed ::CreateWindowEx: {}", get_error_message());
 
-	ShowWindow(surface.m_native_data.window, SW_NORMAL);
-	// SetWindowLongPtrA(surface.m_native_data.window, 0, this);
-	// SetWindowLongPtrA(surface.m_native_data.window, 1, entity);
+	surface.m_native_data.window = hwnd;
 
-
-	// TODO(Light): refactor "environment" into standalone module
-	// NOLINTNEXTLINE(concurrency-mt-unsafe)
-	// auto *display_env = std::getenv("DISPLAY");
-	// ensure(display_env != nullptr, "DISPLAY env var not found!");
-	//
-	// auto *display = XOpenDisplay(display_env);
-	// ensure(display, "Failed to open XDisplay with DISPLAY: {}", display_env);
-	//
-	// auto root_window = XDefaultRootWindow(display);
-	//
-	// auto border_width = 0;
-	// auto depth = i32 { CopyFromParent };
-	// auto window_class = CopyFromParent;
-	// auto *visual = (Visual *)CopyFromParent;
-	//
-	// auto attribute_value_mask = CWBackPixel | CWEventMask;
-	// auto attributes = XSetWindowAttributes {
-	// 	.background_pixel = 0xffafe9af,
-	// 	.event_mask = all_events_mask,
-	// };
-	//
-	// typedef struct Hints
-	// {
-	// 	unsigned long flags;
-	// 	unsigned long functions;
-	// 	unsigned long decorations;
-	// 	long inputMode;
-	// 	unsigned long status;
-	// } Hints;
-	//
-	// auto main_window = XCreateWindow(
-	//     display,
-	//     root_window,
-	//     position.x,
-	//     position.y,
-	//     resolution.x,
-	//     resolution.y,
-	//     border_width,
-	//     depth,
-	//     window_class,
-	//     visual,
-	//     attribute_value_mask,
-	//     &attributes
-	// );
-	// surface.m_native_data.display = display;
-	// surface.m_native_data.window = main_window;
-	//
-	// surface.m_native_data.wm_delete_message = XInternAtom(display, "WM_DELETE_WINDOW", False);
-	// XSetWMProtocols(display, main_window, &surface.m_native_data.wm_delete_message, 1);
-	//
-	// // code to remove decoration
-	// auto hints = std::array<const unsigned char, 5> { 2, 0, 0, 0, 0 };
-	// const auto motif_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
-	//
-	// XChangeProperty(
-	//     display,
-	//     surface.m_native_data.window,
-	//     motif_hints,
-	//     motif_hints,
-	//     32,
-	//     PropModeReplace,
-	//     hints.data(),
-	//     5
-	// );
-	//
-	// XMapWindow(display, main_window);
-	// XStoreName(display, main_window, surface.m_title.c_str());
-	// XFlush(display);
-	//
-	// if (!surface.is_visible())
-	// {
-	// 	XUnmapWindow(display, main_window);
-	// }
+	::ShowWindow(surface.m_native_data.window, SW_SHOW);
 }
 catch (const std::exception &exp)
 {
@@ -846,158 +703,8 @@ void System::handle_events(SurfaceComponent &surface)
 	while (PeekMessage(&message, {}, {}, {}, PM_REMOVE))
 	{
 		TranslateMessage(&message);
-
-		const auto wParam = message.wParam;
-		switch (message.message)
-		{
-		case WM_SETFOCUS: log::debug("Window setfocus"); break;
-		case WM_KILLFOCUS: log::debug("Window killfocus"); break;
-		case WM_ACTIVATE:
-			log::debug("Window activate: {}", static_cast<size_t>(LOWORD(wParam)));
-			break;
-		case WM_MOUSEWHEEL:
-		{
-			const auto delta = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
-			log::debug("wheel delta: {}", static_cast<i64>(delta));
-			break;
-		}
-
-		case WM_LBUTTONDOWN:
-			log::debug("Left button down: {}", to_string(translate_key(wParam)));
-			break;
-		case WM_LBUTTONUP: log::debug("Left button up {}", to_string(translate_key(wParam))); break;
-
-		case WM_RBUTTONDOWN:
-			log::debug("Right button down {}", to_string(translate_key(wParam)));
-			break;
-		case WM_RBUTTONUP:
-			log::debug("Right button up {}", to_string(translate_key(wParam)));
-			break;
-
-		case WM_MBUTTONDOWN:
-			log::debug("Middle button down {}", to_string(translate_key(wParam)));
-			break;
-		case WM_MBUTTONUP:
-			log::debug("Middle button up {}", to_string(translate_key(wParam)));
-			break;
-
-		case WM_XBUTTONDOWN:
-		{
-			const auto key = static_cast<Key>(
-			    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
-			);
-			log::debug("xbutn: {}", std::to_underlying(key));
-			break;
-		}
-		case WM_XBUTTONUP:
-		{
-			const auto key = static_cast<Key>(
-			    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
-			);
-			log::debug("xbutn: {}", std::to_underlying(key));
-			break;
-		}
-		case WM_KEYDOWN: log::debug("Keydown: {}", to_string(translate_key(wParam))); break;
-		case WM_KEYUP: log::debug("Keyup__: {}", to_string(translate_key(wParam))); break;
-		}
-
 		DispatchMessage(&message);
 	}
-
-	// auto event = XEvent {};
-	// auto &[display, window, wm_delete_message] = surface.m_native_data;
-	//
-	// XFlush(display);
-	// while (XEventsQueued(display, QueuedAlready) != 0)
-	// {
-	// 	XNextEvent(surface.m_native_data.display, &event);
-	//
-	// 	switch (event.type)
-	// 	{
-	// 	case KeyPress:
-	// 	{
-	// 		queue.emplace_back<KeyPressedEvent>(
-	// 		    static_cast<u32>(XLookupKeysym(&event.xkey, 0))
-	// 		);
-	// 		break;
-	// 	}
-	// 	case KeyRelease:
-	// 	{
-	// 		queue.emplace_back<KeyReleasedEvent>(
-	// 		    static_cast<u32>(XLookupKeysym(&event.xkey, 0))
-	// 		);
-	// 		break;
-	// 	}
-	// 	case ButtonPress:
-	// 	{
-	// 		queue.emplace_back<ButtonPressedEvent>(static_cast<int>(event.xbutton.button));
-	// 		break;
-	// 	}
-	// 	case ButtonRelease:
-	// 	{
-	// 		queue.emplace_back<ButtonReleasedEvent>(static_cast<int>(event.xbutton.button));
-	// 		break;
-	// 	}
-	// 	case FocusIn:
-	// 	{
-	// 		queue.emplace_back<GainFocusEvent>({});
-	// 		break;
-	// 	}
-	// 	case FocusOut:
-	// 	{
-	// 		queue.emplace_back<LostFocusEvent>({});
-	// 		break;
-	// 	}
-	// 	case ClientMessage:
-	// 	{
-	// 		if (event.xclient.data.l[0] == wm_delete_message)
-	// 		{
-	// 			queue.emplace_back<ClosedEvent>({});
-	// 		}
-	//
-	// 		break;
-	// 	}
-	// 	case MotionNotify:
-	// 	{
-	// 		queue.emplace_back<MouseMovedEvent>(MouseMovedEvent {
-	// 		    static_cast<f32>(event.xmotion.x),
-	// 		    static_cast<f32>(event.xmotion.y),
-	// 		});
-	// 		break;
-	// 	}
-	// 	case ConfigureNotify:
-	// 	{
-	// 		const auto [prev_width, prev_height] = surface.get_resolution();
-	// 		const auto new_width = event.xconfigure.width;
-	// 		const auto new_height = event.xconfigure.height;
-	// 		if (prev_width != new_width || prev_height != new_height)
-	// 		{
-	// 			surface.m_resolution.x = new_width;
-	// 			surface.m_resolution.y = new_height;
-	// 			queue.emplace_back<ResizedEvent>(ResizedEvent {
-	// 			    static_cast<u32>(new_width),
-	// 			    static_cast<u32>(new_height),
-	// 			});
-	// 		}
-	//
-	// 		const auto [prev_x, prev_y] = surface.get_position();
-	// 		const auto new_x = event.xconfigure.x;
-	// 		const auto new_y = event.xconfigure.y;
-	// 		if (prev_x != new_x || prev_y != new_y)
-	// 		{
-	// 			surface.m_position.x = new_x;
-	// 			surface.m_position.y = new_y;
-	// 			queue.emplace_back<MovedEvent>(MovedEvent {
-	// 			    new_x,
-	// 			    new_y,
-	// 			});
-	// 		}
-	// 		break;
-	// 	}
-	//
-	// 	default: break; /* pass */
-	// 	}
-	// }
 }
 
 void System::handle_requests(SurfaceComponent &surface)
@@ -1099,15 +806,28 @@ void System::modify_resolution(SurfaceComponent &surface, const ModifyResolution
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
-	// log::debug("Setting window position to: {}, {}", request.position.x, request.position.y);
+	auto hwnd = surface.m_native_data.window;
+
+	const auto style = ::GetWindowLong(hwnd, GWL_STYLE);
+	const auto ex_style = ::GetWindowLong(hwnd, GWL_EXSTYLE);
+	const auto dpi = get_dpi_from_point(request.position);
+
+	auto rectangle = ::RECT {
+		.left = {},
+		.top = {},
+		.right = static_cast<::LONG>(surface.get_resolution().x),
+		.bottom = static_cast<::LONG>(surface.get_resolution().y),
+	};
+	AdjustWindowRectExForDpi(&rectangle, style, false, ex_style, dpi);
+
 	SetWindowPos(
 	    surface.m_native_data.window,
 	    {},
-	    request.position.x,
-	    request.position.y,
-	    {},
-	    {},
-	    {}
+	    request.position.x + rectangle.left,
+	    request.position.y + rectangle.top,
+	    surface.get_resolution().x,
+	    surface.get_resolution().y,
+	    SWP_NOZORDER | SWP_NOACTIVATE
 	);
 }
 
@@ -1146,9 +866,408 @@ void System::tick(app::TickInfo tick)
 	};
 }
 
+/* static */ auto System::to_native_key(Key code) noexcept -> i64
+{
+	using enum Key;
+
+	switch (code)
+	{
+	case left_button: return VK_LBUTTON;
+	case right_button: return VK_RBUTTON;
+	case middle_button: return VK_MBUTTON;
+
+	case escape: return VK_ESCAPE;
+	case backspace: return VK_BACK;
+	case tab: return VK_TAB;
+	case capslock: return VK_CAPITAL;
+	case enter: return VK_RETURN;
+	case space: return VK_SPACE;
+	case delete_: return VK_DELETE;
+
+	case shift: return VK_SHIFT;
+	case right_shift: return VK_RSHIFT;
+
+	case control: return VK_CONTROL;
+	case right_control: return VK_RCONTROL;
+
+	case alt: return VK_MENU;
+	case right_alt: return VK_RMENU;
+
+	case pageup: return VK_PRIOR;
+	case pagedown: return VK_NEXT;
+	case end: return VK_END;
+	case home: return VK_HOME;
+
+	case left_arrow: return VK_LEFT;
+	case right_arrow: return VK_RIGHT;
+	case down_arrow: return VK_DOWN;
+	case up_arrow: return VK_UP;
+
+	case cancel: return VK_CANCEL;
+	case pause: return VK_PAUSE;
+	case select: return VK_SELECT;
+	case print: return VK_PRINT;
+	case snapshot: return VK_SNAPSHOT;
+	case insert: return VK_INSERT;
+	case help: return VK_HELP;
+	case sleep: return VK_SLEEP;
+
+	case digit_0: return '0';
+	case digit_1: return '1';
+	case digit_2: return '2';
+	case digit_3: return '3';
+	case digit_4: return '4';
+	case digit_5: return '5';
+	case digit_6: return '6';
+	case digit_7: return '7';
+	case digit_8: return '8';
+	case digit_9: return '9';
+
+	case a: return 'A';
+	case b: return 'B';
+	case c: return 'C';
+	case d: return 'D';
+	case e: return 'E';
+	case f: return 'F';
+	case g: return 'G';
+	case h: return 'H';
+	case i: return 'I';
+	case j: return 'J';
+	case k: return 'K';
+	case l: return 'L';
+	case m: return 'M';
+	case n: return 'N';
+	case o: return 'O';
+	case p: return 'P';
+	case q: return 'Q';
+	case r: return 'R';
+	case s: return 'S';
+	case t: return 'T';
+	case u: return 'U';
+	case v: return 'V';
+	case w: return 'W';
+	case x: return 'X';
+	case y: return 'Y';
+	case z: return 'Z';
+
+	case super: return VK_LWIN;
+	case right_super: return VK_RWIN;
+
+	case kp_0: return VK_NUMPAD0;
+	case kp_1: return VK_NUMPAD1;
+	case kp_2: return VK_NUMPAD2;
+	case kp_3: return VK_NUMPAD3;
+	case kp_4: return VK_NUMPAD4;
+	case kp_5: return VK_NUMPAD5;
+	case kp_6: return VK_NUMPAD6;
+	case kp_7: return VK_NUMPAD7;
+	case kp_8: return VK_NUMPAD8;
+	case kp_9: return VK_NUMPAD9;
+
+	case kp_multiply: return VK_MULTIPLY;
+	case kp_add: return VK_ADD;
+	case kp_subtract: return VK_SUBTRACT;
+	case kp_decimal: return VK_DECIMAL;
+
+	case f1: return VK_F1;
+	case f2: return VK_F2;
+	case f3: return VK_F3;
+	case f4: return VK_F4;
+	case f5: return VK_F5;
+	case f6: return VK_F6;
+	case f7: return VK_F7;
+	case f8: return VK_F8;
+	case f9: return VK_F9;
+	case f10: return VK_F10;
+	case f11: return VK_F11;
+	case f12: return VK_F12;
+	}
+
+	return {};
+};
+
+/* static */ auto System::to_engine_key(int code) noexcept -> Key
+{
+	using enum Key;
+
+	switch (code)
+	{
+	case VK_LBUTTON: return left_button;
+	case VK_RBUTTON: return right_button;
+	case VK_MBUTTON: return middle_button;
+
+	case VK_ESCAPE: return escape;
+	case VK_BACK: return backspace;
+	case VK_TAB: return tab;
+	case VK_CAPITAL: return capslock;
+	case VK_RETURN: return enter;
+	case VK_SPACE: return space;
+	case VK_DELETE: return delete_;
+
+	case VK_SHIFT: return shift;
+	case VK_RSHIFT: return right_shift;
+
+	case VK_CONTROL: return control;
+	case VK_RCONTROL: return right_control;
+
+	case VK_MENU: return alt;
+	case VK_RMENU: return right_alt;
+
+	case VK_PRIOR: return pageup;
+	case VK_NEXT: return pagedown;
+	case VK_END: return end;
+	case VK_HOME: return home;
+
+	case VK_LEFT: return left_arrow;
+	case VK_RIGHT: return right_arrow;
+	case VK_DOWN: return down_arrow;
+	case VK_UP: return up_arrow;
+
+	case VK_CANCEL: return cancel;
+	case VK_PAUSE: return pause;
+	case VK_SELECT: return Key::select;
+	case VK_PRINT: return print;
+	case VK_SNAPSHOT: return snapshot;
+	case VK_INSERT: return insert;
+	case VK_HELP: return help;
+	case VK_SLEEP: return sleep;
+
+	case '0': return digit_0;
+	case '1': return digit_1;
+	case '2': return digit_2;
+	case '3': return digit_3;
+	case '4': return digit_4;
+	case '5': return digit_5;
+	case '6': return digit_6;
+	case '7': return digit_7;
+	case '8': return digit_8;
+	case '9': return digit_9;
+
+	case 'A': return a;
+	case 'B': return b;
+	case 'C': return c;
+	case 'D': return d;
+	case 'E': return e;
+	case 'F': return f;
+	case 'G': return g;
+	case 'H': return h;
+	case 'I': return i;
+	case 'J': return j;
+	case 'K': return k;
+	case 'L': return l;
+	case 'M': return m;
+	case 'N': return n;
+	case 'O': return o;
+	case 'P': return p;
+	case 'Q': return q;
+	case 'R': return r;
+	case 'S': return s;
+	case 'T': return t;
+	case 'U': return u;
+	case 'V': return v;
+	case 'W': return w;
+	case 'X': return x;
+	case 'Y': return y;
+	case 'Z': return z;
+
+	case VK_LWIN: return super;
+	case VK_RWIN: return right_super;
+
+	case VK_NUMPAD0: return kp_0;
+	case VK_NUMPAD1: return kp_1;
+	case VK_NUMPAD2: return kp_2;
+	case VK_NUMPAD3: return kp_3;
+	case VK_NUMPAD4: return kp_4;
+	case VK_NUMPAD5: return kp_5;
+	case VK_NUMPAD6: return kp_6;
+	case VK_NUMPAD7: return kp_7;
+	case VK_NUMPAD8: return kp_8;
+	case VK_NUMPAD9: return kp_9;
+
+	case VK_MULTIPLY: return kp_multiply;
+	case VK_ADD: return kp_add;
+	case VK_SUBTRACT: return kp_subtract;
+	case VK_DECIMAL: return kp_decimal;
+
+	case VK_F1: return f1;
+	case VK_F2: return f2;
+	case VK_F3: return f3;
+	case VK_F4: return f4;
+	case VK_F5: return f5;
+	case VK_F6: return f6;
+	case VK_F7: return f7;
+	case VK_F8: return f8;
+	case VK_F9: return f9;
+	case VK_F10: return f10;
+	case VK_F11: return f11;
+	case VK_F12: return f12;
+	}
+
+	return Key::unknown;
+};
+
+/* static */ auto CALLBACK System::window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    -> LRESULT
+{
+	const auto get_userdata = [hwnd]() -> SurfaceComponent & {
+		auto *long_ptr = std::bit_cast<SurfaceComponent *>(GetWindowLongPtrA(hwnd, GWLP_USERDATA));
+
+		/** @todo(Light): Throwing here causes a crash, handle errors more gracefully. */
+		ensure(long_ptr != nullptr, "Null window longptr!");
+
+		return *long_ptr;
+	};
+
+	switch (uMsg)
+	{
+	case WM_NCCREATE:
+		[[unlikely]]
+		{
+			const auto *create_struct = std::bit_cast<::CREATESTRUCT *>(lParam);
+			auto *surface_ptr = std::bit_cast<SurfaceComponent *>(create_struct->lpCreateParams);
+			::SetWindowLongPtrA(hwnd, GWLP_USERDATA, std::bit_cast<LONG_PTR>(surface_ptr));
+
+			return !!surface_ptr;
+		}
+
+	case WM_SETFOCUS: get_userdata().m_event_queue.emplace_back(GainFocusEvent {}); break;
+
+	case WM_KILLFOCUS: get_userdata().m_event_queue.emplace_back(LostFocusEvent {}); break;
+
+	case WM_SIZE:
+	{
+		const auto width = LOWORD(lParam);
+		const auto height = HIWORD(lParam);
+
+		lt::log::test("Received WM_SIZE: {}, {}", width, height);
+		auto &surface = get_userdata();
+		surface.m_resolution = math::vec2_u32 { width, height };
+		surface.m_event_queue.emplace_back(ResizedEvent { width, height });
+
+		return 0;
+	}
+
+	case WM_MOVE:
+	{
+		auto client_top_left = ::POINT {};
+		ensure(
+		    ::ClientToScreen(hwnd, &client_top_left),
+		    "Failed ::ClientToScreen (hwnd: {:x})",
+		    std::bit_cast<size_t>(hwnd)
+		);
+
+		auto &surface = get_userdata();
+
+		surface.m_position = {
+			client_top_left.x,
+			client_top_left.y,
+		};
+
+		surface.m_event_queue.emplace_back(
+		    MovedEvent { static_cast<i32>(client_top_left.x), static_cast<i32>(client_top_left.y) }
+		);
+
+		return 0;
+	}
+
+	case WM_MOUSEWHEEL:
+	{
+		const auto delta = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+
+		if (delta > 0)
+		{
+			get_userdata().m_event_queue.emplace_back(KeyPressedEvent { Key::wheel_up });
+			get_userdata().m_event_queue.emplace_back(KeyReleasedEvent { Key::wheel_up });
+		}
+		else if (delta < 0)
+		{
+			get_userdata().m_event_queue.emplace_back(KeyPressedEvent { Key::wheel_down });
+			get_userdata().m_event_queue.emplace_back(KeyReleasedEvent { Key::wheel_down });
+		}
+
+		break;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(Key::left_button);
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(Key::left_button);
+		break;
+	}
+	case WM_RBUTTONDOWN:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(Key::right_button);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(Key::right_button);
+		break;
+	}
+	case WM_MBUTTONDOWN:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(Key::middle_button);
+		break;
+	}
+	case WM_MBUTTONUP:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(Key::middle_button);
+		break;
+	}
+	case WM_XBUTTONDOWN:
+	{
+		const auto key = static_cast<Key>(
+		    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
+		);
+		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(key);
+		break;
+	}
+	case WM_XBUTTONUP:
+	{
+		const auto key = static_cast<Key>(
+		    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
+		);
+		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(key);
+		break;
+	}
+	case WM_KEYDOWN:
+	{
+		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(
+		    to_engine_key(static_cast<int>(wParam))
+		);
+		break;
+	}
+	case WM_KEYUP:
+
+	{
+		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(
+		    to_engine_key(static_cast<int>(wParam))
+		);
+		break;
+	}
+
+	case WM_CLOSE:
+	{
+		get_userdata().m_event_queue.emplace_back<ClosedEvent>({});
+		return 0;
+	}
+
+	case WM_DESTROY:
+	{
+		PostQuitMessage(0);
+		return 0;
+	}
+	}
+
+	return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+}
+
 void ensure_component_sanity(const SurfaceComponent &component)
 {
-	auto [width, height] = component.get_resolution();
+	const auto [width, height] = component.get_resolution();
 
 	ensure(width != 0u, "Received bad values for surface component: width({}) == 0", width);
 
@@ -1176,29 +1295,42 @@ void ensure_component_sanity(const SurfaceComponent &component)
 	);
 }
 
-auto CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT
+[[nodiscard]] auto get_error_message() -> std::string
 {
-	switch (uMsg)
+	const auto error = GetLastError();
+
+	auto msg = LPSTR { nullptr };
+	::FormatMessageA(
+	    FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+	    nullptr,
+	    error,
+	    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+	    std::bit_cast<::LPSTR>(&msg),
+	    0,
+	    nullptr
+	);
+
+	if (!msg)
 	{
-	case WM_KILLFOCUS:
-	case WM_MOVE:
-	case WM_SETFOCUS:
-	case WM_ACTIVATE:
-	case WM_MOUSEWHEEL:
-	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
-	case WM_MBUTTONDOWN:
-	case WM_MBUTTONUP:
-	case WM_XBUTTONDOWN:
-	case WM_XBUTTONUP:
-	case WM_KEYDOWN:
-	case WM_KEYUP: return 0;
-	case WM_DESTROY: PostQuitMessage(0); return 0;
+		return "Unknown error (" + std::to_string(error) + ")";
 	}
 
-	return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+	auto result = std::string { msg };
+	::LocalFree(msg);
+	return result;
+}
+
+void check_hresult(HRESULT result)
+{
+	if (!result)
+	{
+		return;
+	}
+
+	auto error = ::_com_error { result };
+	auto message = std::string { ::LPCTSTR { error.ErrorMessage() } };
+
+	throw std::runtime_error { std::format("HResult failed: {}", message) };
 }
 
 #endif

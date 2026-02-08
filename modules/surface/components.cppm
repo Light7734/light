@@ -32,9 +32,7 @@ public:
 	    GainFocusEvent,
 	    KeyPressedEvent,
 	    KeyReleasedEvent,
-	    MouseMovedEvent,
-	    ButtonPressedEvent,
-	    ButtonReleasedEvent>;
+	    PointerEvent>;
 
 	using Request = std::variant<
 	    ModifyTitleRequest,
@@ -65,6 +63,8 @@ public:
 	struct CreateInfo
 	{
 		std::string_view title;
+
+		math::vec2_i32 position;
 
 		math::vec2_u32 resolution;
 
