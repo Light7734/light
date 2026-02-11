@@ -13,9 +13,9 @@ platform:
 
 steps:
 - name: unit tests
-  shell: pwsh
+  shell: powershell
   commands: 
-    - ./tools/ci/amd64/msvc/unit_tests.ps1
+    - pwsh ./tools/ci/amd64/msvc/unit_tests.ps1
 
 ---
 kind: pipeline
