@@ -19,11 +19,11 @@ cmake `
     -B build `
     -G Ninja `
     -D ENABLE_UNIT_TESTS=ON `
-    -D CMAKE_BUILD_TYPE=Debug `
+    -D CMAKE_BUILD_TYPE=Release `
     -D CMAKE_EXPORT_COMPILE_COMMANDS=True `
     -D CMAKE_CXX_FLAGS="/std:c++latest /EHsc /Zi /Oy- /WX /W4"
 
-cmake --build ./build
+cmake --build ./build || $(exit $LASTEXITCODE)
 
 $tests = Get-ChildItem -Path "./build" -Recurse -File | Where-Object {
     $_.Name -like "*_tests.exe"

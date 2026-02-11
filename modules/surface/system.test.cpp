@@ -20,6 +20,7 @@ import memory.reference;
 import math.vec2;
 import app.system;
 
+using ::lt::Key;
 using ::lt::surface::SurfaceComponent;
 using ::lt::surface::System;
 
@@ -31,21 +32,6 @@ using ::lt::surface::System;
 		.start_time = std::chrono::steady_clock::now(),
 	};
 }
-
-
-// void simulate_key_down(lt::surface::SurfaceComponent &surface, lt::Key key)
-// {
-// #if defined(LIGHT_PLATFORM_LINUX)
-// #elif defined(LIGHT_PLATFORM_WINDOWS)
-// #endif
-// }
-//
-// void simulate_key_up(lt::Key key)
-// {
-// #if defined(LIGHT_PLATFORM_LINUX)
-// #elif defined(LIGHT_PLATFORM_WINDOWS)
-// #endif
-// }
 
 constexpr auto title = "TestWindow";
 constexpr auto width = 800u;
@@ -164,9 +150,19 @@ Suite system_events = "system_events"_suite = [] {
 Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_construct initializes component" } = [] {
 		auto fixture = Fixture {};
+		auto system = System { fixture.registry() };
 
+		system.tick({});
+		system.tick({});
 		const auto &component = fixture.create_component();
+		system.tick({});
+		system.tick({});
+		system.tick({});
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
+
+		system.tick({});
+		system.tick({});
+		system.tick({});
 		fixture.check_values(*component);
 	};
 
@@ -256,8 +252,9 @@ Suite tick = "ticking"_suite = [] {
 		auto system = System { fixture.registry() };
 		auto &surface = **fixture.create_component();
 
-		constexpr auto position = lt::math::vec2_i32 { 50, 50 };
-		constexpr auto resolution = lt::math::vec2_u32 { width, height };
+		const auto new_title = std::string { title } + std::string { "_" };
+		constexpr auto new_position = lt::math::vec2_i32 { position_x + 50, position_y + 50 };
+		constexpr auto new_resolution = lt::math::vec2_u32 { width + 50, height + 50 };
 
 		expect_eq(surface.peek_requests().size(), 0);
 
@@ -266,11 +263,11 @@ Suite tick = "ticking"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(surface.peek_requests().size(), 0);
 
-		surface.push_request(lt::surface::ModifyTitleRequest(title));
+		surface.push_request(lt::surface::ModifyTitleRequest(new_title));
 		expect_eq(surface.peek_requests().size(), 1);
 
-		surface.push_request(lt::surface::ModifyResolutionRequest(resolution));
-		surface.push_request(lt::surface::ModifyPositionRequest(position));
+		surface.push_request(lt::surface::ModifyResolutionRequest(new_resolution));
+		surface.push_request(lt::surface::ModifyPositionRequest(new_position));
 		expect_eq(surface.peek_requests().size(), 1 + 2);
 
 		surface.push_request(lt::surface::ModifyVisibilityRequest(false));
@@ -280,10 +277,51 @@ Suite tick = "ticking"_suite = [] {
 
 		system.tick(tick_info());
 		expect_eq(surface.peek_requests().size(), 0);
+	};
+};
 
-		expect_eq(surface.get_title(), title);
-		expect_eq(surface.get_position(), position);
-		expect_eq(surface.get_resolution(), resolution);
+Suite requests = "requests"_suite = [] {
+	using ::lt::surface::ModifyTitleRequest;
+	using ::lt::surface::ModifyResolutionRequest;
+	using ::lt::surface::ModifyPositionRequest;
+	using ::lt::surface::ModifyVisibilityRequest;
+
+	auto fixture = Fixture {};
+	auto system = System { fixture.registry() };
+	auto &surface = **fixture.create_component();
+
+	Case { "ModifyTitleRequest" } = [&] {
+		const auto new_title = std::string { title } + std::string { "_" };
+		surface.push_request({ ModifyTitleRequest { new_title } });
+
+		system.tick({});
+		expect_eq(surface.get_title(), new_title);
+	};
+
+	Case { "ModifyResolutionRequest" } = [&] {
+		constexpr auto new_resolution = lt::math::vec2_u32 { width + 50, height + 50 };
+		surface.push_request({ ModifyResolutionRequest { new_resolution } });
+
+		system.tick({});
+		expect_eq(surface.get_resolution(), new_resolution);
+	};
+
+	Case { "ModifyPositionRequest" } = [&] {
+		constexpr auto new_position = lt::math::vec2_i32 { position_x + 50, position_y + 50 };
+		surface.push_request({ ModifyPositionRequest { new_position } });
+
+		system.tick({});
+		expect_eq(surface.get_position(), new_position);
+	};
+
+	Case { "ModifyVisibilityRequest" } = [&] {
+		surface.push_request({ ModifyVisibilityRequest { .visible = false } });
+		system.tick({});
+		expect_eq(surface.is_visible(), false);
+
+		surface.push_request({ ModifyVisibilityRequest { .visible = true } });
+		system.tick({});
+		expect_eq(surface.is_visible(), true);
 	};
 };
 
@@ -302,7 +340,8 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		::SendMessage(hwnd, WM_SETFOCUS, {}, {});
 		expect_eq(events.size(), 1u);
 
-		ignore = std::get<lt::surface::GainFocusEvent>(events.front());
+		auto event = std::get<lt::surface::GainFocusEvent>(events.front());
+		::lt::log::trace("{}", event.to_string()); // make sure it's not optimized away?
 	};
 
 	system.tick({});
@@ -311,7 +350,8 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		::SendMessage(hwnd, WM_KILLFOCUS, {}, {});
 		expect_eq(events.size(), 1u);
 
-		ignore = std::get<lt::surface::LostFocusEvent>(events.front());
+		auto event = std::get<lt::surface::LostFocusEvent>(events.front());
+		::lt::log::trace("{}", event.to_string()); // make sure it's not optimized away?
 	};
 
 	system.tick({});
@@ -350,60 +390,133 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 
 	system.tick({});
 	Case { "WM_MOUSEWHEEL" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, WHEEL_DELTA), {});
+		::SendMessage(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, -WHEEL_DELTA), {});
+
+		// Mouse wheel is treated like key presses,
+		// but since there is no "release" action for it...
+		// Every movement causes two key press events together:
+		// Press + Release of wheel_up/down.
+		expect_eq(events.size(), 4u);
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::wheel_up);
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[1]).get_key(), Key::wheel_up);
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[2]).get_key(), Key::wheel_down);
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[3]).get_key(), Key::wheel_down);
 	};
 
 	system.tick({});
 	Case { "WM_LBUTTONDOWN" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_LBUTTONDOWN, {}, {});
+		expect_eq(events.size(), 1u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::left_button);
 	};
 
 	system.tick({});
 	Case { "WM_LBUTTONUP" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_LBUTTONUP, {}, {});
+		expect_eq(events.size(), 1u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::left_button);
 	};
 
 	system.tick({});
 	Case { "WM_RBUTTONDOWN" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_RBUTTONDOWN, {}, {});
+		expect_eq(events.size(), 1u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::right_button);
 	};
 
 	system.tick({});
 	Case { "WM_RBUTTONUP" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_RBUTTONUP, {}, {});
+		expect_eq(events.size(), 1u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::right_button);
 	};
 
 	system.tick({});
 	Case { "WM_MBUTTONDOWN" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_MBUTTONDOWN, {}, {});
+		expect_eq(events.size(), 1u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::middle_button);
 	};
 
 	system.tick({});
 	Case { "WM_MBUTTONUP" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_MBUTTONUP, {}, {});
+		expect_eq(events.size(), 1u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::middle_button);
 	};
+
 
 	system.tick({});
 	Case { "WM_XBUTTONDOWN" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_XBUTTONDOWN, MAKEWPARAM(0, XBUTTON1), {});
+		::SendMessage(hwnd, WM_XBUTTONDOWN, MAKEWPARAM(0, XBUTTON2), {});
+		expect_eq(events.size(), 2u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::x_button_1);
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[1]).get_key(), Key::x_button_2);
 	};
 
 	system.tick({});
 	Case { "WM_XBUTTONUP" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_XBUTTONUP, MAKEWPARAM(0, XBUTTON1), {});
+		::SendMessage(hwnd, WM_XBUTTONUP, MAKEWPARAM(0, XBUTTON2), {});
+		expect_eq(events.size(), 2u);
+
+		// Mouse buttons are treated like key presses.
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::x_button_1);
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[1]).get_key(), Key::x_button_2);
 	};
 
 	system.tick({});
 	Case { "WM_KEYDOWN" } = [&] {
 		expect_eq(events.size(), 0u);
-		::SendMessage(hwnd, WM_KEYDOWN, System::to_native_key(lt::Key::escape), {});
+		::SendMessage(hwnd, WM_KEYDOWN, System::to_native_key(Key::escape), {});
 		expect_eq(events.size(), 1u);
 
-		const auto &event = std::get<lt::surface::KeyPressedEvent>(events.front());
-		expect_eq(event.get_key(), lt::Key::escape);
+		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::escape);
 	};
 
 	system.tick({});
 	Case { "WM_KEYUP" } = [&] {
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_KEYUP, System::to_native_key(Key::escape), {});
+		expect_eq(events.size(), 1u);
+
+		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::escape);
 	};
 
 	system.tick({});
 	Case { "WM_CLOSE" } = [&] {
-	};
+		expect_eq(events.size(), 0u);
+		::SendMessage(hwnd, WM_CLOSE, {}, {});
+		expect_eq(events.size(), 1u);
 
-	system.tick({});
-	Case { "WM_DESTROY" } = [&] {
+		// would throw if type is incorrect
+		auto event = std::get<lt::surface::ClosedEvent>(events[0]);
+		::lt::log::trace("{}", event.to_string()); // make sure it's not optimized away?
 	};
 };
 

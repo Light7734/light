@@ -72,6 +72,10 @@ private:
 class PointerEvent
 {
 public:
+	PointerEvent(math::vec2 position): m_position(position)
+	{
+	}
+
 	PointerEvent(f32 x, f32 y): m_position(x, y)
 	{
 	}
@@ -135,6 +139,10 @@ public:
 class MovedEvent
 {
 public:
+	MovedEvent(math::vec2_i32 position): m_position(position)
+	{
+	}
+
 	MovedEvent(i32 x, i32 y): m_position(x, y)
 	{
 	}
@@ -156,6 +164,10 @@ private:
 class ResizedEvent
 {
 public:
+	ResizedEvent(math::vec2_u32 size): m_size(size)
+	{
+	}
+
 	ResizedEvent(u32 width, u32 height): m_size(width, height)
 	{
 	}

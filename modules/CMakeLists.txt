@@ -128,6 +128,11 @@ if(WIN32)
         memory
         input_codes
         PRIVATE_DEPENDENCIES
+        user32
+        gdi32
+        kernel32
+        dwmapi
+        Shcore
         logger
         time
         TESTS

@@ -11,7 +11,10 @@ export module input.codes;
 
 import preliminary;
 
-export enum class Key: u16 {
+export namespace lt {
+
+enum class Key : u16
+{
 	none = 0,
 
 	left_button,
@@ -27,6 +30,12 @@ export enum class Key: u16 {
 	x_button_1,
 	x_button_2,
 
+	// Mouse-wheel movement is treated like a key, deal with it.
+	wheel_down,
+	wheel_up,
+
+	escape,
+	escp = escape,
 	backspace,
 	tab,
 	capslock,
@@ -167,7 +176,7 @@ export enum class Key: u16 {
 	unknown,
 };
 
-export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
+[[nodiscard]] constexpr auto to_string(Key key) -> std::string
 {
 	using enum Key;
 	switch (key)
@@ -181,6 +190,10 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 	case x_button_1: return "x_button_1";
 	case x_button_2: return "x_button_2";
 
+	case wheel_down: return "wheel_down";
+	case wheel_up: return "wheel_up";
+
+	case escape: return "escape";
 	case backspace: return "backspace";
 	case tab: return "tab";
 	case capslock: return "capslock";
@@ -290,3 +303,15 @@ export [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 
 	return "<invalid>";
 }
+
+} // namespace lt
+
+template<>
+struct std::formatter<lt::Key>: std::formatter<std::string_view>
+{
+	template<typename FormatContext>
+	auto format(lt::Key key, FormatContext &ctx) const
+	{
+		return std::formatter<std::string_view>::format(lt::to_string(key), ctx);
+	}
+};

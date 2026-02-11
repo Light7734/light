@@ -36,17 +36,11 @@ private:
 
 	void on_key_release(const lt::surface::KeyReleasedEvent &event);
 
-	void on_pointer_move(const lt::surface::MouseMovedEvent &event);
-
-	void on_button_press(const lt::surface::ButtonPressedEvent &event);
-
-	void on_button_release(const lt::surface::ButtonReleasedEvent &event);
+	void on_pointer(const lt::surface::PointerEvent &event);
 
 	memory::Ref<ecs::Registry> m_registry;
 
 	std::array<bool, 512> m_keys {};
-
-	std::array<bool, 512> m_buttons {};
 
 	math::vec2 m_pointer_position;
 
@@ -131,9 +125,7 @@ void System::handle_event(const surface::SurfaceComponent::Event &event)
 		[this](const surface::LostFocusEvent &) { on_surface_lost_focus(); },
 		[this](const surface::KeyPressedEvent &event) { on_key_press(event); },
 		[this](const surface::KeyReleasedEvent &event) { on_key_release(event); },
-		[this](const surface::MouseMovedEvent &event) { on_pointer_move(event); },
-		[this](const surface::ButtonPressedEvent &event) { on_button_press(event); },
-		[this](const surface::ButtonReleasedEvent &event) { on_button_release(event); },
+		[this](const surface::PointerEvent &event) { on_pointer(event); },
 		[this](auto) {},
 	};
 
@@ -145,11 +137,6 @@ void System::on_surface_lost_focus()
 	for (auto &key : m_keys)
 	{
 		key = false;
-	}
-
-	for (auto &button : m_buttons)
-	{
-		button = false;
 	}
 }
 
@@ -183,19 +170,9 @@ void System::on_key_release(const lt::surface::KeyReleasedEvent &event)
 	m_keys[std::to_underlying(event.get_key())] = false;
 }
 
-void System::on_pointer_move(const lt::surface::MouseMovedEvent &event)
+void System::on_pointer(const lt::surface::PointerEvent &event)
 {
 	m_pointer_position = event.get_position();
-}
-
-void System::on_button_press(const lt::surface::ButtonPressedEvent &event)
-{
-	m_buttons[std::to_underlying(event.get_button())] = true;
-}
-
-void System::on_button_release(const lt::surface::ButtonReleasedEvent &event)
-{
-	m_buttons[std::to_underlying(event.get_button())] = false;
 }
 
 } // namespace lt::input

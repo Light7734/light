@@ -147,7 +147,7 @@ Suite tick = "tick"_suite = [] {
 		auto action_key = input.add_action(
 		    {
 		        .name { "test" },
-		        .trigger = { .mapped_keycode = Key::a },
+		        .trigger = { .mapped_keycode = lt::Key::a },
 		    }
 		);
 
@@ -156,7 +156,7 @@ Suite tick = "tick"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, inactive);
 
-		surface.push_event(lt::surface::KeyPressedEvent(Key::a));
+		surface.push_event(lt::surface::KeyPressedEvent(lt::Key::a));
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, triggered);
 
@@ -168,7 +168,7 @@ Suite tick = "tick"_suite = [] {
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, active);
 
-		surface.push_event(lt::surface::KeyReleasedEvent(Key::a));
+		surface.push_event(lt::surface::KeyReleasedEvent(lt::Key::a));
 		system.tick(tick_info());
 		expect_eq(input.get_action(action_key).state, inactive);
 	};

@@ -1,6 +1,7 @@
 export module renderer.vk.renderer;
 
 import preliminary;
+import time;
 import logger;
 import assets.shader;
 import renderer.vk.api_wrapper;
@@ -290,22 +291,27 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, u32 image_idx)
 	    }
 	);
 
+	static lt::time::Timer timer;
+
 	using Attachment = vk::CommandBuffer::RenderingInfo::AttachmentInfo;
-	cmd.begin_rendering(
-	    {
+	cmd.begin_rendering({
         .area_offset = {0u, 0u,},
         .area_extent = m_resolution,
         .color_attachments = std::vector<Attachment> {
-        Attachment{
-            .view= &m_swapchain->get_image_view(image_idx),
-            .layout = vk::Image::Layout::color_attachment_optimal,
-            .load_operation = Attachment::LoadOperation::clear,
-            .store_operation = Attachment::StoreOperation::store,
-            .color_clear_values = {.5f, .5f, .5f, 1.f}
+            Attachment{
+                .view= &m_swapchain->get_image_view(image_idx),
+                .layout = vk::Image::Layout::color_attachment_optimal,
+                .load_operation = Attachment::LoadOperation::clear,
+                .store_operation = Attachment::StoreOperation::store,
+                .color_clear_values = {
+                    static_cast<float>(std::sin(timer.elapsed_time().count())),
+                    static_cast<float>(std::cos(timer.elapsed_time().count() * 2.0)),
+                    static_cast<float>(std::sin(timer.elapsed_time().count() / 2.0)),
+                    1.f
+                }
+            }
         }
-        }
-	    }
-	);
+    });
 	// cmd.bind_pipeline(m_pass->get_pipeline(), vk::Pipeline::BindPoint::graphics);
 	// cmd.set_viewport(
 	//     {

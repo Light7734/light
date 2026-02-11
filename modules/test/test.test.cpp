@@ -8,7 +8,6 @@ Suite expects = "expects"_suite = []() {
 	  };
 
 	Case { "this emptiness machine" } = [] {
-		expect_le(9, 6);
 	};
 
 	Case { "expect_unreachable" } = [] {

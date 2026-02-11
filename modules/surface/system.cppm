@@ -6,6 +6,8 @@ module;
 	#include <ShellScalingApi.h>
 	#include <Windows.h>
 	#include <comdef.h>
+	#include <dwmapi.h> // For DWM functions
+	#include <windowsx.h>
 
 	#if defined(UNICODE) || defined(_UNICODE)
 		#error "Unicode is not turned off"
@@ -165,11 +167,7 @@ private:
 
 	void modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request);
 
-	void modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request);
-
-	void modify_position(ecs::EntityId surface_entity, const math::vec2_i32 &new_size);
-
-	void modify_position(ecs::EntityId surface_entity, const math::vec2_u32 &new_size);
+	void modify_visibility(SurfaceComponent &surface, const ModifyVisibilityRequest &request);
 
 	void set_visibility(ecs::EntityId surface_entity, bool visible);
 
@@ -636,31 +634,26 @@ try
 	auto &surface = m_registry->add<SurfaceComponent>(entity, info);
 	ensure_component_sanity(surface);
 
-	const auto style = WS_OVERLAPPEDWINDOW;
-	const auto ex_style = ::DWORD {};
-	const auto dpi = get_dpi_from_point(info.position);
+	// auto style = WS_THICKFRAME    // Required for a standard resizeable window
+	//              | WS_SYSMENU     // Support snapping via Win + ← / Win + →
+	//              | WS_MAXIMIZEBOX // Support maximizing via mouse dragging to the top of the
+	//              screen | WS_MINIMIZEBOX // Support minimizing by clicking on the taskbar icon
+	//     ;
 
-	auto client_area_rectangle = ::RECT {
-		.left = info.position.x,
-		.top = info.position.y,
-		.right = static_cast<::LONG>(info.position.x + info.resolution.x),
-		.bottom = static_cast<::LONG>(info.position.y + info.resolution.y),
-	};
-	ensure(
-	    ::AdjustWindowRectExForDpi(&client_area_rectangle, style, false, ex_style, dpi),
-	    "Failed ::AdjustWindowRectExForDpi: {}",
-	    get_error_message()
-	);
+	// if (info.visible)
+	// {
+	// 	style |= WS_VISIBLE;
+	// }
 
 	auto hwnd = ::CreateWindowEx(
 	    0,
 	    constants::class_name,
 	    info.title.data(),
-	    WS_OVERLAPPEDWINDOW,
-	    client_area_rectangle.left,
-	    client_area_rectangle.top,
-	    client_area_rectangle.right - client_area_rectangle.left,
-	    client_area_rectangle.bottom - client_area_rectangle.top,
+	    WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+	    info.position.x,
+	    info.position.y,
+	    info.resolution.x,
+	    info.resolution.y,
 	    nullptr,
 	    nullptr,
 	    ::GetModuleHandle(nullptr),
@@ -669,10 +662,35 @@ try
 	    std::bit_cast<LPVOID>(&surface)
 	);
 	ensure(hwnd, "Failed ::CreateWindowEx: {}", get_error_message());
-
 	surface.m_native_data.window = hwnd;
 
-	::ShowWindow(surface.m_native_data.window, SW_SHOW);
+	auto margins = MARGINS { 0, 0, 1, 0 }; // Extend 1px on right for shadow rendering
+	DwmExtendFrameIntoClientArea(hwnd, &margins);
+
+	BOOL useDarkMode = TRUE;
+	DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
+
+	ShowWindow(hwnd, SW_SHOW);
+	SetWindowPos(
+	    hwnd,
+	    NULL,
+	    0,
+	    0,
+	    0,
+	    0,
+	    SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE
+	);
+	UpdateWindow(hwnd);
+	surface.m_visible = info.visible;
+
+	if (info.visible)
+	{
+		ShowWindow(hwnd, SW_SHOW);
+	}
+	else
+	{
+		ShowWindow(hwnd, SW_HIDE);
+	}
 }
 catch (const std::exception &exp)
 {
@@ -714,7 +732,7 @@ void System::handle_requests(SurfaceComponent &surface)
 		[&](const ModifyResolutionRequest &request) { modify_resolution(surface, request); },
 		[&](const ModifyPositionRequest &request) { modify_position(surface, request); },
 		[&](const ModifyVisibilityRequest &request) {
-		    modify_visiblity(surface, request);
+		    modify_visibility(surface, request);
 		}
 	};
 
@@ -728,126 +746,41 @@ void System::handle_requests(SurfaceComponent &surface)
 
 void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
 {
-	// WIP(Light):
-	ignore = surface;
-	ignore = request;
-
+	auto hwnd = surface.m_native_data.window;
 	surface.m_title = request.title;
 
-	// const auto &[display, window, _] = surface.get_native_data();
-	// XStoreName(display, window, request.title.c_str());
+	::SetWindowTextA(hwnd, request.title.c_str());
 }
 
 void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
 {
-	// WIP(Light):
-	ignore = surface;
-	ignore = request;
-
-	// surface.m_resolution = request.resolution;
-
-	// auto &[display, window, _] = surface.m_native_data;
-	// const auto &[width, height] = request.resolution;
-	// // XResizeWindow(display, window, width, height);
-	//
-	// // get baseline serial number for X requests generated from XResizeWindow
-	// auto serial = NextRequest(display);
-	//
-	// // request a new window size from the X server
-	// XResizeWindow(
-	//     display,
-	//     window,
-	//     static_cast<u32>(width),
-	//     static_cast<u32>(height)
-	// );
-	//
-	// // flush output queue and wait for X server to processes the request
-	// XSync(display, False);
-	// // The documentation for XResizeWindow includes this important note:
-	// //
-	// //   If the override-redirect flag of the window is False and some
-	// //   other client has selected SubstructureRedirectMask on the parent,
-	// //   the X server generates a ConfigureRequest event, and no further
-	// //   processing is performed.
-	// //
-	// // What this means, essentially, is that if this window is a top-level
-	// // window, then it's the window manager (the "other client") that is
-	// // responsible for changing this window's size.  So when we call
-	// // XResizeWindow() on a top-level window, then instead of resizing
-	// // the window immediately, the X server informs the window manager,
-	// // and then the window manager sets our new size (usually it will be
-	// // the size we asked for).  We receive a ConfigureNotify event when
-	// // our new size has been set.
-	// constexpr auto lifespan = std::chrono::milliseconds { 10 };
-	// auto timer = time::Timer {};
-	// auto event = XEvent {};
-	// while (!XCheckIfEvent(
-	//            display,
-	//            &event,
-	//            XEventTypeEquals<ConfigureNotify>,
-	//            reinterpret_cast<XPointer>(&window) // NOLINT
-	//        )
-	//        || event.xconfigure.serial < serial)
-	// {
-	// 	std::this_thread::sleep_for(std::chrono::microseconds { 100 });
-	// 	if (timer.elapsed_time() > lifespan)
-	// 	{
-	// 		log::error("Timed out waiting for XResizeWindow's event");
-	// 		return;
-	// 	}
-	// }
-	// // We don't need to update the component's state and handle the event in this funcion.
-	// // Since handle_requests is called before handle_events.
-	// // So we just put the event back into the queue and move on.
-	// XPutBackEvent(display, &event);
-	// XSync(display, False);
-	// XFlush(display);
+	::SetWindowPos(
+	    surface.m_native_data.window,
+	    {},
+	    surface.get_position().x,
+	    surface.get_position().y,
+	    request.resolution.x,
+	    request.resolution.y,
+	    SWP_NOZORDER | SWP_NOACTIVATE
+	);
 }
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
 {
-	auto hwnd = surface.m_native_data.window;
-
-	const auto style = ::GetWindowLong(hwnd, GWL_STYLE);
-	const auto ex_style = ::GetWindowLong(hwnd, GWL_EXSTYLE);
-	const auto dpi = get_dpi_from_point(request.position);
-
-	auto rectangle = ::RECT {
-		.left = {},
-		.top = {},
-		.right = static_cast<::LONG>(surface.get_resolution().x),
-		.bottom = static_cast<::LONG>(surface.get_resolution().y),
-	};
-	AdjustWindowRectExForDpi(&rectangle, style, false, ex_style, dpi);
-
-	SetWindowPos(
+	::SetWindowPos(
 	    surface.m_native_data.window,
 	    {},
-	    request.position.x + rectangle.left,
-	    request.position.y + rectangle.top,
+	    request.position.x,
+	    request.position.y,
 	    surface.get_resolution().x,
 	    surface.get_resolution().y,
 	    SWP_NOZORDER | SWP_NOACTIVATE
 	);
 }
 
-void System::modify_visiblity(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
+void System::modify_visibility(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
 {
-	// WIP(Light): Use ignored local-variables
-	ignore = surface;
-	ignore = request;
-
-	// const auto &[display, window, _] = surface.get_native_data();
-	// surface.m_visible = request.visible;
-
-	// if (request.visible)
-	// {
-	// 	XMapWindow(display, window);
-	// }
-	// else
-	// {
-	// 	XUnmapWindow(display, window);
-	// }
+	::ShowWindow(surface.m_native_data.window, request.visible ? SW_SHOW : SW_HIDE);
 }
 
 void System::tick(app::TickInfo tick)
@@ -1120,6 +1053,74 @@ void System::tick(app::TickInfo tick)
 
 	switch (uMsg)
 	{
+	case WM_NCCALCSIZE:
+	{
+		if (wParam == TRUE)
+		{
+			// Get border thicknesses
+			// int borderPadding = GetSystemMetrics(SM_CXPADDEDBORDER);
+			// int borderLR = GetSystemMetrics(SM_CXFRAME) + borderPadding;
+			// int borderTB = GetSystemMetrics(SM_CYFRAME) + borderPadding;
+			//
+			// NCCALCSIZE_PARAMS *params = (NCCALCSIZE_PARAMS *)lParam;
+			// RECT *rect = &params->rgrc[0];
+
+			// Adjust client rect: Subtract borders from left/right/bottom
+			// rect->left += borderLR;
+			// rect->right -= borderLR;
+			// rect->bottom -= borderTB;
+
+			// For maximized windows, also subtract top border
+			// if (IsZoomed(hwnd))
+			// {
+			// 	rect->top += borderTB;
+			// }
+
+			// Return 0 to indicate we handled it (prevents default title bar)
+			return 0;
+		}
+		break;
+	}
+
+	case WM_NCHITTEST:
+	{
+		// Get mouse position in client coordinates
+		POINT pt;
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
+		ScreenToClient(hwnd, &pt);
+
+		RECT clientRect;
+		GetClientRect(hwnd, &clientRect);
+
+		// Define a drag area (e.g., top 30px of client area acts as "caption" for moving)
+		const int dragHeight = 30; // Adjust as needed; set to 0 if no dragging desired
+		if (pt.y < dragHeight && pt.y >= 0)
+		{
+			// Check corners for diagonal resize
+			const int resizeBorder = 8; // Pixels for corner hit detection
+			if (pt.x < resizeBorder)
+				return HTTOPLEFT;
+			if (pt.x > clientRect.right - resizeBorder)
+				return HTTOPRIGHT;
+			// Middle top: vertical resize
+			return HTTOP;
+		}
+
+		// Fallback to default handling for side/bottom borders and other areas
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		FillRect(hdc, &rect, (HBRUSH)(COLOR_WINDOW + 5));
+		EndPaint(hwnd, &ps);
+		return 0;
+	}
 	case WM_NCCREATE:
 		[[unlikely]]
 		{
@@ -1130,42 +1131,36 @@ void System::tick(app::TickInfo tick)
 			return !!surface_ptr;
 		}
 
-	case WM_SETFOCUS: get_userdata().m_event_queue.emplace_back(GainFocusEvent {}); break;
+	case WM_SETTEXT:
+		[[unlikely]]
+		{
+			get_userdata().m_title = std::string { std::bit_cast<char *>(lParam) };
+			break;
+		}
 
-	case WM_KILLFOCUS: get_userdata().m_event_queue.emplace_back(LostFocusEvent {}); break;
+	case WM_SHOWWINDOW: get_userdata().m_visible = static_cast<bool>(wParam); return 0;
+
+	case WM_SETFOCUS: get_userdata().m_event_queue.emplace_back(GainFocusEvent {}); return 0;
+
+	case WM_KILLFOCUS: get_userdata().m_event_queue.emplace_back(LostFocusEvent {}); return 0;
 
 	case WM_SIZE:
 	{
-		const auto width = LOWORD(lParam);
-		const auto height = HIWORD(lParam);
-
-		lt::log::test("Received WM_SIZE: {}, {}", width, height);
 		auto &surface = get_userdata();
-		surface.m_resolution = math::vec2_u32 { width, height };
-		surface.m_event_queue.emplace_back(ResizedEvent { width, height });
+
+
+		surface.m_resolution = math::vec2_u32 { LOWORD(lParam), HIWORD(lParam) };
+		surface.m_event_queue.emplace_back(surface.m_resolution);
 
 		return 0;
 	}
 
 	case WM_MOVE:
 	{
-		auto client_top_left = ::POINT {};
-		ensure(
-		    ::ClientToScreen(hwnd, &client_top_left),
-		    "Failed ::ClientToScreen (hwnd: {:x})",
-		    std::bit_cast<size_t>(hwnd)
-		);
-
 		auto &surface = get_userdata();
 
-		surface.m_position = {
-			client_top_left.x,
-			client_top_left.y,
-		};
-
-		surface.m_event_queue.emplace_back(
-		    MovedEvent { static_cast<i32>(client_top_left.x), static_cast<i32>(client_top_left.y) }
-		);
+		surface.m_position = math::vec2_i32 { LOWORD(lParam), HIWORD(lParam) };
+		surface.m_event_queue.emplace_back(MovedEvent { surface.m_position });
 
 		return 0;
 	}
@@ -1222,7 +1217,7 @@ void System::tick(app::TickInfo tick)
 		const auto key = static_cast<Key>(
 		    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
 		);
-		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(key);
+		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(key);
 		break;
 	}
 	case WM_XBUTTONUP:
@@ -1230,7 +1225,7 @@ void System::tick(app::TickInfo tick)
 		const auto key = static_cast<Key>(
 		    std::to_underlying(Key::x_button_1) + GET_XBUTTON_WPARAM(wParam) - 1
 		);
-		get_userdata().m_event_queue.emplace_back<KeyPressedEvent>(key);
+		get_userdata().m_event_queue.emplace_back<KeyReleasedEvent>(key);
 		break;
 	}
 	case WM_KEYDOWN:
@@ -1255,11 +1250,11 @@ void System::tick(app::TickInfo tick)
 		return 0;
 	}
 
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
+		// case WM_DESTROY:
+		// {
+		// 	PostQuitMessage(0);
+		// 	return 0;
+		// }
 	}
 
 	return DefWindowProcA(hwnd, uMsg, wParam, lParam);
