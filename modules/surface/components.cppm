@@ -2,6 +2,8 @@ module;
 #if defined(LIGHT_PLATFORM_LINUX)
 struct wl_display;
 struct wl_surface;
+struct xdg_surface;
+struct xdg_toplevel;
 #else defined(LIGHT_PLATFORM_WINDOWS)
 	#include <Windows.h>
 #endif
@@ -46,6 +48,10 @@ public:
 		wl_display *display;
 
 		wl_surface *surface;
+
+		xdg_surface *shell_surface;
+
+		xdg_toplevel *shell_toplevel;
 	};
 #elif defined(LIGHT_PLATFORM_WINDOWS)
 	struct NativeData
@@ -62,7 +68,7 @@ public:
 	// TODO(Light): add `screen_mode` flag (windowed/full_screen/windowed_full_screen)
 	struct CreateInfo
 	{
-		std::string_view title;
+		std::string title;
 
 		math::vec2_i32 position;
 
@@ -73,7 +79,7 @@ public:
 		bool visible;
 	};
 
-	[[nodiscard]] auto get_title() const -> std::string_view
+	[[nodiscard]] auto get_title() const -> std::string // yes copy the title, whatever...
 	{
 		return m_title;
 	}

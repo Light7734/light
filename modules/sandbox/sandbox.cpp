@@ -6,6 +6,8 @@ import renderer.frontend;
 import surface.system;
 import surface.events;
 import surface.requests;
+import ecs.entity;
+import input.codes;
 import ecs.registry;
 import memory.scope;
 import memory.reference;
@@ -83,7 +85,6 @@ try
 		debug_callback_info,
 	} };
 
-    registry.add_
 
 	auto should_close = false;
 	const auto visitor = overloads {

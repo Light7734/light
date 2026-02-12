@@ -169,8 +169,6 @@ private:
 
 	void modify_visibility(SurfaceComponent &surface, const ModifyVisibilityRequest &request);
 
-	void set_visibility(ecs::EntityId surface_entity, bool visible);
-
 	memory::Ref<ecs::Registry> m_registry;
 
 	app::TickResult m_last_tick_result {};
@@ -207,7 +205,16 @@ private:
 module :private;
 namespace lt::surface {
 
+
 #if defined(LIGHT_PLATFORM_LINUX)
+
+template<class... Ts>
+struct overloads: Ts...
+{
+	using Ts::operator()...;
+};
+
+void ensure_component_sanity(const SurfaceComponent &component);
 
 void handle_shell_ping(void *data, xdg_wm_base *shell, u32 serial)
 {
@@ -222,6 +229,7 @@ void handle_shell_surface_configure(void *data, xdg_surface *shell_surface, u32 
 {
 	ignore = data;
 
+	log::test("Surface  configure: {}", (i32)serial);
 	xdg_surface_ack_configure(shell_surface, serial);
 }
 const auto shell_surface_listener = xdg_surface_listener {
@@ -237,7 +245,9 @@ void handle_toplevel_configure(
 )
 {
 	// TODO(Light): handle resizing
+	log::test("Toplevel configure: {}x{}", (i32)width, (i32)height);
 }
+
 void handle_toplevel_close(void *data, xdg_toplevel *toplevel)
 {
 	// TODO(Light): handle quitting
@@ -325,6 +335,7 @@ void wayland_pointer_leave_listener(
     u32 state
 )
 {
+	log::debug("Pointer button");
 }
 
 /* static */ void System::wayland_pointer_axis_listener(
@@ -335,6 +346,7 @@ void wayland_pointer_leave_listener(
     wl_fixed_t value
 )
 {
+	log::debug("Pointer axis listener");
 }
 
 /* static */ void System::wayland_pointer_axis_source_listener(
@@ -343,6 +355,7 @@ void wayland_pointer_leave_listener(
     u32 axis_source
 )
 {
+	log::debug("Pointer axis source listener");
 }
 
 /* static */ void System::wayland_pointer_axis_stop_listener(
@@ -352,6 +365,7 @@ void wayland_pointer_leave_listener(
     u32 axis_source
 )
 {
+	log::debug("Pointer axis stop listener");
 }
 
 /* static */ void System::wayland_pointer_axis_discrete_listener(
@@ -361,6 +375,7 @@ void wayland_pointer_leave_listener(
     i32 discrete
 )
 {
+	log::debug("Pointer axis discrete listener");
 }
 
 /* static */ void System::wayland_pointer_frame_listener(void *data, wl_pointer *pointer)
@@ -451,7 +466,8 @@ System::System(memory::Ref<ecs::Registry> registry)
           }
       )
 {
-	// NOLINTNEXTLINE
+	ensure(m_registry, "Failed to construct surface::System: null ecs::Registry");
+
 	m_wl_display = wl_display_connect({});
 	ensure(m_wl_display, "Failed to connect to Wayland display");
 
@@ -477,6 +493,29 @@ System::~System()
 	{
 		return;
 	}
+
+	try
+	{
+		/** @todo(Light): make registry.remove not invalidate iterators */
+		auto entities_to_remove = std::vector<ecs::EntityId> {};
+		for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
+		{
+			entities_to_remove.emplace_back(entity);
+		}
+
+		for (auto entity : entities_to_remove)
+		{
+			m_registry->remove<SurfaceComponent>(entity);
+		}
+
+		m_registry->disconnect_on_construct<SurfaceComponent>();
+		m_registry->disconnect_on_destruct<SurfaceComponent>();
+	}
+	catch (const std::exception &exp)
+	{
+		log::error("Uncaught exception in surface::~System:");
+		log::error("\twhat: {}", exp.what());
+	}
 }
 
 void System::on_register()
@@ -490,15 +529,18 @@ void System::on_unregister()
 }
 
 void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
+try
 {
 	auto &component = m_registry->add<SurfaceComponent>(entity, info);
+	ensure_component_sanity(component);
+
 	auto &surface = m_registry->get<SurfaceComponent>(entity);
 	const auto &resolution = surface.get_resolution();
 	const auto &position = surface.get_position();
 
 	auto *wayland_surface = (wl_surface *)nullptr;
-	auto *shell_surface = (xdg_surface *)nullptr;
 	auto *shell_toplevel = (xdg_toplevel *)nullptr;
+	auto *shell_surface = (xdg_surface *)nullptr;
 
 	wayland_surface = wl_compositor_create_surface(m_wl_compositor);
 	ensure(wayland_surface, "Failed to create Wayland surface");
@@ -511,7 +553,7 @@ void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::Cr
 	ensure(shell_toplevel, "Failed to get XDG-shell toplevel");
 	xdg_toplevel_add_listener(shell_toplevel, &toplevel_listener, {});
 
-	xdg_toplevel_set_title(shell_toplevel, "Wayland Vulkan Example");
+	xdg_toplevel_set_title(shell_toplevel, info.title.c_str());
 	xdg_toplevel_set_app_id(shell_toplevel, "Wayland Vulkan Example");
 
 	wl_surface_commit(wayland_surface);
@@ -520,11 +562,136 @@ void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::Cr
 
 	surface.m_native_data.surface = wayland_surface;
 	surface.m_native_data.display = m_wl_display;
+	surface.m_native_data.shell_surface = shell_surface;
+	surface.m_native_data.shell_toplevel = shell_toplevel;
+}
+catch (const std::exception &exp)
+{
+	log::error("Exception thrown when on_constructing surface component");
+	log::error("\tentity: {}", u32 { entity });
+	log::error("\twhat: {}", exp.what());
+
+	m_registry->remove<SurfaceComponent>(entity);
 }
 
 void System::tick(app::TickInfo tick)
 {
+	ignore = tick;
+
 	wl_display_roundtrip(m_wl_display);
+
+	for (auto &[id, surface] : m_registry->view<SurfaceComponent>())
+	{
+		handle_requests(surface);
+		handle_events(surface);
+	}
+
+	const auto now = std::chrono::steady_clock::now();
+	m_last_tick_result = app::TickResult {
+		.info = tick,
+		.duration = now - tick.start_time,
+		.end_time = now,
+	};
+}
+
+void System::handle_events(SurfaceComponent &surface)
+{
+	// WIP(Light)
+	ignore = surface;
+
+	auto &queue = surface.m_event_queue;
+	queue.clear();
+
+	const auto roundtrip = wl_display_roundtrip(m_wl_display);
+	ensure(roundtrip != -1, "Wayland roundtrip error"); // WIP(Light)
+
+
+	if (roundtrip != 0)
+	{
+		log::debug("Roundtrip: {}", (int)roundtrip);
+	}
+}
+
+void System::handle_requests(SurfaceComponent &surface)
+{
+	const auto visitor = overloads {
+		[&](const ModifyTitleRequest &request) { modify_title(surface, request); },
+		[&](const ModifyResolutionRequest &request) { modify_resolution(surface, request); },
+		[&](const ModifyPositionRequest &request) { modify_position(surface, request); },
+		[&](const ModifyVisibilityRequest &request) { modify_visibility(surface, request); }
+	};
+
+	for (const auto &request : surface.peek_requests())
+	{
+		std::visit(visitor, request);
+	}
+
+	wl_display_roundtrip(m_wl_display);
+
+	surface.m_requests.clear();
+}
+
+void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
+{
+	auto *toplevel = surface.m_native_data.shell_toplevel;
+	ensure(toplevel, "Failed to modify surface title: null shell toplevel");
+	ensure(!request.title.empty(), "Failed to modify surface title: null titlle");
+
+	xdg_toplevel_set_title(toplevel, request.title.c_str());
+	wl_surface_commit(surface.m_native_data.surface);
+	surface.m_title = request.title;
+}
+
+void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
+{
+	auto *toplevel = surface.m_native_data.shell_toplevel;
+	const auto [width, height] = request.resolution;
+
+	ensure(width, "Failed to modify resolution: invalid width: {}", width);
+	ensure(height, "Failed to modify resolution: invalid height: {}", height);
+
+	log::test("Modifying res: {}x{}", (u32)width, (u32)height);
+
+	xdg_toplevel_set_min_size(toplevel, width, height);
+	xdg_toplevel_set_max_size(toplevel, width, height);
+}
+
+void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)
+{
+}
+
+void System::modify_visibility(SurfaceComponent &surface, const ModifyVisibilityRequest &request)
+{
+}
+
+void ensure_component_sanity(const SurfaceComponent &component)
+{
+	const auto [width, height] = component.get_resolution();
+
+	ensure(width != 0u, "Received bad values for surface component: width({}) == 0", width);
+
+	ensure(height != 0u, "Received bad values for surface component: height({}) == 0", height);
+
+	ensure(
+	    width < SurfaceComponent::max_dimension,
+	    "Received bad values for surface component: width({}) > max_dimension({})",
+	    width,
+	    SurfaceComponent::max_dimension
+	);
+
+	ensure(
+	    height < SurfaceComponent::max_dimension,
+	    "Received bad values for surface component: height({}) > max_dimension({})",
+	    height,
+	    SurfaceComponent::max_dimension
+	);
+
+	ensure(
+	    component.get_title().size() < SurfaceComponent::max_title_length,
+	    "Received bad values for surface component: title.size({}) > max_title_length({})",
+	    component.get_title().size(),
+	    SurfaceComponent::max_title_length
+	);
 }
 
 #endif
@@ -575,7 +742,7 @@ System::~System()
 
 	try
 	{
-		// TODO(Light): make registry.remove not invalidate iterators
+		/** @todo(Light): make registry.remove not invalidate iterators */
 		auto entities_to_remove = std::vector<ecs::EntityId> {};
 		for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
 		{
@@ -731,9 +898,7 @@ void System::handle_requests(SurfaceComponent &surface)
 		[&](const ModifyTitleRequest &request) { modify_title(surface, request); },
 		[&](const ModifyResolutionRequest &request) { modify_resolution(surface, request); },
 		[&](const ModifyPositionRequest &request) { modify_position(surface, request); },
-		[&](const ModifyVisibilityRequest &request) {
-		    modify_visibility(surface, request);
-		}
+		[&](const ModifyVisibilityRequest &request) { modify_visibility(surface, request); }
 	};
 
 	for (const auto &request : surface.peek_requests())

@@ -70,6 +70,7 @@ struct [[maybe_unused]] print
 			case warn    : return "\033[1;33m| wrn |\033[0m";
 			case error   : return "\033[1;31m| err |\033[0m";
 			case critical: return "\033[1;41m| crt |\033[0m";
+            case test: /* testing framework's logs will never have location */
 			case off: return "off";
 			}
 			// clang-format on

@@ -88,8 +88,7 @@ constexpr auto total_metadata_size =         //
     + sizeof(BlobMetadata::compressed_size)  //
     + sizeof(BlobMetadata::uncompressed_size);
 
-ShaderAsset::ShaderAsset(const std::filesystem::path &path)
-    : m_stream(path, std::ios::beg | std::ios::binary)
+ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path, std::ios::binary)
 {
 	ensure(m_stream.is_open(), "Failed to open shader asset at: {}", path.string());
 	const auto read = [this](auto &field) {

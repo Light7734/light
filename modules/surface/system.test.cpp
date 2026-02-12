@@ -1,3 +1,5 @@
+/** @todo(Light): test pointer-invalidation of ecs using this system-> (?) */
+
 #if defined(LIGHT_PLATFORM_LINUX)
 #elif defined(LIGHT_PLATFORM_WINDOWS)
 	#include <Windows.h>
@@ -55,8 +57,14 @@ public:
 		return m_registry;
 	}
 
+
+	[[nodiscard]] auto system() -> lt::memory::Ref<System>
+	{
+		return m_system;
+	}
+
 	auto create_component(
-	    SurfaceComponent::CreateInfo info = SurfaceComponent::CreateInfo {
+	    const SurfaceComponent::CreateInfo &info = SurfaceComponent::CreateInfo {
 	        .title = title,
 	        .position = { position_x, position_y },
 	        .resolution = { width, height },
@@ -66,7 +74,7 @@ public:
 	) -> std::optional<SurfaceComponent *>
 	{
 		auto entity = m_registry->create_entity();
-		m_system.create_surface_component(entity, info);
+		m_system->create_surface_component(entity, info);
 
 		return &m_registry->get<SurfaceComponent>(entity);
 	}
@@ -88,13 +96,13 @@ public:
 private:
 	lt::memory::Ref<lt::ecs::Registry> m_registry = lt::memory::create_ref<lt::ecs::Registry>();
 
-	System m_system { m_registry };
+	lt::memory::Ref<System> m_system = lt::memory::create_ref<System>(m_registry);
 };
 
 Suite raii = "raii"_suite = [] {
 	Case { "happy paths" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 	};
 
 	Case { "unhappy paths" } = [] {
@@ -103,16 +111,17 @@ Suite raii = "raii"_suite = [] {
 
 	Case { "many" } = [] {
 		auto fixture = Fixture {};
+
 		for (auto idx : std::views::iota(0, 250))
 		{
 			ignore = idx;
-			ignore = System { fixture.registry() };
+			ignore = fixture.system();
 		}
 	};
 
 	Case { "post construct has correct state" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
@@ -131,18 +140,18 @@ Suite raii = "raii"_suite = [] {
 Suite system_events = "system_events"_suite = [] {
 	Case { "on_register won't throw" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 
-		system.on_register();
+		system->on_register();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 
 	Case { "on_unregister won't throw" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 
-		system.on_register();
-		system.on_unregister();
+		system->on_register();
+		system->on_unregister();
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
 	};
 };
@@ -150,25 +159,25 @@ Suite system_events = "system_events"_suite = [] {
 Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_construct initializes component" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 
-		system.tick({});
-		system.tick({});
+		system->tick({});
+		system->tick({});
 		const auto &component = fixture.create_component();
-		system.tick({});
-		system.tick({});
-		system.tick({});
+		system->tick({});
+		system->tick({});
+		system->tick({});
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
 
-		system.tick({});
-		system.tick({});
-		system.tick({});
+		system->tick({});
+		system->tick({});
+		system->tick({});
 		fixture.check_values(*component);
 	};
 
 	Case { "unhappy on_construct throws" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 
 		expect_throw([&] { fixture.create_component({ .resolution = { width, 0 } }); });
 
@@ -195,7 +204,7 @@ Suite registry_events = "registry_events"_suite = [] {
 
 	Case { "unhappy on_construct removes component" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 
 		expect_throw([&] { fixture.create_component({ .resolution = { width, 0 } }); });
 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 0);
@@ -217,24 +226,24 @@ Suite registry_events = "registry_events"_suite = [] {
 Suite tick = "ticking"_suite = [] {
 	Case { "on empty registry won't throw" } = [] {
 		auto fixture = Fixture {};
-		System { fixture.registry() }.tick(tick_info());
+		fixture.system()->tick(tick_info());
 	};
 
 	Case { "on non-empty registry won't throw" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 
 		fixture.create_component();
-		system.tick(tick_info());
+		system->tick(tick_info());
 	};
 
 	Case { "clears previous tick's events" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 		auto &surface = **fixture.create_component();
 
 		// flush window-creation events
-		system.tick(tick_info());
+		system->tick(tick_info());
 		expect_eq(surface.peek_events().size(), 0);
 
 		surface.push_event(lt::surface::MovedEvent({}, {}));
@@ -243,13 +252,13 @@ Suite tick = "ticking"_suite = [] {
 		surface.push_event(lt::surface::KeyPressedEvent({}));
 		expect_eq(surface.peek_events().size(), 2);
 
-		system.tick(tick_info());
+		system->tick(tick_info());
 		expect_eq(surface.peek_events().size(), 0);
 	};
 
 	Case { "clears requests" } = [] {
 		auto fixture = Fixture {};
-		auto system = System { fixture.registry() };
+		auto system = fixture.system();
 		auto &surface = **fixture.create_component();
 
 		const auto new_title = std::string { title } + std::string { "_" };
@@ -260,7 +269,7 @@ Suite tick = "ticking"_suite = [] {
 
 		surface.push_request(lt::surface::ModifyVisibilityRequest(true));
 		expect_eq(surface.peek_requests().size(), 1);
-		system.tick(tick_info());
+		system->tick(tick_info());
 		expect_eq(surface.peek_requests().size(), 0);
 
 		surface.push_request(lt::surface::ModifyTitleRequest(new_title));
@@ -275,7 +284,7 @@ Suite tick = "ticking"_suite = [] {
 		surface.push_request(lt::surface::ModifyVisibilityRequest(false));
 		expect_eq(surface.peek_requests().size(), 1 + 2 + 3);
 
-		system.tick(tick_info());
+		system->tick(tick_info());
 		expect_eq(surface.peek_requests().size(), 0);
 	};
 };
@@ -287,14 +296,14 @@ Suite requests = "requests"_suite = [] {
 	using ::lt::surface::ModifyVisibilityRequest;
 
 	auto fixture = Fixture {};
-	auto system = System { fixture.registry() };
+	auto system = fixture.system();
 	auto &surface = **fixture.create_component();
 
 	Case { "ModifyTitleRequest" } = [&] {
 		const auto new_title = std::string { title } + std::string { "_" };
 		surface.push_request({ ModifyTitleRequest { new_title } });
 
-		system.tick({});
+		system->tick({});
 		expect_eq(surface.get_title(), new_title);
 	};
 
@@ -302,7 +311,7 @@ Suite requests = "requests"_suite = [] {
 		constexpr auto new_resolution = lt::math::vec2_u32 { width + 50, height + 50 };
 		surface.push_request({ ModifyResolutionRequest { new_resolution } });
 
-		system.tick({});
+		system->tick({});
 		expect_eq(surface.get_resolution(), new_resolution);
 	};
 
@@ -310,17 +319,17 @@ Suite requests = "requests"_suite = [] {
 		constexpr auto new_position = lt::math::vec2_i32 { position_x + 50, position_y + 50 };
 		surface.push_request({ ModifyPositionRequest { new_position } });
 
-		system.tick({});
+		system->tick({});
 		expect_eq(surface.get_position(), new_position);
 	};
 
 	Case { "ModifyVisibilityRequest" } = [&] {
 		surface.push_request({ ModifyVisibilityRequest { .visible = false } });
-		system.tick({});
+		system->tick({});
 		expect_eq(surface.is_visible(), false);
 
 		surface.push_request({ ModifyVisibilityRequest { .visible = true } });
-		system.tick({});
+		system->tick({});
 		expect_eq(surface.is_visible(), true);
 	};
 };
@@ -329,12 +338,12 @@ Suite requests = "requests"_suite = [] {
 
 Suite windows_window_proc = "windows_window_proc"_suite = [] {
 	auto fixture = Fixture {};
-	auto system = System { fixture.registry() };
+	auto system = fixture.system();
 	auto &surface = **fixture.create_component();
 	auto [hwnd] = surface.get_native_data();
 	const auto &events = surface.peek_events();
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_SETFOCUS" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_SETFOCUS, {}, {});
@@ -344,7 +353,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		::lt::log::trace("{}", event.to_string()); // make sure it's not optimized away?
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_KILLFOCUS" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_KILLFOCUS, {}, {});
@@ -354,7 +363,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		::lt::log::trace("{}", event.to_string()); // make sure it's not optimized away?
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_SIZE" } = [&] {
 		const auto new_width = width + 50;
 		const auto new_height = height + 60;
@@ -371,7 +380,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(surface.get_resolution().y, new_height);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_MOVE" } = [&] {
 		const auto new_x = position_x + 120;
 		const auto new_y = position_y + 150;
@@ -388,7 +397,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(surface.get_position().y, new_y);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_MOUSEWHEEL" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, WHEEL_DELTA), {});
@@ -405,7 +414,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[3]).get_key(), Key::wheel_down);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_LBUTTONDOWN" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_LBUTTONDOWN, {}, {});
@@ -415,7 +424,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::left_button);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_LBUTTONUP" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_LBUTTONUP, {}, {});
@@ -425,7 +434,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::left_button);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_RBUTTONDOWN" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_RBUTTONDOWN, {}, {});
@@ -435,7 +444,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::right_button);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_RBUTTONUP" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_RBUTTONUP, {}, {});
@@ -445,7 +454,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::right_button);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_MBUTTONDOWN" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_MBUTTONDOWN, {}, {});
@@ -455,7 +464,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::middle_button);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_MBUTTONUP" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_MBUTTONUP, {}, {});
@@ -466,7 +475,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 	};
 
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_XBUTTONDOWN" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_XBUTTONDOWN, MAKEWPARAM(0, XBUTTON1), {});
@@ -478,7 +487,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[1]).get_key(), Key::x_button_2);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_XBUTTONUP" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_XBUTTONUP, MAKEWPARAM(0, XBUTTON1), {});
@@ -490,7 +499,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[1]).get_key(), Key::x_button_2);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_KEYDOWN" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_KEYDOWN, System::to_native_key(Key::escape), {});
@@ -499,7 +508,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyPressedEvent>(events[0]).get_key(), Key::escape);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_KEYUP" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_KEYUP, System::to_native_key(Key::escape), {});
@@ -508,7 +517,7 @@ Suite windows_window_proc = "windows_window_proc"_suite = [] {
 		expect_eq(std::get<lt::surface::KeyReleasedEvent>(events[0]).get_key(), Key::escape);
 	};
 
-	system.tick({});
+	system->tick({});
 	Case { "WM_CLOSE" } = [&] {
 		expect_eq(events.size(), 0u);
 		::SendMessage(hwnd, WM_CLOSE, {}, {});
