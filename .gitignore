@@ -1,11 +1,9 @@
-# Temp directories
 .vs/
 bin/
 bin-obj/
 build/
 .cache/
 
-# VS Files
 **.vcxproj**
 **.sln
 
@@ -17,21 +15,9 @@ build/
 Makefile
 
 **/**.mk
-
 **/**.project
 
-**/Engine.txt
-**/GLAD.txt
-**/Sandbox.txt
-
-**/Logs/**
-**/logs/**
-**.ini
-!**/default_gui_layout.ini
-
-CMake/
 CMakeUserPresets.json
-
 compile_commands.json
 
 

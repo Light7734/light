@@ -1,7 +1,10 @@
 if(WIN32)
     add_compile_definitions(LIGHT_PLATFORM_WINDOWS)
+
 elseif(UNIX)
     add_compile_definitions(LIGHT_PLATFORM_LINUX)
+
 else()
     message(FATAL "Failed to generate cmake: unsupported platform")
+
 endif()

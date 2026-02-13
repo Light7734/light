@@ -7,7 +7,7 @@ set(CMAKE_CXX_MODULE_STD 1)
 cmake_minimum_required(VERSION 4.1)
 project(Light)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/functions.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/module.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/definitions.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/options.cmake)
 

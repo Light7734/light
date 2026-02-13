@@ -1,3 +1,14 @@
+function(add_option option help)
+    option(${option} ${help})
+
+    if(${option})
+        message(STATUS "${option}: ON")
+        add_compile_definitions(${option}=1)
+    else()
+        message(STATUS "${option}: OFF")
+    endif()
+endfunction()
+
 add_option(ENABLE_SANDBOX "Enables the building of the sandbox module for experimentation")
 add_option(ENABLE_UNIT_TESTS "Enables the building of the unit test modules")
 add_option(ENABLE_FUZZ_TESTS "Enables the building of the fuzz test modules")
@@ -10,36 +21,13 @@ add_option(
 )
 
 if(ENABLE_STATIC_ANALYSIS)
-    set(CMAKE_CXX_CLANG_TIDY
-        "clang-tidy;--warnings-as-errors=*;--allow-no-checks"
-    )
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;--warnings-as-errors=*;--allow-no-checks")
 endif()
 
 if(ENABLE_LLVM_COVERAGE)
-    include(CheckCXXSourceCompiles)
-
     if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         message(
             FATAL_ERROR "ENABLE_LLVM_COVERAGE only supports the clang compiler"
-        )
-    endif()
-
-    # Check for libc++
-    check_cxx_source_compiles(
-        "
-        #include <string>
-        #ifdef _LIBCPP_VERSION
-        int main() { return 0; }
-        #else
-        #error Not using libc++
-        #endif
-    "
-        USING_LIBCXX
-    )
-    if(NOT USING_LIBCXX)
-        message(
-            FATAL_ERROR
-                "ENABLE_LLVM_COVERAGE requires libc++, please compile with -stdlib=libc++"
         )
     endif()
 

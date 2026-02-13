@@ -5,7 +5,7 @@
  * Why did I do this?
  * To reduce as much complexity from the API,
  * Which should make the Renderer code simpler.
- * In the long run, it should pay off...
+ * In the long run, it should pay off... or so I hope it does.
  */
 module;
 
