@@ -12,8 +12,6 @@ export CXX
 DISPLAY=:99
 export DISPLAY
 
-Xvfb :99 -screen 0 1024x768x16 &
-
 # gcc uses libstdc++ by default
 cmake \
     -S . \

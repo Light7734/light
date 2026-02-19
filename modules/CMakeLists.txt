@@ -140,42 +140,43 @@ if(WIN32)
     )
 
 elseif(UNIX)
-    add_module(
-        NAME
-        surface
-        INTERFACES
-        constants.cppm
-        system.cppm
-        requests.cppm
-        events.cppm
-        components.cppm
-        DEPENDENCIES
-        preliminary
-        ecs
-        app
-        math
-        memory
-        input_codes
-        wayland-client
-        PRIVATE_DEPENDENCIES
-        X11
-        logger
-        time
-        TESTS
-        system.test.cpp
-    )
 
-function(add_wayland_protocol_target TARGET_NAME SPEC NAME)
-    add_custom_target(wayland_${TARGET_NAME}_header COMMAND wayland-scanner client-header /usr/share/wayland-protocols${SPEC} ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.h)
-    add_dependencies(surface wayland_${TARGET_NAME}_header)
-    add_custom_target(wayland_${TARGET_NAME}_source COMMAND wayland-scanner private-code /usr/share/wayland-protocols${SPEC} ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.c)
-    add_dependencies(surface wayland_${TARGET_NAME}_source)
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
+  COMMAND wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
+  COMMAND wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
+  DEPENDS /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+)
+add_custom_target(xdg-shell-gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c)
 
-    target_sources(surface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/${NAME}.c)
-endfunction()
-
+add_module(
+    NAME
+    surface
+    INTERFACES
+    constants.cppm
+    system.cppm
+    requests.cppm
+    events.cppm
+    components.cppm
+    SOURCES
+    wayland-protocols/xdg-shell.c
+    DEPENDENCIES
+    preliminary
+    ecs
+    app
+    math
+    memory
+    input_codes
+    wayland-client
+    PRIVATE_DEPENDENCIES
+    X11
+    logger
+    time
+    TESTS
+    system.test.cpp
+)
 target_include_directories(surface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/)
-add_wayland_protocol_target(xdg_shell "/stable/xdg-shell/xdg-shell.xml" xdg-shell)
+add_dependencies(surface xdg-shell-gen)
 
 else()
     message(FATAL "Failed to generate cmake: unsupported platform")

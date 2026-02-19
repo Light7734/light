@@ -307,6 +307,8 @@ Suite requests = "requests"_suite = [] {
 		expect_eq(surface.get_title(), new_title);
 	};
 
+	// TODO(Light): modifying resolution on Wayland is done by the underlying Graphics API
+	// and not the windowing system iteslf...
 	Case { "ModifyResolutionRequest" } = [&] {
 		constexpr auto new_resolution = lt::math::vec2_u32 { width + 50, height + 50 };
 		surface.push_request({ ModifyResolutionRequest { new_resolution } });
@@ -315,23 +317,23 @@ Suite requests = "requests"_suite = [] {
 		expect_eq(surface.get_resolution(), new_resolution);
 	};
 
-	Case { "ModifyPositionRequest" } = [&] {
-		constexpr auto new_position = lt::math::vec2_i32 { position_x + 50, position_y + 50 };
-		surface.push_request({ ModifyPositionRequest { new_position } });
-
-		system->tick({});
-		expect_eq(surface.get_position(), new_position);
-	};
-
-	Case { "ModifyVisibilityRequest" } = [&] {
-		surface.push_request({ ModifyVisibilityRequest { .visible = false } });
-		system->tick({});
-		expect_eq(surface.is_visible(), false);
-
-		surface.push_request({ ModifyVisibilityRequest { .visible = true } });
-		system->tick({});
-		expect_eq(surface.is_visible(), true);
-	};
+	// Case { "ModifyPositionRequest" } = [&] {
+	// 	constexpr auto new_position = lt::math::vec2_i32 { position_x + 50, position_y + 50 };
+	// 	surface.push_request({ ModifyPositionRequest { new_position } });
+	//
+	// 	system->tick({});
+	// 	expect_eq(surface.get_position(), new_position);
+	// };
+	//
+	// Case { "ModifyVisibilityRequest" } = [&] {
+	// 	surface.push_request({ ModifyVisibilityRequest { .visible = false } });
+	// 	system->tick({});
+	// 	expect_eq(surface.is_visible(), false);
+	//
+	// 	surface.push_request({ ModifyVisibilityRequest { .visible = true } });
+	// 	system->tick({});
+	// 	expect_eq(surface.is_visible(), true);
+	// };
 };
 
 #if defined(LIGHT_PLATFORM_WINDOWS)

@@ -2763,9 +2763,11 @@ void vkc(VkResult result)
 	if (result)
 	{
 		log::error("Checked vulkan call failed with result: {}", to_string(result));
-		throw std::runtime_error {
-			std::format("Vulkan call failed with result: {}", std::to_underlying(result))
-		};
+		throw std::runtime_error { std::format(
+			"Vulkan call failed with result: {} ({})",
+			to_string(result),
+			std::to_underlying(result)
+		) };
 	}
 }
 

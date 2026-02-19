@@ -224,7 +224,6 @@ void handle_shell_ping(void *data, xdg_wm_base *shell, u32 serial)
 const auto shell_listener = xdg_wm_base_listener {
 	.ping = &handle_shell_ping,
 };
-
 void handle_shell_surface_configure(void *data, xdg_surface *shell_surface, u32 serial)
 {
 	ignore = data;
@@ -582,8 +581,15 @@ void System::tick(app::TickInfo tick)
 
 	for (auto &[id, surface] : m_registry->view<SurfaceComponent>())
 	{
-		handle_requests(surface);
+		// TODO(Light): This is flipped between win32 and wayland...
+		// Temporary fix, in wayland we need the resize request to
+		// put a resize event to be picked up by the renderer.
+		//
+		// but in win32 we need to resize before handling events
+		// so we make sure to set the correct dimensions when receiving WM_SIZE
+		// figure out a way to simplify this mess
 		handle_events(surface);
+		handle_requests(surface);
 	}
 
 	const auto now = std::chrono::steady_clock::now();
@@ -604,12 +610,6 @@ void System::handle_events(SurfaceComponent &surface)
 
 	const auto roundtrip = wl_display_roundtrip(m_wl_display);
 	ensure(roundtrip != -1, "Wayland roundtrip error"); // WIP(Light)
-
-
-	if (roundtrip != 0)
-	{
-		log::debug("Roundtrip: {}", (int)roundtrip);
-	}
 }
 
 void System::handle_requests(SurfaceComponent &surface)
@@ -644,16 +644,15 @@ void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &r
 
 void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
 {
-	auto *toplevel = surface.m_native_data.shell_toplevel;
 	const auto [width, height] = request.resolution;
-
 	ensure(width, "Failed to modify resolution: invalid width: {}", width);
 	ensure(height, "Failed to modify resolution: invalid height: {}", height);
 
-	log::test("Modifying res: {}x{}", (u32)width, (u32)height);
-
-	xdg_toplevel_set_min_size(toplevel, width, height);
-	xdg_toplevel_set_max_size(toplevel, width, height);
+	// Window size on Wayland is determined by the underlying swapchain's extent.
+	// Hence we only need to change the internal variables AND simply generate a resized event for
+	// the swapchain to be recreated.
+	surface.m_resolution = request.resolution;
+	surface.m_event_queue.emplace_back<ResizedEvent>(request.resolution);
 }
 
 void System::modify_position(SurfaceComponent &surface, const ModifyPositionRequest &request)

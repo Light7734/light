@@ -182,9 +182,29 @@ void System::handle_surface_resized_events()
 	{
 		if (std::holds_alternative<surface::ResizedEvent>(event))
 		{
+			const auto res = std::get<surface::ResizedEvent>(event).get_size();
+			log::debug("Resize event received from the renderer: {}", res);
+			// m_swapchain.reset();
+			// m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
+			// m_renderer->replace_swapchain(m_swapchain.get());
+
+			m_renderer.reset();
 			m_swapchain.reset();
+			m_device.reset();
+			m_gpu.reset();
+			m_surface.reset();
+
+			m_surface = create_surface(m_api, m_instance, m_surface_entity);
+			m_gpu = create_gpu(m_api, m_instance);
+			m_device = create_device(m_api, m_gpu.get(), m_surface.get());
 			m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
-			m_renderer->replace_swapchain(m_swapchain.get());
+			m_renderer = { create_renderer(
+				m_api,
+				m_gpu.get(),
+				m_device.get(),
+				m_swapchain.get(),
+				m_max_frames_in_flight
+			) };
 
 			// No need to process multiple resize events
 			break;
