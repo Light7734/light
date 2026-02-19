@@ -202,7 +202,8 @@ private:
 
 } // namespace lt::surface
 
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::surface {
 
 

@@ -43,7 +43,8 @@ private:
 
 } // namespace lt::app
 
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::app {
 
 void Application::game_loop()

@@ -2801,7 +2801,8 @@ void Device::name(T &object, const char *name)
 } // namespace lt::renderer::vk
 
 
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::renderer::vk {
 
 namespace api {

@@ -102,7 +102,8 @@ private:
 
 } // namespace lt::renderer::vkb
 
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::renderer::vkb {
 
 Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_frames_in_flight)

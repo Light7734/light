@@ -51,7 +51,8 @@ private:
 } // namespace lt::input
 
 
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::input {
 
 template<class... Ts>

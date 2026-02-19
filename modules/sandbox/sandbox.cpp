@@ -106,6 +106,13 @@ try
 			    lt::log::info("Closing due to: Escape key pressed");
 			    should_close = true;
 		    }
+
+		    if (event.get_key() == lt::Key::q)
+		    {
+			    lt::log::info("Closing due to: Q key pressed");
+			    should_close = true;
+		    }
+
 		    lt::log::info("Key pressed: {}", event.get_key());
 		},
 		[&](const lt::surface::KeyReleasedEvent &event) {
@@ -116,8 +123,22 @@ try
 		}
 	};
 
+	auto timer = lt::time::Timer {};
 	while (!should_close)
 	{
+		if (timer.elapsed_time() > std::chrono::milliseconds { 250 })
+		{
+			const auto [width, height] = window.get_resolution();
+			window.push_request(
+			    lt::surface::ModifyResolutionRequest {
+			        .resolution = { width + 50u, height + 50u },
+			    }
+			);
+
+			lt::log::trace("mrrp");
+			timer.reset();
+		}
+
 		surface_system.tick({});
 		renderer_system.tick({});
 

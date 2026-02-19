@@ -60,7 +60,8 @@ export namespace lt::renderer {
 
 } // namespace lt::renderer
 
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::renderer {
 
 [[nodiscard]] auto get_instance(Api target_api) -> IInstance *

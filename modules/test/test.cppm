@@ -134,7 +134,8 @@ auto operator""_suite(const char *name, size_t size) -> TestSuite
 //////////////////////////////////////
 // -------* IMPLEMENTATION *------- //
 /////////////////////////////////////
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::test {
 
 TestCase::TestCase(std::string name): m_name(name)

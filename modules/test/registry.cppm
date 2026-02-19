@@ -112,7 +112,8 @@ private:
 //////////////////////////////////////
 // -------* IMPLEMENTATION *------- //
 /////////////////////////////////////
-module :private;
+/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
+// module :private;
 namespace lt::test {
 
 /* static */ void Registry::register_suite(SuiteFunction suite)
