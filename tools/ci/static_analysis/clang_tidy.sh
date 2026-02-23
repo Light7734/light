@@ -19,4 +19,4 @@ cmake \
     -D CMAKE_BUILD_TYPE=Release \
     -D CMAKE_CXX_FLAGS="-std=c++26 -stdlib=libc++"
 
-cmake --build . -j"$(nproc)"
+cmake --build ./build/ -j"$(nproc)"
