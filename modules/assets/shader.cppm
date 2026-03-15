@@ -78,15 +78,12 @@ private:
 
 namespace lt::assets {
 
-constexpr auto total_metadata_size =         //
-    sizeof(AssetMetadata::type)              //
-    + sizeof(AssetMetadata::version)         //
-    + sizeof(ShaderAsset::Metadata::type)    //
-    + sizeof(BlobMetadata::tag)              //
-    + sizeof(BlobMetadata::offset)           //
-    + sizeof(BlobMetadata::compression_type) //
-    + sizeof(BlobMetadata::compressed_size)  //
-    + sizeof(BlobMetadata::uncompressed_size);
+constexpr auto total_metadata_size =
+    // NOLINTNEXTLINE(bugprone-sizeof-container)
+    sizeof(AssetMetadata::type) + //
+    sizeof(AssetMetadata::version) + sizeof(ShaderAsset::Metadata::type) + sizeof(BlobMetadata::tag)
+    + sizeof(BlobMetadata::offset) + sizeof(BlobMetadata::compression_type)
+    + sizeof(BlobMetadata::compressed_size) + sizeof(BlobMetadata::uncompressed_size);
 
 ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path, std::ios::binary)
 {
@@ -208,7 +205,7 @@ void ShaderAsset::unpack_to(BlobTag tag, std::span<byte> destination) const
 	m_stream.seekg(static_cast<long long>(m_code_blob_metadata.offset), std::ifstream::beg);
 	m_stream.read(
 	    std::bit_cast<char *>(destination.data()),
-	    m_code_blob_metadata.uncompressed_size
+	    std::bit_cast<std::streamsize>(m_code_blob_metadata.uncompressed_size)
 	);
 }
 

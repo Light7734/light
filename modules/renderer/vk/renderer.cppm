@@ -2,6 +2,7 @@ export module renderer.vk.renderer;
 
 import preliminary;
 import time;
+import math.mat4;
 import logger;
 import assets.shader;
 import renderer.vk.api_wrapper;
@@ -29,27 +30,21 @@ public:
 	    u32 max_frames_in_flight
 	);
 
-	~Renderer() override
-	{
-		try
-		{
-			m_device->vk().wait_idle();
-		}
-		catch (const std::exception &exp)
-		{
-			log::error("Failed to wait idle on device in renderer destructor:");
-			log::error("\twhat: {}", exp.what());
-		}
-	}
+	Renderer(Renderer &&) = default;
+
+	Renderer(const Renderer &) = delete;
+
+	auto operator=(Renderer &&) -> Renderer & = default;
+
+	auto operator=(const Renderer &) -> Renderer & = delete;
+
+	~Renderer() override;
 
 	[[nodiscard]] auto frame(u32 frame_idx, std::function<void()> submit_scene) -> Result override;
 
 	void replace_swapchain(ISwapchain *swapchain) override;
 
-	void set_frame_constants(FrameConstants constants) override
-	{
-		m_frame_constants = constants;
-	}
+	void set_frame_constants(FrameConstants constants) override;
 
 	void submit_sprite(
 	    const components::Sprite &sprite,
@@ -67,37 +62,37 @@ private:
 
 	Swapchain *m_swapchain {};
 
-	memory::Ref<Pass> m_pass;
+	memory::Ref<Pass> m_pass {};
 
-	vk::CommandPool m_pool;
+	vk::CommandPool m_pool {};
 
-	std::vector<vk::CommandBuffer> m_cmds;
+	std::vector<vk::CommandBuffer> m_cmds {};
 
-	std::vector<vk::Fence> m_frame_fences;
+	std::vector<vk::Fence> m_frame_fences {};
 
-	std::vector<vk::Semaphore> m_acquire_image_semaphores;
+	std::vector<vk::Semaphore> m_acquire_image_semaphores {};
 
-	std::vector<vk::Semaphore> m_submit_semaphores;
+	std::vector<vk::Semaphore> m_submit_semaphores {};
 
-	math::vec2_u32 m_resolution;
+	math::vec2_u32 m_resolution {};
 
-	FrameConstants m_frame_constants;
+	FrameConstants m_frame_constants {};
 
 	Buffer m_vertex_buffer;
 
 	Buffer m_staging_buffer;
 
-	size_t m_staging_offset;
+	size_t m_staging_offset {};
 
-	std::span<byte> m_staging_map;
+	std::span<byte> m_staging_map {};
 
-	std::span<components::Sprite::Vertex> m_sprite_vertex_map;
+	std::span<components::Sprite::Vertex> m_sprite_vertex_map {};
 
-	size_t m_current_sprite_idx;
+	size_t m_current_sprite_idx {};
 
-	vk::DescriptorPool m_global_set_pool;
+	vk::DescriptorPool m_global_set_pool {};
 
-	vk::DescriptorSet m_global_set;
+	vk::DescriptorSet m_global_set {};
 };
 
 } // namespace lt::renderer::vkb
@@ -107,11 +102,10 @@ private:
 namespace lt::renderer::vkb {
 
 Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_frames_in_flight)
-    : m_device(static_cast<Device *>(device))
-    , m_swapchain(static_cast<Swapchain *>(swapchain))
+    : m_device(dynamic_cast<Device *>(device))
+    , m_swapchain(dynamic_cast<Swapchain *>(swapchain))
     , m_resolution(m_swapchain->get_resolution())
     , m_max_frames_in_flight(max_frames_in_flight)
-    , m_staging_offset()
     , m_vertex_buffer(
           device,
           gpu,
@@ -170,6 +164,20 @@ Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_fr
 	}
 };
 
+Renderer::~Renderer()
+{
+	try
+	{
+		m_device->vk().wait_idle();
+	}
+	catch (const std::exception &exp)
+	{
+		log::error("Failed to wait idle on device in renderer destructor:");
+		log::error("\twhat: {}", exp.what());
+	}
+}
+
+
 [[nodiscard]] auto Renderer::frame(u32 frame_idx, std::function<void()> submit_scene) -> Result
 {
 	ensure(
@@ -189,7 +197,7 @@ Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_fr
 
 	map_buffers(frame_idx);
 
-	// WIP(Light): submit the scene!
+	// @WIP(Light): submit the scene!
 	ignore = submit_scene;
 	// submit_scene();
 	record_cmd(cmd, image_idx);
@@ -219,8 +227,13 @@ Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_fr
 void Renderer::replace_swapchain(ISwapchain *swapchain)
 {
 	m_device->vk().wait_idle();
-	m_swapchain = static_cast<Swapchain *>(swapchain);
+	m_swapchain = dynamic_cast<Swapchain *>(swapchain);
 	m_resolution = m_swapchain->get_resolution();
+}
+
+void Renderer::set_frame_constants(FrameConstants constants)
+{
+	m_frame_constants = constants;
 }
 
 void Renderer::map_buffers(u32 frame_idx)
@@ -292,7 +305,7 @@ void Renderer::record_cmd(vk::CommandBuffer &cmd, u32 image_idx)
 	    }
 	);
 
-	static lt::time::Timer timer;
+	static const lt::time::Timer timer;
 
 	using Attachment = vk::CommandBuffer::RenderingInfo::AttachmentInfo;
 	cmd.begin_rendering({

@@ -59,7 +59,7 @@ public:
 
 	void on_unregister() override;
 
-	void create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info);
+	void create_surface_component(ecs::EntityId entity, const SurfaceComponent::CreateInfo &info);
 
 	void tick(app::TickInfo tick) override;
 
@@ -229,7 +229,6 @@ void handle_shell_surface_configure(void *data, xdg_surface *shell_surface, u32 
 {
 	ignore = data;
 
-	log::test("Surface  configure: {}", (i32)serial);
 	xdg_surface_ack_configure(shell_surface, serial);
 }
 const auto shell_surface_listener = xdg_surface_listener {
@@ -244,13 +243,18 @@ void handle_toplevel_configure(
     wl_array *states
 )
 {
-	// TODO(Light): handle resizing
-	log::test("Toplevel configure: {}x{}", (i32)width, (i32)height);
+	// @todo(Light): implement
+
+	ignore = data;
+	ignore = toplevel;
+	ignore = states;
 }
 
 void handle_toplevel_close(void *data, xdg_toplevel *toplevel)
 {
-	// TODO(Light): handle quitting
+	// @todo(Light): implement
+	ignore = data;
+	ignore = toplevel;
 }
 const auto toplevel_listener = xdg_toplevel_listener {
 	.configure = &handle_toplevel_configure,
@@ -264,7 +268,13 @@ void wayland_pointer_leave_listener(
     wl_surface *surface
 )
 {
-	void *system = std::bit_cast<System *>(data);
+	// @wip(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = serial;
+	ignore = surface;
+
+	// void *system = std::bit_cast<System *>(data);
 }
 
 /* static */ void System::wayland_seat_capabilities_listener(
@@ -300,6 +310,12 @@ void wayland_pointer_leave_listener(
     wl_surface *surface
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = serial;
+	ignore = surface;
+
 	log::debug("Pointer leave...");
 }
 
@@ -312,6 +328,14 @@ void wayland_pointer_leave_listener(
     wl_fixed_t surface_y
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = serial;
+	ignore = surface;
+	ignore = surface_x;
+	ignore = surface_y;
+
 	log::debug("Pointer enter...");
 }
 
@@ -323,6 +347,11 @@ void wayland_pointer_leave_listener(
     wl_fixed_t surface_y
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = listener;
+	ignore = time;
+
 	log::debug("Pointer motion: [{} - {}]", surface_x, surface_y);
 }
 
@@ -335,6 +364,14 @@ void wayland_pointer_leave_listener(
     u32 state
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = serial;
+	ignore = time;
+	ignore = button;
+	ignore = state;
+
 	log::debug("Pointer button");
 }
 
@@ -346,6 +383,13 @@ void wayland_pointer_leave_listener(
     wl_fixed_t value
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = time;
+	ignore = axis;
+	ignore = value;
+
 	log::debug("Pointer axis listener");
 }
 
@@ -355,6 +399,11 @@ void wayland_pointer_leave_listener(
     u32 axis_source
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = axis_source;
+
 	log::debug("Pointer axis source listener");
 }
 
@@ -365,6 +414,12 @@ void wayland_pointer_leave_listener(
     u32 axis_source
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = time;
+	ignore = axis_source;
+
 	log::debug("Pointer axis stop listener");
 }
 
@@ -375,16 +430,27 @@ void wayland_pointer_leave_listener(
     i32 discrete
 )
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+	ignore = axis;
+	ignore = discrete;
+
 	log::debug("Pointer axis discrete listener");
 }
 
 /* static */ void System::wayland_pointer_frame_listener(void *data, wl_pointer *pointer)
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = pointer;
+
 	log::debug("Pointer frame...");
 }
 
 void seat_name_listener(void *data, wl_seat *seat, const char *name)
 {
+	// @todo(Light): implement
 	ignore = data;
 
 	log::info("Wayland seat:");
@@ -434,6 +500,10 @@ void System::wayland_registry_listener(
 
 void registry_handle_global_remove(void *data, wl_registry *registry, u32 name)
 {
+	// @todo(Light): implement
+	ignore = data;
+	ignore = registry;
+
 	log::trace("Registry global remove:");
 	log::trace("\tname: {}", name);
 }
@@ -528,7 +598,10 @@ void System::on_unregister()
 	log::info("surface::System::on_unregister");
 }
 
-void System::create_surface_component(ecs::EntityId entity, SurfaceComponent::CreateInfo info)
+void System::create_surface_component(
+    ecs::EntityId entity,
+    const SurfaceComponent::CreateInfo &info
+)
 try
 {
 	auto &component = m_registry->add<SurfaceComponent>(entity, info);
@@ -603,7 +676,7 @@ void System::tick(app::TickInfo tick)
 
 void System::handle_events(SurfaceComponent &surface)
 {
-	// WIP(Light)
+	/** @WIP(Light) */
 	ignore = surface;
 
 	auto &queue = surface.m_event_queue;

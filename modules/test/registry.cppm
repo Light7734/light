@@ -70,13 +70,11 @@ public:
 	[[nodiscard]] static auto get_case_regex() -> const std::regex &;
 
 private:
-	Registry();
+	Registry() = default;
 
 	[[nodiscard]] static auto instance() -> Registry &;
 
 	auto run_all_impl() -> i32;
-
-	void print_options();
 
 	Options m_options {};
 
@@ -223,7 +221,6 @@ namespace lt::test {
 
 auto Registry::run_all_impl() -> i32
 {
-	print_options();
 	m_case_regex = std::regex(m_options.case_regex);
 
 	const auto regex = std::regex(m_options.suite_regex);
@@ -308,8 +305,8 @@ auto Registry::run_all_impl() -> i32
 	case ExecutionPolicy::stats:
 	{
 		log::test("[-------STATS------]");
-		log::test("Total suite count: {}", (i32)m_total_suite_count);
-		log::test("Total test count: {}", (i32)m_total_case_count);
+		log::test("Total suite count: {}", m_total_suite_count);
+		log::test("Total test count: {}", m_total_case_count);
 		log::test("________________________________________________________________");
 
 		return 0;
@@ -317,16 +314,6 @@ auto Registry::run_all_impl() -> i32
 	}
 
 	std::unreachable();
-}
-
-void Registry::print_options()
-{
-	// log::info("stop-on-failure: {}", static_cast<bool>(m_options.stop_on_fail));
-}
-
-Registry::Registry()
-{
-	// log::info("________________________________________________________________");
 }
 
 [[nodiscard]] /* static */ auto Registry::instance() -> Registry &

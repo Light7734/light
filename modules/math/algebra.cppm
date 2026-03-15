@@ -43,18 +43,18 @@ constexpr auto perspective(T field_of_view, T aspect_ratio, T z_near, T z_far) -
 
 	auto result = mat4_impl<T>::identity();
 
-	result[0][0] = T { 1 } / (aspect_ratio * half_fov_tan);
+	result[0].x = T { 1 } / (aspect_ratio * half_fov_tan);
 	//
-	result[1][1] = T { 1 } / (half_fov_tan);
+	result[1].y = T { 1 } / (half_fov_tan);
 	//
 	//	result[2][2] = -(z_far + z_near) / (z_far - z_near);
 	//
-	result[2][2] = z_far / (z_far - z_near);
+	result[2].z = z_far / (z_far - z_near);
 	//
-	result[2][3] = -T { 1 };
+	result[2].w = -T { 1 };
 	//
 	// result[3][2] = -(T { 2 } * z_far * z_near) / (z_far - z_near);
-	result[3][2] = -(z_far * z_near) / (z_far - z_near);
+	result[3].z = -(z_far * z_near) / (z_far - z_near);
 	//
 	return result;
 }

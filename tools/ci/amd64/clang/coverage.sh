@@ -9,11 +9,6 @@ export CC
 CXX=$(which clang++)
 export CXX
 
-DISPLAY=:99
-export DISPLAY
-
-Xvfb :99 -screen 0 1024x768x16 &
-
 cmake \
     -S . \
     -B build \

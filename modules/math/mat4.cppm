@@ -20,7 +20,9 @@ struct mat4_impl
 
 	static constexpr auto num_elements = 4u * 4u;
 
-	constexpr explicit mat4_impl(T scalar = T {})
+	constexpr mat4_impl() = default;
+
+	constexpr explicit mat4_impl(T scalar)
 	    : values(
 	          {
 	              Column_T { scalar },

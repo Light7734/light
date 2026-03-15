@@ -63,7 +63,7 @@ Pass::Pass(
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
 )
-    : m_device(static_cast<Device *>(device))
+    : m_device(dynamic_cast<Device *>(device))
       , m_descriptor_set_layout(m_device->vk(),{
         .flags = vk::DescriptorSetLayout::CreateInfo::FlagBits::update_after_bind_pool,
         .bindings = { 

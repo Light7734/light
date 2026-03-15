@@ -37,30 +37,42 @@ enum class Level : u8
 	off = 7,
 };
 
-auto min_severity = Level::trace;
 
-auto set_min_severity(Level severity)
-{
-	min_severity = severity;
-}
+} // namespace lt::log
 
-template<typename... Args>
-struct [[maybe_unused]] print
+/* private */ namespace lt::log {
+
+class Logger
 {
-	[[maybe_unused]] print(
-	    Level level,
-	    const std::source_location &location,
-	    std::format_string<Args...> format,
-	    Args &&...arguments
-	) noexcept
+public:
+	static void set_severity(Level severity)
 	{
-		if (std::to_underlying(level) < std::to_underlying(min_severity))
-		{
-			return;
-		}
+		s_min_severity = severity;
+	}
 
-		constexpr auto to_string = [](Level level) {
-			// clang-format off
+	static auto get_severity() -> Level
+	{
+		return s_min_severity;
+	}
+
+	template<typename... Args>
+	struct [[maybe_unused]] print
+	{
+		[[maybe_unused]] print(
+		    Level level,
+		    const std::source_location &location,
+		    std::format_string<Args...> format,
+		    Args &&...arguments
+		) noexcept
+		{
+			std::print("");
+			if (std::to_underlying(level) < std::to_underlying(get_severity()))
+			{
+				return;
+			}
+
+			constexpr auto to_string = [](Level level) {
+				// clang-format off
 			switch (level)
 			{
 			using enum ::lt::log::Level;
@@ -73,57 +85,54 @@ struct [[maybe_unused]] print
             case test: /* testing framework's logs will never have location */
 			case off: return "off";
 			}
-			// clang-format on
+				// clang-format on
 
-			std::unreachable();
-		};
+				std::unreachable();
+			};
 
-		const auto path = std::filesystem::path { location.file_name() };
+			const auto path = std::filesystem::path { location.file_name() };
 
-		std::println(
-		    "{} {} ==> {}",
-		    to_string(level),
-		    std::format("{}:{}", path.filename().string(), location.line()),
-		    std::format(format, std::forward<Args>(arguments)...)
-		);
-	}
+			std::println(
+			    "{} {} ==> {}",
+			    to_string(level),
+			    std::format("{}:{}", path.filename().string(), location.line()),
+			    std::format(format, std::forward<Args>(arguments)...)
+			);
+		}
+	};
 
-	[[maybe_unused]] print(
-	    Level level,
-	    std::format_string<Args...> format,
-	    Args &&...arguments
-	) noexcept
+	template<typename... Args>
+	print(Level, const std::source_location &, std::format_string<Args...>, Args &&...) noexcept
+	    -> print<Args...>;
+
+	template<typename... Args>
+	static void print_test(std::format_string<Args...> format, Args &&...arguments) noexcept
 	{
-		constexpr auto to_string = [](Level level) {
-			// clang-format off
-			switch (level)
-			{
-			using enum ::lt::log::Level;
-			case trace   : return "\033[1;37m| trc |\033[0m";
-			case debug   : return "\033[1;36m| dbg |\033[0m";
-			case info    : return "\033[1;32m| inf |\033[0m";
-			case warn    : return "\033[1;33m| wrn |\033[0m";
-			case error   : return "\033[1;31m| err |\033[0m";
-			case critical: return "\033[1;41m| crt |\033[0m";
-			case test    : return "\033[1;33m| test |\033[0m";
-			case off     : return "";
-			}
-			// clang-format on
-
-			std::unreachable();
-		};
-
 		std::println(
-		    "{} {}",
-		    to_string(level),
+		    "\033[1;33m| test |\033[0m {}",
 		    std::format(format, std::forward<Args>(arguments)...)
 		);
 	}
-};
 
-template<typename... Args>
-print(Level, const std::source_location &, std::format_string<Args...>, Args &&...) noexcept
-    -> print<Args...>;
+
+private:
+	static Level s_min_severity;
+};
+auto Logger::s_min_severity = Level::trace;
+
+} // namespace lt::log
+
+export namespace lt::log {
+
+void set_severity(Level level)
+{
+	Logger::set_severity(level);
+}
+
+auto get_severity() -> Level
+{
+	return Logger::get_severity();
+}
 
 template<typename... Args>
 struct [[maybe_unused]] trace
@@ -134,7 +143,7 @@ struct [[maybe_unused]] trace
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::trace, location, format, std::forward<Args>(arguments)...);
+		Logger::print(Level::trace, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -150,7 +159,7 @@ struct [[maybe_unused]] debug
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::debug, location, format, std::forward<Args>(arguments)...);
+		Logger::print(Level::debug, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -167,7 +176,7 @@ struct [[maybe_unused]] info
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::info, location, format, std::forward<Args>(arguments)...);
+		Logger::print(Level::info, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -183,7 +192,7 @@ struct [[maybe_unused]] warn
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::warn, location, format, std::forward<Args>(arguments)...);
+		Logger::print(Level::warn, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -199,7 +208,7 @@ struct [[maybe_unused]] error
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::error, location, format, std::forward<Args>(arguments)...);
+		Logger::print(Level::error, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -215,7 +224,7 @@ struct [[maybe_unused]] critical
 	    const std::source_location &location = std::source_location::current()
 	) noexcept
 	{
-		print(Level::critical, location, format, std::forward<Args>(arguments)...);
+		Logger::print(Level::critical, location, format, std::forward<Args>(arguments)...);
 	}
 };
 
@@ -223,9 +232,15 @@ template<typename... Args>
 critical(std::format_string<Args...>, Args &&...) noexcept -> critical<Args...>;
 
 template<typename... Args>
-void test(std::format_string<Args...> format, Args &&...arguments) noexcept
+struct [[maybe_unused]] test
 {
-	print(Level::test, format, std::forward<Args>(arguments)...);
-}
+	[[maybe_unused]] test(std::format_string<Args...> format, Args &&...arguments) noexcept
+	{
+		Logger::print_test(format, std::forward<Args>(arguments)...);
+	}
+};
+
+template<typename... Args>
+test(std::format_string<Args...>, Args &&...) noexcept -> test<Args...>;
 
 } // namespace lt::log

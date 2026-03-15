@@ -30,7 +30,7 @@ namespace lt {
 void renderer_callback(
     renderer::IDebugger::MessageSeverity message_severity,
     renderer::IDebugger::MessageType message_type,
-    renderer::IDebugger::MessageData data,
+    const renderer::IDebugger::MessageData &data,
     std::any &user_data
 )
 {

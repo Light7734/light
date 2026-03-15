@@ -5,17 +5,17 @@ import math.vec2;
 
 export namespace lt::math {
 
+/** A vector of THREE @a `T`s.
+ *
+ * @warn Does not defualt initialize to zero.
+ */
 template<typename T = f32>
     requires(std::is_arithmetic_v<T>)
 struct vec3_impl
 {
 	using Underlying_T = T;
 
-	static constexpr auto num_elements = 3u;
-
-	constexpr vec3_impl(): x(), y(), z()
-	{
-	}
+	constexpr vec3_impl() = default;
 
 	constexpr explicit vec3_impl(T scalar): x(scalar), y(scalar), z(scalar)
 	{
@@ -79,24 +79,6 @@ struct vec3_impl
 		};
 	}
 
-	[[nodiscard]] constexpr auto operator[](u8 idx) -> T &
-	{
-		debug_check(idx < num_elements, "vec3 out of bound access: {}", idx);
-		return ((T *)this)[idx];
-	}
-
-	[[nodiscard]] constexpr auto operator[](u8 idx) const -> const T &
-	{
-		debug_check(idx < num_elements, "vec3 out of bound access: {}", idx);
-		return ((T *)this)[idx];
-	}
-
-	friend auto operator<<(std::ostream &stream, vec3_impl<T> value) -> std::ostream &
-	{
-		stream << value.x << ", " << value.y << ", " << value.z;
-		return stream;
-	}
-
 	T x;
 
 	T y;
@@ -120,17 +102,3 @@ using vec3_u32 = vec3_impl<u32>;
 using vec3_u64 = vec3_impl<u64>;
 
 } // namespace lt::math
-
-export template<typename T>
-struct std::formatter<lt::math::vec3_impl<T>>
-{
-	constexpr auto parse(std::format_parse_context &context)
-	{
-		return context.begin();
-	}
-
-	auto format(const lt::math::vec3_impl<T> &val, std::format_context &context) const
-	{
-		return std::format_to(context.out(), "{}, {}, {}", val.x, val.y, val.z);
-	}
-};

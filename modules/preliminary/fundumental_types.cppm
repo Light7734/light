@@ -19,4 +19,5 @@ export using f64 = double;
 
 export using size_t = ::std::size_t;
 
+// NOLINTNEXTLINE(misc-unused-using-decls)
 export using ::std::ignore;

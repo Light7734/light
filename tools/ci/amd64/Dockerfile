@@ -1,4 +1,4 @@
-FROM archlinux:latest
+FROM archlinux:multilib-devel
 
 ## Configurations ##
 RUN \
@@ -7,9 +7,15 @@ mkdir /msan \
 && sed -i 's/^#ParallelDownloads = .*/ParallelDownloads = 8/' /etc/pacman.conf \
 && echo 'NoExtract = usr/share/{man,doc,info}/*' >> /etc/pacman.conf
 
+RUN printf '%s\n' \
+  'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' \
+  > /etc/pacman.d/mirrorlist
+
 ## Packages ##
+RUN pacman -Syyu --noconfirm --disable-download-timeout
+
 RUN \
-pacman -Syyu --noconfirm --needed --disable-download-timeout \
+pacman -S --noconfirm --needed --disable-download-timeout \
     afl++ \
     afl-utils \
     base-devel \
@@ -312,10 +318,10 @@ export CXXFLAGS="\
 
 
 # Cache debuginfo symbols downloaded when running valgrind
-RUN \
-git clone https://git.light7734.com/light7734/light.git --depth=1 \
-&& cd ./light/tools/ci/amd64/gcc/ \
-&& ./valgrind.sh
+# RUN \
+# git clone https://git.light7734.com/light7734/light.git --depth=1 \
+# && cd ./light/tools/ci/amd64/gcc/ \
+# && ./valgrind.sh
 
 
 # && cmake \

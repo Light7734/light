@@ -39,7 +39,10 @@ struct VertexInputBindingDescription
 	u32 stride;
 };
 
-/** Requires a math::components::Transform component on the same entity to be functional. */
+/** Component representing a colored 2d-quad.
+ *
+ * @warn Requires a math::components::Transform component on the same entity to be functional.
+ */
 struct Sprite
 {
 	struct Vertex

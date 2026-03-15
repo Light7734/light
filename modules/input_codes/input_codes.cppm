@@ -13,6 +13,7 @@ import preliminary;
 
 export namespace lt {
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum class Key : u16
 {
 	none = 0,

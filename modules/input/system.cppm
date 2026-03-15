@@ -38,11 +38,11 @@ private:
 
 	void on_pointer(const lt::surface::PointerEvent &event);
 
-	memory::Ref<ecs::Registry> m_registry;
+	memory::Ref<ecs::Registry> m_registry {};
 
 	std::array<bool, 512> m_keys {};
 
-	math::vec2 m_pointer_position;
+	math::vec2 m_pointer_position {};
 
 	app::TickResult m_last_tick_result {};
 };

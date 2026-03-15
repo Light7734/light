@@ -61,8 +61,8 @@ private:
 namespace lt::renderer::vkb {
 
 Buffer::Buffer(IDevice *device, IGpu *gpu, const CreateInfo &info)
-    : m_device(static_cast<Device *>(device))
-    , m_gpu(static_cast<Gpu *>(gpu))
+    : m_device(dynamic_cast<Device *>(device))
+    , m_gpu(dynamic_cast<Gpu *>(gpu))
     , m_buffer(
           m_device->vk(),
           vk::Buffer::CreateInfo {
@@ -147,7 +147,7 @@ void Buffer::unmap() /* override */
 
 [[nodiscard]] auto Buffer::has_correct_memory_type_bit(u32 type_bits, u32 type_idx) const -> bool
 {
-	return type_bits & (1 << type_idx);
+	return type_bits & (1u << type_idx);
 }
 
 [[nodiscard]] auto Buffer::has_required_memory_properties(

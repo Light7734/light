@@ -38,6 +38,7 @@ add_module(
     vec4.cppm
     mat4.cppm
     components.cppm
+    formatter.cppm
     DEPENDENCIES
     preliminary
     TESTS

@@ -53,7 +53,7 @@ Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
 	);
 
 	m_surface = vk::Surface(
-	    static_cast<Instance *>(instance)->vk(),
+	    dynamic_cast<Instance *>(instance)->vk(),
 	    vk::Surface::CreateInfo {
 	        .display = component.get_native_data().display,
 	        .surface = component.get_native_data().surface,

@@ -1,11 +1,15 @@
 module;
-#if defined(LIGHT_PLATFORM_LINUX)
+
 struct wl_display;
 struct wl_surface;
 struct xdg_surface;
 struct xdg_toplevel;
-#else defined(LIGHT_PLATFORM_WINDOWS)
+
+#if defined(LIGHT_PLATFORM_LINUX)
+#elif defined(LIGHT_PLATFORM_WINDOWS)
 	#include <Windows.h>
+#else
+	#error "Unsupported platform"
 #endif
 
 export module surface.system:components;
@@ -14,6 +18,7 @@ import preliminary;
 import math.vec2;
 import surface.events;
 import surface.requests;
+
 
 export namespace lt::surface {
 
@@ -136,25 +141,24 @@ private:
 	    , m_resolution(info.resolution)
 	    , m_vsync(info.vsync)
 	    , m_visible(info.visible)
-	    , m_native_data({})
 	{
 	}
 
-	std::string m_title;
+	std::string m_title {};
 
-	math::vec2_u32 m_resolution;
+	math::vec2_u32 m_resolution {};
 
-	math::vec2_i32 m_position;
+	math::vec2_i32 m_position {};
 
-	bool m_vsync;
+	bool m_vsync {};
 
-	bool m_visible;
+	bool m_visible {};
 
-	NativeData m_native_data;
+	NativeData m_native_data {};
 
-	std::vector<Event> m_event_queue;
+	std::vector<Event> m_event_queue {};
 
-	std::vector<Request> m_requests;
+	std::vector<Request> m_requests {};
 };
 
 } // namespace lt::surface

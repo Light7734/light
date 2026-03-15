@@ -35,7 +35,7 @@ namespace lt::renderer::vkb {
 
 Gpu::Gpu(IInstance *instance)
 {
-	auto gpus = vk::Gpu::enumerate(static_cast<Instance *>(instance)->vk());
+	auto gpus = vk::Gpu::enumerate(dynamic_cast<Instance *>(instance)->vk());
 
 	for (auto &gpu : gpus)
 	{

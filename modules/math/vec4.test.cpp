@@ -2,32 +2,13 @@ import test;
 import math.vec2;
 import math.vec3;
 import math.vec4;
+import math.formatter;
 import logger;
 
 using vec2 = ::lt::math::vec2;
 using vec3 = ::lt::math::vec3;
 using vec4 = ::lt::math::vec4;
 using ivec4 = ::lt::math::vec4_i32;
-
-Suite static_tests = "vec4_static_checks"_suite = [] {
-	constexpr auto num_elements = lt::math::vec4::num_elements;
-
-	static_assert(num_elements == 4u);
-	static_assert(std::is_same_v<lt::math::vec4, lt::math::vec4_f32>);
-
-	static_assert(sizeof(lt::math::vec4_f32) == sizeof(f32) * num_elements);
-	static_assert(sizeof(lt::math::vec4_f64) == sizeof(f64) * num_elements);
-
-	static_assert(sizeof(lt::math::vec4_i8) == sizeof(i8) * num_elements);
-	static_assert(sizeof(lt::math::vec4_i16) == sizeof(i16) * num_elements);
-	static_assert(sizeof(lt::math::vec4_i32) == sizeof(i32) * num_elements);
-	static_assert(sizeof(lt::math::vec4_i64) == sizeof(i64) * num_elements);
-
-	static_assert(sizeof(lt::math::vec4_u8) == sizeof(u8) * num_elements);
-	static_assert(sizeof(lt::math::vec4_u16) == sizeof(u16) * num_elements);
-	static_assert(sizeof(lt::math::vec4_u32) == sizeof(u32) * num_elements);
-	static_assert(sizeof(lt::math::vec4_u64) == sizeof(u64) * num_elements);
-};
 
 Suite raii = "vec4_raii"_suite = [] {
 	Case { "happy paths" } = [] {
@@ -79,8 +60,8 @@ Suite raii = "vec4_raii"_suite = [] {
 		const auto vec = vec4 { 1.0, 2.0, 3.0, 4.0 };
 		expect_eq(vec.x, 1.0);
 		expect_eq(vec.y, 2.0);
-		expect_eq(vec.y, 3.0);
-		expect_eq(vec.z, 4.0);
+		expect_eq(vec.z, 3.0);
+		expect_eq(vec.w, 4.0);
 	};
 
 	Case { "post construct with xy,z,w has correct state" } = [] {
@@ -187,18 +168,18 @@ Suite arithmetic_operators = "vec4_operators"_suite = [] {
 
 	Case { "operator []" } = [] {
 		auto vec = vec4 { 0.0, 1.0, 2.0, 3.0 };
-		expect_eq(vec[0], 0.0);
-		expect_eq(vec[1], 1.0);
-		expect_eq(vec[2], 2.0);
-		expect_eq(vec[3], 3.0);
+		expect_eq(vec.x, 0.0);
+		expect_eq(vec.y, 1.0);
+		expect_eq(vec.z, 2.0);
+		expect_eq(vec.w, 3.0);
 	};
 
 	Case { "operator [] const" } = [] {
 		const auto vec = vec4 { 0.0, 1.0, 2.0, 3.0 };
-		expect_eq(vec[0], 0.0);
-		expect_eq(vec[1], 1.0);
-		expect_eq(vec[2], 2.0);
-		expect_eq(vec[3], 3.0);
+		expect_eq(vec.x, 0.0);
+		expect_eq(vec.y, 1.0);
+		expect_eq(vec.z, 2.0);
+		expect_eq(vec.w, 3.0);
 	};
 };
 

@@ -22,10 +22,10 @@ constexpr auto frames_in_flight = u32 { 3u };
 
 
 export void noop_callback(
-    lt::renderer::IDebugger::MessageSeverity,
-    lt::renderer::IDebugger::MessageType,
-    const lt::renderer::IDebugger::MessageData &,
-    std::any &
+    lt::renderer::IDebugger::MessageSeverity /* unused */,
+    lt::renderer::IDebugger::MessageType /* unused */,
+    const lt::renderer::IDebugger::MessageData & /* unused */,
+    std::any & /* unused */
 )
 {
 }

@@ -54,17 +54,17 @@ private:
 	    u32 desired_image_count
 	) const -> u32;
 
-	Gpu *m_gpu;
+	Gpu *m_gpu {};
 
 	Surface *m_surface {};
 
-	Device *m_device;
+	Device *m_device {};
 
-	vk::Swapchain m_swapchain;
+	vk::Swapchain m_swapchain {};
 
-	std::vector<vk::Image> m_images;
+	std::vector<vk::Image> m_images {};
 
-	std::vector<vk::ImageView> m_image_views;
+	std::vector<vk::ImageView> m_image_views {};
 
 	math::vec2_u32 m_resolution {};
 
@@ -78,9 +78,9 @@ private:
 namespace lt::renderer::vkb {
 
 Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
-    : m_surface(static_cast<Surface *>(surface))
-    , m_gpu(static_cast<Gpu *>(gpu))
-    , m_device(static_cast<Device *>(device))
+    : m_surface(dynamic_cast<Surface *>(surface))
+    , m_gpu(dynamic_cast<Gpu *>(gpu))
+    , m_device(dynamic_cast<Device *>(device))
 {
 	auto capabilities = m_gpu->vk().get_surface_capabilities(m_surface->vk());
 	const auto formats = m_gpu->vk().get_surface_formats(m_surface->vk());
@@ -126,29 +126,28 @@ Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
 	for (auto idx = 0u; auto &image : m_images)
 	{
 		m_image_views.emplace_back(
-		    vk::ImageView {
-		        m_device->vk(),
-		        image,
-		        vk::ImageView::CreateInfo {
-                .type = vk::ImageView::Type::_2d,
-                .format = surface_format.format,
-                .components = {
-                    vk::ImageView::Swizzle::identity,
-                    vk::ImageView::Swizzle::identity,
-                    vk::ImageView::Swizzle::identity,
-                    vk::ImageView::Swizzle::identity,
-                },
-                .range = {
-		            .aspect_flags = vk::Image::AspectFlags::color_bit,
-		            .base_mip_level = 0u,
-		            .level_count = 1u,
-		            .base_array_layer = 0u,
-		            .layer_count = 1u,
-                },
+            m_device->vk(),
+            image,
+            vk::ImageView::CreateInfo {
+            .type = vk::ImageView::Type::_2d,
+            .format = surface_format.format,
+            .components = {
+                vk::ImageView::Swizzle::identity,
+                vk::ImageView::Swizzle::identity,
+                vk::ImageView::Swizzle::identity,
+                vk::ImageView::Swizzle::identity,
+            },
+            .range = {
+                .aspect_flags = vk::Image::AspectFlags::color_bit,
+                .base_mip_level = 0u,
+                .level_count = 1u,
+                .base_array_layer = 0u,
+                .layer_count = 1u,
+            },
 
-                .name = std::format("swapchain image view {}", idx++),
-		        },
-		    }
+            .name = std::format("swapchain image view {}", idx++),
+            }
+		    
 		);
 	}
 	m_device->vk().wait_idle();

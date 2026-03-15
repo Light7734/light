@@ -22,8 +22,7 @@ public:
 private:
 	void run_normal(std::invocable auto test) const;
 
-private:
-	std::string m_name;
+	std::string m_name {};
 };
 
 struct TestSuite
@@ -138,7 +137,7 @@ auto operator""_suite(const char *name, size_t size) -> TestSuite
 // module :private;
 namespace lt::test {
 
-TestCase::TestCase(std::string name): m_name(name)
+TestCase::TestCase(std::string name): m_name(std::move(name))
 {
 	if (m_name.size() > 79u)
 	{

@@ -68,8 +68,8 @@ private:
 namespace lt::renderer::vkb {
 
 Device::Device(IGpu *gpu, ISurface *surface)
-    : m_gpu(static_cast<Gpu *>(gpu))
-    , m_surface(static_cast<Surface *>(surface))
+    : m_gpu(dynamic_cast<Gpu *>(gpu))
+    , m_surface(dynamic_cast<Surface *>(surface))
 {
 	ensure(m_surface->vk(), "Failed to initialize vk::Device: null vulkan surface");
 

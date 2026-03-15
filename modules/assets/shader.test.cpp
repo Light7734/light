@@ -54,6 +54,7 @@ Suite raii = "shader_raii"_suite = [] {
 	};
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
 Suite packing = "shader_pack"_suite = [] {
 	Case { "Unpacking packed data returns the same data" } = [] {
 		const auto out_path = tmp_path / "shader_packing";
@@ -62,7 +63,7 @@ Suite packing = "shader_pack"_suite = [] {
 		auto blob = generate_blob(blob_size);
 
 		const auto expected_size =                    //
-		    sizeof(AssetMetadata::type)               //
+		    sizeof(AssetMetadata::type)               // NOLINT(bugprone-sizeof-container)
 		    + sizeof(AssetMetadata::version)          //
 		    + sizeof(ShaderAsset::Metadata::type)     //
 		    + sizeof(BlobMetadata::tag)               //

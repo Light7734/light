@@ -74,7 +74,7 @@ Suite expects = "expects"_suite = []() {
 		try { expect_false(!false); }
         catch (const std::exception&) { ++unhappy_counter; }
 
-		try { expect_false(!!1);  }
+		try { expect_false(!!true);  }
         catch (const std::exception&) { ++unhappy_counter; }
 		// clang-format on
 
@@ -98,7 +98,7 @@ Suite expects = "expects"_suite = []() {
 		try { expect_true(false); }
         catch (const std::exception&) { ++unhappy_counter; }
 
-		try { expect_true(!!0); } 
+		try { expect_true(!!false); } 
         catch (const std::exception&) { ++unhappy_counter; }
 		// clang-format on
 
@@ -180,7 +180,7 @@ Suite expects = "expects"_suite = []() {
 	Case { "expect_le - happy" } = [] {
 		expect_le(69, 420);
 		expect_le(19.694206942069420, 20.0);
-		expect_le(false, !!1);
+		expect_le(false, !!true);
 	};
 
 	Case { "expect_le - unhappy" } = [] {

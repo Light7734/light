@@ -18,7 +18,7 @@ private:
 	static void native_callback(
 	    vk::Flags severity,
 	    vk::Flags types,
-	    vk::Messenger::MessageData data,
+	    const vk::Messenger::MessageData &data,
 	    void *user_data
 	);
 
@@ -150,7 +150,7 @@ namespace lt::renderer::vkb {
 void Debugger::native_callback(
     vk::Flags severity,
     vk::Flags types,
-    vk::Messenger::MessageData data,
+    const vk::Messenger::MessageData &data,
     void *user_data
 )
 {
@@ -179,7 +179,7 @@ Debugger::Debugger(IInstance *instance, CreateInfo info)
     : m_user_data(std::move(info.user_data))
     , m_user_callback(std::move(info.callback))
     , m_messenger(
-          static_cast<Instance *>(instance)->vk(),
+          dynamic_cast<Instance *>(instance)->vk(),
           vk::Messenger::CreateInfo {
               .user_callback = &native_callback,
               .user_data = this,

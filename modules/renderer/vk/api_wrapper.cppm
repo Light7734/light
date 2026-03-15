@@ -1,5 +1,5 @@
 /** For lack of a better word, the way things are implemented is pretty F'ed up...
- * BUT... it works... and the exported interface simplifies everything for the consumer
+ * BUT... it works... and the exported interface simplifies everything for our Vulkan backend
  *
  *
  * Why did I do this?
@@ -279,12 +279,14 @@ enum T : VkFlags // NOLINT
 
 }
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum class SharingMode : std::underlying_type_t<VkSharingMode>
 {
 	exclusive = VK_SHARING_MODE_EXCLUSIVE,
 	concurrent = VK_SHARING_MODE_CONCURRENT,
 };
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum class PolygonMode
 {
 	fill = VK_POLYGON_MODE_FILL,
@@ -292,12 +294,14 @@ enum class PolygonMode
 	point = VK_POLYGON_MODE_POINT,
 };
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum class FrontFace : std::underlying_type_t<VkFrontFace>
 {
 	counter_clockwise = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 	clockwise = VK_FRONT_FACE_CLOCKWISE,
 };
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum class BlendFactor : std::underlying_type_t<VkBlendFactor>
 {
 	zero = VK_BLEND_FACTOR_ZERO,
@@ -321,6 +325,7 @@ enum class BlendFactor : std::underlying_type_t<VkBlendFactor>
 	one_minus_src1_alpha = VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA,
 };
 
+// NOLINTNEXTLINE(performance-enum-size)
 enum class PrimitiveTopology : std::underlying_type_t<VkPrimitiveTopology>
 {
 	point_list = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
@@ -695,9 +700,9 @@ struct Viewport
 
 	math::vec2 extent;
 
-	f32 min_depth {};
+	f32 min_depth;
 
-	f32 max_depth {};
+	f32 max_depth;
 };
 
 struct Rect2d
@@ -744,7 +749,7 @@ public:
 
 	Instance() = default;
 
-	Instance(CreateInfo info);
+	Instance(const CreateInfo &info);
 
 	Instance(Instance &&) = default;
 
@@ -754,10 +759,8 @@ public:
 
 	auto operator=(const Instance &) = delete;
 
-	~Instance()
-	{
-		// WIP;
-	}
+	/** @WIP */
+	~Instance() = default;
 
 	void load_functions();
 
@@ -782,6 +785,7 @@ public:
 
 	friend class Swapchain;
 
+	// NOLINTNEXTLINE(performance-enum-size)
 	enum Transform : VkFlags
 	{
 		identity_bit = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
@@ -886,59 +890,113 @@ public:
 	struct Features
 	{
 		Bool32 robust_buffer_access;
+
 		Bool32 full_draw_index_uint32;
+
 		Bool32 image_cube_array;
+
 		Bool32 independent_blend;
+
 		Bool32 geometry_shader;
+
 		Bool32 tessellation_shader;
+
 		Bool32 sample_rate_shading;
+
 		Bool32 dual_src_blend;
+
 		Bool32 logic_op;
+
 		Bool32 multi_draw_indirect;
+
 		Bool32 draw_indirect_first_instance;
+
 		Bool32 depth_clamp;
+
 		Bool32 depth_bias_clamp;
+
 		Bool32 fill_mode_non_solid;
+
 		Bool32 depth_bounds;
+
 		Bool32 wide_lines;
+
 		Bool32 large_points;
+
 		Bool32 alpha_to_one;
+
 		Bool32 multi_viewport;
+
 		Bool32 sampler_anisotropy;
+
 		Bool32 texture_compression_etc2;
+
 		Bool32 texture_compression_astc_ldr;
+
 		Bool32 texture_compression_bc;
+
 		Bool32 occlusion_query_precise;
+
 		Bool32 pipeline_statistics_query;
+
 		Bool32 vertex_pipeline_stores_and_atomics;
+
 		Bool32 fragment_stores_and_atomics;
+
 		Bool32 shader_tessellation_and_geometry_point_size;
+
 		Bool32 shader_image_gather_extended;
+
 		Bool32 shader_storage_image_extended_formats;
+
 		Bool32 shader_storage_image_multisample;
+
 		Bool32 shader_storage_image_read_without_format;
+
 		Bool32 shader_storage_image_write_without_format;
+
 		Bool32 shader_uniform_buffer_array_dynamic_indexing;
+
 		Bool32 shader_sampled_image_array_dynamic_indexing;
+
 		Bool32 shader_storage_buffer_array_dynamic_indexing;
+
 		Bool32 shader_storage_image_array_dynamic_indexing;
+
 		Bool32 shader_clip_distance;
+
 		Bool32 shader_cull_distance;
+
 		Bool32 shader_float64;
+
 		Bool32 shader_int64;
+
 		Bool32 shader_int16;
+
 		Bool32 shader_resource_residency;
+
 		Bool32 shader_resource_min_lod;
+
 		Bool32 sparse_binding;
+
 		Bool32 sparse_residency_buffer;
+
 		Bool32 sparse_residency_image_2d;
+
 		Bool32 sparse_residency_image_3d;
+
 		Bool32 sparse_residency_2_samples;
+
 		Bool32 sparse_residency_4_samples;
+
 		Bool32 sparse_residency_8_samples;
+
 		Bool32 sparse_residency_16_samples;
+
 		Bool32 sparse_residency_aliased;
+
 		Bool32 variable_multisample_rate;
+
 		Bool32 inherited_queries;
 	};
 
@@ -950,182 +1008,324 @@ public:
 	struct DescriptorIndexingFeatures
 	{
 		Bool32 shader_input_attachment_array_dynamic_indexing;
+
 		Bool32 shader_uniform_texel_buffer_array_dynamic_indexing;
+
 		Bool32 shader_storage_texel_buffer_array_dynamic_indexing;
+
 		Bool32 shader_uniform_buffer_array_non_uniform_indexing;
+
 		Bool32 shader_sampled_image_array_non_uniform_indexing;
+
 		Bool32 shader_storage_buffer_array_non_uniform_indexing;
+
 		Bool32 shader_storage_image_array_non_uniform_indexing;
+
 		Bool32 shader_input_attachment_array_non_uniform_indexing;
+
 		Bool32 shader_uniform_texel_buffer_array_non_uniform_indexing;
+
 		Bool32 shader_storage_texel_buffer_array_non_uniform_indexing;
+
 		Bool32 descriptor_binding_uniform_buffer_update_after_bind;
+
 		Bool32 descriptor_binding_sampled_image_update_after_bind;
+
 		Bool32 descriptor_binding_storage_image_update_after_bind;
+
 		Bool32 descriptor_binding_storage_buffer_update_after_bind;
+
 		Bool32 descriptor_binding_uniform_texel_buffer_update_after_bind;
+
 		Bool32 descriptor_binding_storage_texel_buffer_update_after_bind;
+
 		Bool32 descriptor_binding_update_unused_while_pending;
+
 		Bool32 descriptor_binding_partially_bound;
+
 		Bool32 descriptor_binding_variable_descriptor_count;
+
 		Bool32 runtime_descriptor_array;
 	};
 
 	struct Limits
 	{
 		u32 max_image_dimension_1d;
+
 		u32 max_image_dimension_2d;
+
 		u32 max_image_dimension_3d;
+
 		u32 max_image_dimension_cube;
+
 		u32 max_image_array_layers;
+
 		u32 max_texel_buffer_elements;
+
 		u32 max_uniform_buffer_range;
+
 		u32 max_storage_buffer_range;
+
 		u32 max_push_constants_size;
+
 		u32 max_memory_allocation_count;
+
 		u32 max_sampler_allocation_count;
+
 		size_t buffer_image_granularity;
+
 		size_t sparse_address_space_size;
+
 		u32 max_bound_descriptor_sets;
+
 		u32 max_per_stage_descriptor_samplers;
+
 		u32 max_per_stage_descriptor_uniform_buffers;
+
 		u32 max_per_stage_descriptor_storage_buffers;
+
 		u32 max_per_stage_descriptor_sampled_images;
+
 		u32 max_per_stage_descriptor_storage_images;
+
 		u32 max_per_stage_descriptor_input_attachments;
+
 		u32 max_per_stage_resources;
+
 		u32 max_descriptor_set_samplers;
+
 		u32 max_descriptor_set_uniform_buffers;
+
 		u32 max_descriptor_set_uniform_buffers_dynamic;
+
 		u32 max_descriptor_set_storage_buffers;
+
 		u32 max_descriptor_set_storage_buffers_dynamic;
+
 		u32 max_descriptor_set_sampled_images;
+
 		u32 max_descriptor_set_storage_images;
+
 		u32 max_descriptor_set_input_attachments;
+
 		u32 max_vertex_input_attributes;
+
 		u32 max_vertex_input_bindings;
+
 		u32 max_vertex_input_attribute_offset;
+
 		u32 max_vertex_input_binding_stride;
+
 		u32 max_vertex_output_components;
+
 		u32 max_tessellation_generation_level;
+
 		u32 max_tessellation_patch_size;
+
 		u32 max_tessellation_control_per_vertex_input_components;
+
 		u32 max_tessellation_control_per_vertex_output_components;
+
 		u32 max_tessellation_control_per_patch_output_components;
+
 		u32 max_tessellation_control_total_output_components;
+
 		u32 max_tessellation_evaluation_input_components;
+
 		u32 max_tessellation_evaluation_output_components;
+
 		u32 max_geometry_shader_invocations;
+
 		u32 max_geometry_input_components;
+
 		u32 max_geometry_output_components;
+
 		u32 max_geometry_output_vertices;
+
 		u32 max_geometry_total_output_components;
+
 		u32 max_fragment_input_components;
+
 		u32 max_fragment_output_attachments;
+
 		u32 max_fragment_dual_src_attachments;
+
 		u32 max_fragment_combined_output_resources;
+
 		u32 max_compute_shared_memory_size;
+
 		std::array<u32, 3> max_compute_work_group_count;
+
 		u32 max_compute_work_group_invocations;
+
 		std::array<u32, 3> max_compute_work_group_size;
+
 		u32 sub_pixel_precision_bits;
+
 		u32 sub_texel_precision_bits;
+
 		u32 mipmap_precision_bits;
+
 		u32 max_draw_indexed_index_value;
+
 		u32 max_draw_indirect_count;
+
 		f32 max_sampler_lod_bias;
+
 		f32 max_sampler_anisotropy;
+
 		u32 max_viewports;
+
 		std::array<u32, 2> max_viewport_dimensions;
+
 		std::array<f32, 2> viewport_bounds_range;
+
 		u32 viewport_sub_pixel_bits;
+
 		size_t min_memory_map_alignment;
+
 		VkDeviceSize min_texel_buffer_offset_alignment;
+
 		VkDeviceSize min_uniform_buffer_offset_alignment;
+
 		VkDeviceSize min_storage_buffer_offset_alignment;
+
 		i32 min_texel_offset;
+
 		u32 max_texel_offset;
+
 		i32 min_texel_gather_offset;
+
 		u32 max_texel_gather_offset;
+
 		f32 min_interpolation_offset;
+
 		f32 max_interpolation_offset;
+
 		u32 sub_pixel_interpolation_offset_bits;
+
 		u32 max_framebuffer_width;
+
 		u32 max_framebuffer_height;
+
 		u32 max_framebuffer_layers;
+
 		VkSampleCountFlags framebuffer_color_sample_counts;
+
 		VkSampleCountFlags framebuffer_depth_sample_counts;
+
 		VkSampleCountFlags framebuffer_stencil_sample_counts;
+
 		VkSampleCountFlags framebuffer_no_attachments_sample_counts;
+
 		u32 max_color_attachments;
+
 		VkSampleCountFlags sampled_image_color_sample_counts;
+
 		VkSampleCountFlags sampled_image_integer_sample_counts;
+
 		VkSampleCountFlags sampled_image_depth_sample_counts;
+
 		VkSampleCountFlags sampled_image_stencil_sample_counts;
+
 		VkSampleCountFlags storage_image_sample_counts;
+
 		u32 max_sample_mask_words;
+
 		Bool32 timestamp_compute_and_graphics;
+
 		f32 timestamp_period;
+
 		u32 max_clip_distances;
+
 		u32 max_cull_distances;
+
 		u32 max_combined_clip_and_cull_distances;
+
 		u32 discrete_queue_priorities;
+
 		std::array<f32, 2> point_size_range;
+
 		std::array<f32, 2> line_width_range;
+
 		f32 point_size_granularity;
+
 		f32 line_width_granularity;
+
 		Bool32 strict_lines;
+
 		Bool32 standard_sample_locations;
+
 		size_t optimal_buffer_copy_offset_alignment;
+
 		size_t optimal_buffer_copy_row_pitch_alignment;
+
 		size_t non_coherent_atom_size;
 	};
 
 	struct SparseProperties
 	{
 		Bool32 residency_standard_2d_block_shape;
+
 		Bool32 residency_standard_2d_multisample_block_shape;
+
 		Bool32 residency_standard_3d_block_shape;
+
 		Bool32 residency_aligned_mip_size;
+
 		Bool32 residency_non_resident_strict;
 	};
 
 	struct Properties
 	{
 		u32 api_version;
+
 		u32 driver_version;
+
 		u32 vendor_id;
+
 		u32 device_id;
+
 		Type device_type;
+
 		std::array<char, constants::max_physical_device_name> device_name;
+
 		std::array<u8, constants::uuid_size> pipeline_cache_uuid;
+
 		Limits limits;
+
 		SparseProperties sparse_properties;
 	};
 
 	struct MemoryType
 	{
 		MemoryPropertyFlags::T property_flags;
+
 		u32 heap_idx;
 	};
 
 	struct MemoryHeap
 	{
 		size_t size;
+
 		MemoryHeapFlags::T flags;
 	};
 
 	struct MemoryProperties
 	{
 		std::vector<MemoryType> memory_types;
+
 		std::vector<MemoryHeap> memory_heaps;
 	};
 
 	struct QueueFamilyProperties
 	{
-		QueueFlags::T queue_flags {};
-		u32 queue_count {};
-		u32 timestamp_valid_bits {};
+		QueueFlags::T queue_flags;
+
+		u32 queue_count;
+
+		u32 timestamp_valid_bits;
+
 		math::vec3_u32 min_image_transfer_granularity;
 	};
 
@@ -1142,10 +1342,8 @@ public:
 
 	auto operator=(const Gpu &) -> Gpu & = default;
 
-	~Gpu()
-	{
-		// WIP;
-	}
+	/** @WIP */
+	~Gpu() = default;
 
 	[[nodiscard]] auto get_features() const -> Features;
 
@@ -1550,6 +1748,7 @@ public:
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
 
+	// NOLINTNEXTLINE(performance-enum-size)
 	enum AspectFlags : VkFlags
 	{
 		color_bit = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -1692,7 +1891,8 @@ public:
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_IMAGE_VIEW;
 
-	enum class Type
+	// NOLINTNEXTLINE(performance-enum-size)
+	enum class Type : std::underlying_type_t<VkImageViewType>
 	{
 
 		_1d = VK_IMAGE_VIEW_TYPE_1D,
@@ -1704,7 +1904,8 @@ public:
 		cube_array = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY,
 	};
 
-	enum class Swizzle
+	// NOLINTNEXTLINE(performance-enum-size)
+	enum class Swizzle : std::underlying_type_t<VkComponentSwizzle>
 	{
 		identity = VK_COMPONENT_SWIZZLE_IDENTITY,
 		zero = VK_COMPONENT_SWIZZLE_ZERO,
@@ -1863,6 +2064,7 @@ public:
 
 	struct Binding
 	{
+		// NOLINTNEXTLINE(performance-enum-size)
 		enum FlagBits : std::underlying_type_t<VkDescriptorBindingFlagBits>
 		{
 			update_after_bind = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
@@ -1884,6 +2086,7 @@ public:
 
 	struct CreateInfo
 	{
+		// NOLINTNEXTLINE(performance-enum-size)
 		enum FlagBits : std::underlying_type_t<VkDescriptorSetLayoutCreateFlagBits>
 		{
 			update_after_bind_pool = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
@@ -2265,6 +2468,7 @@ public:
 	{
 		struct AttachmentInfo
 		{
+			// NOLINTNEXTLINE(performance-enum-size)
 			enum class ResolveModeBits : std::underlying_type_t<VkResolveModeFlagBits>
 			{
 				none = VK_RESOLVE_MODE_NONE,
@@ -2325,6 +2529,8 @@ public:
 	};
 
 	CommandBuffer() = default;
+
+	~CommandBuffer() = default;
 
 	CommandBuffer(CommandBuffer &&) = default;
 
@@ -2389,6 +2595,7 @@ public:
 
 	struct CreateInfo
 	{
+		// NOLINTNEXTLINE(performance-enum-size)
 		enum FlagBits : std::underlying_type_t<VkCommandPoolCreateFlagBits>
 		{
 			transient = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
@@ -2401,6 +2608,7 @@ public:
 		std::string_view name;
 	};
 
+	// NOLINTNEXTLINE(performance-enum-size)
 	enum class BufferLevel
 	{
 		secondary = VK_COMMAND_BUFFER_LEVEL_SECONDARY,
@@ -2549,7 +2757,7 @@ public:
 
 	auto operator=(const Queue &) -> Queue & = delete;
 
-	~Queue();
+	~Queue() = default;
 
 	void submit(SubmitInfo info) const;
 
@@ -2573,7 +2781,8 @@ public:
 
 	static constexpr auto object_type = VK_OBJECT_TYPE_DEVICE_MEMORY;
 
-	enum PropertyFlags : VkFlags
+	// NOLINTNEXTLINE(performance-enum-size)
+	enum PropertyFlags : std::underlying_type_t<VkMemoryPropertyFlagBits>
 	{
 		device_local_bit = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		host_visible_bit = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
@@ -2625,6 +2834,7 @@ private:
 class Messenger
 {
 public:
+	// NOLINTNEXTLINE(performance-enum-size)
 	enum SeverityFlagBits : std::underlying_type_t<VkDebugUtilsMessageSeverityFlagBitsEXT>
 	{
 		verbose = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
@@ -2633,6 +2843,7 @@ public:
 		error = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 	};
 
+	// NOLINTNEXTLINE(performance-enum-size)
 	enum TypeFlagBits : std::underlying_type_t<VkDebugUtilsMessageTypeFlagBitsEXT>
 	{
 		general = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
@@ -2802,123 +3013,127 @@ void Device::name(T &object, const char *name)
 
 
 /** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
+module :private;
 namespace lt::renderer::vk {
 
 namespace api {
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+
 // global functions
-PFN_vkGetInstanceProcAddr get_instance_proc_address {};
-PFN_vkCreateInstance create_instance {};
-PFN_vkEnumerateInstanceExtensionProperties enumerate_instance_extension_properties {};
-PFN_vkEnumerateInstanceLayerProperties enumerate_instance_layer_properties {};
+PFN_vkGetInstanceProcAddr get_instance_proc_address;
+PFN_vkCreateInstance create_instance;
+PFN_vkEnumerateInstanceExtensionProperties enumerate_instance_extension_properties;
+PFN_vkEnumerateInstanceLayerProperties enumerate_instance_layer_properties;
 
 // instance functions
-PFN_vkDestroyInstance destroy_instance {};
-PFN_vkEnumeratePhysicalDevices enumerate_physical_devices {};
+PFN_vkDestroyInstance destroy_instance;
+PFN_vkEnumeratePhysicalDevices enumerate_physical_devices;
 
-PFN_vkGetPhysicalDeviceProperties get_physical_device_properties {};
-PFN_vkGetPhysicalDeviceQueueFamilyProperties get_physical_device_queue_family_properties {};
-PFN_vkCreateDevice create_device {};
-PFN_vkGetDeviceProcAddr get_device_proc_address {};
-PFN_vkDestroyDevice destroy_device {};
-PFN_vkGetPhysicalDeviceFeatures2 get_physical_device_features {};
-PFN_vkEnumerateDeviceExtensionProperties enumerate_device_extension_properties {};
-PFN_vkGetPhysicalDeviceMemoryProperties get_physical_device_memory_properties {};
+PFN_vkGetPhysicalDeviceProperties get_physical_device_properties;
+PFN_vkGetPhysicalDeviceQueueFamilyProperties get_physical_device_queue_family_properties;
+PFN_vkCreateDevice create_device;
+PFN_vkGetDeviceProcAddr get_device_proc_address;
+PFN_vkDestroyDevice destroy_device;
+PFN_vkGetPhysicalDeviceFeatures2 get_physical_device_features;
+PFN_vkEnumerateDeviceExtensionProperties enumerate_device_extension_properties;
+PFN_vkGetPhysicalDeviceMemoryProperties get_physical_device_memory_properties;
 
 // extension instance functions
-PFN_vkCmdBeginDebugUtilsLabelEXT cmd_begin_debug_label {};
-PFN_vkCmdEndDebugUtilsLabelEXT cmd_end_debug_label {};
-PFN_vkCmdInsertDebugUtilsLabelEXT cmd_insert_debug_label {};
-PFN_vkCreateDebugUtilsMessengerEXT create_debug_messenger {};
-PFN_vkDestroyDebugUtilsMessengerEXT destroy_debug_messenger {};
-PFN_vkQueueBeginDebugUtilsLabelEXT queue_begin_debug_label {};
-PFN_vkQueueEndDebugUtilsLabelEXT queue_end_debug_label {};
-PFN_vkQueueInsertDebugUtilsLabelEXT queue_insert_debug_label {};
-PFN_vkSetDebugUtilsObjectTagEXT set_debug_object_tag {};
-PFN_vkSubmitDebugUtilsMessageEXT submit_debug_message {};
+PFN_vkCmdBeginDebugUtilsLabelEXT cmd_begin_debug_label;
+PFN_vkCmdEndDebugUtilsLabelEXT cmd_end_debug_label;
+PFN_vkCmdInsertDebugUtilsLabelEXT cmd_insert_debug_label;
+PFN_vkCreateDebugUtilsMessengerEXT create_debug_messenger;
+PFN_vkDestroyDebugUtilsMessengerEXT destroy_debug_messenger;
+PFN_vkQueueBeginDebugUtilsLabelEXT queue_begin_debug_label;
+PFN_vkQueueEndDebugUtilsLabelEXT queue_end_debug_label;
+PFN_vkQueueInsertDebugUtilsLabelEXT queue_insert_debug_label;
+PFN_vkSetDebugUtilsObjectTagEXT set_debug_object_tag;
+PFN_vkSubmitDebugUtilsMessageEXT submit_debug_message;
 
 // surface instance functions
-PFN_vkGetPhysicalDeviceSurfaceSupportKHR get_physical_device_surface_support {};
-PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR get_physical_device_surface_capabilities {};
-PFN_vkGetPhysicalDeviceSurfaceFormatsKHR get_physical_device_surface_formats {};
+PFN_vkGetPhysicalDeviceSurfaceSupportKHR get_physical_device_surface_support;
+PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR get_physical_device_surface_capabilities;
+PFN_vkGetPhysicalDeviceSurfaceFormatsKHR get_physical_device_surface_formats;
 
 // device functions
-PFN_vkGetDeviceQueue get_device_queue {};
-PFN_vkCreateCommandPool create_command_pool {};
-PFN_vkDestroyCommandPool destroy_command_pool {};
-PFN_vkAllocateCommandBuffers allocate_command_buffers {};
-PFN_vkFreeCommandBuffers free_command_buffers {};
-PFN_vkBeginCommandBuffer begin_command_buffer {};
-PFN_vkEndCommandBuffer end_command_buffer {};
-PFN_vkCmdPipelineBarrier cmd_pipeline_barrier {};
-PFN_vkQueueSubmit queue_submit {};
-PFN_vkQueueWaitIdle queue_wait_idle {};
-PFN_vkDeviceWaitIdle device_wait_idle {};
-PFN_vkCreateFence create_fence {};
-PFN_vkDestroyFence destroy_fence {};
-PFN_vkWaitForFences wait_for_fences {};
-PFN_vkResetFences reset_fences {};
-PFN_vkCreateSemaphore create_semaphore {};
-PFN_vkDestroySemaphore destroy_semaphore {};
-PFN_vkCreateSwapchainKHR create_swapchain_khr {};
-PFN_vkDestroySwapchainKHR destroy_swapchain_khr {};
-PFN_vkGetSwapchainImagesKHR get_swapchain_images_khr {};
-PFN_vkAcquireNextImageKHR acquire_next_image_khr {};
-PFN_vkQueuePresentKHR queue_present_khr {};
-PFN_vkCreateImage create_image {};
-PFN_vkDestroyImage destroy_image {};
-PFN_vkCreateImageView create_image_view {};
-PFN_vkDestroyImageView destroy_image_view {};
-PFN_vkCreateRenderPass create_render_pass {};
-PFN_vkDestroyRenderPass destroy_render_pass {};
-PFN_vkCreateFramebuffer create_frame_buffer {};
-PFN_vkDestroyFramebuffer destroy_frame_buffer {};
-PFN_vkCreateShaderModule create_shader_module {};
-PFN_vkDestroyShaderModule destroy_shader_module {};
-PFN_vkCreatePipelineLayout create_pipeline_layout {};
-PFN_vkDestroyPipelineLayout destroy_pipeline_layout {};
-PFN_vkCreateGraphicsPipelines create_graphics_pipelines {};
-PFN_vkDestroyPipeline destroy_pipeline {};
-PFN_vkCmdBeginRenderPass cmd_begin_render_pass {};
-PFN_vkCmdEndRenderPass cmd_end_render_pass {};
-PFN_vkCmdBindPipeline cmd_bind_pipeline {};
-PFN_vkCmdBindDescriptorSets cmd_bind_descriptor_sets {};
-PFN_vkCmdDraw cmd_draw {};
-PFN_vkCmdSetViewport cmd_set_viewport {};
-PFN_vkCmdSetScissor cmd_set_scissors {};
-PFN_vkCmdPushConstants cmd_push_constants {};
-PFN_vkCmdCopyBuffer cmd_copy_buffer {};
+PFN_vkGetDeviceQueue get_device_queue;
+PFN_vkCreateCommandPool create_command_pool;
+PFN_vkDestroyCommandPool destroy_command_pool;
+PFN_vkAllocateCommandBuffers allocate_command_buffers;
+PFN_vkFreeCommandBuffers free_command_buffers;
+PFN_vkBeginCommandBuffer begin_command_buffer;
+PFN_vkEndCommandBuffer end_command_buffer;
+PFN_vkCmdPipelineBarrier cmd_pipeline_barrier;
+PFN_vkQueueSubmit queue_submit;
+PFN_vkQueueWaitIdle queue_wait_idle;
+PFN_vkDeviceWaitIdle device_wait_idle;
+PFN_vkCreateFence create_fence;
+PFN_vkDestroyFence destroy_fence;
+PFN_vkWaitForFences wait_for_fences;
+PFN_vkResetFences reset_fences;
+PFN_vkCreateSemaphore create_semaphore;
+PFN_vkDestroySemaphore destroy_semaphore;
+PFN_vkCreateSwapchainKHR create_swapchain_khr;
+PFN_vkDestroySwapchainKHR destroy_swapchain_khr;
+PFN_vkGetSwapchainImagesKHR get_swapchain_images_khr;
+PFN_vkAcquireNextImageKHR acquire_next_image_khr;
+PFN_vkQueuePresentKHR queue_present_khr;
+PFN_vkCreateImage create_image;
+PFN_vkDestroyImage destroy_image;
+PFN_vkCreateImageView create_image_view;
+PFN_vkDestroyImageView destroy_image_view;
+PFN_vkCreateRenderPass create_render_pass;
+PFN_vkDestroyRenderPass destroy_render_pass;
+PFN_vkCreateFramebuffer create_frame_buffer;
+PFN_vkDestroyFramebuffer destroy_frame_buffer;
+PFN_vkCreateShaderModule create_shader_module;
+PFN_vkDestroyShaderModule destroy_shader_module;
+PFN_vkCreatePipelineLayout create_pipeline_layout;
+PFN_vkDestroyPipelineLayout destroy_pipeline_layout;
+PFN_vkCreateGraphicsPipelines create_graphics_pipelines;
+PFN_vkDestroyPipeline destroy_pipeline;
+PFN_vkCmdBeginRenderPass cmd_begin_render_pass;
+PFN_vkCmdEndRenderPass cmd_end_render_pass;
+PFN_vkCmdBindPipeline cmd_bind_pipeline;
+PFN_vkCmdBindDescriptorSets cmd_bind_descriptor_sets;
+PFN_vkCmdDraw cmd_draw;
+PFN_vkCmdSetViewport cmd_set_viewport;
+PFN_vkCmdSetScissor cmd_set_scissors;
+PFN_vkCmdPushConstants cmd_push_constants;
+PFN_vkCmdCopyBuffer cmd_copy_buffer;
 
-PFN_vkCreateDescriptorSetLayout create_descriptor_set_layout {};
-PFN_vkDestroyDescriptorSetLayout destroy_descriptor_set_layout {};
-PFN_vkCreateDescriptorPool create_descriptor_pool {};
-PFN_vkDestroyDescriptorPool destroy_descriptor_pool {};
-PFN_vkAllocateDescriptorSets allocate_descriptor_sets {};
-PFN_vkFreeDescriptorSets free_descriptor_sets {};
+PFN_vkCreateDescriptorSetLayout create_descriptor_set_layout;
+PFN_vkDestroyDescriptorSetLayout destroy_descriptor_set_layout;
+PFN_vkCreateDescriptorPool create_descriptor_pool;
+PFN_vkDestroyDescriptorPool destroy_descriptor_pool;
+PFN_vkAllocateDescriptorSets allocate_descriptor_sets;
+PFN_vkFreeDescriptorSets free_descriptor_sets;
 
-PFN_vkCreateBuffer create_buffer {};
-PFN_vkDestroyBuffer destroy_buffer {};
-PFN_vkGetBufferMemoryRequirements get_buffer_memory_requirements {};
-PFN_vkAllocateMemory allocate_memory {};
-PFN_vkBindBufferMemory bind_buffer_memory {};
-PFN_vkMapMemory map_memory {};
-PFN_vkUnmapMemory unmap_memory {};
-PFN_vkFreeMemory free_memory {};
+PFN_vkCreateBuffer create_buffer;
+PFN_vkDestroyBuffer destroy_buffer;
+PFN_vkGetBufferMemoryRequirements get_buffer_memory_requirements;
+PFN_vkAllocateMemory allocate_memory;
+PFN_vkBindBufferMemory bind_buffer_memory;
+PFN_vkMapMemory map_memory;
+PFN_vkUnmapMemory unmap_memory;
+PFN_vkFreeMemory free_memory;
 
-PFN_vkResetCommandBuffer reset_command_buffer {};
+PFN_vkResetCommandBuffer reset_command_buffer;
 
-PFN_vkCmdBeginRendering cmd_begin_rendering {};
-PFN_vkCmdEndRendering cmd_end_rendering {};
+PFN_vkCmdBeginRendering cmd_begin_rendering;
+PFN_vkCmdEndRendering cmd_end_rendering;
 
 #if defined(LIGHT_PLATFORM_LINUX)
-PFN_vkCreateWaylandSurfaceKHR create_wayland_surface_khr {};
+PFN_vkCreateWaylandSurfaceKHR create_wayland_surface_khr;
 #elif defined(LIGHT_PLATFORM_WINDOWS)
-PFN_vkCreateWin32SurfaceKHR create_win32_surface_khr {};
+PFN_vkCreateWin32SurfaceKHR create_win32_surface_khr;
 #else
 	#error "Unsupported platform"
 #endif
 
-PFN_vkDestroySurfaceKHR destroy_surface_khr {};
+PFN_vkDestroySurfaceKHR destroy_surface_khr;
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 } // namespace api
 
 void *library = nullptr; // NOLINT
@@ -3106,7 +3321,7 @@ void Device::load_functions()
 	load_fn(api::cmd_end_rendering, "vkCmdEndRendering");
 }
 
-Instance::Instance(CreateInfo info)
+Instance::Instance(const CreateInfo &info)
 {
 	const auto layer_setting_type_visitor = overloads {
 		[](const std::vector<const char *> &) { return VK_LAYER_SETTING_TYPE_STRING_EXT; },
@@ -3123,7 +3338,7 @@ Instance::Instance(CreateInfo info)
 	auto layer_settings = std::vector<VkLayerSettingEXT> {};
 	auto layer_names = std::vector<const char *> {};
 	auto extension_names = std::vector<const char *> {};
-	for (auto &extension : info.extensions)
+	for (const auto &extension : info.extensions)
 	{
 		extension_names.emplace_back(extension.c_str());
 	}
@@ -3658,7 +3873,7 @@ Surface::~Surface()
 	return formats;
 }
 
-Semaphore::Semaphore(Device &device): m_device(device.get_vk_handle())
+Semaphore::Semaphore(Device &device): m_device(device.get_vk_handle()), m_semaphore()
 {
 	auto vk_info = VkSemaphoreCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
@@ -3675,7 +3890,7 @@ Semaphore::~Semaphore()
 	}
 }
 
-Fence::Fence(Device &device, CreateInfo info): m_device(device.get_vk_handle())
+Fence::Fence(Device &device, CreateInfo info): m_device(device.get_vk_handle()), m_fence()
 {
 	auto vk_info = VkFenceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
@@ -3947,7 +4162,7 @@ void Device::bind_memory(VkBuffer buffer, VkDeviceMemory memory, size_t offset /
 [[nodiscard]] auto Device::map_memory(VkDeviceMemory memory, size_t size, size_t offset) const
     -> std::span<byte>
 {
-	void *data = {};
+	auto *data = (void *) { nullptr };
 	vkc(api::map_memory(m_device, memory, offset, size, {}, &data));
 	return { std::bit_cast<byte *>(data), size };
 }
@@ -4228,10 +4443,6 @@ Queue::Queue(Device &device, uint32_t queue_family_idx, uint32_t queue_idx)
 	api::get_device_queue(m_device, queue_family_idx, queue_idx, &m_queue);
 }
 
-Queue::~Queue()
-{
-}
-
 void Queue::submit(SubmitInfo info) const
 {
 	const auto vk_info = VkSubmitInfo {
@@ -4270,7 +4481,7 @@ void Queue::present(PresentInfo info) const
 
 Image::Image(Device &device, CreateInfo info): m_device(device.get_vk_handle()), m_image()
 {
-	// WIP(Light): use image create info's info
+	/** @WIP(Light): use image create info's info */
 
 	ignore = info;
 	auto vk_info = VkImageCreateInfo {};
@@ -4336,7 +4547,7 @@ CommandBuffer::CommandBuffer(VkCommandBuffer buffer): m_buffer(buffer)
 
 void CommandBuffer::begin(BeginInfo info /* = {} */)
 {
-	// WIP(Light): Use info
+	/** @WIP(Light): Use info */
 	ignore = info;
 
 	auto vk_info = VkCommandBufferBeginInfo {
@@ -4617,7 +4828,7 @@ Swapchain::~Swapchain()
 	api::get_swapchain_images_khr(m_device, m_swapchain, &count, vk_images.data());
 
 	auto images = std::vector<Image>();
-	for (auto vk_image : vk_images)
+	for (auto *vk_image : vk_images)
 	{
 		images.emplace_back(Image { vk_image });
 	}
@@ -4703,7 +4914,7 @@ Memory::~Memory()
 
 [[nodiscard]] auto Memory::map(size_t size, size_t offset) -> std::span<byte>
 {
-	void *data = {};
+	auto *data = (void *) { nullptr };
 	vkc(api::map_memory(m_device, m_memory, offset, size, {}, &data));
 	return { std::bit_cast<byte *>(data), size };
 }
@@ -4923,6 +5134,8 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 		.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 		.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
 		.alphaBlendOp = VK_BLEND_OP_ADD,
+
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
 		                  | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 	};
@@ -4938,7 +5151,7 @@ Pipeline::Pipeline(Device &device, PipelineLayout &layout, CreateInfo info)
 
 	auto color_attachment_formats = std::vector<vk::Format> {};
 
-	// WIP(Light): use color attachments
+	/** @WIP(Light): use color attachments */
 	for (auto &color_attachment : info.attachment_state.color_attachments)
 	{
 		ignore = color_attachment;
@@ -5039,13 +5252,17 @@ PipelineLayout::~PipelineLayout()
 	api::destroy_pipeline_layout(m_device, m_pipeline_layout, nullptr);
 }
 
-Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.get_vk_handle())
+Messenger::Messenger(Instance &instance, CreateInfo info)
+    : m_instance(instance.get_vk_handle())
+    , m_user_callback(std::move(info.user_callback))
+    , m_user_data(info.user_data)
 {
 	constexpr auto native_callback = [](VkDebugUtilsMessageSeverityFlagBitsEXT severity,
 	                                    VkDebugUtilsMessageTypeFlagsEXT types,
 	                                    const VkDebugUtilsMessengerCallbackDataEXT *data,
 	                                    void *user_data) {
 		auto *messenger = std::bit_cast<Messenger *>(user_data);
+
 		messenger->m_user_callback(
 		    severity,
 		    types,
@@ -5056,15 +5273,12 @@ Messenger::Messenger(Instance &instance, CreateInfo info): m_instance(instance.g
 		return VK_FALSE;
 	};
 
-	m_user_callback = std::move(info.user_callback);
-	m_user_data = info.user_data;
 	auto vk_info = VkDebugUtilsMessengerCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.messageSeverity = info.enabled_severities,
 		.messageType = info.enabled_types,
 		.pfnUserCallback = native_callback,
 		.pUserData = this,
-
 	};
 
 	vkc(api::create_debug_messenger(m_instance, &vk_info, nullptr, &m_messenger));

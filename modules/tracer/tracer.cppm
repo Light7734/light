@@ -56,6 +56,14 @@ class TracerTimer
 public:
 	TracerTimer(const std::string &scopeName);
 
+	TracerTimer(const TracerTimer &) = delete;
+
+	TracerTimer(TracerTimer &&) = delete;
+
+	auto operator=(const TracerTimer &) -> TracerTimer & = delete;
+
+	auto operator=(TracerTimer &&) -> TracerTimer & = delete;
+
 	~TracerTimer();
 
 private:
@@ -66,17 +74,6 @@ private:
 
 } // namespace lt::tracer
 
-/* scope */
-#define lt_trace_scope(name)                        lt_profile_scope_no_redifinition(name, __LINE__)
-#define lt_trace_scope_no_redifinition(name, line)  lt_profile_scope_no_redifinition2(name, line)
-#define lt_trace_scope_no_redifinition2(name, line) InstrumentorTimer timer##line(name)
-
-/* function */
-#define lt_trace_function lt_profile_scope(__FUNCSIG__)
-
-/* session */
-#define lt_trace_begin_session(outputPath) ::lt::Instrumentor::begin_session(outputPath)
-#define lt_trace_end_session()             ::lt::Instrumentor::end_session()
 
 /** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
 // module :private;

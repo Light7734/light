@@ -20,9 +20,9 @@ import ecs.registry;
 import memory.scope;
 import memory.reference;
 import math.vec2;
+import math.formatter;
 import app.system;
 
-using ::lt::Key;
 using ::lt::surface::SurfaceComponent;
 using ::lt::surface::System;
 

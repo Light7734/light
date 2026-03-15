@@ -9,9 +9,6 @@ export CC
 CXX=$(which g++)
 export CXX
 
-DISPLAY=:99
-export DISPLAY
-
 # gcc uses libstdc++ by default
 cmake \
     -S . \

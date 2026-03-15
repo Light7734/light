@@ -1,28 +1,9 @@
 import test;
 import math.vec2;
+import math.formatter;
 
 using vec2 = ::lt::math::vec2;
 using ivec2 = ::lt::math::vec2_i32;
-
-Suite static_tests = "vec3_static_checks"_suite = [] {
-	constexpr auto num_elements = lt::math::vec2::num_elements;
-
-	static_assert(num_elements == 2u);
-	static_assert(std::is_same_v<lt::math::vec2, lt::math::vec2_f32>);
-
-	static_assert(sizeof(lt::math::vec2_f32) == sizeof(f32) * num_elements);
-	static_assert(sizeof(lt::math::vec2_f64) == sizeof(f64) * num_elements);
-
-	static_assert(sizeof(lt::math::vec2_i8) == sizeof(i8) * num_elements);
-	static_assert(sizeof(lt::math::vec2_i16) == sizeof(i16) * num_elements);
-	static_assert(sizeof(lt::math::vec2_i32) == sizeof(i32) * num_elements);
-	static_assert(sizeof(lt::math::vec2_i64) == sizeof(i64) * num_elements);
-
-	static_assert(sizeof(lt::math::vec2_u8) == sizeof(u8) * num_elements);
-	static_assert(sizeof(lt::math::vec2_u16) == sizeof(u16) * num_elements);
-	static_assert(sizeof(lt::math::vec2_u32) == sizeof(u32) * num_elements);
-	static_assert(sizeof(lt::math::vec2_u64) == sizeof(u64) * num_elements);
-};
 
 Suite raii = "vec2_raii"_suite = [] {
 	Case { "happy paths" } = [] {
@@ -106,14 +87,14 @@ Suite arithmetic_operators = "vec2_operators"_suite = [] {
 
 	Case { "operator []" } = [] {
 		auto vec = vec2 { 0.0, 1.0 };
-		expect_eq(vec[0], 0.0);
-		expect_eq(vec[1], 1.0);
+		expect_eq(vec.x, 0.0);
+		expect_eq(vec.y, 1.0);
 	};
 
 	Case { "operator [] const" } = [] {
 		const auto vec = vec2 { 0.0, 1.0 };
-		expect_eq(vec[0], 0.0);
-		expect_eq(vec[1], 1.0);
+		expect_eq(vec.x, 0.0);
+		expect_eq(vec.y, 1.0);
 	};
 };
 

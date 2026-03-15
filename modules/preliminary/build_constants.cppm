@@ -35,7 +35,7 @@ enum class Compiler : u8
 	apple_clang,
 };
 
-enum class BuildType
+enum class BuildType : u8
 {
 	debug,
 	release,
