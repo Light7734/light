@@ -9,7 +9,10 @@ function(add_option option help)
     endif()
 endfunction()
 
-add_option(ENABLE_SANDBOX "Enables the building of the sandbox module for experimentation")
+add_option(
+    ENABLE_SANDBOX
+    "Enables the building of the sandbox module for experimentation"
+)
 add_option(ENABLE_UNIT_TESTS "Enables the building of the unit test modules")
 add_option(ENABLE_FUZZ_TESTS "Enables the building of the fuzz test modules")
 add_option(
@@ -21,7 +24,9 @@ add_option(
 )
 
 if(ENABLE_STATIC_ANALYSIS)
-    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;--warnings-as-errors=*;--allow-no-checks")
+    set(CMAKE_CXX_CLANG_TIDY
+        "clang-tidy;--warnings-as-errors=*;--allow-no-checks;--system-headers=false;--header-filter='./modules/*'"
+    )
 endif()
 
 if(ENABLE_LLVM_COVERAGE)
