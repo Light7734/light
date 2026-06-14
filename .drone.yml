@@ -126,7 +126,7 @@ trigger:
 
 steps:
 - name: build and deploy
-  image: sphinxdoc/sphinx
+  image: documentation:latest
   pull: if-not-exists
   commands:
     - cd docs
@@ -148,7 +148,7 @@ trigger:
 
 steps:
 - name: build and deploy
-  image: sphinxdoc/sphinx
+  image: documentation:latest
   pull: if-not-exists
   commands:
     - cd docs
