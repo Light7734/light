@@ -148,7 +148,7 @@ trigger:
 
 steps:
 - name: build and deploy
-  image: documentation:latest
+  image: sphinxdoc/sphinx
   pull: if-not-exists
   commands:
     - cd docs
