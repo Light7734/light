@@ -22,7 +22,7 @@ kind: pipeline
 type: docker
 name: amd64 — gcc
 node:
-  environment: marci
+  environment: lina
 trigger:
   branch:
   - main
@@ -45,7 +45,7 @@ kind: pipeline
 type: docker
 name: amd64 — clang
 node:
-  environment: marci
+  environment: lina
 trigger:
   branch:
   - main
@@ -77,7 +77,7 @@ kind: pipeline
 type: docker
 name: static analysis
 node:
-  environment: marci
+  environment: lina
 trigger:
   branch:
   - main
@@ -132,8 +132,8 @@ steps:
     - cd docs
     - sphinx-build -M html . .
 
-    - rm -rf /light_docs_dev/*
-    - mv ./html/* /light_docs_dev/
+    - rm -rf /light_engine_docs_dev/*
+    - mv ./html/* /light_engine_docs_dev/
 
 ---
 
@@ -157,6 +157,5 @@ steps:
     - touch generated/api.rst
     - sphinx-build -M html . .
 
-    - rm -rf /light_docs/*
-    - mv ./html/* /light_docs/
-
+    - rm -rf /light_engine_docs/*
+    - mv ./html/* /light_engine_docs/
