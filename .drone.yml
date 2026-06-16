@@ -1,8 +1,6 @@
 kind: pipeline
 type: docker
 name: amd64 — clang
-node:
-  environment: lina
 trigger:
   branch:
   - main
@@ -34,8 +32,6 @@ steps:
 kind: pipeline
 type: docker
 name: static analysis
-node:
-  environment: lina
 trigger:
   branch:
   - main
