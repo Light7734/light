@@ -1,5 +1,5 @@
 kind: pipeline
-type: docker
+type: exec
 name: amd64 — clang
 trigger:
   branch:
@@ -7,7 +7,6 @@ trigger:
 
 steps:
 - name: code coverage
-  image: ci:latest
   pull: if-not-exists
   environment:
     CODECOV_TOKEN:
@@ -17,20 +16,18 @@ steps:
 
 # @todo(light): set these up in a very near future...
 # - name: leak sanitizer
-#   image: ci:latest
 #   pull: if-not-exists
 #   commands:
 #     - ./tools/ci/amd64/clang/lsan.sh
 # 
 # - name: memory sanitizer
-#   image: ci:latest
 #   pull: if-not-exists
 #   commands:
 #     - ./tools/ci/amd64/clang/msan.sh
 
 ---
 kind: pipeline
-type: docker
+type: exec
 name: static analysis
 trigger:
   branch:
@@ -38,32 +35,27 @@ trigger:
 
 steps:
 - name: clang tidy
-  image: ci:latest
   pull: if-not-exists
   privileged: true
   commands:
     - ./tools/ci/static_analysis/clang_tidy.sh
 
 - name: shell check
-  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/static_analysis/shell_check.sh
 
 - name: clang format
-  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/static_analysis/clang_format.sh
 
 - name: cmake format
-  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/static_analysis/cmake_format.sh
 
 - name: shell format
-  image: ci:latest
   pull: if-not-exists
   commands:
     - ./tools/ci/static_analysis/shell_format.sh
