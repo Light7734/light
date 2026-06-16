@@ -7,7 +7,6 @@ trigger:
 
 steps:
 - name: code coverage
-  pull: if-not-exists
   environment:
     CODECOV_TOKEN:
       from_secret: CODECOV_TOKEN 
@@ -16,12 +15,10 @@ steps:
 
 # @todo(light): set these up in a very near future...
 # - name: leak sanitizer
-#   pull: if-not-exists
 #   commands:
 #     - ./tools/ci/lsan.sh
 # 
 # - name: memory sanitizer
-#   pull: if-not-exists
 #   commands:
 #     - ./tools/ci/msan.sh
 
@@ -35,28 +32,23 @@ trigger:
 
 steps:
 - name: clang tidy
-  pull: if-not-exists
   privileged: true
   commands:
     - ./tools/ci/clang_tidy.sh
 
 - name: shell check
-  pull: if-not-exists
   commands:
     - ./tools/ci/shell_check.sh
 
 - name: clang format
-  pull: if-not-exists
   commands:
     - ./tools/ci/clang_format.sh
 
 - name: cmake format
-  pull: if-not-exists
   commands:
     - ./tools/ci/cmake_format.sh
 
 - name: shell format
-  pull: if-not-exists
   commands:
     - ./tools/ci/shell_format.sh
 
