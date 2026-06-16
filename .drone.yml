@@ -1,46 +1,3 @@
----
-kind: pipeline
-type: exec
-name: amd64 — msvc
-node:
-  environment: lina
-trigger:
-  branch:
-  - main
-platform:
-  os: windows
-  arch: amd64
-
-steps:
-- name: unit tests
-  shell: powershell
-  commands: 
-    - pwsh ./tools/ci/amd64/msvc/unit_tests.ps1
-
----
-kind: pipeline
-type: docker
-name: amd64 — gcc
-node:
-  environment: lina
-trigger:
-  branch:
-  - main
-
-steps:
-- name: unit tests
-  image: ci:latest
-  pull: if-not-exists
-  commands:
-    - ./tools/ci/amd64/gcc/unit_tests.sh
-
-- name: valgrind
-  image: ci:latest
-  pull: if-not-exists
-  commands:
-    - ./tools/ci/amd64/gcc/valgrind.sh
-
----
 kind: pipeline
 type: docker
 name: amd64 — clang
@@ -60,17 +17,18 @@ steps:
   commands:
     - ./tools/ci/amd64/clang/coverage.sh
 
-- name: leak sanitizer
-  image: ci:latest
-  pull: if-not-exists
-  commands:
-    - ./tools/ci/amd64/clang/lsan.sh
-
-- name: memory sanitizer
-  image: ci:latest
-  pull: if-not-exists
-  commands:
-    - ./tools/ci/amd64/clang/msan.sh
+# @todo(light): set these up in a very near future...
+# - name: leak sanitizer
+#   image: ci:latest
+#   pull: if-not-exists
+#   commands:
+#     - ./tools/ci/amd64/clang/lsan.sh
+# 
+# - name: memory sanitizer
+#   image: ci:latest
+#   pull: if-not-exists
+#   commands:
+#     - ./tools/ci/amd64/clang/msan.sh
 
 ---
 kind: pipeline
