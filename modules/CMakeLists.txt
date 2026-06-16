@@ -1,14 +1,54 @@
-add_module(NAME preliminary INTERFACES module.cppm fundumental_types.cppm assertions.cppm build_constants.cppm)
-add_module(NAME logger INTERFACES logger.cppm TESTS logger.test.cpp DEPENDENCIES preliminary)
-add_module(NAME tracer INTERFACES tracer.cppm DEPENDENCIES preliminary logger)
-
-add_module(NAME bitwise INTERFACES operations.cppm DEPENDENCIES preliminary)
-add_module(NAME memory INTERFACES null_on_move.cppm reference.cppm scope.cppm
+add_module(
+    NAME
+    preliminary
+    INTERFACES
+    module.cppm
+    fundumental_types.cppm
+    assertions.cppm
+    build_constants.cppm
+)
+add_module(
+    NAME
+    logger
+    INTERFACES
+    logger.cppm
+    TESTS
+    logger.test.cpp
+    DEPENDENCIES
+    preliminary
+)
+add_module(
+    NAME
+    tracer
+    INTERFACES
+    tracer.cppm
     DEPENDENCIES
     preliminary
     logger
 )
-add_module(NAME time INTERFACES timer.cppm TESTS timer.test.cpp DEPENDENCIES preliminary)
+
+add_module(NAME bitwise INTERFACES operations.cppm DEPENDENCIES preliminary)
+add_module(
+    NAME
+    memory
+    INTERFACES
+    null_on_move.cppm
+    reference.cppm
+    scope.cppm
+    DEPENDENCIES
+    preliminary
+    logger
+)
+add_module(
+    NAME
+    time
+    INTERFACES
+    timer.cppm
+    TESTS
+    timer.test.cpp
+    DEPENDENCIES
+    preliminary
+)
 
 add_module(
     NAME
@@ -80,7 +120,15 @@ add_module(
 # add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
 # PRIVATE libasset_baker)
 
-add_module(NAME camera INTERFACES components.cppm DEPENDENCIES preliminary math)
+add_module(
+    NAME
+    camera
+    INTERFACES
+    components.cppm
+    DEPENDENCIES
+    preliminary
+    math
+)
 
 add_module(
     NAME
@@ -109,7 +157,9 @@ add_module(
     sparse_set.test.cpp
 )
 
-add_module(NAME input_codes INTERFACES input_codes.cppm DEPENDENCIES preliminary)
+add_module(
+    NAME input_codes INTERFACES input_codes.cppm DEPENDENCIES preliminary
+)
 
 if(WIN32)
     add_module(
@@ -142,42 +192,56 @@ if(WIN32)
 
 elseif(UNIX)
 
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
-  COMMAND wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
-  COMMAND wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
-  DEPENDS /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
-)
-add_custom_target(xdg-shell-gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
+               ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
+        COMMAND
+            wayland-scanner client-header
+            /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+            ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
+        COMMAND
+            wayland-scanner private-code
+            /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+            ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
+        DEPENDS /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml
+    )
+    add_custom_target(
+        xdg-shell-gen
+        DEPENDS
+            ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
+    )
 
-add_module(
-    NAME
-    surface
-    INTERFACES
-    constants.cppm
-    system.cppm
-    requests.cppm
-    events.cppm
-    components.cppm
-    SOURCES
-    wayland-protocols/xdg-shell.c
-    DEPENDENCIES
-    preliminary
-    ecs
-    app
-    math
-    memory
-    input_codes
-    wayland-client
-    PRIVATE_DEPENDENCIES
-    X11
-    logger
-    time
-    TESTS
-    system.test.cpp
-)
-target_include_directories(surface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/)
-add_dependencies(surface xdg-shell-gen)
+    add_module(
+        NAME
+        surface
+        INTERFACES
+        constants.cppm
+        system.cppm
+        requests.cppm
+        events.cppm
+        components.cppm
+        SOURCES
+        wayland-protocols/xdg-shell.c
+        DEPENDENCIES
+        preliminary
+        ecs
+        app
+        math
+        memory
+        input_codes
+        wayland-client
+        PRIVATE_DEPENDENCIES
+        X11
+        logger
+        time
+        TESTS
+        system.test.cpp
+    )
+    target_include_directories(
+        surface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/
+    )
+    add_dependencies(surface xdg-shell-gen)
 
 else()
     message(FATAL "Failed to generate cmake: unsupported platform")

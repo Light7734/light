@@ -10,34 +10,15 @@
 module;
 
 #define VK_NO_PROTOTYPES
-#if defined(LIGHT_PLATFORM_LINUX)
-	#define VK_USE_PLATFORM_WAYLAND_KHR
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-	#define VK_USE_PLATFORM_WIN32_KHR
-#else
-	#error "Unsupported platform"
-#endif
-
+#define VK_USE_PLATFORM_WAYLAND_KHR
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
-#if defined(LIGHT_PLATFORM_LINUX)
 struct wl_display;
 struct wl_surface;
-	#include <vulkan/vulkan_wayland.h>
-	#include <wayland-client.h>
-#endif
-#if defined(LIGHT_PLATFORM_WINDOWS)
-	#include <Windows.h>
-	#undef max
-	#undef min
-	#undef MIN
-	#undef MAX
-#elif defined(LIGHT_PLATFORM_LINUX)
-	#include <dlfcn.h>
-#else
-	#error "Unsupported platform"
-#endif
+#include <dlfcn.h>
+#include <vulkan/vulkan_wayland.h>
+#include <wayland-client.h>
 
 export module renderer.vk.api_wrapper;
 import preliminary;
@@ -84,18 +65,11 @@ constexpr auto validation = "VK_LAYER_KHRONOS_validation";
 namespace instance_extension_names {
 
 constexpr auto debug_utils = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
-constexpr auto physical_device_properties_2
-    = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
+constexpr auto
+    physical_device_properties_2 = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
 
 constexpr auto surface = VK_KHR_SURFACE_EXTENSION_NAME;
-#if defined(LIGHT_PLATFORM_LINUX)
 constexpr auto platform_surface = VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME;
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-constexpr auto platform_surface = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
-
-#else
-	#error "Unsupported platform"
-#endif
 
 } // namespace instance_extension_names
 
@@ -723,17 +697,23 @@ public:
 	friend class Gpu;
 	friend class Messenger;
 
-	struct Layer
+	struct ValidationLayerSettings
 	{
-		struct Setting
-		{
-			std::string name;
-			std::variant<std::vector<const char *>, u32, bool> values;
-		};
+		bool enabled;
 
-		std::string name;
+		VkBool32 validate_core;
 
-		std::vector<Setting> settings;
+		VkBool32 validate_sync;
+
+		VkBool32 thread_safety;
+
+		VkBool32 debug_action;
+
+		VkBool32 enable_message_limit;
+
+		u32 duplicate_message_limit;
+
+		std::vector<const char *> report_flags;
 	};
 
 	using Extension = std::string;
@@ -742,7 +722,7 @@ public:
 	{
 		ApplicationInfo application_info;
 
-		std::vector<Layer> layers;
+		ValidationLayerSettings validation_layer_settings;
 
 		std::vector<Extension> extensions;
 	};
@@ -760,7 +740,7 @@ public:
 	auto operator=(const Instance &) = delete;
 
 	/** @WIP */
-	~Instance() = default;
+	~Instance();
 
 	void load_functions();
 
@@ -832,15 +812,9 @@ public:
 
 	struct CreateInfo
 	{
-#if defined(LIGHT_PLATFORM_LINUX)
 		wl_display *display;
 
 		wl_surface *surface;
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-		HWND window;
-#else
-	#error "Unsupported platform"
-#endif
 	};
 
 	Surface() = default;
@@ -2550,7 +2524,7 @@ public:
 
 	void image_barrier(ImageBarrierInfo info);
 
-	void begin_rendering(RenderingInfo info);
+	void begin_rendering(const RenderingInfo &info);
 
 	void end_rendering();
 
@@ -3123,13 +3097,7 @@ PFN_vkResetCommandBuffer reset_command_buffer;
 PFN_vkCmdBeginRendering cmd_begin_rendering;
 PFN_vkCmdEndRendering cmd_end_rendering;
 
-#if defined(LIGHT_PLATFORM_LINUX)
 PFN_vkCreateWaylandSurfaceKHR create_wayland_surface_khr;
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-PFN_vkCreateWin32SurfaceKHR create_win32_surface_khr;
-#else
-	#error "Unsupported platform"
-#endif
 
 PFN_vkDestroySurfaceKHR destroy_surface_khr;
 
@@ -3140,7 +3108,6 @@ void *library = nullptr; // NOLINT
 
 void load_library()
 {
-#if defined(LIGHT_PLATFORM_LINUX)
 	constexpr auto runtime_loader_flags = RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE;
 	library = dlopen("libvulkan.so.1", runtime_loader_flags);
 	if (!library)
@@ -3154,21 +3121,6 @@ void load_library()
 	    dlsym(library, "vkGetInstanceProcAddr")
 	);
 	ensure(api::get_instance_proc_address, "Failed to load vulkan function: vkGetInstanceProcAddr");
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-	library = LoadLibraryA("vulkan-1.dll");
-	ensure(library, "Failed to LoadLibraryA the vulkan-1.dll");
-
-	api::get_instance_proc_address = std::bit_cast<PFN_vkGetInstanceProcAddr>(
-	    GetProcAddress(std::bit_cast<HMODULE>(library), "vkGetInstanceProcAddr")
-	);
-	ensure(
-	    api::get_instance_proc_address,
-	    "Failed to get vkGetInstanceProcAddr function pointer from vulkan-1.dll"
-	);
-
-#else
-	#error "Unsupported platform"
-#endif
 }
 
 
@@ -3239,13 +3191,7 @@ void Instance::load_functions()
 	);
 	load_fn(api::get_physical_device_surface_formats, "vkGetPhysicalDeviceSurfaceFormatsKHR");
 
-#if defined(LIGHT_PLATFORM_LINUX)
 	load_fn(api::create_wayland_surface_khr, "vkCreateWaylandSurfaceKHR");
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-	load_fn(api::create_win32_surface_khr, "vkCreateWin32SurfaceKHR");
-#else
-	#error "Unsupported platform"
-#endif
 	load_fn(api::destroy_surface_khr, "vkDestroySurfaceKHR");
 }
 
@@ -3323,61 +3269,89 @@ void Device::load_functions()
 
 Instance::Instance(const CreateInfo &info)
 {
-	const auto layer_setting_type_visitor = overloads {
-		[](const std::vector<const char *> &) { return VK_LAYER_SETTING_TYPE_STRING_EXT; },
-		[](u32) { return VK_LAYER_SETTING_TYPE_UINT32_EXT; },
-		[](bool) { return VK_LAYER_SETTING_TYPE_BOOL32_EXT; },
-	};
-
-	const auto layer_setting_value_visitor = overloads {
-		[](std::vector<const char *> values) { return std::bit_cast<void *>(values.data()); },
-		[](u32 value) { return std::bit_cast<void *>(&value); },
-		[](bool value) { return std::bit_cast<void *>(&value); },
-	};
-
-	auto layer_settings = std::vector<VkLayerSettingEXT> {};
-	auto layer_names = std::vector<const char *> {};
 	auto extension_names = std::vector<const char *> {};
 	for (const auto &extension : info.extensions)
 	{
 		extension_names.emplace_back(extension.c_str());
 	}
 
-	for (const auto &layer : info.layers)
+	auto layer_settings = std::vector<VkLayerSettingEXT> {};
+	if (info.validation_layer_settings.enabled)
 	{
-		layer_names.emplace_back(layer.name.c_str());
-		for (const auto &setting : layer.settings)
-		{
-			const auto *values = static_cast<void *>(nullptr);
+		const auto &settings = info.validation_layer_settings;
 
-			if (setting.values.index() == 0)
-			{
-				values = std::bit_cast<const void *>(std::get<0>(setting.values).data());
-			}
-			else if (setting.values.index() == 1)
-			{
-				values = std::bit_cast<const void *>(&std::get<1>(setting.values));
-			}
-			else if (setting.values.index() == 2)
-			{
-				values = std::bit_cast<const void *>(&std::get<2>(setting.values));
-			}
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "validate_core",
+		        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+		        .valueCount = 1u,
+		        .pValues = &settings.validate_core,
+		    }
+		);
 
-			ensure(values, "Failed to get variant from setting.values");
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "validate_sync",
+		        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+		        .valueCount = 1u,
+		        .pValues = &settings.validate_sync,
+		    }
+		);
 
-			layer_settings.emplace_back(
-			    VkLayerSettingEXT {
-			        .pLayerName = layer.name.c_str(),
-			        .pSettingName = setting.name.c_str(),
-			        .type = std::visit(layer_setting_type_visitor, setting.values),
-			        .valueCount = 1u,
-			        .pValues = values,
-			    }
-			);
-		}
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "thread_safety",
+		        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+		        .valueCount = 1u,
+		        .pValues = &settings.thread_safety,
+		    }
+		);
+
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "debug_action",
+		        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+		        .valueCount = 1u,
+		        .pValues = &settings.debug_action,
+		    }
+		);
+
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "enable_message_limit",
+		        .type = VK_LAYER_SETTING_TYPE_BOOL32_EXT,
+		        .valueCount = 1u,
+		        .pValues = &settings.enable_message_limit,
+		    }
+		);
+
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "duplicate_message_limit",
+		        .type = VK_LAYER_SETTING_TYPE_UINT32_EXT,
+		        .valueCount = 1u,
+		        .pValues = &settings.duplicate_message_limit,
+		    }
+		);
+
+		layer_settings.emplace_back(
+		    VkLayerSettingEXT {
+		        .pLayerName = vk::instance_layer_names::validation,
+		        .pSettingName = "duplicate_message_limit",
+		        .type = VK_LAYER_SETTING_TYPE_STRING_EXT,
+		        .valueCount = static_cast<u32>(settings.report_flags.size()),
+		        .pValues = std::bit_cast<void *>(settings.report_flags.data()),
+		    }
+		);
 	}
 
-	const auto layer_settings_create_info = VkLayerSettingsCreateInfoEXT {
+	auto layer_settings_create_info = VkLayerSettingsCreateInfoEXT {
 		.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT,
 		.settingCount = static_cast<uint32_t>(layer_settings.size()),
 		.pSettings = layer_settings.data(),
@@ -3393,12 +3367,17 @@ Instance::Instance(const CreateInfo &info)
 
 	auto vk_info = VkInstanceCreateInfo {
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-		.pNext = &layer_settings_create_info,
+		.pNext = info.validation_layer_settings.enabled ? &layer_settings_create_info : nullptr,
 		.flags = {},
 		.pApplicationInfo = &app_info,
-		.enabledLayerCount = static_cast<uint32_t>(info.layers.size()),
-		.ppEnabledLayerNames = layer_names.data(),
-		.enabledExtensionCount = static_cast<uint32_t>(extension_names.size()),
+
+		.enabledLayerCount = info.validation_layer_settings.enabled ? 1u : 0u,
+
+		.ppEnabledLayerNames = info.validation_layer_settings.enabled ?
+		                           &instance_layer_names::validation :
+		                           nullptr,
+
+		.enabledExtensionCount = static_cast<u32>(extension_names.size()),
 		.ppEnabledExtensionNames = extension_names.data(),
 	};
 
@@ -3406,10 +3385,17 @@ Instance::Instance(const CreateInfo &info)
 	ensure(m_instance, "Failed to create vulkan instance");
 }
 
+Instance::~Instance()
+{
+	if (m_instance)
+	{
+		api::destroy_instance(m_instance, nullptr);
+	}
+}
+
 Surface::Surface(const Instance &instance, const CreateInfo &info)
     : m_instance(instance.m_instance.get())
 {
-#if defined(LIGHT_PLATFORM_LINUX)
 	const auto vk_info = VkWaylandSurfaceCreateInfoKHR {
 		.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
 		.pNext = {},
@@ -3419,21 +3405,6 @@ Surface::Surface(const Instance &instance, const CreateInfo &info)
 	};
 
 	vkc(api::create_wayland_surface_khr(instance.get_vk_handle(), &vk_info, nullptr, &m_surface));
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-
-	const auto vk_info = VkWin32SurfaceCreateInfoKHR {
-		.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-		.pNext = {},
-		.flags = {},
-		.hinstance = GetModuleHandle(nullptr),
-		.hwnd = info.window,
-	};
-
-	vkc(api::create_win32_surface_khr(instance.get_vk_handle(), &vk_info, nullptr, &m_surface));
-#else
-	#error "Unsupported platform"
-
-#endif
 }
 
 Surface::~Surface()
@@ -4629,7 +4600,7 @@ void CommandBuffer::image_barrier(ImageBarrierInfo info)
 	);
 }
 
-void CommandBuffer::begin_rendering(RenderingInfo info)
+void CommandBuffer::begin_rendering(const RenderingInfo &info)
 {
 	auto vk_color_attachments = std::vector<VkRenderingAttachmentInfo> {};
 	for (auto attachment : info.color_attachments)
@@ -4652,8 +4623,8 @@ void CommandBuffer::begin_rendering(RenderingInfo info)
 	{
 		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO, .pNext = {}, .flags = {},
 		.renderArea = {
-			.offset = {info.area_offset.x, info.area_offset.y},
-			.extent = {info.area_extent.x, info.area_extent.y},
+			.offset = {.x = info.area_offset.x, .y= info.area_offset.y },
+			.extent = {.width = info.area_extent.x, .height = info.area_extent.y },
 		},
         .layerCount = 1u,
         .colorAttachmentCount = static_cast<u32>(vk_color_attachments.size()),

@@ -42,29 +42,9 @@ enum class BuildType : u8
 	distribution
 };
 
-#if defined(LIGHT_PLATFORM_WINDOWS)
-	#define lt_win(x)
-constexpr auto platform = Platform::windows;
-constexpr auto platform_name = "windows";
-constexpr auto platform_identifier = platform_name; // TODO(Light)
-
-	#undef LIGHT_PLATFORM_WINDOWS
-
-#elif defined(LIGHT_PLATFORM_LINUX)
 constexpr auto platform = Platform::gnu_linux;
 constexpr auto platform_name = "gnu_linux";
 constexpr auto platform_identifier = platform_name; // TODO(Light)
-
-#elif defined(LIGHT_PLATFORM_MAC)
-	#define lt_mac(x) x
-constexpr auto platform = Platform::mac;
-constexpr auto platform_name = "mac";
-constexpr auto platform_identifier = platform_name; // TODO(Light)
-
-#else
-	#error "Unsupported platform: Unknown"
-
-#endif
 
 /** @TODO(Light): Handle other compilers... */
 #ifdef __clang__

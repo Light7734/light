@@ -129,6 +129,7 @@ public:
 
 	void recreate_swapchain()
 	{
+		m_device->wait_idle();
 		m_swapchain.reset();
 		m_swapchain = lt::renderer::create_swapchain(
 		    constants::api,

@@ -3,40 +3,38 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
 
-CC=$(which clang)
-export CC
-
-CXX=$(which clang++)
-export CXX
-
-DISPLAY=:99
-export DISPLAY
-
-LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/amd64/clang/lsan.supp:fast_unwind_on_malloc=0:verbosity=1:report_objects=1"
+LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/lsan.supp:fast_unwind_on_malloc=0:verbosity=1:report_objects=1"
 export LSAN_OPTIONS
 
 LSAN_SYMBOLIZER_PATH="$(which llvm-symbolizer)"
 export LSAN_SYMBOLIZER_PATH
-
-Xvfb :99 -screen 0 1024x768x16 &
 
 cmake \
     -S . \
     -B build \
     -G Ninja \
     -D CMAKE_LINKER_TYPE=MOLD \
+    -D CMAKE_C_COMPILER="$(which clang)" \
+    -D CMAKE_CXX_COMPILER="$(which clang++)" \
+    -D CMAKE_EXPORT_COMPILE_COMMANDS=TRUE \
     -D ENABLE_UNIT_TESTS=ON \
     -D CMAKE_BUILD_TYPE=Release \
     -D CMAKE_CXX_FLAGS=" \
 -fsanitize=leak \
--fno-common \
 -g \
 -fno-omit-frame-pointer \
--std=c++23 \
+-fno-inline-functions \
+-fno-common \
+-std=c++26 \
 -nostdinc++ \
 -isystem /libcxx_lsan/include/c++/v1/" \
     -D CMAKE_EXE_LINKER_FLAGS=" \
 -fsanitize=leak \
+-g \
+-fno-omit-frame-pointer \
+-fno-inline-functions \
+-fno-common \
+-std=c++26 \
 -L/libcxx_lsan/lib \
 -lc++ \
 -lc++abi \

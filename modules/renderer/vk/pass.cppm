@@ -77,7 +77,7 @@ Pass::Pass(
     }}),
 	m_layout(vk::PipelineLayout(m_device->vk(),{
         .descriptor_set_layouts = { &m_descriptor_set_layout },
-        .push_constant_ranges = { {  vk::ShaderStageFlags::vertex_bit,  0u,  sizeof(FrameConstants) } }
+        .push_constant_ranges = { { .shader_stages =  vk::ShaderStageFlags::vertex_bit, .offset =  0u, .size =  sizeof(FrameConstants) } }
     }))
 {
 	auto shaders = std::vector<std::pair<vk::ShaderModule, vk::ShaderStageFlags::T>> {};

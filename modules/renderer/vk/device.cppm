@@ -16,6 +16,11 @@ class Device: public IDevice
 public:
 	Device(IGpu *gpu, ISurface *surface);
 
+	void wait_idle() override
+	{
+		m_device.wait_idle();
+	}
+
 	[[nodiscard]] auto vk() -> vk::Device &
 	{
 		return m_device;

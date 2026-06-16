@@ -1,4 +1,57 @@
 {
+   libnvidia-cond
+   Memcheck:Cond
+   obj:/usr/lib/libnvidia-glcore.so.610.43.02
+}
+
+{
+   libnvidia-free
+   Memcheck:Free
+   obj:/usr/lib/libnvidia-glcore.so.610.43.02
+}
+
+{
+   libnvidia-val8
+   Memcheck:Value8
+   obj:/usr/lib/libnvidia-glcore.so.610.43.02
+}
+
+{
+   libnvidia-leak
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/libnvidia-glcore.so.610.43.02
+   ...
+}
+
+{
+   libnvidia-realloc-zero
+   Memcheck:ReallocZero
+   fun:realloc
+   ...
+   obj:/usr/lib/libnvidia-glcore.so.610.43.02
+   ...
+}
+
+{
+   libnvidia-badsize
+   Memcheck:BadSize
+   fun:posix_memalign
+   ...
+   obj:/usr/lib/libGLX_nvidia.so.610.43.02
+   ...
+}
+
+{
+   dlopen
+   Memcheck:Leak
+   ...
+   fun:_dl_open
+   ...
+}
+
+{
    <insert_a_suppression_name_here>
    Memcheck:Leak
    match-leak-kinds: indirect

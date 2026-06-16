@@ -8,7 +8,7 @@ function(add_module)
     )
 
     if(NOT ARGS_NAME)
-        message(FATAL_ERROR "You must provide a name")
+        message(FATAL_ERROR "You MUST provide a name")
     endif()
 
     set(target_library_name ${ARGS_NAME})
@@ -69,7 +69,6 @@ function(add_module)
     )
 
     if(ARGS_TESTS)
-        message("ADDING TESTS ${target_library_name}!!!")
         set(test_files)
         foreach(test_file ${ARGS_TESTS})
             list(APPEND test_files "${module_directory}/${test_file}")
@@ -87,7 +86,6 @@ function(add_module)
             foreach(file ${ARGS_TEST_INTERFACES})
                 list(APPEND test_interface_files "${module_directory}/${file}")
             endforeach()
-            message("TEST INTERFACE FILES: ${test_interface_files}")
             target_sources(
                 "${target_library_name}_tests"
                 PRIVATE FILE_SET test_cxx_modules TYPE CXX_MODULES FILES

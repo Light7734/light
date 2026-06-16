@@ -5,13 +5,6 @@ struct wl_surface;
 struct xdg_surface;
 struct xdg_toplevel;
 
-#if defined(LIGHT_PLATFORM_LINUX)
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-	#include <Windows.h>
-#else
-	#error "Unsupported platform"
-#endif
-
 export module surface.system:components;
 
 import preliminary;
@@ -47,7 +40,6 @@ public:
 	    ModifyPositionRequest,
 	    ModifyVisibilityRequest>;
 
-#if defined(LIGHT_PLATFORM_LINUX)
 	struct NativeData
 	{
 		wl_display *display;
@@ -58,12 +50,6 @@ public:
 
 		xdg_toplevel *shell_toplevel;
 	};
-#elif defined(LIGHT_PLATFORM_WINDOWS)
-	struct NativeData
-	{
-		HWND window;
-	};
-#endif
 
 	static constexpr auto max_dimension = 4096;
 

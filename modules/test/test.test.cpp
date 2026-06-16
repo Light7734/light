@@ -3,9 +3,8 @@ import test;
 Suite expects = "expects"_suite = []() {
 	// should be truncated...
 	Case { "berryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy "
-		   "long name" }
-	= [] {
-	  };
+		   "long name" } = [] {
+	};
 
 	Case { "this emptiness machine" } = [] {
 	};

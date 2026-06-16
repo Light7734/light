@@ -1,5 +1,6 @@
 import renderer.frontend;
 import renderer.test_utils;
+import logger;
 
 Suite raii = "renderer_raii"_suite = [] {
 	Case { "happy paths" } = [] {
@@ -119,9 +120,10 @@ Suite draw = "renderer_draw"_suite = [] {
 			expect_eq(renderer->frame(frame_idx % constants::frames_in_flight, [] {}), success);
 		}
 
-		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::error));
+
+		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger::MessageSeverity::error));
 		expect_false(
-		    fixture.has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity::warning)
+		    fixture.has_any_messages_of(lt::renderer::IDebugger::MessageSeverity::warning)
 		);
 	};
 };

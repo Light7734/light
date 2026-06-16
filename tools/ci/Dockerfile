@@ -1,4 +1,4 @@
-FROM archlinux:multilib-devel
+FROM archlinux:latest
 
 ## Configurations ##
 RUN \
@@ -7,15 +7,9 @@ mkdir /msan \
 && sed -i 's/^#ParallelDownloads = .*/ParallelDownloads = 8/' /etc/pacman.conf \
 && echo 'NoExtract = usr/share/{man,doc,info}/*' >> /etc/pacman.conf
 
-RUN printf '%s\n' \
-  'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' \
-  > /etc/pacman.d/mirrorlist
-
 ## Packages ##
-RUN pacman -Syyu --noconfirm --disable-download-timeout
-
 RUN \
-pacman -S --noconfirm --needed --disable-download-timeout \
+pacman -Syyu --noconfirm --needed --disable-download-timeout \
     afl++ \
     afl-utils \
     base-devel \
@@ -91,9 +85,6 @@ pacman -S --noconfirm --needed --disable-download-timeout \
     xcb-util-cursor \
     xcb-util-keysyms \
     xcb-util-wm \
-    xorg-server-xvfb \
-    xorg-util-macros \
-    xorgproto \
     xtrans \
     zlib \
     zstd \
@@ -102,7 +93,7 @@ pacman -S --noconfirm --needed --disable-download-timeout \
 ## Libc++ ##
 RUN \
 git clone \
-    --branch llvmorg-20.1.8 \
+    --branch llvmorg-22.1.7 \
     --depth=1 \
     https://github.com/llvm/llvm-project.git
 
@@ -111,8 +102,8 @@ RUN git clone \
     --depth=1 \
     https://gitlab.freedesktop.org/mesa/mesa.git
 
-RUN wget https://x.org/releases/individual/lib/libxcb-1.17.0.tar.xz
-RUN wget https://x.org/releases/individual/lib/libX11-1.8.12.tar.xz
+# RUN wget https://x.org/releases/individual/lib/libxcb-1.17.0.tar.xz
+# RUN wget https://x.org/releases/individual/lib/libX11-1.8.12.tar.xz
 RUN wget 'https://sdk.lunarg.com/sdk/download/1.4.328.1/linux/vulkansdk-linux-x86_64-1.4.328.1.tar.xz'
 
 RUN cd llvm-project/ \
@@ -252,9 +243,6 @@ tar xf 'vulkansdk-linux-x86_64-1.4.328.1.tar.xz' \
     spirv-tools
 
 ## Mesa ##
-
-
-
 RUN \
 export build_llvm=/build-llvm \
 && export build_path=/b_llvm_normal \
@@ -315,14 +303,6 @@ export CXXFLAGS="\
     -D CMAKE_CXX_COMPILER=/opt/llvm-normal/bin/clang++ \
     -D CMAKE_INSTALL_PREFIX=/opt/llvm-msan \
 && ninja -C $build_path install
-
-
-# Cache debuginfo symbols downloaded when running valgrind
-# RUN \
-# git clone https://git.light7734.com/light7734/light.git --depth=1 \
-# && cd ./light/tools/ci/amd64/gcc/ \
-# && ./valgrind.sh
-
 
 # && cmake \
 #     -G Ninja \

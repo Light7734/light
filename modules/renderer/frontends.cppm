@@ -85,6 +85,8 @@ public:
 	auto operator=(const IDevice &) -> IDevice & = delete;
 
 	virtual ~IDevice() = default;
+
+	virtual void wait_idle() = 0;
 };
 
 /** Somewhere to put our rendered pixels on.

@@ -15,6 +15,7 @@ export namespace lt::renderer::vkb {
  * https://www.xfree86.org/4.7.0/DRI11.html
  * https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues/1894
  */
+// NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
 class Instance: public IInstance
 {
 public:
@@ -28,6 +29,14 @@ public:
 		return m_instance;
 	}
 
+	Instance(const Instance &) = delete;
+
+	auto operator=(const Instance &) -> Instance & = delete;
+
+	Instance(Instance &&other) noexcept = delete;
+
+	auto operator=(Instance &&other) noexcept -> Instance & = delete;
+
 private:
 	static auto instance() -> IInstance &
 	{
@@ -37,13 +46,13 @@ private:
 
 	Instance();
 
+	~Instance() override;
+
 	vk::Instance m_instance;
 };
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
 Instance::Instance()
@@ -59,41 +68,32 @@ Instance::Instance()
 		.api_version = vk::constants::api_version,
 	};
 
-	using Setting = vk::Instance::Layer::Setting;
-	const auto validation_layer_settings = std::vector<Setting> {
-		Setting { .name = "validate_core", .values = true },
-		Setting { .name = "validate_sync", .values = true },
-		Setting { .name = "thread_safety", .values = true },
-		Setting { .name = "debug_action", .values = true },
-		Setting { .name = "enable_message_limit", .values = true },
-		Setting {
-		    .name = "duplicate_message_limit",
-		    .values = std::numeric_limits<u32>::max(),
-		},
-		Setting {
-		    .name = "report_flags",
-		    .values = std::vector<const char *> { "info", "warn", "perf", "error", "verbose" },
-		},
-	};
-
-	using Layer = vk::Instance::Layer;
-	m_instance = vk::Instance(
-	    vk::Instance::CreateInfo {
-	        .application_info = app_info,
-            .layers = std::vector<Layer> { Layer {
-		.name = vk::instance_layer_names::validation,
-		.settings = validation_layer_settings,
-	} },
-            .extensions = {
-                vk::instance_extension_names::debug_utils,
-                vk::instance_extension_names::surface,
-                vk::instance_extension_names::platform_surface,
-                vk::instance_extension_names::physical_device_properties_2,
-            },
-	    }
-	);
+	m_instance = vk::Instance({
+        .application_info = app_info,
+        .validation_layer_settings = {
+            .enabled = true,
+            .validate_core= true,
+            .validate_sync = true,
+            .thread_safety = true,
+            .debug_action = true,
+            .enable_message_limit = true,
+            .duplicate_message_limit =  std::numeric_limits<u32>::max(),
+            .report_flags =  { "info", "warn", "perf", "error", "verbose" },
+        },
+        .extensions = {
+            vk::instance_extension_names::debug_utils,
+            vk::instance_extension_names::surface,
+            vk::instance_extension_names::platform_surface,
+            vk::instance_extension_names::physical_device_properties_2,
+        },
+    });
 
 	m_instance.load_functions();
+}
+
+Instance::~Instance()
+{
+	vk::unload_library();
 }
 
 } // namespace lt::renderer::vkb

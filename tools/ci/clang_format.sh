@@ -11,7 +11,7 @@ while IFS= read -r -d '' file; do
         echo "❌ Formatting issue detected in $file"
         has_fomatting_issues=1
     fi
-done < <(find ./modules -name '*.?pp' -print0)
+done < <(find ./modules \( -name '*.?pp' -o -name '*.?ppm' \) -print0)
 
 if [ "$has_fomatting_issues" -eq 0 ]; then
     echo "✅ All files are properly formatted! Well done! ^~^"

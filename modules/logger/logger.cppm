@@ -65,14 +65,15 @@ public:
 		    Args &&...arguments
 		) noexcept
 		{
-			std::print("");
-			if (std::to_underlying(level) < std::to_underlying(get_severity()))
+			try
 			{
-				return;
-			}
+				if (std::to_underlying(level) < std::to_underlying(get_severity()))
+				{
+					return;
+				}
 
-			constexpr auto to_string = [](Level level) {
-				// clang-format off
+				constexpr auto to_string = [](Level level) {
+					// clang-format off
 			switch (level)
 			{
 			using enum ::lt::log::Level;
@@ -85,19 +86,25 @@ public:
             case test: /* testing framework's logs will never have location */
 			case off: return "off";
 			}
-				// clang-format on
+					// clang-format on
 
-				std::unreachable();
-			};
+					std::unreachable();
+				};
 
-			const auto path = std::filesystem::path { location.file_name() };
+				const auto path = std::filesystem::path { location.file_name() };
 
-			std::println(
-			    "{} {} ==> {}",
-			    to_string(level),
-			    std::format("{}:{}", path.filename().string(), location.line()),
-			    std::format(format, std::forward<Args>(arguments)...)
-			);
+				std::println(
+				    "{} {} ==> {}",
+				    to_string(level),
+				    std::format("{}:{}", path.filename().string(), location.line()),
+				    std::format(format, std::forward<Args>(arguments)...)
+				);
+			}
+			catch (const std::exception &exp)
+			{
+				std::cout << "logger exception: " << exp.what();
+				std::terminate();
+			}
 		}
 	};
 

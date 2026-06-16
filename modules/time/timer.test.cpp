@@ -6,8 +6,10 @@ using ::lt::time::Timer;
 /* @note: error margin is high since run-time may slow down extremely due to
  * sanitization/debugging or execution through valgrind...
  * <1us error margin is tested manually in release builds and it works fine.
+ *
+ * @todo: use a custom "test mode" for super slow execution environments
  **/
-constexpr auto max_error_margin = std::chrono::milliseconds { 1 };
+constexpr auto max_error_margin = std::chrono::milliseconds { 5 };
 
 Suite raii = "raii"_suite = [] {
 	using std::chrono::microseconds;
