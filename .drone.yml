@@ -12,18 +12,18 @@ steps:
     CODECOV_TOKEN:
       from_secret: CODECOV_TOKEN 
   commands:
-    - ./tools/ci/amd64/clang/coverage.sh
+    - ./tools/ci//coverage.sh
 
 # @todo(light): set these up in a very near future...
 # - name: leak sanitizer
 #   pull: if-not-exists
 #   commands:
-#     - ./tools/ci/amd64/clang/lsan.sh
+#     - ./tools/ci/lsan.sh
 # 
 # - name: memory sanitizer
 #   pull: if-not-exists
 #   commands:
-#     - ./tools/ci/amd64/clang/msan.sh
+#     - ./tools/ci/msan.sh
 
 ---
 kind: pipeline
@@ -38,27 +38,27 @@ steps:
   pull: if-not-exists
   privileged: true
   commands:
-    - ./tools/ci/static_analysis/clang_tidy.sh
+    - ./tools/ci/clang_tidy.sh
 
 - name: shell check
   pull: if-not-exists
   commands:
-    - ./tools/ci/static_analysis/shell_check.sh
+    - ./tools/ci/shell_check.sh
 
 - name: clang format
   pull: if-not-exists
   commands:
-    - ./tools/ci/static_analysis/clang_format.sh
+    - ./tools/ci/clang_format.sh
 
 - name: cmake format
   pull: if-not-exists
   commands:
-    - ./tools/ci/static_analysis/cmake_format.sh
+    - ./tools/ci/cmake_format.sh
 
 - name: shell format
   pull: if-not-exists
   commands:
-    - ./tools/ci/static_analysis/shell_format.sh
+    - ./tools/ci/shell_format.sh
 
 ---
 kind: pipeline
