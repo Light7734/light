@@ -12,12 +12,11 @@ steps:
     CODECOV_TOKEN:
       from_secret: CODECOV_TOKEN 
   commands:
-    - ./tools/ci//coverage.sh
+    - ./tools/ci/coverage.sh
 
-# @todo(light): set these up in a very near future...
-# - name: leak sanitizer
-#   commands:
-#     - ./tools/ci/lsan.sh
+- name: leak sanitizer
+  commands:
+    - ./tools/ci/lsan.sh
 # 
 # - name: memory sanitizer
 #   commands:
