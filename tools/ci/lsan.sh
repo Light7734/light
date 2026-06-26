@@ -3,6 +3,9 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
 
+XDG_RUNTIME_DIR='/run/user/1000'
+export XDG_RUNTIME_DIR
+
 LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/lsan.supp:fast_unwind_on_malloc=0:verbosity=1:report_objects=1"
 export LSAN_OPTIONS
 
