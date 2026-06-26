@@ -3,3 +3,4 @@ leak:_dlopen
 leak:_dlclose
 leak:lt::renderer::vk::Device::destroy_swapchain
 leak:loader_get_icd_interface_version
+leak:libdbus-1.so
