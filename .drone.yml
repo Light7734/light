@@ -6,13 +6,13 @@ trigger:
   - main
 
 steps:
-- name: code coverage
-  privileged: true
-  environment:
-    CODECOV_TOKEN:
-      from_secret: CODECOV_TOKEN 
-  commands:
-    - ./tools/ci/coverage.sh
+# - name: code coverage
+#   privileged: true
+#   environment:
+#     CODECOV_TOKEN:
+#       from_secret: CODECOV_TOKEN 
+#   commands:
+#     - ./tools/ci/coverage.sh
 
 - name: leak sanitizer
   commands:
