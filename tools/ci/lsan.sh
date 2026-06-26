@@ -27,7 +27,7 @@ cmake \
 -fno-common \
 -std=c++26 \
 -nostdinc++ \
--isystem /libcxx_lsan/include/c++/v1/" \
+-isystem /usr/local/lib/libcxx_lsan/include/c++/v1/" \
     -D CMAKE_EXE_LINKER_FLAGS=" \
 -fsanitize=leak \
 -g \
@@ -35,12 +35,12 @@ cmake \
 -fno-inline-functions \
 -fno-common \
 -std=c++26 \
--L/libcxx_lsan/lib \
+-L/usr/local/lib/libcxx_lsan/lib \
 -lc++ \
 -lc++abi \
--Wl,-rpath,/libcxx_lsan/lib"
+-Wl,-rpath,/usr/local/lib/libcxx_lsan/lib"
 
-cmake --build ./build --target='renderer_tests' -j"$(nproc)"
+cmake --build ./build  -j"$(nproc)"
 
 while IFS= read -r -d '' test; do
     echo "Running $test"
