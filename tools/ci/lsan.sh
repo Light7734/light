@@ -43,7 +43,7 @@ cmake \
 -lc++abi \
 -Wl,-rpath,/usr/local/lib/libcxx_lsan/lib"
 
-cmake --build ./build  -j"$(nproc)"
+cmake --build ./build -j"$(nproc)"
 
 while IFS= read -r -d '' test; do
     echo "Running $test"
