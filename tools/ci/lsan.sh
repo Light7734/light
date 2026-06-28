@@ -21,6 +21,7 @@ cmake \
     -D CMAKE_CXX_COMPILER="$(which clang++)" \
     -D CMAKE_EXPORT_COMPILE_COMMANDS=TRUE \
     -D ENABLE_UNIT_TESTS=ON \
+    -D ENABLE_LSAN=ON \
     -D CMAKE_BUILD_TYPE=Release \
     -D CMAKE_CXX_FLAGS=" \
 -fsanitize=leak \

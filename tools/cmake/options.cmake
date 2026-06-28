@@ -23,6 +23,9 @@ add_option(
     ENABLE_LLVM_COVERAGE "Enables the code coverage instrumentation for clang"
 )
 
+add_option(ENABLE_LSAN "Disables build of modules that don't supprot lsan")
+add_option(ENABLE_MSAN "Disables build of modules that don't supprot msan")
+
 if(ENABLE_STATIC_ANALYSIS)
     set(CMAKE_CXX_CLANG_TIDY
         "clang-tidy;--warnings-as-errors=*;--allow-no-checks;--system-headers=false;--header-filter='./modules/*'"
