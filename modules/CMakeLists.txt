@@ -180,9 +180,8 @@ add_custom_command(
 )
 add_custom_target(
     xdg-shell-gen
-    DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/surface/wayland-protocols/xdg-shell.c
 )
 
 add_module(
