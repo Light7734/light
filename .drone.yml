@@ -14,13 +14,14 @@ steps:
 #   commands:
 #     - ./tools/ci/coverage.sh
 
-- name: leak sanitizer
+- name: memory sanitizer
   commands:
-    - ./tools/ci/lsan.sh
-# 
-# - name: memory sanitizer
+    - ./tools/ci/msan.sh
+
+# - name: leak sanitizer
 #   commands:
-#     - ./tools/ci/msan.sh
+#     - ./tools/ci/lsan.sh
+
 
 ---
 kind: pipeline
