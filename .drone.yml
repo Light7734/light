@@ -6,22 +6,21 @@ trigger:
   - main
 
 steps:
-# - name: code coverage
-#   privileged: true
-#   environment:
-#     CODECOV_TOKEN:
-#       from_secret: CODECOV_TOKEN 
-#   commands:
-#     - ./tools/ci/coverage.sh
+- name: code coverage
+  privileged: true
+  environment:
+    CODECOV_TOKEN:
+      from_secret: CODECOV_TOKEN 
+  commands:
+    - ./tools/ci/coverage.sh
+
+- name: leak sanitizer
+  commands:
+    - ./tools/ci/lsan.sh
 
 - name: memory sanitizer
   commands:
     - ./tools/ci/msan.sh
-
-# - name: leak sanitizer
-#   commands:
-#     - ./tools/ci/lsan.sh
-
 
 ---
 kind: pipeline
