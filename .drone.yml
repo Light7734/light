@@ -31,15 +31,6 @@ trigger:
   - main
 
 steps:
-- name: clang tidy
-  privileged: true
-  commands:
-    - ./tools/ci/clang_tidy.sh
-
-- name: shell check
-  commands:
-    - ./tools/ci/shell_check.sh
-
 - name: clang format
   commands:
     - ./tools/ci/clang_format.sh
@@ -51,6 +42,15 @@ steps:
 - name: shell format
   commands:
     - ./tools/ci/shell_format.sh
+
+- name: shell check
+  commands:
+    - ./tools/ci/shell_check.sh
+
+- name: clang tidy
+  privileged: true
+  commands:
+    - ./tools/ci/clang_tidy.sh
 
 ---
 kind: pipeline
