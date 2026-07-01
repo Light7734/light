@@ -7,10 +7,10 @@ rm -rf ./build/
 XDG_RUNTIME_DIR='/run/user/1000'
 export XDG_RUNTIME_DIR
 
-LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/lsan.supp:fast_unwind_on_malloc=0:verbosity=1:report_objects=1"
+LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/lsan.supp:verbosity=1"
 export LSAN_OPTIONS
 
-ASAN_OPTIONS="detect_leaks=1:symbolize=1:verbosity=1"
+ASAN_OPTIONS="detect_leaks=1:symbolize=1:verbosity=1:fast_unwind_on_malloc=0:report_objects=1"
 export ASAN_OPTIONS
 
 LSAN_SYMBOLIZER_PATH="$(which llvm-symbolizer)"
