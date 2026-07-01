@@ -2,6 +2,7 @@
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
+rm -rf ./build/
 
 XDG_RUNTIME_DIR='/run/user/1000'
 export XDG_RUNTIME_DIR

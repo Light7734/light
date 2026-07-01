@@ -2,6 +2,7 @@
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
+rm -rf ./build/
 
 MSAN_OPTIONS="verbosity=1"
 export MSAN_OPTIONS
