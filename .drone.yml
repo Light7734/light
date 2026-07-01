@@ -14,9 +14,9 @@ steps:
   commands:
     - ./tools/ci/coverage.sh
 
-- name: leak sanitizer
+- name: address sanitizer
   commands:
-    - ./tools/ci/lsan.sh
+    - ./tools/ci/asan.sh
 
 - name: memory sanitizer
   commands:
