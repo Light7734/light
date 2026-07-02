@@ -23,11 +23,23 @@ add_option(
     ENABLE_LLVM_COVERAGE "Enables the code coverage instrumentation for clang"
 )
 
-add_option(ENABLE_LSAN "Disables build of modules that don't supprot leak sanitizer")
-add_option(ENABLE_ASAN "Disables build of modules that don't supprot address sanitizer")
-add_option(ENABLE_UBSAN "Disables build of modules that don't supprot undefined behavior sanatizer")
-add_option(ENABLE_MSAN "Disables build of modules that don't supprot memory sanitizer")
-add_option(ENABLE_TSAN "Disables build of modules that don't supprot thread sanitizer")
+add_option(
+    ENABLE_LSAN "Disables build of modules that don't supprot leak sanitizer"
+)
+add_option(
+    ENABLE_ASAN
+    "Disables build of modules that don't supprot address sanitizer"
+)
+add_option(
+    ENABLE_UBSAN
+    "Disables build of modules that don't supprot undefined behavior sanatizer"
+)
+add_option(
+    ENABLE_MSAN "Disables build of modules that don't supprot memory sanitizer"
+)
+add_option(
+    ENABLE_TSAN "Disables build of modules that don't supprot thread sanitizer"
+)
 
 if(ENABLE_STATIC_ANALYSIS)
     set(CMAKE_CXX_CLANG_TIDY
