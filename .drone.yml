@@ -14,10 +14,6 @@ steps:
   commands:
     - ./tools/ci/coverage.sh
 
-- name: valgrind
-  commands:
-    - ./tools/ci/valgrind.sh
-
 - name: undefined behavior sanitizer
   commands:
     - ./tools/ci/ubsan.sh
@@ -33,6 +29,10 @@ steps:
 - name: thread sanitizer
   commands:
     - ./tools/ci/tsan.sh
+
+- name: valgrind
+  commands:
+    - ./tools/ci/valgrind.sh
 
 ---
 kind: pipeline
