@@ -161,7 +161,7 @@ add_module(
     NAME input_codes INTERFACES input_codes.cppm DEPENDENCIES preliminary
 )
 
-if(ENABLE_MSAN)
+if(ENABLE_MSAN OR ENABLE_TSAN)
     return()
 endif()
 
@@ -243,16 +243,16 @@ add_module(
     frontends.cppm
     components.cppm
     factory.cppm
-    vk/api_wrapper.cppm
-    vk/device.cppm
-    vk/gpu.cppm
-    vk/instance.cppm
-    vk/surface.cppm
-    vk/swapchain.cppm
-    vk/buffer.cppm
-    vk/pass.cppm
-    vk/renderer.cppm
-    vk/debugger.cppm
+    api_wrapper.cppm
+    device.cppm
+    gpu.cppm
+    instance.cppm
+    surface.cppm
+    swapchain.cppm
+    buffer.cppm
+    pass.cppm
+    renderer.cppm
+    debugger.cppm
     DEPENDENCIES
     preliminary
     app

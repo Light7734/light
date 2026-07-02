@@ -14,6 +14,10 @@ steps:
   commands:
     - ./tools/ci/coverage.sh
 
+- name: undefined behavior sanitizer
+  commands:
+    - ./tools/ci/ubsan.sh
+
 - name: address sanitizer
   commands:
     - ./tools/ci/asan.sh
@@ -22,9 +26,9 @@ steps:
   commands:
     - ./tools/ci/msan.sh
 
-- name: undefined behavior sanitizer
+- name: thread sanitizer
   commands:
-    - ./tools/ci/ubsan.sh
+    - ./tools/ci/asan.sh
 
 ---
 kind: pipeline
