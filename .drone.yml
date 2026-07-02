@@ -22,6 +22,10 @@ steps:
   commands:
     - ./tools/ci/msan.sh
 
+- name: undefined behavior sanitizer
+  commands:
+    - ./tools/ci/uvsan.sh
+
 ---
 kind: pipeline
 type: exec
