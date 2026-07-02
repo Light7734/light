@@ -24,7 +24,7 @@ steps:
 
 - name: undefined behavior sanitizer
   commands:
-    - ./tools/ci/uvsan.sh
+    - ./tools/ci/ubsan.sh
 
 ---
 kind: pipeline
