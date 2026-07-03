@@ -7,7 +7,7 @@ rm -rf ./build/
 XDG_RUNTIME_DIR='/run/user/1000'
 export XDG_RUNTIME_DIR
 
-LSAN_OPTIONS="suppressions=$(git rev-parse --show-toplevel)/tools/ci/lsan.supp:verbosity=1"
+LSAN_OPTIONS="symbolize=1:suppressions=$(git rev-parse --show-toplevel)/tools/ci/lsan.supp:verbosity=1"
 export LSAN_OPTIONS
 
 ASAN_OPTIONS="detect_leaks=1:symbolize=1:verbosity=1:fast_unwind_on_malloc=0:report_objects=1"
@@ -35,7 +35,7 @@ cmake \
 -fno-common \
 -std=c++26 \
 -nostdinc++ \
--isystem /usr/local/lib/libcxx_lsan/include/c++/v1/" \
+-isystem /usr/local/lib/libcxx_asan/include/c++/v1/" \
     -D CMAKE_EXE_LINKER_FLAGS=" \
 -fsanitize=address \
 -g \
@@ -43,10 +43,10 @@ cmake \
 -fno-inline-functions \
 -fno-common \
 -std=c++26 \
--L/usr/local/lib/libcxx_lsan/lib \
+-L/usr/local/lib/libcxx_asan/lib \
 -lc++ \
 -lc++abi \
--Wl,-rpath,/usr/local/lib/libcxx_lsan/lib"
+-Wl,-rpath,/usr/local/lib/libcxx_asan/lib"
 
 cmake --build ./build -j"$(nproc)"
 

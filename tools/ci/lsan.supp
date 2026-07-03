@@ -5,3 +5,16 @@ leak:lt::renderer::vk::Device::destroy_swapchain
 leak:loader_get_icd_interface_version
 leak:libdbus-1.so
 leak:libvulkan.so.1
+leak:internal_bus_get
+leak:dbus_bus_register
+leak:_dbus_message_loader_queue_messages
+leak:dbus_connection_send_with_reply_and_block
+leak:dbus_bus_register
+leak:internal_bus_get
+leak:dbus_message_new_empty_header
+leak:load_message
+leak:_dbus_header_load
+leak:_dbus_string_copy_len
+leak:reallocate_for_length
+leak:internal_bus_get
+leak:dbus_bus_register
