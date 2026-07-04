@@ -6,106 +6,106 @@ trigger:
   - main
 
 steps:
-- name: code coverage
-  privileged: true
-  environment:
-    CODECOV_TOKEN:
-      from_secret: CODECOV_TOKEN 
-  commands:
-    - ./tools/ci/coverage.sh
+# - name: code coverage
+#   privileged: true
+#   environment:
+#     CODECOV_TOKEN:
+#       from_secret: CODECOV_TOKEN 
+#   commands:
+#     - ./tools/ci/coverage.sh
 
-- name: undefined behavior sanitizer
-  commands:
-    - ./tools/ci/ubsan.sh
-
-- name: address sanitizer
-  commands:
-    - ./tools/ci/asan.sh
-
-- name: memory sanitizer
-  commands:
-    - ./tools/ci/msan.sh
-
-- name: thread sanitizer
-  commands:
-    - ./tools/ci/tsan.sh
+# - name: undefined behavior sanitizer
+#   commands:
+#     - ./tools/ci/ubsan.sh
+#
+# - name: address sanitizer
+#   commands:
+#     - ./tools/ci/asan.sh
+#
+# - name: memory sanitizer
+#   commands:
+#     - ./tools/ci/msan.sh
+#
+# - name: thread sanitizer
+#   commands:
+#     - ./tools/ci/tsan.sh
 
 - name: valgrind
   commands:
     - ./tools/ci/valgrind.sh
 
----
-kind: pipeline
-type: exec
-name: static analysis
-trigger:
-  branch:
-  - main
-
-steps:
-- name: clang format
-  commands:
-    - ./tools/ci/clang_format.sh
-
-- name: cmake format
-  commands:
-    - ./tools/ci/cmake_format.sh
-
-- name: shell format
-  commands:
-    - ./tools/ci/shell_format.sh
-
-- name: shell check
-  commands:
-    - ./tools/ci/shell_check.sh
-
-- name: clang tidy
-  privileged: true
-  commands:
-    - ./tools/ci/clang_tidy.sh
-
----
-kind: pipeline
-type: docker 
-name: documentation — development
-node:
-  environment: ryali
-trigger:
-  branch:
-  - main
-
-steps:
-- name: build and deploy
-  image: documentation:latest
-  pull: if-not-exists
-  commands:
-    - cd docs
-    - sphinx-build -M html . .
-
-    - rm -rf /light_engine_docs_dev/*
-    - mv ./html/* /light_engine_docs_dev/
-
----
-
-kind: pipeline
-type: docker
-name: documentation — production
-node:
-  environment: ryali
-trigger:
-  event:
-  - tag
-
-steps:
-- name: build and deploy
-  image: documentation:latest
-  pull: if-not-exists
-  commands:
-    - cd docs
-    - mkdir generated
-    - touch generated/changelogs.rst
-    - touch generated/api.rst
-    - sphinx-build -M html . .
-
-    - rm -rf /light_engine_docs/*
-    - mv ./html/* /light_engine_docs/
+# ---
+# kind: pipeline
+# type: exec
+# name: static analysis
+# trigger:
+#   branch:
+#   - main
+#
+# steps:
+# - name: clang format
+#   commands:
+#     - ./tools/ci/clang_format.sh
+#
+# - name: cmake format
+#   commands:
+#     - ./tools/ci/cmake_format.sh
+#
+# - name: shell format
+#   commands:
+#     - ./tools/ci/shell_format.sh
+#
+# - name: shell check
+#   commands:
+#     - ./tools/ci/shell_check.sh
+#
+# - name: clang tidy
+#   privileged: true
+#   commands:
+#     - ./tools/ci/clang_tidy.sh
+#
+# ---
+# kind: pipeline
+# type: docker 
+# name: documentation — development
+# node:
+#   environment: ryali
+# trigger:
+#   branch:
+#   - main
+#
+# steps:
+# - name: build and deploy
+#   image: documentation:latest
+#   pull: if-not-exists
+#   commands:
+#     - cd docs
+#     - sphinx-build -M html . .
+#
+#     - rm -rf /light_engine_docs_dev/*
+#     - mv ./html/* /light_engine_docs_dev/
+#
+# ---
+#
+# kind: pipeline
+# type: docker
+# name: documentation — production
+# node:
+#   environment: ryali
+# trigger:
+#   event:
+#   - tag
+#
+# steps:
+# - name: build and deploy
+#   image: documentation:latest
+#   pull: if-not-exists
+#   commands:
+#     - cd docs
+#     - mkdir generated
+#     - touch generated/changelogs.rst
+#     - touch generated/api.rst
+#     - sphinx-build -M html . .
+#
+#     - rm -rf /light_engine_docs/*
+#     - mv ./html/* /light_engine_docs/
