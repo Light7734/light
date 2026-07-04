@@ -7,6 +7,9 @@ rm -rf ./build/
 DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
 export DEBUGINFOD_URLS
 
+echo "You are $(whoami)"
+echo "You live in ${HOME}"
+
 cmake \
     -S . \
     -B build \
