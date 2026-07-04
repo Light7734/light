@@ -4,15 +4,14 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
 rm -rf ./build/
 
+XDG_RUNTIME_DIR='/run/user/1000'
+export XDG_RUNTIME_DIR
+
 DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
 export DEBUGINFOD_URLS
 
 DEBUGINFOD_CACHE_PATH="/home/light/.cache/debuginfod_client/"
 export DEBUGINFOD_CACHE_PATH
-
-
-echo "You are $(whoami)"
-echo "You live in ${HOME}"
 
 cmake \
     -S . \
