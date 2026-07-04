@@ -7,6 +7,10 @@ rm -rf ./build/
 DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
 export DEBUGINFOD_URLS
 
+DEBUGINFOD_CACHE_PATH="/home/light/.cache/debuginfod_client/"
+export DEBUGINFOD_CACHE_PATH
+
+
 echo "You are $(whoami)"
 echo "You live in ${HOME}"
 
