@@ -32,12 +32,15 @@ add_module(
     NAME
     memory
     INTERFACES
+    not_null.cppm
     null_on_move.cppm
     reference.cppm
     scope.cppm
     DEPENDENCIES
     preliminary
     logger
+    TESTS
+    not_null.test.cpp
 )
 add_module(
     NAME
