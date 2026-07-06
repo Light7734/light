@@ -243,9 +243,7 @@ add_module(
     INTERFACES
     data.cppm
     system.cppm
-    frontends.cppm
     components.cppm
-    factory.cppm
     api_wrapper.cppm
     device.cppm
     gpu.cppm
@@ -270,15 +268,15 @@ add_module(
     PRIVATE_DEPENDENCIES
     surface
     TESTS
-    _tests/buffer.cpp
-    _tests/debugger.cpp
-    _tests/device.cpp
-    _tests/pass.cpp
-    _tests/renderer.cpp
-    _tests/surface.cpp
-    _tests/system.cpp
+    buffer.test.cpp
+    debugger.test.cpp
+    device.test.cpp
+    pass.test.cpp
+    renderer.test.cpp
+    surface.test.cpp
+    system.test.cpp
     TEST_INTERFACES
-    _tests/utils.cppm
+    test_utils.test.cppm
 )
 
 add_module(
