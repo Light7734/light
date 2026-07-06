@@ -60,8 +60,6 @@ export namespace lt::renderer {
 
 } // namespace lt::renderer
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer {
 
 [[nodiscard]] auto get_instance(Api target_api) -> IInstance *
@@ -221,7 +219,7 @@ namespace lt::renderer {
 	std::unreachable();
 }
 
-[[nodiscard]] auto create_debugger(Api target_api, IInstance *instance, IDebugger::CreateInfo info)
+[[nodiscard]] auto create_debugger(Api target_api, Instance *instance, Debugger::CreateInfo info)
     -> memory::Scope<IDebugger>
 {
 	ensure(

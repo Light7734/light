@@ -4,25 +4,27 @@ import preliminary;
 import ecs.entity;
 import ecs.registry;
 import memory.null_on_move;
+import memory.not_null;
 import math.vec2;
 import surface.system;
-import renderer.frontend;
 import renderer.vk.instance;
 import renderer.vk.api_wrapper;
 
+using lt::memory::NotNull;
+
 export namespace lt::renderer::vkb {
 
-class Surface: public ISurface
+class Surface
 {
 public:
-	Surface(IInstance *instance, const ecs::Entity &surface_entity);
+	Surface(NotNull<Instance *> instance, ecs::Entity &surface_entity);
 
 	[[nodiscard]] auto vk() -> vk::Surface &
 	{
 		return m_surface;
 	}
 
-	[[nodiscard]] auto get_framebuffer_size() const -> math::vec2_u32 override;
+	[[nodiscard]] auto get_framebuffer_size() const -> math::vec2_u32;
 
 private:
 	vk::Surface m_surface;
@@ -32,29 +34,22 @@ private:
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-Surface::Surface(IInstance *instance, const ecs::Entity &surface_entity)
+Surface::Surface(NotNull<Instance *> instance, ecs::Entity &surface_entity)
     : m_surface_entity(surface_entity)
 {
-	const auto &component = surface_entity.get<surface::SurfaceComponent>();
+	auto &component = surface_entity.get<surface::SurfaceComponent>();
 
-	ensure(
-	    component.get_native_data().display,
-	    "Failed to initialize vk::Surface: null Wayland display"
-	);
-	ensure(
-	    component.get_native_data().surface,
-	    "Failed to initialize vk::Surface: null Wayland surface"
-	);
+	ensure(component.get_wl_display(), "Failed to initialize vk::Surface: null Wayland display");
+	ensure(component.get_wl_surface(), "Failed to initialize vk::Surface: null Wayland surface");
 
 	m_surface = vk::Surface(
-	    dynamic_cast<Instance *>(instance)->vk(),
+	    instance->vk(),
 	    vk::Surface::CreateInfo {
-	        .display = component.get_native_data().display,
-	        .surface = component.get_native_data().surface,
+	        .display = component.get_wl_display(),
+	        .surface = component.get_wl_surface(),
+
 	    }
 	);
 }

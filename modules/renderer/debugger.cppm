@@ -1,18 +1,65 @@
 export module renderer.vk.debugger;
 
 import preliminary;
+import bitwise;
 import renderer.vk.instance;
-import renderer.frontend;
 import renderer.vk.api_wrapper;
 import memory.null_on_move;
 import logger;
 
 export namespace lt::renderer::vkb {
 
-class Debugger: public IDebugger
+class Debugger
 {
 public:
-	Debugger(IInstance *instance, CreateInfo info);
+	enum class MessageSeverity : u8
+	{
+		none = 0u,
+
+		verbose = bitwise::bit(0u),
+		info = bitwise::bit(1u),
+		warning = bitwise::bit(2u),
+		error = bitwise::bit(3u),
+
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		all = verbose | info | warning | error,
+	};
+
+	enum class MessageType : u8
+	{
+		none = 0u,
+		general = bitwise::bit(0u),
+		validation = bitwise::bit(1u),
+		performance = bitwise::bit(2u),
+
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		all = general | validation | performance,
+	};
+
+	struct MessageData
+	{
+		std::string message;
+	};
+
+	using Callback_T = std::function<void(
+	    MessageSeverity message_severity,
+	    MessageType message_type,
+	    const MessageData &data,
+	    std::any &user_data
+	)>;
+
+	struct CreateInfo
+	{
+		MessageSeverity severities;
+
+		MessageType types;
+
+		Callback_T callback;
+
+		std::any user_data;
+	};
+
+	Debugger(Instance *instance, CreateInfo info);
 
 private:
 	static void native_callback(
@@ -35,16 +82,14 @@ private:
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-[[nodiscard]] auto to_native_severity(IDebugger::MessageSeverity severity) -> vk::Flags
+[[nodiscard]] auto to_native_severity(Debugger::MessageSeverity severity) -> vk::Flags
 {
 	const auto value = std::to_underlying(severity);
 	auto flags = vk::Flags {};
 
-	using enum IDebugger::MessageSeverity;
+	using enum Debugger::MessageSeverity;
 	using NativeSeverity = vk::Messenger::SeverityFlagBits;
 	if (value & std::to_underlying(error))
 	{
@@ -69,12 +114,12 @@ namespace lt::renderer::vkb {
 	return flags;
 }
 
-[[nodiscard]] /* static */ auto to_native_type(IDebugger::MessageType type) -> vk::Flags
+[[nodiscard]] /* static */ auto to_native_type(Debugger::MessageType type) -> vk::Flags
 {
 	const auto value = std::to_underlying(type);
 	auto flags = vk::Flags {};
 
-	using enum IDebugger::MessageType;
+	using enum Debugger::MessageType;
 	using NativeType = vk::Messenger::TypeFlagBits;
 	if (value & std::to_underlying(general))
 	{
@@ -94,11 +139,11 @@ namespace lt::renderer::vkb {
 	return flags;
 }
 
-[[nodiscard]] auto from_native_type(vk::Flags type) -> IDebugger::MessageType
+[[nodiscard]] auto from_native_type(vk::Flags type) -> Debugger::MessageType
 {
-	auto flags = std::underlying_type_t<IDebugger::MessageType> {};
+	auto flags = std::underlying_type_t<Debugger::MessageType> {};
 
-	using enum IDebugger::MessageType;
+	using enum Debugger::MessageType;
 	using NativeType = vk::Messenger::TypeFlagBits;
 	if (type & NativeType::general)
 	{
@@ -115,14 +160,14 @@ namespace lt::renderer::vkb {
 		flags |= std::to_underlying(performance);
 	}
 
-	return static_cast<IDebugger::MessageType>(flags);
+	return static_cast<Debugger::MessageType>(flags);
 }
 
-[[nodiscard]] auto from_native_severity(vk::Flags severity) -> IDebugger::MessageSeverity
+[[nodiscard]] auto from_native_severity(vk::Flags severity) -> Debugger::MessageSeverity
 {
-	auto flags = std::underlying_type_t<IDebugger::MessageSeverity> {};
+	auto flags = std::underlying_type_t<Debugger::MessageSeverity> {};
 
-	using enum IDebugger::MessageSeverity;
+	using enum Debugger::MessageSeverity;
 	using NativeSeverity = vk::Messenger::SeverityFlagBits;
 	if (severity & NativeSeverity::error)
 	{
@@ -144,7 +189,7 @@ namespace lt::renderer::vkb {
 		flags |= std::to_underlying(verbose);
 	}
 
-	return static_cast<IDebugger::MessageSeverity>(flags);
+	return static_cast<Debugger::MessageSeverity>(flags);
 }
 
 void Debugger::native_callback(
@@ -175,11 +220,11 @@ void Debugger::native_callback(
 	}
 }
 
-Debugger::Debugger(IInstance *instance, CreateInfo info)
+Debugger::Debugger(Instance *instance, CreateInfo info)
     : m_user_data(std::move(info.user_data))
     , m_user_callback(std::move(info.callback))
     , m_messenger(
-          dynamic_cast<Instance *>(instance)->vk(),
+          instance->vk(),
           vk::Messenger::CreateInfo {
               .user_callback = &native_callback,
               .user_data = this,
@@ -188,6 +233,7 @@ Debugger::Debugger(IInstance *instance, CreateInfo info)
           }
       )
 {
+	ensure(m_user_callback, "Failed to create vkb::Debugger: null callback");
 }
 
 } // namespace lt::renderer::vkb

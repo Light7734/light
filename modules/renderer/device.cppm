@@ -4,19 +4,18 @@ import preliminary;
 import memory.null_on_move;
 import logger;
 import renderer.vk.instance;
-import renderer.frontend;
 import renderer.vk.api_wrapper;
 import renderer.vk.gpu;
 import renderer.vk.surface;
 
 export namespace lt::renderer::vkb {
 
-class Device: public IDevice
+class Device
 {
 public:
-	Device(IGpu *gpu, ISurface *surface);
+	Device(Gpu *gpu, Surface *surface);
 
-	void wait_idle() override
+	void wait_idle()
 	{
 		m_device.wait_idle();
 	}
@@ -67,15 +66,12 @@ private:
 
 } // namespace lt::renderer::vkb
 
-
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-Device::Device(IGpu *gpu, ISurface *surface)
-    : m_gpu(dynamic_cast<Gpu *>(gpu))
-    , m_surface(dynamic_cast<Surface *>(surface))
+Device::Device(Gpu *gpu, Surface *surface): m_gpu(gpu), m_surface(surface)
 {
+	ensure(m_gpu, "Failed to initialize vkb::Device: null gpu");
+	ensure(m_surface, "Failed to initialize vkb::Device: null surface");
 	ensure(m_surface->vk(), "Failed to initialize vk::Device: null vulkan surface");
 
 	initialize_queue_indices();

@@ -1,7 +1,6 @@
 export module renderer.vk.instance;
 
 import preliminary;
-import renderer.frontend;
 import renderer.vk.api_wrapper;
 
 export namespace lt::renderer::vkb {
@@ -16,10 +15,10 @@ export namespace lt::renderer::vkb {
  * https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues/1894
  */
 // NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
-class Instance: public IInstance
+class Instance
 {
 public:
-	static auto get() -> IInstance *
+	static auto get() -> Instance *
 	{
 		return &Instance::instance();
 	}
@@ -38,7 +37,7 @@ public:
 	auto operator=(Instance &&other) noexcept -> Instance & = delete;
 
 private:
-	static auto instance() -> IInstance &
+	static auto instance() -> Instance &
 	{
 		static auto instance = Instance {};
 		return instance;
@@ -46,7 +45,7 @@ private:
 
 	Instance();
 
-	~Instance() override;
+	~Instance();
 
 	vk::Instance m_instance;
 };

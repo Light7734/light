@@ -8,15 +8,15 @@ import renderer.vk.swapchain;
 import assets.shader;
 import assets.metadata;
 import memory.null_on_move;
-import renderer.frontend;
+import memory.not_null;
 
 export namespace lt::renderer::vkb {
 
-class Pass: public IPass
+class Pass
 {
 public:
 	Pass(
-	    class IDevice *device,
+	    lt::memory::NotNull<Device *> device,
 	    const lt::assets::ShaderAsset &vertex_shader,
 	    const lt::assets::ShaderAsset &fragment_shader
 	);
@@ -52,18 +52,16 @@ private:
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
 using enum vk::DescriptorSetLayout::Binding::FlagBits;
 
 Pass::Pass(
-    IDevice *device,
+    lt::memory::NotNull<Device *>device,
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
 )
-    : m_device(dynamic_cast<Device *>(device))
+    : m_device(device.get())
       , m_descriptor_set_layout(m_device->vk(),{
         .flags = vk::DescriptorSetLayout::CreateInfo::FlagBits::update_after_bind_pool,
         .bindings = { 

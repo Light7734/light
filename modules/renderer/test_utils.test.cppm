@@ -1,20 +1,29 @@
 export module renderer.test_utils;
 
+
 export import test;
 export import surface.system;
 export import ecs.registry;
-export import renderer.factory;
 export import memory.reference;
-export import renderer.frontend;
 export import renderer.system;
 export import math.vec2;
 export import math.vec3;
 export import math.vec4;
 export import math.mat4;
+export import memory.scope;
+export import renderer.vk.device;
+export import renderer.vk.pass;
+export import renderer.vk.instance;
+export import renderer.vk.swapchain;
+export import renderer.vk.renderer;
+export import renderer.vk.buffer;
+export import renderer.vk.gpu;
+export import renderer.vk.debugger;
+export import renderer.vk.surface;
+export import ecs.entity;
 
 export namespace constants {
 
-constexpr auto api = lt::renderer::Api::vulkan;
 constexpr auto resolution = lt::math::vec2_u32 { 800u, 600u };
 constexpr auto frames_in_flight = u32 { 3u };
 
@@ -22,9 +31,9 @@ constexpr auto frames_in_flight = u32 { 3u };
 
 
 export void noop_callback(
-    lt::renderer::IDebugger::MessageSeverity /* unused */,
-    lt::renderer::IDebugger::MessageType /* unused */,
-    const lt::renderer::IDebugger::MessageData & /* unused */,
+    lt::renderer::vkb::Debugger::MessageSeverity /* unused */,
+    lt::renderer::vkb::Debugger::MessageType /* unused */,
+    const lt::renderer::vkb::Debugger::MessageData & /* unused */,
     std::any & /* unused */
 )
 {
@@ -48,14 +57,13 @@ public:
 	{
 		return lt::renderer::System::CreateInfo{
 		        .config = lt::renderer::System::Configuration{
-                    .target_api = constants::api,
                     .max_frames_in_flight = constants::frames_in_flight,
                 },
                 .registry = registry(),
 		        .surface_entity = surface_entity(),
                 .debug_callback_info = {
-                    .severities = lt::renderer::IDebugger::MessageSeverity::all,
-                    .types= lt::renderer::IDebugger::MessageType::all,
+                    .severities = lt::renderer::vkb::Debugger::MessageSeverity::all,
+                    .types= lt::renderer::vkb::Debugger::MessageType::all,
                     .callback = noop_callback,
                     .user_data = {},
                 }
@@ -90,25 +98,26 @@ export class Fixture_SurfaceGpu: public Fixture_SurfaceSystem
 public:
 	Fixture_SurfaceGpu() = default;
 
-	[[nodiscard]] auto surface() -> lt::renderer::ISurface *
+	[[nodiscard]] auto surface() -> lt::renderer::vkb::Surface *
 	{
 		return m_surface.get();
 	}
 
-	[[nodiscard]] auto gpu() -> lt::renderer::IGpu *
+	[[nodiscard]] auto gpu() -> lt::renderer::vkb::Gpu *
 	{
 		return m_gpu.get();
 	}
 
 private:
-	lt::memory::Scope<lt::renderer::ISurface> m_surface { lt::renderer::create_surface(
-		constants::api,
-		lt::renderer::get_instance(constants::api),
-		surface_entity()
-	) };
+	lt::memory::Scope<lt::renderer::vkb::Surface> m_surface {
+		lt::memory::create_scope<lt::renderer::vkb::Surface>(
+		    lt::renderer::vkb::Instance::get(),
+		    surface_entity()
+		)
+	};
 
-	lt::memory::Scope<lt::renderer::IGpu> m_gpu {
-		lt::renderer::create_gpu(constants::api, lt::renderer::get_instance(constants::api))
+	lt::memory::Scope<lt::renderer::vkb::Gpu> m_gpu {
+		lt::memory::create_scope<lt::renderer::vkb::Gpu>(lt::renderer::vkb::Instance::get())
 	};
 };
 
@@ -117,12 +126,12 @@ export class FixtureDeviceSwapchain: public Fixture_SurfaceGpu
 public:
 	FixtureDeviceSwapchain() = default;
 
-	[[nodiscard]] auto device() -> lt::renderer::IDevice *
+	[[nodiscard]] auto device() -> lt::renderer::vkb::Device *
 	{
 		return m_device.get();
 	}
 
-	[[nodiscard]] auto swapchain() -> lt::renderer::ISwapchain *
+	[[nodiscard]] auto swapchain() -> lt::renderer::vkb::Swapchain *
 	{
 		return m_swapchain.get();
 	}
@@ -131,8 +140,7 @@ public:
 	{
 		m_device->wait_idle();
 		m_swapchain.reset();
-		m_swapchain = lt::renderer::create_swapchain(
-		    constants::api,
+		m_swapchain = lt::memory::create_scope<lt::renderer::vkb::Swapchain>(
 		    surface(),
 		    gpu(),
 		    m_device.get()
@@ -144,17 +152,18 @@ public:
 		return m_user_data->m_has_any_messages;
 	}
 
-	[[nodiscard]] auto has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity severity) const
-	    -> u32
+	[[nodiscard]] auto has_any_messages_of(
+	    lt::renderer::vkb::Debugger ::MessageSeverity severity
+	) const -> u32
 	{
 		return m_user_data->m_severity_counter.contains(severity);
 	}
 
 private:
 	static void messenger_callback(
-	    lt::renderer::IDebugger::MessageSeverity severity,
-	    lt::renderer::IDebugger::MessageType type,
-	    const lt::renderer::IDebugger::MessageData &data,
+	    lt::renderer::vkb::Debugger::MessageSeverity severity,
+	    lt::renderer::vkb::Debugger::MessageType type,
+	    const lt::renderer::vkb::Debugger::MessageData &data,
 	    std::any &user_data
 	)
 	{
@@ -171,30 +180,31 @@ private:
 
 	struct UserData
 	{
-		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, u32> m_severity_counter;
+		std::unordered_map<lt::renderer::vkb::Debugger::MessageSeverity, u32> m_severity_counter;
 
 		bool m_has_any_messages {};
 	};
 
 	lt::memory::Scope<UserData> m_user_data = lt::memory::create_scope<UserData>();
 
-	lt::memory::Scope<lt::renderer::IDebugger> m_messenger = lt::renderer::create_debugger(
-	    constants::api,
-	    lt::renderer::get_instance(constants::api),
-	    lt::renderer::IDebugger ::CreateInfo {
-	        .severities = lt::renderer::IDebugger::MessageSeverity::all,
-	        .types = lt::renderer::IDebugger::MessageType::all,
-	        .callback = &messenger_callback,
-	        .user_data = m_user_data.get(),
-	    }
-	);
-
-	lt::memory::Scope<lt::renderer::IDevice> m_device {
-		lt::renderer::create_device(constants::api, gpu(), surface())
+	lt::memory::Scope<lt::renderer::vkb::Debugger> m_messenger {
+		lt::memory::create_scope<lt::renderer::vkb::Debugger>(
+		    lt::renderer::vkb::Instance::get(),
+		    lt::renderer::vkb::Debugger ::CreateInfo {
+		        .severities = lt::renderer::vkb::Debugger::MessageSeverity::all,
+		        .types = lt::renderer::vkb::Debugger::MessageType::all,
+		        .callback = &messenger_callback,
+		        .user_data = m_user_data.get(),
+		    }
+		)
 	};
 
-	lt::memory::Scope<lt::renderer::ISwapchain> m_swapchain {
-		lt::renderer::create_swapchain(constants::api, surface(), gpu(), m_device.get())
+	lt::memory::Scope<lt::renderer::vkb::Device> m_device {
+		lt::memory::create_scope<lt::renderer::vkb::Device>(gpu(), surface())
+	};
+
+	lt::memory::Scope<lt::renderer::vkb::Swapchain> m_swapchain {
+		lt::memory::create_scope<lt::renderer::vkb::Swapchain>(surface(), gpu(), m_device.get())
 	};
 };
 
@@ -213,17 +223,18 @@ public:
 		return m_user_data->m_has_any_messages;
 	}
 
-	[[nodiscard]] auto has_any_messages_of(lt::renderer::IDebugger ::MessageSeverity severity) const
-	    -> u32
+	[[nodiscard]] auto has_any_messages_of(
+	    lt::renderer::vkb::Debugger ::MessageSeverity severity
+	) const -> u32
 	{
 		return m_user_data->m_severity_counter.contains(severity);
 	}
 
 private:
 	static void messenger_callback(
-	    lt::renderer::IDebugger::MessageSeverity severity,
-	    lt::renderer::IDebugger::MessageType type,
-	    const lt::renderer::IDebugger::MessageData &data,
+	    lt::renderer::vkb::Debugger::MessageSeverity severity,
+	    lt::renderer::vkb::Debugger::MessageType type,
+	    const lt::renderer::vkb::Debugger::MessageData &data,
 	    std::any &user_data
 	)
 	{
@@ -241,7 +252,7 @@ private:
 
 	struct UserData
 	{
-		std::unordered_map<lt::renderer::IDebugger::MessageSeverity, u32> m_severity_counter;
+		std::unordered_map<lt::renderer::vkb::Debugger::MessageSeverity, u32> m_severity_counter;
 
 		bool m_has_any_messages {};
 	};
@@ -250,14 +261,13 @@ private:
 
 	lt::renderer::System m_system = lt::renderer::System::CreateInfo {
 		.config = { 
-            .target_api = constants::api,
             .max_frames_in_flight = constants::frames_in_flight,
         },
 		.registry = registry(),
 		.surface_entity = surface_entity(),
-        .debug_callback_info = lt::renderer::IDebugger ::CreateInfo {
-		        .severities = lt::renderer::IDebugger ::MessageSeverity::all,
-		        .types = lt::renderer::IDebugger ::MessageType::all,
+        .debug_callback_info = lt::renderer::vkb::Debugger ::CreateInfo {
+		        .severities = lt::renderer::vkb::Debugger ::MessageSeverity::all,
+		        .types = lt::renderer::vkb::Debugger ::MessageType::all,
 		        .callback = &messenger_callback,
 		        .user_data = m_user_data.get(),
         }

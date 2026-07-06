@@ -141,33 +141,6 @@ public:
 class IBuffer
 {
 public:
-	enum class Usage : u8
-	{
-		vertex,
-
-		index,
-
-		storage,
-
-		staging,
-	};
-
-	struct CreateInfo
-	{
-		Usage usage;
-
-		size_t size;
-
-		std::string debug_name;
-	};
-
-	struct CopyInfo
-	{
-		size_t offset;
-
-		size_t size;
-	};
-
 	IBuffer() = default;
 
 	IBuffer(IBuffer &&) = default;
@@ -223,13 +196,6 @@ public:
 
 	static constexpr auto frames_in_flight_lower_limit = 1u;
 
-	enum class Result : u8
-	{
-		success = 0,
-		invalid_swapchain,
-		error,
-	};
-
 	IRenderer() = default;
 
 	IRenderer(IRenderer &&) = default;
@@ -262,53 +228,6 @@ public:
 class IDebugger
 {
 public:
-	enum class MessageSeverity : u8
-	{
-		none = 0u,
-
-		verbose = bitwise::bit(0u),
-		info = bitwise::bit(1u),
-		warning = bitwise::bit(2u),
-		error = bitwise::bit(3u),
-
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		all = verbose | info | warning | error,
-	};
-
-	enum class MessageType : u8
-	{
-		none = 0u,
-		general = bitwise::bit(0u),
-		validation = bitwise::bit(1u),
-		performance = bitwise::bit(2u),
-
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		all = general | validation | performance,
-	};
-
-	struct MessageData
-	{
-		std::string message;
-	};
-
-	using Callback_T = std::function<void(
-	    MessageSeverity message_severity,
-	    MessageType message_type,
-	    const MessageData &data,
-	    std::any &user_data
-	)>;
-
-	struct CreateInfo
-	{
-		MessageSeverity severities;
-
-		MessageType types;
-
-		Callback_T callback;
-
-		std::any user_data;
-	};
-
 	IDebugger() = default;
 
 	IDebugger(IDebugger &&) = default;

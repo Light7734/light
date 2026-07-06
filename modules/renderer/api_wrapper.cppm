@@ -23,6 +23,7 @@ struct wl_surface;
 export module renderer.vk.api_wrapper;
 import preliminary;
 import memory.null_on_move;
+import memory.not_null;
 import math.vec3;
 import math.vec2;
 import logger;
@@ -2985,9 +2986,6 @@ void Device::name(T &object, const char *name)
 
 } // namespace lt::renderer::vk
 
-
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-module :private;
 namespace lt::renderer::vk {
 
 namespace api {
@@ -5228,6 +5226,10 @@ Messenger::Messenger(Instance &instance, CreateInfo info)
     , m_user_callback(std::move(info.user_callback))
     , m_user_data(info.user_data)
 {
+	ensure(info.enabled_severities != Flags {}, "Failed to create vk::Messenger: empty severities");
+	ensure(info.enabled_types != Flags {}, "Failed to create vk::Messenger: empty types");
+	ensure(info.user_callback, "Failed to create vk::Messenger: null callback");
+
 	constexpr auto native_callback = [](VkDebugUtilsMessageSeverityFlagBitsEXT severity,
 	                                    VkDebugUtilsMessageTypeFlagsEXT types,
 	                                    const VkDebugUtilsMessengerCallbackDataEXT *data,

@@ -3,16 +3,15 @@ export module renderer.vk.gpu;
 import preliminary;
 import renderer.vk.api_wrapper;
 import logger;
-import renderer.frontend;
 import renderer.vk.instance;
 import memory.null_on_move;
 
 export namespace lt::renderer::vkb {
 
-class Gpu: public IGpu
+class Gpu
 {
 public:
-	Gpu(IInstance *instance);
+	Gpu(Instance *instance);
 
 	[[nodiscard]] auto vk() -> vk::Gpu &;
 
@@ -28,14 +27,11 @@ private:
 
 } // namespace lt::renderer::vkb
 
-
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-Gpu::Gpu(IInstance *instance)
+Gpu::Gpu(Instance *instance)
 {
-	auto gpus = vk::Gpu::enumerate(dynamic_cast<Instance *>(instance)->vk());
+	auto gpus = vk::Gpu::enumerate(instance->vk());
 
 	for (auto &gpu : gpus)
 	{

@@ -1,6 +1,5 @@
 import preliminary;
 import time;
-import renderer.frontend;
 import renderer.test_utils;
 
 struct SurfaceContext
@@ -20,9 +19,11 @@ struct RendererContext
 Suite raii = "system_raii"_suite = [] {
 	Case { "happy paths" } = [] {
 		auto fixture = Fixture_RendererSystem {};
-		expect_false(fixture.has_any_messages_of(lt::renderer::IDebugger::MessageSeverity::error));
 		expect_false(
-		    fixture.has_any_messages_of(lt::renderer::IDebugger::MessageSeverity::warning)
+		    fixture.has_any_messages_of(lt::renderer::vkb::Debugger::MessageSeverity::error)
+		);
+		expect_false(
+		    fixture.has_any_messages_of(lt::renderer::vkb::Debugger::MessageSeverity::warning)
 		);
 	};
 
@@ -43,22 +44,6 @@ Suite raii = "system_raii"_suite = [] {
 		});
 
 		expect_throw([=] mutable {
-			info.config.target_api = lt::renderer::Api::none;
-			ignore = lt::renderer::System { info };
-		});
-
-		// unsupported Apis
-		expect_throw([=] mutable {
-			info.config.target_api = lt::renderer::Api::direct_x;
-			ignore = lt::renderer::System { info };
-		});
-
-		expect_throw([=] mutable {
-			info.config.target_api = lt::renderer::Api::metal;
-			ignore = lt::renderer::System { info };
-		});
-
-		expect_throw([=] mutable {
 			constexpr auto limit = lt::renderer::System::frames_in_flight_upper_limit;
 			info.config.max_frames_in_flight = limit + 1u;
 			ignore = lt::renderer::System { info };
@@ -71,7 +56,7 @@ Suite raii = "system_raii"_suite = [] {
 		});
 
 		expect_throw([=] mutable {
-			info.debug_callback_info = lt::renderer::IDebugger::CreateInfo {};
+			info.debug_callback_info = lt::renderer::vkb::Debugger::CreateInfo {};
 			ignore = lt::renderer::System { info };
 		});
 

@@ -1,17 +1,25 @@
 export module renderer.system;
 
+
+import renderer.vk.device;
+import renderer.vk.pass;
+import renderer.vk.instance;
+import renderer.vk.swapchain;
+import renderer.vk.renderer;
+import renderer.vk.buffer;
+import renderer.vk.gpu;
+import renderer.vk.debugger;
+import renderer.vk.surface;
 import preliminary;
 import math.formatter;
 import logger;
 import math.mat4;
-import renderer.factory;
 import app.system;
 import surface.events;
 import ecs.entity;
 import ecs.registry;
 import memory.reference;
 import memory.scope;
-import renderer.frontend;
 import camera.components;
 import surface.system;
 import renderer.components;
@@ -41,8 +49,6 @@ public:
 
 	struct Configuration
 	{
-		Api target_api;
-
 		u32 max_frames_in_flight;
 	};
 
@@ -54,7 +60,7 @@ public:
 
 		ecs::Entity surface_entity;
 
-		IDebugger::CreateInfo debug_callback_info;
+		vkb::Debugger::CreateInfo debug_callback_info;
 	};
 
 	System(CreateInfo info);
@@ -87,25 +93,23 @@ private:
 
 	void recreate_swapchain();
 
-	Api m_api;
-
 	memory::Ref<ecs::Registry> m_registry;
 
 	ecs::Entity m_surface_entity;
 
-	memory::Scope<IDebugger> m_messenger;
+	memory::Scope<vkb::Debugger> m_messenger;
 
-	IInstance *m_instance;
+	vkb::Instance *m_instance;
 
-	memory::Scope<ISurface> m_surface;
+	memory::Scope<vkb::Surface> m_surface;
 
-	memory::Scope<IGpu> m_gpu;
+	memory::Scope<vkb::Gpu> m_gpu;
 
-	memory::Scope<IDevice> m_device;
+	memory::Scope<vkb::Device> m_device;
 
-	memory::Scope<ISwapchain> m_swapchain;
+	memory::Scope<vkb::Swapchain> m_swapchain;
 
-	memory::Scope<IRenderer> m_renderer;
+	memory::Scope<vkb::Renderer> m_renderer;
 
 	app::TickResult m_last_tick_result {};
 
@@ -116,15 +120,12 @@ private:
 
 } // namespace lt::renderer
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer {
 
 System::System(CreateInfo info)
     : m_surface_entity(info.surface_entity)
-    , m_api(info.config.target_api)
     , m_registry(std::move(info.registry))
-    , m_instance(get_instance(m_api))
+    , m_instance(vkb::Instance::get())
     , m_max_frames_in_flight(info.config.max_frames_in_flight)
 {
 	ensure(m_registry, "Failed to initialize renderer::System: null registry");
@@ -141,14 +142,20 @@ System::System(CreateInfo info)
 	    frames_in_flight_upper_limit
 	);
 
-	m_messenger = create_debugger(m_api, m_instance, info.debug_callback_info);
-	m_surface = create_surface(m_api, m_instance, m_surface_entity);
-	m_gpu = create_gpu(m_api, m_instance);
+	m_messenger = memory::create_scope<vkb::Debugger>(
+	    m_instance,
+	    std::move(info.debug_callback_info)
+	);
+	m_surface = memory::create_scope<vkb::Surface>(m_instance, info.surface_entity);
+	m_gpu = memory::create_scope<vkb::Gpu>(m_instance);
 
-	m_device = create_device(m_api, m_gpu.get(), m_surface.get());
-	m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
-	m_renderer = { create_renderer(
-		m_api,
+	m_device = memory::create_scope<vkb::Device>(m_gpu.get(), m_surface.get());
+	m_swapchain = memory::create_scope<vkb::Swapchain>(
+	    m_surface.get(),
+	    m_gpu.get(),
+	    m_device.get()
+	);
+	m_renderer = { memory::create_scope<vkb::Renderer>(
 		m_gpu.get(),
 		m_device.get(),
 		m_swapchain.get(),
@@ -171,7 +178,7 @@ void System::tick(app::TickInfo tick)
 	handle_surface_resized_events();
 	auto frame_result = m_renderer->frame(m_frame_idx, [this] { submit_scene(); });
 
-	if (frame_result == IRenderer::Result::invalid_swapchain)
+	if (frame_result == vkb::Renderer::Result::invalid_swapchain)
 	{
 		recreate_swapchain();
 	}
@@ -186,9 +193,6 @@ void System::handle_surface_resized_events()
 		{
 			const auto res = std::get<surface::ResizedEvent>(event).get_size();
 			log::debug("Resize event received from the renderer: {}", res);
-			// m_swapchain.reset();
-			// m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
-			// m_renderer->replace_swapchain(m_swapchain.get());
 
 			m_renderer.reset();
 			m_swapchain.reset();
@@ -196,12 +200,15 @@ void System::handle_surface_resized_events()
 			m_gpu.reset();
 			m_surface.reset();
 
-			m_surface = create_surface(m_api, m_instance, m_surface_entity);
-			m_gpu = create_gpu(m_api, m_instance);
-			m_device = create_device(m_api, m_gpu.get(), m_surface.get());
-			m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
-			m_renderer = { create_renderer(
-				m_api,
+			m_surface = memory::create_scope<vkb::Surface>(m_instance, m_surface_entity);
+			m_gpu = memory::create_scope<vkb::Gpu>(m_instance);
+			m_device = memory::create_scope<vkb::Device>(m_gpu.get(), m_surface.get());
+			m_swapchain = memory::create_scope<vkb::Swapchain>(
+			    m_surface.get(),
+			    m_gpu.get(),
+			    m_device.get()
+			);
+			m_renderer = { memory::create_scope<vkb::Renderer>(
 				m_gpu.get(),
 				m_device.get(),
 				m_swapchain.get(),
@@ -244,7 +251,11 @@ void System::recreate_swapchain()
 {
 	log::trace("Re-creating swapchaain");
 	m_swapchain.reset();
-	m_swapchain = create_swapchain(m_api, m_surface.get(), m_gpu.get(), m_device.get());
+	m_swapchain = memory::create_scope<vkb::Swapchain>(
+	    m_surface.get(),
+	    m_gpu.get(),
+	    m_device.get()
+	);
 	m_renderer->replace_swapchain(m_swapchain.get());
 }
 

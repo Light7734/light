@@ -8,6 +8,7 @@ import assets.shader;
 import renderer.vk.api_wrapper;
 import memory.reference;
 import memory.null_on_move;
+import memory.not_null;
 import renderer.vk.device;
 import math.vec2;
 import math.components;
@@ -16,17 +17,30 @@ import renderer.components;
 import renderer.vk.buffer;
 import renderer.vk.pass;
 import renderer.data;
-import renderer.frontend;
+import renderer.vk.gpu;
+
+using lt::memory::NotNull;
 
 export namespace lt::renderer::vkb {
 
-class Renderer: public IRenderer
+class Renderer
 {
 public:
+	enum class Result : u8
+	{
+		success = 0,
+		invalid_swapchain,
+		error,
+	};
+
+	static constexpr auto frames_in_flight_upper_limit = 5u;
+
+	static constexpr auto frames_in_flight_lower_limit = 1u;
+
 	Renderer(
-	    class IGpu *gpu,
-	    class IDevice *device,
-	    class ISwapchain *swapchain,
+	    NotNull<Gpu *> gpu,
+	    NotNull<Device *> device,
+	    NotNull<Swapchain *> swapchain,
 	    u32 max_frames_in_flight
 	);
 
@@ -38,18 +52,18 @@ public:
 
 	auto operator=(const Renderer &) -> Renderer & = delete;
 
-	~Renderer() override;
+	~Renderer();
 
-	[[nodiscard]] auto frame(u32 frame_idx, std::function<void()> submit_scene) -> Result override;
+	[[nodiscard]] auto frame(u32 frame_idx, std::function<void()> submit_scene) -> Result;
 
-	void replace_swapchain(ISwapchain *swapchain) override;
+	void replace_swapchain(Swapchain *swapchain);
 
-	void set_frame_constants(FrameConstants constants) override;
+	void set_frame_constants(FrameConstants constants);
 
 	void submit_sprite(
 	    const components::Sprite &sprite,
 	    const math::components::Transform &transform
-	) override;
+	);
 
 private:
 	void record_cmd(vk::CommandBuffer &cmd, u32 image_idx);
@@ -97,20 +111,23 @@ private:
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_frames_in_flight)
-    : m_device(dynamic_cast<Device *>(device))
-    , m_swapchain(dynamic_cast<Swapchain *>(swapchain))
+Renderer::Renderer(
+    NotNull<Gpu *> gpu,
+    NotNull<Device *> device,
+    NotNull<Swapchain *> swapchain,
+    u32 max_frames_in_flight
+)
+    : m_device(device)
+    , m_swapchain(swapchain)
     , m_resolution(m_swapchain->get_resolution())
     , m_max_frames_in_flight(max_frames_in_flight)
     , m_vertex_buffer(
           device,
           gpu,
           {
-              .usage = IBuffer::Usage::storage,
+              .usage = Buffer::Usage::storage,
               .size = 1'000'000,
               .debug_name = "vertex buffer",
           }
@@ -119,7 +136,7 @@ Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_fr
           device,
           gpu,
           {
-              .usage = IBuffer::Usage::staging,
+              .usage = Buffer::Usage::staging,
               .size = 1'000'000,
               .debug_name = "staging buffer",
           }
@@ -152,6 +169,15 @@ Renderer::Renderer(IGpu *gpu, IDevice *device, ISwapchain *swapchain, u32 max_fr
 
     , m_global_set(m_global_set_pool.allocate(m_pass->get_descriptor_set_layout()))
 {
+	ensure(
+	    (m_max_frames_in_flight >= frames_in_flight_lower_limit)
+	        && (m_max_frames_in_flight <= frames_in_flight_upper_limit),
+	    "Recieved max_frames_in_flight ({}) out of bound range: {} to {}",
+	    m_max_frames_in_flight,
+	    frames_in_flight_lower_limit,
+	    frames_in_flight_upper_limit
+	);
+
 	for (auto [semaphore, fence] : std::views::zip(m_acquire_image_semaphores, m_frame_fences))
 	{
 		semaphore = vk::Semaphore(m_device->vk());
@@ -224,10 +250,10 @@ Renderer::~Renderer()
 	return Result::success;
 }
 
-void Renderer::replace_swapchain(ISwapchain *swapchain)
+void Renderer::replace_swapchain(Swapchain *swapchain)
 {
 	m_device->vk().wait_idle();
-	m_swapchain = dynamic_cast<Swapchain *>(swapchain);
+	m_swapchain = swapchain;
 	m_resolution = m_swapchain->get_resolution();
 }
 

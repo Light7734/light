@@ -1,8 +1,7 @@
-import renderer.frontend;
 import renderer.test_utils;
 
-using enum ::lt::renderer::IDebugger::MessageSeverity;
-using enum ::lt::renderer::IBuffer::Usage;
+using enum ::lt::renderer::vkb::Debugger::MessageSeverity;
+using enum ::lt::renderer::vkb::Buffer::Usage;
 using ::std::this_thread::sleep_for;
 
 // TODO(Light): finish these (and many other) tests...

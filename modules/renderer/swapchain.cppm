@@ -6,17 +6,16 @@ import renderer.vk.surface;
 import renderer.vk.device;
 import renderer.vk.instance;
 import renderer.vk.gpu;
-import renderer.frontend;
 import math.vec2;
 import memory.null_on_move;
 import logger;
 
 export namespace lt::renderer::vkb {
 
-class Swapchain: public ISwapchain
+class Swapchain
 {
 public:
-	Swapchain(ISurface *surface, IGpu *gpu, IDevice *device);
+	Swapchain(Surface *surface, Gpu *gpu, Device *device);
 
 	[[nodiscard]] auto vk() -> vk::Swapchain &
 	{
@@ -73,14 +72,12 @@ private:
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-Swapchain::Swapchain(ISurface *surface, IGpu *gpu, IDevice *device)
-    : m_surface(dynamic_cast<Surface *>(surface))
-    , m_gpu(dynamic_cast<Gpu *>(gpu))
-    , m_device(dynamic_cast<Device *>(device))
+Swapchain::Swapchain(Surface *surface, Gpu *gpu, Device *device)
+    : m_surface(surface)
+    , m_gpu(gpu)
+    , m_device(device)
 {
 	auto capabilities = m_gpu->vk().get_surface_capabilities(m_surface->vk());
 	const auto formats = m_gpu->vk().get_surface_formats(m_surface->vk());

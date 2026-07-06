@@ -4,20 +4,46 @@ import preliminary;
 import renderer.vk.device;
 import renderer.vk.gpu;
 import renderer.vk.api_wrapper;
-import renderer.frontend;
 
 export namespace lt::renderer::vkb {
 
-class Buffer: public IBuffer
+class Buffer
 {
 public:
-	Buffer(class IDevice *device, class IGpu *gpu, const CreateInfo &info);
+	enum class Usage : u8
+	{
+		vertex,
 
-	[[nodiscard]] auto map() -> std::span<std::byte> override;
+		index,
 
-	void unmap() override;
+		storage,
 
-	[[nodiscard]] auto get_size() const -> size_t override
+		staging,
+	};
+
+	struct CreateInfo
+	{
+		Usage usage;
+
+		size_t size;
+
+		std::string debug_name;
+	};
+
+	struct CopyInfo
+	{
+		size_t offset;
+
+		size_t size;
+	};
+
+	Buffer(Device *device, Gpu *gpu, const CreateInfo &info);
+
+	[[nodiscard]] auto map() -> std::span<std::byte>;
+
+	void unmap();
+
+	[[nodiscard]] auto get_size() const -> size_t
 	{
 		return m_size;
 	}
@@ -56,13 +82,11 @@ private:
 
 } // namespace lt::renderer::vkb
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::renderer::vkb {
 
-Buffer::Buffer(IDevice *device, IGpu *gpu, const CreateInfo &info)
-    : m_device(dynamic_cast<Device *>(device))
-    , m_gpu(dynamic_cast<Gpu *>(gpu))
+Buffer::Buffer(Device *device, Gpu *gpu, const CreateInfo &info)
+    : m_device(device)
+    , m_gpu(gpu)
     , m_buffer(
           m_device->vk(),
           vk::Buffer::CreateInfo {
@@ -76,12 +100,12 @@ Buffer::Buffer(IDevice *device, IGpu *gpu, const CreateInfo &info)
 {
 }
 
-[[nodiscard]] auto Buffer::map() -> std::span<std::byte> /* override */
+[[nodiscard]] auto Buffer::map() -> std::span<std::byte>
 {
 	return m_memory.map(m_size, 0ul);
 }
 
-void Buffer::unmap() /* override */
+void Buffer::unmap()
 {
 	m_memory.unmap();
 }
