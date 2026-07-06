@@ -72,8 +72,8 @@ public:
 
 	void check_values(SurfaceComponent *component)
 	{
-		expect_not_nullptr(component->get_native_data().display);
-		expect_not_nullptr(component->get_native_data().surface);
+		expect_not_nullptr(component->get_wl_display());
+		expect_not_nullptr(component->get_wl_surface());
 
 		expect_eq(component->get_resolution().x, width);
 		expect_eq(component->get_resolution().y, height);

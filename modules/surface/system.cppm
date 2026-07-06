@@ -172,10 +172,7 @@ private:
 
 } // namespace lt::surface
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::surface {
-
 
 template<class... Ts>
 struct overloads: Ts...
@@ -542,9 +539,9 @@ System::~System()
 		{
 			entities_to_remove.emplace_back(entity);
 
-			xdg_toplevel_destroy(surface.m_native_data.shell_toplevel);
-			xdg_surface_destroy(surface.m_native_data.shell_surface);
-			wl_surface_destroy(surface.m_native_data.surface);
+			xdg_toplevel_destroy(surface.m_xdg_toplevel);
+			xdg_surface_destroy(surface.m_xdg_surface);
+			wl_surface_destroy(surface.m_wl_surface);
 		}
 
 		for (auto entity : entities_to_remove)
@@ -645,39 +642,57 @@ try
 	auto &surface = m_registry->get<SurfaceComponent>(entity);
 	const auto &resolution = surface.get_resolution();
 	const auto &position = surface.get_position();
+	surface.m_wl_display = m_wl_display;
 
-	auto *wayland_surface = (wl_surface *)nullptr;
-	auto *shell_toplevel = (xdg_toplevel *)nullptr;
-	auto *shell_surface = (xdg_surface *)nullptr;
+	surface.m_wl_surface = wl_compositor_create_surface(m_wl_compositor);
+	ensure(surface.m_wl_surface, "Failed to create Wayland surface");
 
-	wayland_surface = wl_compositor_create_surface(m_wl_compositor);
-	ensure(wayland_surface, "Failed to create Wayland surface");
+	surface.m_xdg_surface = xdg_wm_base_get_xdg_surface(m_shell, surface.m_wl_surface);
+	ensure(surface.m_xdg_surface, "Failed to get XDG-shell surface");
+	xdg_surface_add_listener(surface.m_xdg_surface, &shell_surface_listener, {});
 
-	shell_surface = xdg_wm_base_get_xdg_surface(m_shell, wayland_surface);
-	ensure(shell_surface, "Failed to get XDG-shell surface");
-	xdg_surface_add_listener(shell_surface, &shell_surface_listener, {});
+	surface.m_xdg_toplevel = xdg_surface_get_toplevel(surface.m_xdg_surface);
+	ensure(surface.m_xdg_toplevel, "Failed to get XDG-shell toplevel");
+	xdg_toplevel_add_listener(surface.m_xdg_toplevel, &toplevel_listener, {});
 
-	shell_toplevel = xdg_surface_get_toplevel(shell_surface);
-	ensure(shell_toplevel, "Failed to get XDG-shell toplevel");
-	xdg_toplevel_add_listener(shell_toplevel, &toplevel_listener, {});
+	xdg_toplevel_set_title(surface.m_xdg_toplevel, info.title.c_str());
+	xdg_toplevel_set_app_id(surface.m_xdg_toplevel, "Wayland Vulkan Example");
 
-	xdg_toplevel_set_title(shell_toplevel, info.title.c_str());
-	xdg_toplevel_set_app_id(shell_toplevel, "Wayland Vulkan Example");
-
-	wl_surface_commit(wayland_surface);
+	wl_surface_commit(surface.m_wl_surface);
 	wl_display_roundtrip(m_wl_display);
-	wl_surface_commit(wayland_surface);
-
-	surface.m_native_data.surface = wayland_surface;
-	surface.m_native_data.display = m_wl_display;
-	surface.m_native_data.shell_surface = shell_surface;
-	surface.m_native_data.shell_toplevel = shell_toplevel;
+	wl_surface_commit(surface.m_wl_surface);
 }
 catch (const std::exception &exp)
 {
 	log::error("Exception thrown when on_constructing surface component");
 	log::error("\tentity: {}", u32 { entity });
 	log::error("\twhat: {}", exp.what());
+
+	try
+	{
+		auto &surface = m_registry->get<SurfaceComponent>(entity);
+
+		if (surface.m_xdg_toplevel)
+		{
+			xdg_toplevel_destroy(surface.m_xdg_toplevel);
+		}
+
+		if (surface.m_xdg_surface)
+		{
+			xdg_surface_destroy(surface.m_xdg_surface);
+		}
+
+		if (surface.m_wl_surface)
+		{
+			wl_surface_destroy(surface.m_wl_surface);
+		}
+	}
+	catch (const std::exception &exp)
+	{
+		log::error("Exception thrown when freeing a throwing surface component");
+		log::error("\tentity: {}", u32 { entity });
+		log::error("\twhat: {}", exp.what());
+	}
 
 	m_registry->remove<SurfaceComponent>(entity);
 }
@@ -742,12 +757,12 @@ void System::handle_requests(SurfaceComponent &surface)
 
 void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
 {
-	auto *toplevel = surface.m_native_data.shell_toplevel;
+	auto *toplevel = surface.m_xdg_toplevel;
 	ensure(toplevel, "Failed to modify surface title: null shell toplevel");
 	ensure(!request.title.empty(), "Failed to modify surface title: null titlle");
 
 	xdg_toplevel_set_title(toplevel, request.title.c_str());
-	wl_surface_commit(surface.m_native_data.surface);
+	wl_surface_commit(surface.m_wl_surface);
 	surface.m_title = request.title;
 }
 

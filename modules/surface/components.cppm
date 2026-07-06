@@ -40,17 +40,6 @@ public:
 	    ModifyPositionRequest,
 	    ModifyVisibilityRequest>;
 
-	struct NativeData
-	{
-		wl_display *display;
-
-		wl_surface *surface;
-
-		xdg_surface *shell_surface;
-
-		xdg_toplevel *shell_toplevel;
-	};
-
 	static constexpr auto max_dimension = 4096;
 
 	static constexpr auto max_title_length = 256;
@@ -95,9 +84,24 @@ public:
 		return m_visible;
 	}
 
-	[[nodiscard]] auto get_native_data() const -> const NativeData &
+	[[nodiscard]] auto get_wl_display() -> wl_display *
 	{
-		return m_native_data;
+		return m_wl_display;
+	}
+
+	[[nodiscard]] auto get_wl_surface() -> wl_surface *
+	{
+		return m_wl_surface;
+	}
+
+	[[nodiscard]] auto get_xdg_surface() -> xdg_surface *
+	{
+		return m_xdg_surface;
+	}
+
+	[[nodiscard]] auto get_xdg_toplevel() -> xdg_toplevel *
+	{
+		return m_xdg_toplevel;
 	}
 
 	[[nodiscard]] auto peek_events() const -> const std::vector<Event> &
@@ -140,7 +144,13 @@ private:
 
 	bool m_visible {};
 
-	NativeData m_native_data {};
+	wl_display *m_wl_display {};
+
+	wl_surface *m_wl_surface {};
+
+	xdg_surface *m_xdg_surface {};
+
+	xdg_toplevel *m_xdg_toplevel {};
 
 	std::vector<Event> m_event_queue {};
 
