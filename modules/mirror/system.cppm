@@ -17,7 +17,6 @@ import memory.reference;
 import memory.scope;
 import renderer.components;
 import renderer.system;
-import renderer.frontend;
 import surface.events;
 import time;
 import app;
@@ -25,12 +24,14 @@ import app.system;
 import ecs.entity;
 import ecs.registry;
 
+import renderer.vk.debugger;
+
 namespace lt {
 
 void renderer_callback(
-    renderer::IDebugger::MessageSeverity message_severity,
-    renderer::IDebugger::MessageType message_type,
-    const renderer::IDebugger::MessageData &data,
+    renderer::vkb::Debugger::MessageSeverity message_severity,
+    renderer::vkb::Debugger::MessageType message_type,
+    const renderer::vkb::Debugger::MessageData &data,
     std::any &user_data
 )
 {
@@ -223,12 +224,12 @@ public:
 		auto entity = ecs::Entity { m_editor_registry, m_window };
 
 		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
-		    .config = { .target_api = renderer::Api::vulkan, .max_frames_in_flight = 3u },
+		    .config = { .max_frames_in_flight = 3u },
 		    .registry = m_editor_registry,
 		    .surface_entity = entity,
-		    .debug_callback_info = renderer::IDebugger::CreateInfo {
-		        .severities = renderer::IDebugger::MessageSeverity::all,
-		        .types = renderer::IDebugger::MessageType::all,
+		    .debug_callback_info = renderer::vkb::Debugger::CreateInfo {
+		        .severities = renderer::vkb::Debugger::MessageSeverity::all,
+		        .types = renderer::vkb::Debugger::MessageType::all,
 		        .callback = &renderer_callback,
 		        .user_data = this,
 		    } });
