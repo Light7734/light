@@ -26,8 +26,6 @@ private:
 
 } // namespace lt::time
 
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::time {
 
 Timer::Timer(Timepoint start): m_start(start)

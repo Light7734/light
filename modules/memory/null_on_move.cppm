@@ -4,14 +4,14 @@ import logger;
 
 import preliminary;
 
-namespace lt::memory {
+export namespace lt::memory {
 
 /** Holds an `Underlying_T`, assigns it to `null_value` when this object is moved.
  *
  * @note For avoiding the need to explicitly implement the move constructor for objects that hold
  * non-raii-handles (eg. Vulkan, Wayland).
  */
-export template<typename Underlying_T, Underlying_T null_value = nullptr>
+template<typename Underlying_T, Underlying_T null_value = nullptr>
 class NullOnMove
 {
 public:

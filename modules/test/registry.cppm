@@ -4,9 +4,6 @@ import logger;
 import preliminary;
 import test.expects;
 
-///////////////////////////////////////
-// ----------* INTERFACE *--------- //
-/////////////////////////////////////
 namespace lt::test {
 
 export class Registry
@@ -107,11 +104,6 @@ private:
 
 } // namespace lt::test
 
-//////////////////////////////////////
-// -------* IMPLEMENTATION *------- //
-/////////////////////////////////////
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::test {
 
 /* static */ void Registry::register_suite(SuiteFunction suite)

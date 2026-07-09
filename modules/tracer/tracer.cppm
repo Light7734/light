@@ -74,9 +74,6 @@ private:
 
 } // namespace lt::tracer
 
-
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::tracer {
 
 void Tracer::begin_session_impl(const std::string &outputPath)

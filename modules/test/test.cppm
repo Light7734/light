@@ -5,10 +5,6 @@ import test.registry;
 import preliminary;
 import logger;
 
-
-///////////////////////////////////////
-// ----------* INTERFACE *--------- //
-/////////////////////////////////////
 namespace lt::test {
 
 class TestCase
@@ -40,10 +36,6 @@ export using Case = const TestCase;
 export using Suite = const TestSuite;
 export using FuzzHarness = const TestFuzzHarness;
 export auto operator""_suite(const char *name, size_t size) -> TestSuite;
-
-///////////////////////////////////////
-// * IMPLEMENTATION -- TEMPLATES *  //
-/////////////////////////////////////
 
 // NOLINTNEXTLINE(misc-unconventional-assign-operator)
 auto TestCase::operator=(std::invocable auto test) const -> void
@@ -130,11 +122,6 @@ auto operator""_suite(const char *name, size_t size) -> TestSuite
 
 } // namespace lt::test
 
-//////////////////////////////////////
-// -------* IMPLEMENTATION *------- //
-/////////////////////////////////////
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::test {
 
 TestCase::TestCase(std::string name): m_name(std::move(name))

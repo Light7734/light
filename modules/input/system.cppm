@@ -47,12 +47,8 @@ private:
 	app::TickResult m_last_tick_result {};
 };
 
-
 } // namespace lt::input
 
-
-/** @todo(Light): unimplemented in gcc -- is it even right to use a private fragment? */
-// module :private;
 namespace lt::input {
 
 template<class... Ts>
