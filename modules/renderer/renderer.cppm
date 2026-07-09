@@ -54,7 +54,7 @@ public:
 
 	~Renderer();
 
-	[[nodiscard]] auto frame(u32 frame_idx, std::function<void()> submit_scene) -> Result;
+	[[nodiscard]] auto frame(u32 frame_idx, const std::function<void()> &submit_scene) -> Result;
 
 	void replace_swapchain(Swapchain *swapchain);
 
@@ -204,7 +204,8 @@ Renderer::~Renderer()
 }
 
 
-[[nodiscard]] auto Renderer::frame(u32 frame_idx, std::function<void()> submit_scene) -> Result
+[[nodiscard]] auto Renderer::frame(u32 frame_idx, const std::function<void()> &submit_scene)
+    -> Result
 {
 	ensure(
 	    frame_idx < m_max_frames_in_flight,
