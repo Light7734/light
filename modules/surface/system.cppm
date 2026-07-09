@@ -475,6 +475,20 @@ void registry_handle_global_remove(void *data, wl_registry *registry, u32 name)
 	log::trace("\tname: {}", name);
 }
 
+void System::on_surface_destruct(ecs::Registry &registry, ecs::EntityId entity)
+try
+{
+	auto &surface = registry.get<SurfaceComponent>(entity);
+	xdg_toplevel_destroy(surface.m_xdg_toplevel);
+	xdg_surface_destroy(surface.m_xdg_surface);
+	wl_surface_destroy(surface.m_wl_surface);
+}
+catch (const std::exception &exp)
+{
+	log::error("Uncaught exception in surface::on_surface_destruct:");
+	log::error("\twhat: {}", exp.what());
+}
+
 System::System(memory::Ref<ecs::Registry> registry)
     : m_wl_registry_listener(
           {
@@ -503,6 +517,10 @@ System::System(memory::Ref<ecs::Registry> registry)
           }
       )
 {
+	m_registry->connect_on_destruct<SurfaceComponent>([this](auto &registry, auto entity_id) {
+		on_surface_destruct(registry, entity_id);
+	});
+
 	ensure(m_registry, "Failed to construct surface::System: null ecs::Registry");
 
 	m_wl_display = wl_display_connect({});
@@ -538,10 +556,6 @@ System::~System()
 		for (auto &[entity, surface] : m_registry->view<SurfaceComponent>())
 		{
 			entities_to_remove.emplace_back(entity);
-
-			xdg_toplevel_destroy(surface.m_xdg_toplevel);
-			xdg_surface_destroy(surface.m_xdg_surface);
-			wl_surface_destroy(surface.m_wl_surface);
 		}
 
 		for (auto entity : entities_to_remove)
