@@ -37,18 +37,28 @@ public:
 
 	~NotNull() = default;
 
+	// get()/operator->/operator*/operator T() all return T *by value*, which means they require
+	// T to be copyable - so they can't be used to inspect a NotNull<unique_ptr<...>> at all
+	constexpr auto get_by_ref() noexcept -> Underlying_T &
+	{
+		return m_ptr;
+	}
+
 	constexpr Underlying_T get() const noexcept
 	{
 		return m_ptr;
 	}
+
 	constexpr operator Underlying_T() const noexcept
 	{
 		return get();
 	}
+
 	constexpr Underlying_T operator->() const noexcept
 	{
 		return get();
 	}
+
 	constexpr decltype(auto) operator*() const
 	{
 		return *get();

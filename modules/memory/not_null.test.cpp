@@ -19,32 +19,30 @@ struct Widget
 	}
 };
 
-// ---------------------------------------------------------------------------
-// Construction
-// ---------------------------------------------------------------------------
-
-Suite not_null_suite = "not null suite"_suite = [] {
+Suite raii = "raii"_suite = [] {
 	Case { "construction from a valid raw pointer succeeds" } = [] {
-		i32 x = 5;
-		NotNull<i32 *> nn(&x);
-		expect_true(nn.get() == &x);
+		auto value = i32 { 5 };
+
+		auto not_null = NotNull<i32 *>(&value);
+		expect_true(not_null.get() == &value);
 	};
 
 	Case { "constructing from a null raw pointer throws" } = [] {
-		i32 *p = nullptr;
-		expect_throw([&] { NotNull<i32 *> { p }; });
+		auto *null_ptr = (i32 *) { nullptr };
+		expect_throw([&] { NotNull<i32 *> { null_ptr }; });
 	};
 
 	Case { "constructing from a null shared_ptr throws" } = [] {
-		std::shared_ptr<i32> sp; // default-constructed => null
-		expect_throw([&] { NotNull<std::shared_ptr<i32>> { sp }; });
+		auto shared_ptr = std::shared_ptr<i32> {};
+		expect_throw([&] { NotNull<std::shared_ptr<i32>> { shared_ptr }; });
 	};
 
 	Case { "exception carries a meaningful message" } = [] {
-		i32 *p = nullptr;
+		auto *null_ptr = (i32 *) { nullptr };
+
 		try
 		{
-			NotNull<i32 *> nn(p);
+			auto not_null = NotNull<i32 *> { null_ptr };
 			expect_unreachable();
 		}
 		catch (const std::exception &exp)
@@ -53,11 +51,10 @@ Suite not_null_suite = "not null suite"_suite = [] {
 		}
 	};
 
-	// ---------------------------------------------------------------------------
-	// Compile-time guarantees (checked via type traits rather than runtime
-	// behavior, since these are meant to be *compile* errors)
-	// ---------------------------------------------------------------------------
-
+	/* Compile-time guarantees,
+	 * checked via type traits rather than runtime behavior, since these are meant to be *compile*
+	 * errors
+	 */
 	Case { "nullptr_t is rejected at compile time, not just at runtime" } = [] {
 		expect_false(std::is_constructible_v<NotNull<i32 *>, std::nullptr_t>);
 		expect_false(std::is_assignable_v<NotNull<i32 *> &, std::nullptr_t>);
@@ -66,168 +63,165 @@ Suite not_null_suite = "not null suite"_suite = [] {
 	Case { "there is no default constructor" } = [] {
 		expect_false(std::is_default_constructible_v<NotNull<i32 *>>);
 	};
+};
 
-	// Note: instantiating NotNull<i32> (a T that can't be compared to nullptr)
-	// trips the class's static_assert and fails the whole build by design -
-	// that's not something a SFINAE-based trait can probe safely, so it isn't
-	// exercised here. It's the same tradeoff the real GSL implementation makes.
-
-	// ---------------------------------------------------------------------------
-	// Access: conversion, operator->, operator*
-	// ---------------------------------------------------------------------------
-
+Suite access_and_conversion = "access and conversion"_suite = [] {
 	Case { "implicit conversion back to T works" } = [] {
-		i32 x = 7;
-		NotNull<i32 *> nn(&x);
-		i32 *raw = nn;
-		expect_true(raw == &x);
+		auto value = i32 { 7 };
+		auto not_null = NotNull<i32 *> { &value };
+
+		expect_true((i32 *) { not_null } == &value);
 	};
 
 	Case { "passing NotNull where a raw T parameter is expected" } = [] {
-		i32 x = 9;
-		NotNull<i32 *> nn(&x);
-		auto takesRaw = [](const i32 *p) {
+		auto value = i32 { 9 };
+		auto not_null = NotNull<i32 *> { &value };
+
+		constexpr auto takes_raw = [](const i32 *p) -> i32 {
 			return *p;
 		};
-		expect_true(takesRaw(nn) == 9);
+
+		expect_true(takes_raw(not_null) == 9);
 	};
 
 	Case { "contextual boolean conversion is always true for a valid NotNull" } = [] {
-		i32 x = 1;
-		NotNull<i32 *> nn(&x);
-		expect_true(static_cast<bool>(nn));
+		auto value = i32 { 1 };
+		auto not_null = NotNull<i32 *> { &value };
+
+		expect_true(static_cast<bool>(not_null));
 	};
 
 	Case { "operator-> forwards member access" } = [] {
-		Widget w;
-		NotNull<Widget *> nn(&w);
-		expect_true(nn->get_value() == 42);
-		nn->set_value(100);
-		expect_true(w.value == 100);
+		auto widget = Widget {};
+
+		auto not_null = NotNull<Widget *> { &widget };
+		expect_true(not_null->get_value() == 42);
+
+		not_null->set_value(100);
+		expect_true(widget.value == 100);
 	};
 
 	Case { "operator* dereferences to the pointee and allows mutation" } = [] {
-		i32 x = 3;
-		NotNull<i32 *> nn(&x);
-		expect_true(*nn == 3);
-		*nn = 10;
-		expect_true(x == 10);
+		auto value = i32 { 3 };
+
+		auto not_null = NotNull<i32 *> { &value };
+		expect_true(*not_null == 3);
+
+		*not_null = 10;
+		expect_true(value == 10);
 	};
 
 	Case { "const NotNull objects remain fully usable" } = [] {
-		Widget w;
-		const NotNull<Widget *> nn(&w);
-		expect_true(nn->get_value() == 42);
-		expect_true((*nn).value == 42);
-		Widget *raw = nn;
-		expect_true(raw == &w);
+		auto widget = Widget {};
+
+		const auto not_null = NotNull<Widget *> { &widget };
+		expect_true(not_null->get_value() == 42);
+		expect_true((*not_null).value == 42);
+
+		auto *raw_ptr = (Widget *) { not_null };
+		expect_true(raw_ptr == &widget);
 	};
+};
 
-	// ---------------------------------------------------------------------------
-	// Copy / move semantics
-	// ---------------------------------------------------------------------------
-
+Suite copy_move_assignment = "copy, move, and assigment"_suite = [] {
 	Case { "copy construction and copy assignment preserve the pointee" } = [] {
-		i32 x = 1;
-		NotNull<i32 *> a(&x);
-		NotNull<i32 *> b(a);
-		expect_true(b.get() == &x);
+		auto value_a_b = i32 { 1 };
 
-		i32 y = 2;
-		NotNull<i32 *> c(&y);
-		c = a;
-		expect_true(c.get() == &x);
+		auto ptr_a = NotNull<i32 *>(&value_a_b);
+		auto ptr_b = NotNull<i32 *>(ptr_a);
+		expect_true(ptr_b.get() == &value_a_b);
+
+		auto value_c = i32 { 2 };
+		auto c = NotNull<i32 *> { &value_c };
+
+		c = ptr_a;
+		expect_true(c.get() == &value_a_b);
 	};
 
 	Case { "assigning a raw pointer goes through the validating constructor" } = [] {
-		i32 x = 1;
-		i32 y = 2;
+		auto value_a = i32 { 1 };
+		auto value_b = i32 { 2 };
 
-		NotNull<i32 *> nn(&x);
+		auto not_null = NotNull<i32 *> { &value_a };
 
-		nn = &y; // implicit conversion + assignment
-		expect_true(nn.get() == &y);
+		not_null = &value_b; // implicit conversion + assignment
+		expect_true(not_null.get() == &value_b);
 
-		i32 *np = nullptr;
-		expect_throw([&] { nn = np; });
-		expect_true(nn.get() == &y); // failed assignment must not have side effects
+		auto *null_ptr = (i32 *) { nullptr };
+		expect_throw([&] { not_null = null_ptr; });
+		expect_true(not_null.get() == &value_b); // failed assignment must not have side effects
 	};
 
 	Case { "move construction and move assignment compile for move-only T" } = [] {
-		// get()/operator->/operator*/operator T() all return T *by value*,
-		// which means they require T to be copyable - so they can't be used
-		// to inspect a NotNull<unique_ptr<...>> at all (this mirrors a known
-		// limitation of the real gsl::NotNull, not something specific to this
-		// port). Construction and moving are still well-formed, so that's all
-		// we can meaningfully exercise here.
-		auto up = std::make_unique<i32>(55);
-		NotNull<std::unique_ptr<i32>> a(std::move(up));
+		auto unique_ptr = std::make_unique<i32>(55);
+		auto ptr_a = NotNull<std::unique_ptr<i32>> { std::move(unique_ptr) };
 
-		auto up2 = std::make_unique<i32>(56);
-		NotNull<std::unique_ptr<i32>> b(std::move(up2));
-		NotNull<std::unique_ptr<i32>> c(std::move(b)); // SHOULD NOT THROW!
+		auto new_unique_ptr = std::make_unique<i32>(56);
+		auto ptr_b = NotNull<std::unique_ptr<i32>>(std::move(new_unique_ptr));
 
-		// `b` is left wrapping a moved-from (null) unique_ptr here. NotNull
-		// only checks its invariant at construction time, so this is a real
-		// sharp edge with move-only T - documented rather than silently assumed.
-		(void)a;
+		auto ptr_c = NotNull<std::unique_ptr<i32>>(std::move(ptr_b));
+		expect_eq(*ptr_c.get_by_ref(), 56);
+
+		// IMPORTANT:
+		// `ptr_b` is left wrapping a moved-from (null) unique_ptr here. NotNull only checks its
+		// invariant at construction time, so this is a real sharp edge with move-only T!
+		(void)ptr_b; // NOLINT(bugprone-use-after-move)
 	};
+};
 
-	// ---------------------------------------------------------------------------
-	// Comparisons
-	// ---------------------------------------------------------------------------
-
+Suite comparisons = "comparisons"_suite = [] {
 	Case { "equality and inequality compare the underlying pointee" } = [] {
-		i32 x = 1;
-		i32 y = 2;
+		auto value_a_b = i32 { 1 };
+		auto value_c = i32 { 2 };
 
-		NotNull<i32 *> a(&x);
-		NotNull<i32 *> b(&x);
-		NotNull<i32 *> c(&y);
+		auto ptr_a = NotNull<i32 *> { &value_a_b };
+		auto ptr_b = NotNull<i32 *> { &value_a_b };
 
-		expect_true(a == b);
-		expect_false(a != b);
-		expect_true(a != c);
-		expect_false(a == c);
+		auto ptr_c = NotNull<i32 *> { &value_c };
+
+		expect_true(ptr_a == ptr_b);
+		expect_false(ptr_a != ptr_b);
+
+		expect_true(ptr_a != ptr_c);
+		expect_false(ptr_a == ptr_c);
 	};
 
 	Case { "comparison works across related but distinct pointer types" } = [] {
-		i32 x = 1;
-		NotNull<i32 *> a(&x);
-		NotNull<const i32 *> b(&x);
-		expect_true(a == b);
+		auto value = i32 { 1 };
+
+		auto lhs = NotNull<i32 *> { &value };
+		auto rhs = NotNull<const i32 *> { &value };
+
+		expect_true(lhs == rhs);
 	};
+};
 
-	// ---------------------------------------------------------------------------
-	// Interop with smart pointers and containers
-	// ---------------------------------------------------------------------------
 
+Suite pointers_and_containers = "interop with smart pointers and containers"_suite = [] {
 	Case { "works with shared_ptr, including operator-> chaining" } = [] {
-		auto sp = std::make_shared<Widget>();
-		NotNull<std::shared_ptr<Widget>> nn(sp);
+		auto shared_ptr = std::make_shared<Widget>();
+		auto not_null = NotNull<std::shared_ptr<Widget>> { shared_ptr };
 
-		expect_true(nn->get_value() == 42);
+		expect_true(not_null->get_value() == 42);
 		// use_count is 3, not 2: sp + nn's internal copy + the temporary that
 		// get() itself returns by value (another consequence of accessors
 		// returning T by value instead of by reference).
-		expect_true(nn.get().use_count() == 3);
-		nn->set_value(7);
-		expect_true(sp->value == 7);
+		expect_true(not_null.get().use_count() == 3);
+		not_null->set_value(7);
+		expect_true(shared_ptr->value == 7);
 	};
 
 	Case { "can be stored in standard containers" } = [] {
-		i32 a = 1;
-		i32 b = 2;
-		i32 c = 3;
+		std::array<i32, 3> nums = { 1, 2, 3 };
+		auto vec = std::vector<NotNull<i32 *>> {};
 
-		std::vector<NotNull<i32 *>> v;
-		v.push_back(NotNull<i32 *>(&a)); // NOLINT
-		v.push_back(NotNull<i32 *>(&b)); // NOLINT
-		v.emplace_back(&c);
+		vec.push_back(NotNull<i32 *>(&nums[0])); // NOLINT(modernize-use-emplace)
+		vec.push_back(NotNull<i32 *>(&nums[1])); // NOLINT(modernize-use-emplace)
+		vec.emplace_back(&nums[2]);
 
-		expect_true(v.size() == 3);
-		expect_true(*v[0] == 1);
-		expect_true(*v[1] == 2);
-		expect_true(*v[2] == 3);
+		expect_true(vec.size() == 3);
+		expect_true(*vec[0] == 1);
+		expect_true(*vec[1] == 2);
+		expect_true(*vec[2] == 3);
 	};
 };
