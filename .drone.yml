@@ -30,9 +30,9 @@ steps:
   commands:
     - ./tools/ci/tsan.sh
 
-# - name: valgrind
-#   commands:
-#     - ./tools/ci/valgrind.sh
+- name: valgrind
+  commands:
+    - ./tools/ci/valgrind.sh
 
 ---
 kind: pipeline
