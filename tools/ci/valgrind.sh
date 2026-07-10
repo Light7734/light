@@ -1,5 +1,9 @@
 #!/bin/bash
 
+env | grep -E 'WAYLAND_DISPLAY|XDG_RUNTIME_DIR|DISPLAY|VK_ICD|EGL_VENDOR|VK_LOADER'
+echo "id:  $(id)"  # is the exec runner running as the same uid as your desktop session?
+ls -la /run/user/1000/  # does the Drone runner's user actually see the compositor socket?
+
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
 rm -rf ./build/
@@ -43,6 +47,7 @@ while IFS= read -r -d '' test; do
         --verbose \
         --num-callers=50 \
         --gen-suppressions=all \
+        --log-file="val_$counter" \
         --suppressions='./tools/ci/valgrind.supp' \
         --error-exitcode=255 "${test}" || exit 1
 
