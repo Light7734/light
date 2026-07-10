@@ -2,7 +2,10 @@
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
-rm -rf ./build/
+# rm -rf ./build/
+
+WAYLAND_DISPLAY='wayland-0'
+export WAYLAND_DISPLAY
 
 XDG_RUNTIME_DIR='/run/user/1000'
 export XDG_RUNTIME_DIR
@@ -40,7 +43,8 @@ while IFS= read -r -d '' test; do
         --verbose \
         --num-callers=50 \
         --gen-suppressions=all \
+        --log-file="val_${counter}" \
         --suppressions='./tools/ci/valgrind.supp' \
-        --error-exitcode=255 "${test}" || exit 1
+        --error-exitcode=255 "${test}"
 
 done < <(find ./build -type f -name '*_tests' -executable -print0)
