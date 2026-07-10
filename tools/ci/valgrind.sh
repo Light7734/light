@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
 rm -rf ./build/
 
-WAYLAND_DISPLAY=wayland-0
+WAYLAND_DISPLAY='wayland-0'
 export WAYLAND_DISPLAY
 
 XDG_RUNTIME_DIR='/run/user/1000'
