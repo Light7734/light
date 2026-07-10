@@ -34,11 +34,8 @@ cmake \
 
 cmake --build ./build -j"$(nproc)"
 
-counter=0
 while IFS= read -r -d '' test; do
     echo "Running $test"
-
-    counter=$((counter + 1))
 
     valgrind \
         --leak-check=full \
@@ -47,7 +44,6 @@ while IFS= read -r -d '' test; do
         --verbose \
         --num-callers=50 \
         --gen-suppressions=all \
-        --log-file="val_$counter" \
         --suppressions='./tools/ci/valgrind.supp' \
         --error-exitcode=255 "${test}" || exit 1
 
