@@ -2,6 +2,7 @@ add_module(
     NAME
     preliminary
     INTERFACES
+    concepts.cppm
     module.cppm
     fundumental_types.cppm
     assertions.cppm

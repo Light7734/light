@@ -1,5 +1,6 @@
 export module preliminary;
 export import preliminary.fundumental_types;
+export import preliminary.concepts;
 export import preliminary.assertions;
 export import preliminary.build_constants;
 
