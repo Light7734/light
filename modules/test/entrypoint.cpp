@@ -41,7 +41,8 @@ void print_help()
 	std::println("--stop-on-fail --> Stops executing the remaining tests on first failure");
 	std::println("--suite        --> Regex for running specific suite(s)");
 	std::println("--case         --> Regex for running specific test(s)");
-	std::println("--mode=stats   --> Executes tests with an alternative policy");
+	std::println("--mode=???   --> Executes tests with an alternative policy");
+	std::println("\t---> (default): Runs normally");
 	std::println("\t---> stats: Print statistics about the tests without running any");
 	std::println("--help | -h    --> ~You just used it! :D");
 }
