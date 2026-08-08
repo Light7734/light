@@ -18,6 +18,58 @@ void parse_option(std::string_view argument, lt::test::Registry::Options &option
 		return;
 	}
 
+	if (argument.starts_with("--verbosity="))
+	{
+		if (argument.substr(12ul) == "trace")
+		{
+			lt::log::set_severity(lt::log::Level::trace);
+			std::println("Log level overriden to: trace");
+			return;
+		}
+
+		if (argument.substr(12ul) == "debug")
+		{
+			lt::log::set_severity(lt::log::Level::debug);
+			std::println("Log level overriden to: debug");
+			return;
+		}
+
+		if (argument.substr(12ul) == "info")
+		{
+			lt::log::set_severity(lt::log::Level::info);
+			std::println("Log level overriden to: info");
+			return;
+		}
+
+		if (argument.substr(12ul) == "warn")
+		{
+			lt::log::set_severity(lt::log::Level::warn);
+			std::println("Log level overriden to: warn");
+			return;
+		}
+
+		if (argument.substr(12ul) == "error")
+		{
+			lt::log::set_severity(lt::log::Level::error);
+			std::println("Log level overriden to: error");
+			return;
+		}
+
+		if (argument.substr(12ul) == "critical")
+		{
+			lt::log::set_severity(lt::log::Level::critical);
+			std::println("Log level overriden to: critical");
+			return;
+		}
+
+		if (argument.substr(12ul) == "test")
+		{
+			lt::log::set_severity(lt::log::Level::test);
+			std::println("Log level overriden to: test (this was not necessary...)");
+			return;
+		}
+	}
+
 	if (argument.starts_with(suite_str) && argument.length() > suite_str.size())
 	{
 		options.suite_regex = argument.substr(suite_str.length());
@@ -38,6 +90,16 @@ void parse_option(std::string_view argument, lt::test::Registry::Options &option
 void print_help()
 {
 	std::println("Options: ");
+	std::println("--verbosity=??? --> Sets the verbosity level of the logger");
+	std::println(
+	    "\t---> trace: Lowest and most vebose log level, for tracing execution paths and events"
+	);
+	std::println("\t---> debug: Vebose log level, for enabling temporarily to debug");
+	std::println("\t---> info: General information");
+	std::println("\t---> warn: Things we should to be aware of and edge cases");
+	std::println("\t---> error: Defects, bugs and undesired behaviour");
+	std::println("\t---> critical: Unrecoverable errors (on a module level)");
+	std::println("\t---> test (default): No logs from the program, only test results");
 	std::println("--stop-on-fail --> Stops executing the remaining tests on first failure");
 	std::println("--suite        --> Regex for running specific suite(s)");
 	std::println("--case         --> Regex for running specific test(s)");
