@@ -2,6 +2,7 @@ export module ecs.entity;
 
 import preliminary;
 import memory.reference;
+import memory.not_null;
 import ecs.registry;
 
 export namespace lt::ecs {
@@ -10,8 +11,8 @@ export namespace lt::ecs {
 class Entity
 {
 public:
-	Entity(memory::Ref<Registry> registry, EntityId identifier)
-	    : m_registry(std::move(registry))
+	Entity(memory::NotNull<memory::Ref<Registry>> &registry, EntityId identifier)
+	    : m_registry(std::move(registry.get()))
 	    , m_identifier(identifier)
 	{
 		ensure(m_registry, "Failed to create Entity ({}): null registry", m_identifier);

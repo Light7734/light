@@ -39,11 +39,6 @@ Suite raii = "system_raii"_suite = [] {
 		});
 
 		expect_throw([=] mutable {
-			info.surface_entity = lt::ecs::Entity({}, {});
-			ignore = lt::renderer::System { info };
-		});
-
-		expect_throw([=] mutable {
 			constexpr auto limit = lt::renderer::System::frames_in_flight_upper_limit;
 			info.config.max_frames_in_flight = limit + 1u;
 			ignore = lt::renderer::System { info };
