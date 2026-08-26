@@ -22,7 +22,7 @@ enum class Level : u8
 	/** Defects, bugs and undesired behaviour */
 	error = 4,
 
-	/** Unrecoverable errors */
+	/** Unrecoverable errors (on a module level)*/
 	critical = 5,
 
 	/**
