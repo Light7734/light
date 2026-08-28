@@ -11,9 +11,13 @@ using value_or_reference_return_t = std::conditional_t<
 export namespace lt::memory {
 
 /** Makes your code crash when using nullptrs on bind-point instead of dereference point.
- * Makes debugging easier in case of a logical error.
+ * Which should make debugging easier in case of a logical error.
  * Also removes the "is this a nullptr?" checks as it is now implied through construction.
  * Has 0 zero-size-overhead over Underlying_T.
+ *
+ * The constructor is explicit so that when T* changes to not_null<T*>, the call-sites that used the
+ * old T* form stop compiling and require explicitly specifying that they indeed understand the
+ * passed point should not be null
  *
  * ALLOWS construction from Underlying_T (which MUST be nullptr assignable)
  * ALLOWS implicit conversion to Underlying_T
@@ -29,7 +33,10 @@ template<typename Underlying_T>
 class NotNull
 {
 public:
-	/** Constructs from anything convertible to Underlying_T (raw pointer, smart pointer, etc.) */
+	/** Constructs from anything convertible to Underlying_T (raw pointer, smart pointer, etc.)
+	 *
+	 * @warn Explicit
+	 */
 	template<typename Ptr_T>
 	constexpr explicit NotNull(Ptr_T &&pointer)
 	    requires std::is_convertible_v<Ptr_T, Underlying_T>
