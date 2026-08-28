@@ -87,6 +87,20 @@ public:
 		return *get();
 	}
 
+	/** Equality comparison operator */
+	template<typename T, typename U>
+	constexpr friend auto operator==(const NotNull<T> &lhs, const NotNull<U> &rhs) -> bool
+	{
+		return lhs.get() == rhs.get();
+	}
+
+	/** Unequality comparison */
+	template<typename T, typename U>
+	constexpr friend auto operator!=(const NotNull<T> &lhs, const NotNull<U> &rhs) -> bool
+	{
+		return !(lhs == rhs);
+	}
+
 	/** Swaps the underlying pointers */
 	void swap(NotNull<Underlying_T> &other) noexcept
 	{
@@ -133,17 +147,5 @@ public:
 private:
 	Underlying_T m_ptr;
 };
-
-template<typename T, typename U>
-constexpr bool operator==(const NotNull<T> &lhs, const NotNull<U> &rhs)
-{
-	return lhs.get() == rhs.get();
-}
-
-template<typename T, typename U>
-constexpr bool operator!=(const NotNull<T> &lhs, const NotNull<U> &rhs)
-{
-	return !(lhs == rhs);
-}
 
 } // namespace lt::memory
