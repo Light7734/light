@@ -2,13 +2,13 @@ export module memory.not_null;
 
 import preliminary;
 
-export namespace lt::memory {
-
 template<typename T>
 using value_or_reference_return_t = std::conditional_t<
     std::is_trivially_copy_constructible_v<T> && sizeof(T) <= sizeof(void *) * 2,
     const T,
     const T &>;
+
+export namespace lt::memory {
 
 /** Makes your code crash when using nullptrs on bind-point instead of dereference point.
  * Makes debugging easier in case of a logical error.
