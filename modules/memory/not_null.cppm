@@ -19,6 +19,7 @@ using value_or_reference_return_t = std::conditional_t<
  * ALLOWS implicit conversion to Underlying_T
  * DISALLOWS default construction
  * DISALLOWS construction from nullptr_t
+ * DISALLOWS pointer arithmetics
  * THROWS when constructing an Underlying_T with a nullptr
  *
  * @tparam Underlying_T The underlying pointer type
@@ -112,6 +113,22 @@ public:
 
 	/** DISALLOW pointer arithmetic */
 	void operator[](std::ptrdiff_t) const = delete;
+
+	/** DISALLOW pointer arithmetic */
+	template<class T, class U>
+	friend std::ptrdiff_t operator-(const NotNull<T> &, const NotNull<U> &) = delete;
+
+	/** DISALLOW pointer arithmetic */
+	template<class T>
+	friend NotNull<T> operator-(const NotNull<T> &, std::ptrdiff_t) = delete;
+
+	/** DISALLOW pointer arithmetic */
+	template<class T>
+	friend NotNull<T> operator+(const NotNull<T> &, std::ptrdiff_t) = delete;
+
+	/** DISALLOW pointer arithmetic */
+	template<class T>
+	friend NotNull<T> operator+(std::ptrdiff_t, const NotNull<T> &) = delete;
 
 private:
 	Underlying_T m_ptr;
