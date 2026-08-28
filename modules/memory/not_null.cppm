@@ -12,7 +12,7 @@ using value_or_reference_return_t = std::conditional_t<
 
 /** Makes your code crash when using nullptrs on bind-point instead of dereference point.
  * Makes debugging easier in case of a logical error.
- * Also removes the "is this nullptr?" checks as it is now implied through construction.
+ * Also removes the "is this a nullptr?" checks as it is now implied through construction.
  * Has 0 zero-size-overhead over Underlying_T.
  *
  * ALLOWS construction from Underlying_T (which MUST be nullptr assignable)
