@@ -31,7 +31,7 @@ class NotNull
 public:
 	/** Constructs from anything convertible to Underlying_T (raw pointer, smart pointer, etc.) */
 	template<typename Ptr_T>
-	constexpr NotNull(Ptr_T &&pointer)
+	constexpr explicit NotNull(Ptr_T &&pointer)
 	    requires std::is_convertible_v<Ptr_T, Underlying_T>
 	    : m_ptr(std::forward<Ptr_T>(pointer))
 	{
