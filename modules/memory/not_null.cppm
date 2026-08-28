@@ -35,7 +35,7 @@ public:
 	    requires std::is_convertible_v<Ptr_T, Underlying_T>
 	    : m_ptr(std::forward<Ptr_T>(pointer))
 	{
-		ensure(m_ptr, "Bound a NotNull ptr to a nullptr!");
+		ensure(m_ptr != nullptr, "Bound a NotNull ptr to a nullptr!");
 	}
 
 	/** DISALLOW construction via nullptr_t */
