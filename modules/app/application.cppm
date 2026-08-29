@@ -2,8 +2,6 @@ export module app;
 
 import preliminary;
 import app.system;
-import memory.reference;
-import memory.scope;
 
 export namespace lt::app {
 
@@ -26,19 +24,19 @@ public:
 
 	void game_loop();
 
-	void register_system(memory::Ref<app::ISystem> system);
+	void register_system(ref<app::ISystem> system);
 
-	void unregister_system(memory::Ref<app::ISystem> system);
+	void unregister_system(ref<app::ISystem> system);
 
 protected:
 	Application() = default;
 
 private:
-	std::vector<memory::Ref<app::ISystem>> m_systems;
+	std::vector<ref<app::ISystem>> m_systems;
 
-	std::vector<memory::Ref<app::ISystem>> m_systems_to_be_unregistered;
+	std::vector<ref<app::ISystem>> m_systems_to_be_unregistered;
 
-	std::vector<memory::Ref<app::ISystem>> m_systems_to_be_registered;
+	std::vector<ref<app::ISystem>> m_systems_to_be_registered;
 };
 
 } // namespace lt::app
@@ -83,12 +81,12 @@ void Application::game_loop()
 	}
 }
 
-void Application::register_system(memory::Ref<app::ISystem> system)
+void Application::register_system(ref<app::ISystem> system)
 {
 	m_systems.emplace_back(std::move(system));
 }
 
-void Application::unregister_system(memory::Ref<app::ISystem> system)
+void Application::unregister_system(ref<app::ISystem> system)
 {
 	m_systems_to_be_unregistered.emplace_back(std::move(system));
 }
