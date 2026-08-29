@@ -10,7 +10,6 @@ export import renderer.vk.buffer;
 export import renderer.vk.gpu;
 export import renderer.vk.debugger;
 export import renderer.vk.surface;
-export import memory.scope;
 export import ecs.entity;
 
 import preliminary;
@@ -20,28 +19,27 @@ export namespace lt::renderer {
 [[nodiscard]] auto get_instance(Api target_api) -> IInstance *;
 
 [[nodiscard]] auto create_debugger(Api target_api, IInstance *instance, IDebugger::CreateInfo info)
-    -> memory::Scope<IDebugger>;
+    -> scope<IDebugger>;
 
 [[nodiscard]] auto create_surface(
     Api target_api,
     IInstance *instance,
     const ecs::Entity &surface_entity
-) -> memory::Scope<ISurface>;
+) -> scope<ISurface>;
 
-[[nodiscard]] auto create_gpu(Api target_api, IInstance *instance) -> memory::Scope<IGpu>;
+[[nodiscard]] auto create_gpu(Api target_api, IInstance *instance) -> scope<IGpu>;
 
-[[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface)
-    -> memory::Scope<IDevice>;
+[[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface) -> scope<IDevice>;
 
 [[nodiscard]] auto create_swapchain(Api target_api, ISurface *surface, IGpu *gpu, IDevice *device)
-    -> memory::Scope<ISwapchain>;
+    -> scope<ISwapchain>;
 
 [[nodiscard]] auto create_pass(
     lt::renderer::Api target_api,
     IDevice *device,
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
-) -> memory::Scope<IPass>;
+) -> scope<IPass>;
 
 [[nodiscard]] auto create_renderer(
     Api target_api,
@@ -49,14 +47,14 @@ export namespace lt::renderer {
     IDevice *device,
     ISwapchain *swapchain,
     u32 max_frames_in_flight
-) -> memory::Scope<IRenderer>;
+) -> scope<IRenderer>;
 
 [[nodiscard]] auto create_buffer(
     Api target_api,
     IDevice *device,
     IGpu *gpu,
     const IBuffer::CreateInfo &info
-) -> memory::Scope<IBuffer>;
+) -> scope<IBuffer>;
 
 } // namespace lt::renderer
 
@@ -79,13 +77,13 @@ namespace lt::renderer {
     Api target_api,
     IInstance *instance,
     const lt::ecs::Entity &surface_entity
-) -> memory::Scope<ISurface>
+) -> scope<ISurface>
 {
 	ensure(instance, "Failed to create renderer::ISurface: null instance");
 
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vkb::Surface>(instance, surface_entity);
+	case Api::vulkan: return create_scope<vkb::Surface>(instance, surface_entity);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -94,11 +92,11 @@ namespace lt::renderer {
 	std::unreachable();
 }
 
-[[nodiscard]] auto create_gpu(Api target_api, IInstance *instance) -> memory::Scope<IGpu>
+[[nodiscard]] auto create_gpu(Api target_api, IInstance *instance) -> scope<IGpu>
 {
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vkb::Gpu>(instance);
+	case Api::vulkan: return create_scope<vkb::Gpu>(instance);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -107,15 +105,14 @@ namespace lt::renderer {
 	std::unreachable();
 }
 
-[[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface)
-    -> memory::Scope<IDevice>
+[[nodiscard]] auto create_device(Api target_api, IGpu *gpu, ISurface *surface) -> scope<IDevice>
 {
 	ensure(gpu, "Failed to create renderer::IDevice: null gpu");
 	ensure(surface, "Failed to create renderer::IDevice: null surface");
 
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vkb::Device>(gpu, surface);
+	case Api::vulkan: return create_scope<vkb::Device>(gpu, surface);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -125,11 +122,11 @@ namespace lt::renderer {
 }
 
 [[nodiscard]] auto create_swapchain(Api target_api, ISurface *surface, IGpu *gpu, IDevice *device)
-    -> memory::Scope<ISwapchain>
+    -> scope<ISwapchain>
 {
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vkb::Swapchain>(surface, gpu, device);
+	case Api::vulkan: return create_scope<vkb::Swapchain>(surface, gpu, device);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -143,7 +140,7 @@ namespace lt::renderer {
     IDevice *device,
     IGpu *gpu,
     const IBuffer::CreateInfo &info
-) -> memory::Scope<IBuffer>
+) -> scope<IBuffer>
 {
 	ensure(device, "Failed to create renderer::IBuffer: null device");
 	ensure(gpu, "Failed to create renderer::IBuffer: null gpu");
@@ -151,7 +148,7 @@ namespace lt::renderer {
 
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vkb::Buffer>(device, gpu, info);
+	case Api::vulkan: return create_scope<vkb::Buffer>(device, gpu, info);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -166,14 +163,13 @@ namespace lt::renderer {
     IDevice *device,
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
-) -> memory::Scope<IPass>
+) -> scope<IPass>
 {
 	ensure(device, "Failed to create renderer::IPass: null device");
 
 	switch (target_api)
 	{
-	case Api::vulkan:
-		return memory::create_scope<vkb::Pass>(device, vertex_shader, fragment_shader);
+	case Api::vulkan: return create_scope<vkb::Pass>(device, vertex_shader, fragment_shader);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -188,7 +184,7 @@ namespace lt::renderer {
     IDevice *device,
     ISwapchain *swapchain,
     u32 max_frames_in_flight
-) -> memory::Scope<IRenderer>
+) -> scope<IRenderer>
 {
 	ensure(gpu, "Failed to create renderer::IRenderer: null gpu");
 	ensure(device, "Failed to create renderer::IRenderer: null device");
@@ -210,7 +206,7 @@ namespace lt::renderer {
 	switch (target_api)
 	{
 	case Api::vulkan:
-		return memory::create_scope<vkb::Renderer>(gpu, device, swapchain, max_frames_in_flight);
+		return create_scope<vkb::Renderer>(gpu, device, swapchain, max_frames_in_flight);
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };
@@ -220,7 +216,7 @@ namespace lt::renderer {
 }
 
 [[nodiscard]] auto create_debugger(Api target_api, Instance *instance, Debugger::CreateInfo info)
-    -> memory::Scope<IDebugger>
+    -> scope<IDebugger>
 {
 	ensure(
 	    info.severities != IDebugger::MessageSeverity::none,
@@ -236,7 +232,7 @@ namespace lt::renderer {
 
 	switch (target_api)
 	{
-	case Api::vulkan: return memory::create_scope<vkb::Debugger>(instance, std::move(info));
+	case Api::vulkan: return create_scope<vkb::Debugger>(instance, std::move(info));
 	case Api::none:
 	case Api::metal:
 	case Api::direct_x: throw std::runtime_error { "Invalid API" };

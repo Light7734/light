@@ -1,7 +1,6 @@
 export module renderer.vk.device;
 
 import preliminary;
-import memory.null_on_move;
 import logger;
 import renderer.vk.instance;
 import renderer.vk.api_wrapper;

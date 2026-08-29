@@ -6,9 +6,6 @@ import math.mat4;
 import logger;
 import assets.shader;
 import renderer.vk.api_wrapper;
-import memory.reference;
-import memory.null_on_move;
-import memory.not_null;
 import renderer.vk.device;
 import math.vec2;
 import math.components;
@@ -18,8 +15,6 @@ import renderer.vk.buffer;
 import renderer.vk.pass;
 import renderer.data;
 import renderer.vk.gpu;
-
-using lt::memory::NotNull;
 
 export namespace lt::renderer::vkb {
 
@@ -38,9 +33,9 @@ public:
 	static constexpr auto frames_in_flight_lower_limit = 1u;
 
 	Renderer(
-	    NotNull<Gpu *> gpu,
-	    NotNull<Device *> device,
-	    NotNull<Swapchain *> swapchain,
+	    not_null<Gpu *> gpu,
+	    not_null<Device *> device,
+	    not_null<Swapchain *> swapchain,
 	    u32 max_frames_in_flight
 	);
 
@@ -76,7 +71,7 @@ private:
 
 	Swapchain *m_swapchain {};
 
-	memory::Ref<Pass> m_pass {};
+	ref<Pass> m_pass {};
 
 	vk::CommandPool m_pool {};
 
@@ -114,9 +109,9 @@ private:
 namespace lt::renderer::vkb {
 
 Renderer::Renderer(
-    NotNull<Gpu *> gpu,
-    NotNull<Device *> device,
-    NotNull<Swapchain *> swapchain,
+    not_null<Gpu *> gpu,
+    not_null<Device *> device,
+    not_null<Swapchain *> swapchain,
     u32 max_frames_in_flight
 )
     : m_device(device)
@@ -142,8 +137,8 @@ Renderer::Renderer(
           }
       )
     , m_pass(
-          memory::create_ref<Pass>(
-              m_device,
+          create_ref<Pass>(
+              not_null<Device *>(m_device),
               assets::ShaderAsset { "./data/test_assets/sprite.vert.asset" },
               assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
           )

@@ -3,7 +3,6 @@ export module renderer.components;
 import preliminary;
 import assets.shader;
 import math.vec3;
-import memory.reference;
 
 export namespace lt::renderer::components {
 

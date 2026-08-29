@@ -8,7 +8,6 @@ import math.components;
 import assets.shader;
 import ecs.entity;
 import math.vec2;
-import memory.scope;
 
 export namespace lt::renderer {
 

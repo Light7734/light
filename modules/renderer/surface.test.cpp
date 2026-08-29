@@ -5,7 +5,7 @@ Suite raii = "surface"_suite = [] {
 		auto fixture = Fixture_SurfaceSystem {};
 
 		const auto surface = lt::renderer::vkb::Surface(
-		    lt::renderer::vkb::Instance::get(),
+		    not_null<lt::renderer::vkb::Instance *>(lt::renderer::vkb::Instance::get()),
 		    fixture.surface_entity()
 		);
 
@@ -15,12 +15,16 @@ Suite raii = "surface"_suite = [] {
 	};
 
 	Case { "unhappy paths" } = [&] {
-		auto registry = lt::memory::create_ref<lt::ecs::Registry>();
-		auto entity = lt::ecs::Entity { registry, registry->create_entity() };
+		auto registry = create_ref<lt::ecs::Registry>();
+		auto entity = lt::ecs::Entity { not_null<ref<lt::ecs::Registry>>(registry),
+			                            registry->create_entity() };
 		auto system = lt::surface::System(registry);
 
 		expect_throw([&] {
-			ignore = lt::renderer::vkb::Surface(lt::renderer::vkb::Instance::get(), entity);
+			ignore = lt::renderer::vkb::Surface(
+			    not_null<lt::renderer::vkb::Instance *>(lt::renderer::vkb::Instance::get()),
+			    entity
+			);
 		});
 
 		system.create_surface_component(
@@ -32,6 +36,9 @@ Suite raii = "surface"_suite = [] {
 		);
 
 		// Ensure base creation info is non-throwing
-		ignore = lt::renderer::vkb::Surface(lt::renderer::vkb::Instance::get(), entity);
+		ignore = lt::renderer::vkb::Surface(
+		    not_null<lt::renderer::vkb::Instance *>(lt::renderer::vkb::Instance::get()),
+		    entity
+		);
 	};
 };

@@ -11,7 +11,7 @@ struct SurfaceContext
 
 struct RendererContext
 {
-	lt::memory::Ref<lt::ecs::Registry> registry;
+	ref<lt::ecs::Registry> registry;
 
 	lt::renderer::System system;
 };
@@ -29,8 +29,10 @@ Suite raii = "system_raii"_suite = [] {
 
 	Case { "unhappy paths" } = [] {
 		auto fixture = Fixture_SurfaceSystem {};
-		auto empty_entity = lt::ecs::Entity { fixture.registry(),
-			                                  fixture.registry()->create_entity() };
+		auto empty_entity = lt::ecs::Entity {
+			not_null { fixture.registry() },
+			fixture.registry()->create_entity(),
+		};
 		auto info = fixture.renderer_system_create_info();
 
 		expect_throw([=] mutable {

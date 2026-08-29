@@ -7,8 +7,6 @@ import renderer.vk.device;
 import renderer.vk.swapchain;
 import assets.shader;
 import assets.metadata;
-import memory.null_on_move;
-import memory.not_null;
 
 export namespace lt::renderer::vkb {
 
@@ -16,7 +14,7 @@ class Pass
 {
 public:
 	Pass(
-	    lt::memory::NotNull<Device *> device,
+	    not_null<Device *> device,
 	    const lt::assets::ShaderAsset &vertex_shader,
 	    const lt::assets::ShaderAsset &fragment_shader
 	);
@@ -57,7 +55,7 @@ namespace lt::renderer::vkb {
 using enum vk::DescriptorSetLayout::Binding::FlagBits;
 
 Pass::Pass(
-    lt::memory::NotNull<Device *>device,
+    not_null<Device *>device,
     const lt::assets::ShaderAsset &vertex_shader,
     const lt::assets::ShaderAsset &fragment_shader
 )

@@ -18,8 +18,6 @@ import app.system;
 import surface.events;
 import ecs.entity;
 import ecs.registry;
-import memory.reference;
-import memory.scope;
 import camera.components;
 import surface.system;
 import renderer.components;
@@ -56,7 +54,7 @@ public:
 	{
 		Configuration config;
 
-		memory::Ref<ecs::Registry> registry;
+		ref<ecs::Registry> registry;
 
 		ecs::Entity surface_entity;
 
@@ -93,23 +91,23 @@ private:
 
 	void recreate_swapchain();
 
-	memory::Ref<ecs::Registry> m_registry;
+	ref<ecs::Registry> m_registry;
 
 	ecs::Entity m_surface_entity;
 
-	memory::Scope<vkb::Debugger> m_messenger;
+	scope<vkb::Debugger> m_messenger;
 
 	vkb::Instance *m_instance;
 
-	memory::Scope<vkb::Surface> m_surface;
+	scope<vkb::Surface> m_surface;
 
-	memory::Scope<vkb::Gpu> m_gpu;
+	scope<vkb::Gpu> m_gpu;
 
-	memory::Scope<vkb::Device> m_device;
+	scope<vkb::Device> m_device;
 
-	memory::Scope<vkb::Swapchain> m_swapchain;
+	scope<vkb::Swapchain> m_swapchain;
 
-	memory::Scope<vkb::Renderer> m_renderer;
+	scope<vkb::Renderer> m_renderer;
 
 	app::TickResult m_last_tick_result {};
 
@@ -142,23 +140,19 @@ System::System(CreateInfo info)
 	    frames_in_flight_upper_limit
 	);
 
-	m_messenger = memory::create_scope<vkb::Debugger>(
-	    m_instance,
-	    std::move(info.debug_callback_info)
+	m_messenger = create_scope<vkb::Debugger>(m_instance, std::move(info.debug_callback_info));
+	m_surface = create_scope<vkb::Surface>(
+	    not_null<vkb::Instance *>(m_instance),
+	    info.surface_entity
 	);
-	m_surface = memory::create_scope<vkb::Surface>(m_instance, info.surface_entity);
-	m_gpu = memory::create_scope<vkb::Gpu>(m_instance);
+	m_gpu = create_scope<vkb::Gpu>(m_instance);
 
-	m_device = memory::create_scope<vkb::Device>(m_gpu.get(), m_surface.get());
-	m_swapchain = memory::create_scope<vkb::Swapchain>(
-	    m_surface.get(),
-	    m_gpu.get(),
-	    m_device.get()
-	);
-	m_renderer = { memory::create_scope<vkb::Renderer>(
-		m_gpu.get(),
-		m_device.get(),
-		m_swapchain.get(),
+	m_device = create_scope<vkb::Device>(m_gpu.get(), m_surface.get());
+	m_swapchain = create_scope<vkb::Swapchain>(m_surface.get(), m_gpu.get(), m_device.get());
+	m_renderer = { create_scope<vkb::Renderer>(
+		not_null<vkb::Gpu *>(m_gpu.get()),
+		not_null<vkb::Device *>(m_device.get()),
+		not_null<vkb::Swapchain *>(m_swapchain.get()),
 		info.config.max_frames_in_flight
 	) };
 }
@@ -200,18 +194,21 @@ void System::handle_surface_resized_events()
 			m_gpu.reset();
 			m_surface.reset();
 
-			m_surface = memory::create_scope<vkb::Surface>(m_instance, m_surface_entity);
-			m_gpu = memory::create_scope<vkb::Gpu>(m_instance);
-			m_device = memory::create_scope<vkb::Device>(m_gpu.get(), m_surface.get());
-			m_swapchain = memory::create_scope<vkb::Swapchain>(
+			m_surface = create_scope<vkb::Surface>(
+			    not_null<vkb::Instance *>(m_instance),
+			    m_surface_entity
+			);
+			m_gpu = create_scope<vkb::Gpu>(m_instance);
+			m_device = create_scope<vkb::Device>(m_gpu.get(), m_surface.get());
+			m_swapchain = create_scope<vkb::Swapchain>(
 			    m_surface.get(),
 			    m_gpu.get(),
 			    m_device.get()
 			);
-			m_renderer = { memory::create_scope<vkb::Renderer>(
-				m_gpu.get(),
-				m_device.get(),
-				m_swapchain.get(),
+			m_renderer = { create_scope<vkb::Renderer>(
+				not_null<vkb::Gpu *>(m_gpu.get()),
+				not_null<vkb::Device *>(m_device.get()),
+				not_null<vkb::Swapchain *>(m_swapchain.get()),
 				m_max_frames_in_flight
 			) };
 
@@ -251,11 +248,7 @@ void System::recreate_swapchain()
 {
 	log::trace("Re-creating swapchaain");
 	m_swapchain.reset();
-	m_swapchain = memory::create_scope<vkb::Swapchain>(
-	    m_surface.get(),
-	    m_gpu.get(),
-	    m_device.get()
-	);
+	m_swapchain = create_scope<vkb::Swapchain>(m_surface.get(), m_gpu.get(), m_device.get());
 	m_renderer->replace_swapchain(m_swapchain.get());
 }
 

@@ -7,7 +7,6 @@ import renderer.vk.device;
 import renderer.vk.instance;
 import renderer.vk.gpu;
 import math.vec2;
-import memory.null_on_move;
 import logger;
 
 export namespace lt::renderer::vkb {

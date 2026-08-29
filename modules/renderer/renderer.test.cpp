@@ -5,9 +5,9 @@ Suite raii = "renderer_raii"_suite = [] {
 	Case { "happy paths" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		ignore = lt::renderer::vkb::Renderer(
-		    fixture.gpu(),
-		    fixture.device(),
-		    fixture.swapchain(),
+		    not_null(fixture.gpu()),
+		    not_null(fixture.device()),
+		    not_null(fixture.swapchain()),
 		    constants::frames_in_flight
 		);
 
@@ -24,18 +24,18 @@ Suite raii = "renderer_raii"_suite = [] {
 
 		expect_throw([&] {
 			ignore = lt::renderer::vkb::Renderer(
-			    fixture.gpu(),
-			    fixture.device(),
-			    fixture.swapchain(),
+			    not_null { fixture.gpu() },
+			    not_null { fixture.device() },
+			    not_null { fixture.swapchain() },
 			    lt::renderer::vkb::Renderer::frames_in_flight_upper_limit + 1
 			);
 		});
 
 		expect_throw([&] {
 			ignore = lt::renderer::vkb::Renderer(
-			    fixture.gpu(),
-			    fixture.device(),
-			    fixture.swapchain(),
+			    not_null { fixture.gpu() },
+			    not_null { fixture.device() },
+			    not_null { fixture.swapchain() },
 			    lt::renderer::vkb::Renderer::frames_in_flight_lower_limit - 1
 			);
 		});
@@ -48,9 +48,9 @@ Suite draw = "renderer_draw"_suite = [] {
 	Case { "renderer draw" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		auto renderer = lt::renderer::vkb::Renderer(
-		    fixture.gpu(),
-		    fixture.device(),
-		    fixture.swapchain(),
+		    not_null { fixture.gpu() },
+		    not_null { fixture.device() },
+		    not_null { fixture.swapchain() },
 		    constants::frames_in_flight
 		);
 

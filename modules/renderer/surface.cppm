@@ -3,21 +3,17 @@ export module renderer.vk.surface;
 import preliminary;
 import ecs.entity;
 import ecs.registry;
-import memory.null_on_move;
-import memory.not_null;
 import math.vec2;
 import surface.system;
 import renderer.vk.instance;
 import renderer.vk.api_wrapper;
-
-using lt::memory::NotNull;
 
 export namespace lt::renderer::vkb {
 
 class Surface
 {
 public:
-	Surface(NotNull<Instance *> instance, ecs::Entity &surface_entity);
+	Surface(not_null<Instance *> instance, ecs::Entity &surface_entity);
 
 	[[nodiscard]] auto vk() -> vk::Surface &
 	{
@@ -36,7 +32,7 @@ private:
 
 namespace lt::renderer::vkb {
 
-Surface::Surface(NotNull<Instance *> instance, ecs::Entity &surface_entity)
+Surface::Surface(not_null<Instance *> instance, ecs::Entity &surface_entity)
     : m_surface_entity(surface_entity)
 {
 	auto &component = surface_entity.get<surface::SurfaceComponent>();

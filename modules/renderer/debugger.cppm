@@ -4,7 +4,6 @@ import preliminary;
 import bitwise;
 import renderer.vk.instance;
 import renderer.vk.api_wrapper;
-import memory.null_on_move;
 import logger;
 
 export namespace lt::renderer::vkb {

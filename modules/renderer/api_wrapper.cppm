@@ -22,8 +22,6 @@ struct wl_surface;
 
 export module renderer.vk.api_wrapper;
 import preliminary;
-import memory.null_on_move;
-import memory.not_null;
 import math.vec3;
 import math.vec2;
 import logger;
@@ -756,7 +754,7 @@ private:
 		return m_instance;
 	}
 
-	memory::NullOnMove<VkInstance> m_instance {};
+	null_on_move<VkInstance> m_instance {};
 };
 
 class Surface
@@ -843,7 +841,7 @@ private:
 		return m_surface;
 	}
 
-	memory::NullOnMove<VkInstance> m_instance {};
+	null_on_move<VkInstance> m_instance {};
 
 	VkSurfaceKHR m_surface {};
 };
@@ -1533,7 +1531,7 @@ private:
 		return m_device.get();
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 };
 
 class Semaphore
@@ -1570,7 +1568,7 @@ private:
 		return &m_semaphore;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	null_on_move<VkDevice> m_device;
 
 	VkSemaphore m_semaphore;
 };
@@ -1621,7 +1619,7 @@ private:
 		return &m_fence;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	null_on_move<VkDevice> m_device;
 
 	VkFence m_fence;
 };
@@ -1708,7 +1706,7 @@ private:
 		return m_buffer;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkBuffer m_buffer {};
 };
@@ -1853,7 +1851,7 @@ private:
 		return m_image;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	null_on_move<VkDevice> m_device;
 
 	VkImage m_image;
 };
@@ -1924,7 +1922,7 @@ private:
 		return m_image_view;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	null_on_move<VkDevice> m_device;
 
 	VkImageView m_image_view;
 };
@@ -1964,7 +1962,7 @@ private:
 		return m_shader_module;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkShaderModule m_shader_module {};
 };
@@ -2106,7 +2104,7 @@ private:
 		return &m_descriptor_set_layout;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkDescriptorSetLayout m_descriptor_set_layout {};
 };
@@ -2156,7 +2154,7 @@ private:
 		return m_descriptor_pool;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkDescriptorPool m_descriptor_pool {};
 };
@@ -2294,7 +2292,7 @@ private:
 		return m_pipeline;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkPipeline m_pipeline {};
 };
@@ -2344,7 +2342,7 @@ private:
 		return m_pipeline_layout;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkPipelineLayout m_pipeline_layout {};
 };
@@ -2612,7 +2610,7 @@ private:
 		return m_pool;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkCommandPool m_pool {};
 };
@@ -2686,7 +2684,7 @@ private:
 		return &m_swapchain;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	null_on_move<VkDevice> m_device;
 
 	VkSwapchainKHR m_swapchain;
 };
@@ -2744,7 +2742,7 @@ private:
 		return m_queue;
 	}
 
-	memory::NullOnMove<VkDevice> m_device;
+	null_on_move<VkDevice> m_device;
 
 	VkQueue m_queue;
 };
@@ -2801,7 +2799,7 @@ private:
 		return m_memory;
 	}
 
-	memory::NullOnMove<VkDevice> m_device {};
+	null_on_move<VkDevice> m_device {};
 
 	VkDeviceMemory m_memory {};
 };
@@ -2857,7 +2855,7 @@ public:
 	auto operator=(const Messenger &) -> Messenger & = delete;
 
 private:
-	memory::NullOnMove<VkInstance> m_instance {};
+	null_on_move<VkInstance> m_instance {};
 
 	Callback m_user_callback;
 

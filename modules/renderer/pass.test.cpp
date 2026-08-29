@@ -6,7 +6,7 @@ Suite raii = "pass_raii"_suite = [] {
 	Case { "happy paths" } = [] {
 		auto fixture = FixtureDeviceSwapchain {};
 		ignore = lt::renderer::vkb::Pass(
-		    fixture.device(),
+		    not_null<lt::renderer::vkb::Device *>(fixture.device()),
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.vert.asset" },
 		    lt::assets::ShaderAsset { "./data/test_assets/triangle.frag.asset" }
 		);

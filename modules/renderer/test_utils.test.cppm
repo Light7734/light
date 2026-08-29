@@ -1,16 +1,13 @@
 export module renderer.test_utils;
 
-
 export import test;
 export import surface.system;
 export import ecs.registry;
-export import memory.reference;
 export import renderer.system;
 export import math.vec2;
 export import math.vec3;
 export import math.vec4;
 export import math.mat4;
-export import memory.scope;
 export import renderer.vk.device;
 export import renderer.vk.pass;
 export import renderer.vk.instance;
@@ -70,7 +67,7 @@ public:
 		    } ;
 	}
 
-	[[nodiscard]] auto registry() -> lt::memory::Ref<lt::ecs::Registry> &
+	[[nodiscard]] auto registry() -> ref<lt::ecs::Registry> &
 	{
 		return m_registry;
 	}
@@ -86,9 +83,11 @@ public:
 	}
 
 private:
-	lt::memory::Ref<lt::ecs::Registry> m_registry = lt::memory::create_ref<lt::ecs::Registry>();
+	ref<lt::ecs::Registry> m_registry = create_ref<lt::ecs::Registry>();
 
-	lt::ecs::Entity m_entity { m_registry, m_registry->create_entity() };
+
+	lt::ecs::Entity m_entity { not_null<ref<lt::ecs::Registry>>(m_registry),
+		                       m_registry->create_entity() };
 
 	lt::surface::System m_system = lt::surface::System(m_registry);
 };
@@ -109,15 +108,13 @@ public:
 	}
 
 private:
-	lt::memory::Scope<lt::renderer::vkb::Surface> m_surface {
-		lt::memory::create_scope<lt::renderer::vkb::Surface>(
-		    lt::renderer::vkb::Instance::get(),
-		    surface_entity()
-		)
-	};
+	scope<lt::renderer::vkb::Surface> m_surface { create_scope<lt::renderer::vkb::Surface>(
+		not_null<lt::renderer::vkb::Instance *>(lt::renderer::vkb::Instance::get()),
+		surface_entity()
+	) };
 
-	lt::memory::Scope<lt::renderer::vkb::Gpu> m_gpu {
-		lt::memory::create_scope<lt::renderer::vkb::Gpu>(lt::renderer::vkb::Instance::get())
+	scope<lt::renderer::vkb::Gpu> m_gpu {
+		create_scope<lt::renderer::vkb::Gpu>(lt::renderer::vkb::Instance::get())
 	};
 };
 
@@ -140,11 +137,7 @@ public:
 	{
 		m_device->wait_idle();
 		m_swapchain.reset();
-		m_swapchain = lt::memory::create_scope<lt::renderer::vkb::Swapchain>(
-		    surface(),
-		    gpu(),
-		    m_device.get()
-		);
+		m_swapchain = create_scope<lt::renderer::vkb::Swapchain>(surface(), gpu(), m_device.get());
 	}
 
 	[[nodiscard]] auto has_any_messages() const -> bool
@@ -185,26 +178,24 @@ private:
 		bool m_has_any_messages {};
 	};
 
-	lt::memory::Scope<UserData> m_user_data = lt::memory::create_scope<UserData>();
+	scope<UserData> m_user_data = create_scope<UserData>();
 
-	lt::memory::Scope<lt::renderer::vkb::Debugger> m_messenger {
-		lt::memory::create_scope<lt::renderer::vkb::Debugger>(
-		    lt::renderer::vkb::Instance::get(),
-		    lt::renderer::vkb::Debugger ::CreateInfo {
-		        .severities = lt::renderer::vkb::Debugger::MessageSeverity::all,
-		        .types = lt::renderer::vkb::Debugger::MessageType::all,
-		        .callback = &messenger_callback,
-		        .user_data = m_user_data.get(),
-		    }
-		)
+	scope<lt::renderer::vkb::Debugger> m_messenger { create_scope<lt::renderer::vkb::Debugger>(
+		lt::renderer::vkb::Instance::get(),
+		lt::renderer::vkb::Debugger ::CreateInfo {
+		    .severities = lt::renderer::vkb::Debugger::MessageSeverity::all,
+		    .types = lt::renderer::vkb::Debugger::MessageType::all,
+		    .callback = &messenger_callback,
+		    .user_data = m_user_data.get(),
+		}
+	) };
+
+	scope<lt::renderer::vkb::Device> m_device {
+		create_scope<lt::renderer::vkb::Device>(gpu(), surface())
 	};
 
-	lt::memory::Scope<lt::renderer::vkb::Device> m_device {
-		lt::memory::create_scope<lt::renderer::vkb::Device>(gpu(), surface())
-	};
-
-	lt::memory::Scope<lt::renderer::vkb::Swapchain> m_swapchain {
-		lt::memory::create_scope<lt::renderer::vkb::Swapchain>(surface(), gpu(), m_device.get())
+	scope<lt::renderer::vkb::Swapchain> m_swapchain {
+		create_scope<lt::renderer::vkb::Swapchain>(surface(), gpu(), m_device.get())
 	};
 };
 
@@ -257,7 +248,7 @@ private:
 		bool m_has_any_messages {};
 	};
 
-	lt::memory::Scope<UserData> m_user_data = lt::memory::create_scope<UserData>();
+	scope<UserData> m_user_data = create_scope<UserData>();
 
 	lt::renderer::System m_system = lt::renderer::System::CreateInfo {
 		.config = { 
