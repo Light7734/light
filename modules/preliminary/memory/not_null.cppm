@@ -168,3 +168,6 @@ public:
 private:
 	Underlying_T m_ptr;
 };
+
+template<class T>
+not_null(T) -> not_null<T>;
