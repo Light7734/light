@@ -1,14 +1,16 @@
-export module memory.not_null;
+export module preliminary.memory.not_null;
 
-import preliminary;
+import preliminary.fundumental_types;
+import preliminary.concepts;
+import preliminary.assertions;
+import preliminary.build_constants;
+import std;
 
 template<typename T>
 using value_or_reference_return_t = std::conditional_t<
     std::is_trivially_copy_constructible_v<T> && sizeof(T) <= sizeof(void *) * 2,
     const T,
     const T &>;
-
-export namespace lt::memory {
 
 /** Makes your code crash when using nullptrs on bind-point instead of dereference point.
  * Which should make debugging easier in case of a logical error.
@@ -28,9 +30,9 @@ export namespace lt::memory {
  *
  * @tparam Underlying_T The underlying pointer type
  */
-template<typename Underlying_T>
+export template<typename Underlying_T>
     requires(std::is_assignable_v<Underlying_T &, std::nullptr_t>)
-class NotNull
+class not_null
 {
 public:
 	/** Constructs from anything convertible to Underlying_T (raw pointer, smart pointer, etc.)
@@ -38,32 +40,32 @@ public:
 	 * @warn Explicit
 	 */
 	template<typename Ptr_T>
-	constexpr explicit NotNull(Ptr_T &&pointer)
+	constexpr explicit not_null(Ptr_T &&pointer)
 	    requires std::is_convertible_v<Ptr_T, Underlying_T>
 	    : m_ptr(std::forward<Ptr_T>(pointer))
 	{
-		ensure(m_ptr != nullptr, "Bound a NotNull ptr to a nullptr!");
+		ensure(m_ptr != nullptr, "Bound a not_null ptr to a nullptr!");
 	}
 
 	/** DISALLOW construction via nullptr_t */
-	NotNull(std::nullptr_t) = delete;
+	not_null(std::nullptr_t) = delete;
 
 	/** DISALLOW assignment to nullptr_t */
-	NotNull &operator=(std::nullptr_t) = delete;
+	not_null &operator=(std::nullptr_t) = delete;
 
 	/** Default move constructor */
-	NotNull(NotNull &&) = default;
+	not_null(not_null &&) = default;
 
 	/** Default copy constructor */
-	NotNull(const NotNull &) = default;
+	not_null(const not_null &) = default;
 
 	/** Default move assignment operator */
-	NotNull &operator=(NotNull &&) = default;
+	not_null &operator=(not_null &&) = default;
 
 	/** Default copy assignment operator */
-	NotNull &operator=(const NotNull &) = default;
+	not_null &operator=(const not_null &) = default;
 
-	~NotNull() = default;
+	~not_null() = default;
 
 	/** Returns the underlying pointer.
 	 * `value_or_reference_return_t` is used because a wrapped `unique_ptr` can only be
@@ -95,64 +97,74 @@ public:
 	}
 
 	/** Equality comparison operator */
-	template<typename T, typename U>
-	constexpr friend auto operator==(const NotNull<T> &lhs, const NotNull<U> &rhs) -> bool
+	constexpr friend auto operator==(
+	    const not_null<Underlying_T> &lhs,
+	    const not_null<Underlying_T> &rhs
+	) -> bool
 	{
 		return lhs.get() == rhs.get();
 	}
 
 	/** Unequality comparison */
-	template<typename T, typename U>
-	constexpr friend auto operator!=(const NotNull<T> &lhs, const NotNull<U> &rhs) -> bool
+	constexpr friend auto operator!=(
+	    const not_null<Underlying_T> &lhs,
+	    const not_null<Underlying_T> &rhs
+	) -> bool
 	{
 		return !(lhs == rhs);
 	}
 
 	/** Swaps the underlying pointers */
-	void swap(NotNull<Underlying_T> &other) noexcept
+	void swap(not_null<Underlying_T> &other) noexcept
 	{
 		std::swap(m_ptr, other.m_ptr);
 	}
 
 	/** DISALLOW pointer arithmetic */
-	NotNull &operator++() = delete;
+	not_null &operator++() = delete;
 
 	/** DISALLOW pointer arithmetic */
-	NotNull &operator--() = delete;
+	not_null &operator--() = delete;
 
 	/** DISALLOW pointer arithmetic */
-	NotNull operator++(int) = delete;
+	not_null operator++(int) = delete;
 
 	/** DISALLOW pointer arithmetic */
-	NotNull operator--(int) = delete;
+	not_null operator--(int) = delete;
 
 	/** DISALLOW pointer arithmetic */
-	NotNull &operator+=(std::ptrdiff_t) = delete;
+	not_null &operator+=(std::ptrdiff_t) = delete;
 
 	/** DISALLOW pointer arithmetic */
-	NotNull &operator-=(std::ptrdiff_t) = delete;
+	not_null &operator-=(std::ptrdiff_t) = delete;
 
 	/** DISALLOW pointer arithmetic */
 	void operator[](std::ptrdiff_t) const = delete;
 
 	/** DISALLOW pointer arithmetic */
-	template<class T, class U>
-	friend std::ptrdiff_t operator-(const NotNull<T> &, const NotNull<U> &) = delete;
+	friend std::ptrdiff_t operator-(
+	    const not_null<Underlying_T> &,
+	    const not_null<Underlying_T> &
+	) = delete;
 
 	/** DISALLOW pointer arithmetic */
-	template<class T>
-	friend NotNull<T> operator-(const NotNull<T> &, std::ptrdiff_t) = delete;
+	friend not_null<Underlying_T> operator-(
+	    const not_null<Underlying_T> &,
+	    std::ptrdiff_t
+	) = delete;
 
 	/** DISALLOW pointer arithmetic */
-	template<class T>
-	friend NotNull<T> operator+(const NotNull<T> &, std::ptrdiff_t) = delete;
+	friend not_null<Underlying_T> operator+(
+	    const not_null<Underlying_T> &,
+	    std::ptrdiff_t
+	) = delete;
 
 	/** DISALLOW pointer arithmetic */
-	template<class T>
-	friend NotNull<T> operator+(std::ptrdiff_t, const NotNull<T> &) = delete;
+	friend not_null<Underlying_T> operator+(
+	    std::ptrdiff_t,
+	    const not_null<Underlying_T> &
+	) = delete;
 
 private:
 	Underlying_T m_ptr;
 };
-
-} // namespace lt::memory

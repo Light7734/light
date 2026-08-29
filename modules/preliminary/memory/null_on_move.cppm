@@ -1,38 +1,38 @@
-export module memory.null_on_move;
+export module preliminary.memory.null_on_move;
 
-import logger;
-
-import preliminary;
-
-export namespace lt::memory {
+import preliminary.fundumental_types;
+import preliminary.concepts;
+import preliminary.assertions;
+import preliminary.build_constants;
+import std;
 
 /** Holds an `Underlying_T`, assigns it to `null_value` when this object is moved.
  *
  * @note For avoiding the need to explicitly implement the move constructor for objects that hold
  * non-raii-handles (eg. Vulkan, Wayland).
  */
-template<typename Underlying_T, Underlying_T null_value = nullptr>
-class NullOnMove
+export template<typename Underlying_T, Underlying_T null_value = nullptr>
+class null_on_move
 {
 public:
-	NullOnMove() = default;
+	null_on_move() = default;
 
-	NullOnMove(Underlying_T value): m_value(value)
+	null_on_move(Underlying_T value): m_value(value)
 	{
 	}
 
-	~NullOnMove() = default;
+	~null_on_move() = default;
 
-	NullOnMove(const NullOnMove &) = delete;
+	null_on_move(const null_on_move &) = delete;
 
-	auto operator=(const NullOnMove &) -> NullOnMove & = delete;
+	auto operator=(const null_on_move &) -> null_on_move & = delete;
 
-	NullOnMove(NullOnMove &&other) noexcept
+	null_on_move(null_on_move &&other) noexcept
 	{
 		*this = std::move(other);
 	}
 
-	auto operator=(NullOnMove &&other) noexcept -> NullOnMove &
+	auto operator=(null_on_move &&other) noexcept -> null_on_move &
 	{
 		if (this == std::addressof(other))
 		{
@@ -94,5 +94,3 @@ public:
 private:
 	Underlying_T m_value;
 };
-
-} // namespace lt::memory

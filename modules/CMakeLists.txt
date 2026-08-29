@@ -2,11 +2,17 @@ add_module(
     NAME
     preliminary
     INTERFACES
+    memory/not_null.cppm
+    memory/null_on_move.cppm
+    memory/ref.cppm
+    memory/scope.cppm
     concepts.cppm
     module.cppm
     fundumental_types.cppm
     assertions.cppm
     build_constants.cppm
+    TESTS
+    memory/not_null.test.cpp
 )
 add_module(
     NAME
@@ -29,20 +35,6 @@ add_module(
 )
 
 add_module(NAME bitwise INTERFACES operations.cppm DEPENDENCIES preliminary)
-add_module(
-    NAME
-    memory
-    INTERFACES
-    not_null.cppm
-    null_on_move.cppm
-    reference.cppm
-    scope.cppm
-    DEPENDENCIES
-    preliminary
-    logger
-    TESTS
-    not_null.test.cpp
-)
 add_module(
     NAME
     time
@@ -142,8 +134,7 @@ add_module(
     system.cppm
     DEPENDENCIES
     preliminary
-    memory
-    PRIVATE_DEPENDENCIES
+    logger
 )
 
 add_module(
@@ -155,7 +146,6 @@ add_module(
     entity.cppm
     DEPENDENCIES
     logger
-    memory
     TESTS
     registry.test.cpp
     sparse_set.test.cpp
@@ -204,7 +194,6 @@ add_module(
     ecs
     app
     math
-    memory
     input_codes
     wayland-client
     PRIVATE_DEPENDENCIES
@@ -259,7 +248,6 @@ add_module(
     preliminary
     app
     ecs
-    memory
     assets
     time
     bitwise
@@ -288,7 +276,6 @@ add_module(
     INTERFACES
     system.cppm
     DEPENDENCIES
-    memory
     app
     time
     input
