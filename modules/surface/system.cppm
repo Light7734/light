@@ -12,12 +12,9 @@ import ecs.registry;
 import math.vec2;
 import input.codes;
 import surface.requests;
-import memory.reference;
-import memory.null_on_move;
 import logger;
 import preliminary;
 import surface.constants;
-import memory.reference;
 import surface.requests;
 import surface.events;
 import logger;
@@ -30,7 +27,7 @@ export namespace lt::surface {
 class System: public app::ISystem
 {
 public:
-	[[nodiscard]] System(memory::Ref<ecs::Registry> registry);
+	[[nodiscard]] System(ref<ecs::Registry> registry);
 
 	~System() override;
 
@@ -143,11 +140,11 @@ private:
 
 	void modify_visibility(SurfaceComponent &surface, const ModifyVisibilityRequest &request);
 
-	memory::Ref<ecs::Registry> m_registry;
+	ref<ecs::Registry> m_registry;
 
 	app::TickResult m_last_tick_result {};
 
-	memory::NullOnMove<wl_display *> m_wl_display {};
+	null_on_move<wl_display *> m_wl_display {};
 
 	wl_registry *m_wl_registry {};
 
@@ -489,7 +486,7 @@ catch (const std::exception &exp)
 	log::error("\twhat: {}", exp.what());
 }
 
-System::System(memory::Ref<ecs::Registry> registry)
+System::System(ref<ecs::Registry> registry)
     : m_wl_registry_listener(
           {
               .global = wayland_registry_listener,

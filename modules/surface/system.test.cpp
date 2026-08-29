@@ -8,8 +8,6 @@ import surface.system;
 import surface.events;
 import surface.requests;
 import ecs.registry;
-import memory.scope;
-import memory.reference;
 import math.vec2;
 import math.formatter;
 import app.system;
@@ -43,13 +41,13 @@ struct overloads: Ts...
 class Fixture
 {
 public:
-	[[nodiscard]] auto registry() -> lt::memory::Ref<lt::ecs::Registry>
+	[[nodiscard]] auto registry() -> ref<lt::ecs::Registry>
 	{
 		return m_registry;
 	}
 
 
-	[[nodiscard]] auto system() -> lt::memory::Ref<System>
+	[[nodiscard]] auto system() -> ref<System>
 	{
 		return m_system;
 	}
@@ -83,9 +81,9 @@ public:
 	}
 
 private:
-	lt::memory::Ref<lt::ecs::Registry> m_registry = lt::memory::create_ref<lt::ecs::Registry>();
+	ref<lt::ecs::Registry> m_registry = create_ref<lt::ecs::Registry>();
 
-	lt::memory::Ref<System> m_system = lt::memory::create_ref<System>(m_registry);
+	ref<System> m_system = create_ref<System>(m_registry);
 };
 
 Suite raii = "raii"_suite = [] {
@@ -116,7 +114,7 @@ Suite raii = "raii"_suite = [] {
 	//
 	// Case { "post destruct has correct state" } = [] {
 	// 	auto fixture = Fixture {};
-	// 	auto system = lt::memory::create_scope<System>(fixture.registry());
+	// 	auto system = create_scope<System>(fixture.registry());
 	//
 	// 	fixture.create_component();
 	// 	expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
@@ -201,7 +199,7 @@ Suite raii = "raii"_suite = [] {
 //
 // 	Case { "on_destroy cleans up component" } = [] {
 // 		auto fixture = Fixture {};
-// 		auto system = lt::memory::create_scope<System>(fixture.registry());
+// 		auto system = create_scope<System>(fixture.registry());
 //
 // 		const auto &component = fixture.create_component();
 // 		expect_eq(fixture.registry()->view<SurfaceComponent>().get_size(), 1);
