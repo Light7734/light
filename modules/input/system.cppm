@@ -3,7 +3,6 @@ export import :components;
 import logger;
 import app.system;
 import ecs.registry;
-import memory.reference;
 import surface.system;
 import surface.events;
 import math.vec2;
@@ -14,7 +13,7 @@ namespace lt::input {
 export class System: public app::ISystem
 {
 public:
-	System(memory::Ref<ecs::Registry> registry);
+	System(ref<ecs::Registry> registry);
 
 	void tick(app::TickInfo tick) override;
 
@@ -38,7 +37,7 @@ private:
 
 	void on_pointer(const lt::surface::PointerEvent &event);
 
-	memory::Ref<ecs::Registry> m_registry {};
+	ref<ecs::Registry> m_registry {};
 
 	std::array<bool, 512> m_keys {};
 
@@ -57,7 +56,7 @@ struct overloads: Ts...
 	using Ts::operator()...;
 };
 
-System::System(memory::Ref<ecs::Registry> registry): m_registry(std::move(registry))
+System::System(ref<ecs::Registry> registry): m_registry(std::move(registry))
 {
 	ensure(m_registry, "Failed to initialize input system: null registry");
 }

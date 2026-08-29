@@ -2,8 +2,6 @@ import test;
 import input.system;
 import input.codes;
 import surface.events;
-import memory.scope;
-import memory.reference;
 import app.system;
 import ecs.entity;
 import ecs.registry;
@@ -24,7 +22,7 @@ using ::lt::input::System;
 class Fixture
 {
 public:
-	[[nodiscard]] auto registry() -> lt::memory::Ref<lt::ecs::Registry>
+	[[nodiscard]] auto registry() -> ref<lt::ecs::Registry>
 	{
 		return m_registry;
 	}
@@ -49,7 +47,7 @@ public:
 	}
 
 private:
-	lt::memory::Ref<lt::ecs::Registry> m_registry = lt::memory::create_ref<lt::ecs::Registry>();
+	ref<lt::ecs::Registry> m_registry = create_ref<lt::ecs::Registry>();
 
 	lt::surface::System m_surface_system = lt::surface::System { m_registry };
 };
@@ -107,7 +105,7 @@ Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_destrroy<InputComponent>" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = lt::memory::create_scope<System>(registry);
+		auto system = create_scope<System>(registry);
 
 		auto entity_a = fixture.add_input_component();
 		auto entity_b = fixture.add_input_component();
