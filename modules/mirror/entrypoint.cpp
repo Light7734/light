@@ -2,7 +2,6 @@ import app;
 import app.system;
 import std;
 import logger;
-import memory.scope;
 import mirror.system;
 import renderer.factory;
 
@@ -14,7 +13,7 @@ auto main(i32 argc, char *argv[]) -> i32
 		ignore = argc;
 		ignore = argv;
 
-		auto application = lt::memory::create_scope<lt::Mirror>();
+		auto application = create_scope<lt::Mirror>();
 		if (!application)
 		{
 			throw std::runtime_error { "Failed to create application\n" };

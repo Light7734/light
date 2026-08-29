@@ -13,8 +13,6 @@ import input.codes;
 import input.events;
 import input.system;
 import math.components;
-import memory.reference;
-import memory.scope;
 import renderer.components;
 import renderer.system;
 import surface.events;
@@ -46,7 +44,7 @@ class MirrorSystem: public lt::app::ISystem
 {
 public:
 	MirrorSystem(
-	    memory::Ref<ecs::Registry> registry,
+	    ref<ecs::Registry> registry,
 	    size_t quit_action_key,
 	    std::array<size_t, 4ul> debug_action_keys
 	)
@@ -128,7 +126,7 @@ public:
 	}
 
 private:
-	memory::Ref<ecs::Registry> m_registry;
+	ref<ecs::Registry> m_registry;
 
 	size_t m_quit_action_key;
 
@@ -142,7 +140,7 @@ export class Mirror: public app::Application
 public:
 	Mirror()
 	{
-		m_editor_registry = memory::create_ref<ecs::Registry>();
+		m_editor_registry = create_ref<ecs::Registry>();
 
 		setup_window_system();
 		setup_input_system();
@@ -164,7 +162,7 @@ public:
 	{
 		using lt::input::InputComponent;
 		using lt::surface::SurfaceComponent;
-		m_surface_system = memory::create_ref<lt::surface::System>(m_editor_registry);
+		m_surface_system = create_ref<lt::surface::System>(m_editor_registry);
 
 		m_window = m_editor_registry->create_entity();
 		m_surface_system->create_surface_component(
@@ -214,14 +212,14 @@ public:
 		    }
 		);
 
-		m_input_system = memory::create_ref<input::System>(m_editor_registry);
-		m_mirror_system = memory::create_ref<MirrorSystem>(
+		m_input_system = create_ref<input::System>(m_editor_registry);
+		m_mirror_system = create_ref<MirrorSystem>(
 		    m_editor_registry,
 		    quit_action_key,
 		    debug_action_keys
 		);
 
-		auto entity = ecs::Entity { m_editor_registry, m_window };
+		auto entity = ecs::Entity { not_null<ref<lt::ecs::Registry>>(m_editor_registry), m_window };
 
 		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
 		    .config = { .max_frames_in_flight = 3u },
@@ -279,15 +277,15 @@ public:
 	}
 
 private:
-	memory::Ref<ecs::Registry> m_editor_registry;
+	ref<ecs::Registry> m_editor_registry;
 
-	memory::Ref<lt::surface::System> m_surface_system;
+	ref<lt::surface::System> m_surface_system;
 
-	memory::Ref<lt::input::System> m_input_system;
+	ref<lt::input::System> m_input_system;
 
-	memory::Ref<lt::renderer::System> m_renderer_system;
+	ref<lt::renderer::System> m_renderer_system;
 
-	memory::Ref<MirrorSystem> m_mirror_system;
+	ref<MirrorSystem> m_mirror_system;
 
 	lt::ecs::EntityId m_window = lt::ecs::null_entity;
 
