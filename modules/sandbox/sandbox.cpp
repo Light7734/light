@@ -9,8 +9,6 @@ import surface.requests;
 import ecs.entity;
 import input.codes;
 import ecs.registry;
-import memory.scope;
-import memory.reference;
 import logger;
 import math.vec2;
 import app.system;
@@ -44,7 +42,7 @@ void renderer_debug_callback(
 auto main() -> i32
 try
 {
-	auto registry = lt::memory::create_ref<lt::ecs::Registry>();
+	auto registry = create_ref<lt::ecs::Registry>();
 	auto surface_system = lt::surface::System { registry };
 
 	auto entity = registry->create_entity();
