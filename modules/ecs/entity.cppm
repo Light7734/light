@@ -1,7 +1,6 @@
 export module ecs.entity;
 
 import preliminary;
-import memory.reference;
 import ecs.registry;
 
 export namespace lt::ecs {
@@ -10,11 +9,10 @@ export namespace lt::ecs {
 class Entity
 {
 public:
-	Entity(memory::Ref<Registry> registry, EntityId identifier)
-	    : m_registry(std::move(registry))
+	Entity(const not_null<ref<Registry>> &registry, EntityId identifier)
+	    : m_registry(registry.get())
 	    , m_identifier(identifier)
 	{
-		ensure(m_registry, "Failed to create Entity ({}): null registry", m_identifier);
 	}
 
 	template<typename Component_T>
@@ -35,7 +33,7 @@ public:
 		return m_registry->get<Component_T>(m_identifier);
 	}
 
-	auto get_registry() -> memory::Ref<Registry>
+	auto get_registry() -> ref<Registry>
 	{
 		return m_registry;
 	}
@@ -46,7 +44,7 @@ public:
 	}
 
 private:
-	memory::Ref<Registry> m_registry;
+	ref<Registry> m_registry;
 
 	EntityId m_identifier;
 };
