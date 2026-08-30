@@ -49,10 +49,6 @@ Suite raii = "raii"_suite = [] {
 		}
 	};
 
-	/* Compile-time guarantees,
-	 * checked via type traits rather than runtime behavior, since these are meant to be *compile*
-	 * errors
-	 */
 	Case { "nullptr_t is rejected at compile time, not just at runtime" } = [] {
 		static_assert(!(std::is_constructible_v<not_null<i32 *>, std::nullptr_t>));
 		static_assert(!(std::is_assignable_v<not_null<i32 *> &, std::nullptr_t>));
