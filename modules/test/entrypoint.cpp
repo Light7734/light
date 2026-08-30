@@ -110,6 +110,7 @@ void print_help()
 }
 
 auto main(i32 argc, char **argv) -> i32
+
 try
 {
 	lt::log::set_severity(lt::log::Level::test);
@@ -146,14 +147,11 @@ try
 }
 catch (const std::exception &exp)
 {
-	std::println("Terminated due to uncaught exception:");
-	std::println("\twhat: {}", exp.what());
-
+	std::cout << "Terminated due to uncaught exception:\n\twhat: " << exp.what();
 	return 1;
 }
 catch (...)
 {
-	std::println("Terminated due to uncaught non-std exception!");
-
+	std::cout << "Terminated due to uncaught non-std exception!";
 	return 1;
 }

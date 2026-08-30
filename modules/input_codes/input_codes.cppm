@@ -203,6 +203,7 @@ enum class Key : u16
 	case delete_: return "delete";
 
 	case shift: return "shift";
+	case right_shift: return "right_shift";
 	case control: return "control";
 	case right_control: return "right_control";
 	case alt: return "alt";
