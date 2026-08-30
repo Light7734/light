@@ -21,12 +21,13 @@ using value_or_reference_return_t = std::conditional_t<
  * old T* form stop compiling and require explicitly specifying that they indeed understand the
  * passed point should not be null
  *
- * ALLOWS construction from Underlying_T (which MUST be nullptr assignable)
+ * ALLOWS construction from Underlying_T (which MUST be nullptr_t assignable)
  * ALLOWS implicit conversion to Underlying_T
  * DISALLOWS default construction
  * DISALLOWS construction from nullptr_t
  * DISALLOWS pointer arithmetics
- * THROWS when constructing an Underlying_T with a nullptr
+ * FORCES explicit construction when passing pointers around
+ * THROWS when constructing an Underlying_T with a null value
  *
  * @tparam Underlying_T The underlying pointer type
  */
