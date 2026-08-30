@@ -92,7 +92,22 @@ export constexpr void expect_ne(
     std::source_location source_location = std::source_location::current()
 )
 {
-	if (lhs == rhs)
+	if constexpr (std::is_enum_v<decltype(lhs)>)
+	{
+		if (lhs != rhs)
+		{
+			throw std::runtime_error {
+				std::format(
+				    "expect_ne: {} != {} @ {}:{}",
+				    std::to_underlying<decltype(lhs)>(lhs),
+				    std::to_underlying<decltype(rhs)>(rhs),
+				    source_location.file_name(),
+				    source_location.line()
+				),
+			};
+		}
+	}
+	else if (lhs == rhs)
 	{
 		throw std::runtime_error {
 			std::format(
