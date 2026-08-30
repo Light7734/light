@@ -20,6 +20,7 @@ export using ::lt::test::expect_false;
 
 export using ::lt::test::expect_throw;
 export using ::lt::test::expect_not_nullptr;
+export using ::lt::test::expect_str_contains;
 export using ::lt::test::expect_unreachable;
 
 export using ::lt::test::operator""_suite;

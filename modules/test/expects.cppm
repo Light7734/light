@@ -246,4 +246,24 @@ export constexpr void expect_not_nullptr(
 	}
 }
 
+export constexpr void expect_str_contains(
+    const std::string &string,
+    const std::string &token,
+    std::source_location source_location = std::source_location::current()
+)
+{
+	if (!string.contains(token))
+	{
+		throw std::runtime_error {
+			std::format(
+			    "expect_str_contains @ {}:{} \nstring: {}\n token: {}",
+			    source_location.file_name(),
+			    source_location.line(),
+			    string,
+			    token
+			),
+		};
+	}
+}
+
 } // namespace lt::test
