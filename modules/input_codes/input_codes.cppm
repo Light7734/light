@@ -45,7 +45,7 @@ enum class Key : u16
 	delete_,
 
 	shift,
-	left_shit = shift,
+	left_shift = shift,
 	l_shift = shift,
 
 	right_shift,
