@@ -155,7 +155,10 @@ add_module(
     NAME input_codes INTERFACES input_codes.cppm DEPENDENCIES preliminary
 )
 
-if(ENABLE_MSAN OR ENABLE_TSAN OR ENABLE_VALGRIND)
+if(ENABLE_MSAN
+   OR ENABLE_TSAN
+   OR ENABLE_VALGRIND
+)
     return()
 endif()
 

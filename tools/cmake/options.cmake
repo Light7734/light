@@ -24,7 +24,8 @@ add_option(
 )
 
 add_option(
-    ENABLE_LSAN "Disables build of modules that are problematic for checking such a tool"
+    ENABLE_LSAN
+    "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
     ENABLE_ASAN
@@ -35,14 +36,17 @@ add_option(
     "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
-    ENABLE_MSAN "Disables build of modules that are problematic for checking such a tool"
+    ENABLE_MSAN
+    "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
-    ENABLE_TSAN "Disables build of modules that are problematic for checking such a tool"
+    ENABLE_TSAN
+    "Disables build of modules that are problematic for checking such a tool"
 )
 
 add_option(
-    ENABLE_VALGRIND "Disables build of modules that are problematic for checking such a tool"
+    ENABLE_VALGRIND
+    "Disables build of modules that are problematic for checking such a tool"
 )
 
 if(ENABLE_STATIC_ANALYSIS)
