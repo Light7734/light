@@ -24,21 +24,22 @@ add_option(
 )
 
 add_option(
-    ENABLE_LSAN "Disables build of modules that don't supprot leak sanitizer"
+    ENABLE_LSAN "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
     ENABLE_ASAN
-    "Disables build of modules that don't supprot address sanitizer"
+    "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
     ENABLE_UBSAN
-    "Disables build of modules that don't supprot undefined behavior sanatizer"
+    "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
-    ENABLE_MSAN "Disables build of modules that don't supprot memory sanitizer"
+    ENABLE_MSAN "Disables build of modules that are problematic for checking such a tool"
 )
 add_option(
-    ENABLE_TSAN "Disables build of modules that don't supprot thread sanitizer"
+    ENABLE_TSAN "Disables build of modules that are problematic for checking such a tool"
+)
 
 add_option(
     ENABLE_VALGRIND "Disables build of modules that are problematic for checking such a tool"
