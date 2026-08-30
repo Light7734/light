@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)/"
 rm -rf ./build/
@@ -30,6 +29,7 @@ cmake \
     -D CMAKE_CXX_FLAGS="-std=c++26 -stdlib=libc++ -fno-omit-frame-pointer -fno-inline-functions -fno-common -g" \
     -D CMAKE_EXPORT_COMPILE_COMMANDS=TRUE \
     -D ENABLE_UNIT_TESTS=ON \
+    -D ENABLE_VALGRIND=ON \
     -D CMAKE_BUILD_TYPE=Release
 
 cmake --build ./build -j"$(nproc)"
@@ -40,10 +40,6 @@ while IFS= read -r -d '' test; do
     valgrind \
         --leak-check=full \
         --show-leak-kinds=all \
-        --track-origins=yes \
-        --verbose \
-        --num-callers=50 \
-        --gen-suppressions=all \
         --suppressions='./tools/ci/valgrind.supp' \
         --error-exitcode=255 "${test}" || exit 1
 
