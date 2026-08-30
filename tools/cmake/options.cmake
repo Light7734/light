@@ -39,6 +39,9 @@ add_option(
 )
 add_option(
     ENABLE_TSAN "Disables build of modules that don't supprot thread sanitizer"
+
+add_option(
+    ENABLE_VALGRIND "Disables build of modules that are problematic for checking such a tool"
 )
 
 if(ENABLE_STATIC_ANALYSIS)
