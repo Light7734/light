@@ -54,12 +54,12 @@ Suite raii = "raii"_suite = [] {
 	 * errors
 	 */
 	Case { "nullptr_t is rejected at compile time, not just at runtime" } = [] {
-		expect_false(std::is_constructible_v<not_null<i32 *>, std::nullptr_t>);
-		expect_false(std::is_assignable_v<not_null<i32 *> &, std::nullptr_t>);
+		static_assert(!(std::is_constructible_v<not_null<i32 *>, std::nullptr_t>));
+		static_assert(!(std::is_assignable_v<not_null<i32 *> &, std::nullptr_t>));
 	};
 
 	Case { "there is no default constructor" } = [] {
-		expect_false(std::is_default_constructible_v<not_null<i32 *>>);
+		static_assert(!(std::is_default_constructible_v<not_null<i32 *>>));
 	};
 };
 
