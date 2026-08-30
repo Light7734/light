@@ -16,7 +16,7 @@ concept Printable = Formattable<T> || requires(std::ostream &stream, T value) {
 };
 
 template<typename T>
-concept Testable = Printable<T> && std::equality_comparable<T>;
+concept Testable = (Printable<T> || std::is_pointer_v<T>) && std::equality_comparable<T>;
 
 export void expect_unreachable(
     std::source_location source_location = std::source_location::current()
@@ -72,6 +72,22 @@ export constexpr void expect_eq(
 			};
 		}
 	}
+	// TODO(Light): ensure that rhs type can't cause trouble
+	else if constexpr (std::is_pointer_v<decltype(lhs)>)
+	{
+		if (lhs != rhs)
+		{
+			throw std::runtime_error {
+				std::format(
+				    "expect_eq: 0x{:x} == 0x{:x} @ {}:{}",
+				    std::bit_cast<size_t>(lhs),
+				    std::bit_cast<size_t>(rhs),
+				    source_location.file_name(),
+				    source_location.line()
+				),
+			};
+		}
+	}
 	else if (lhs != rhs)
 	{
 		throw std::runtime_error {
@@ -101,6 +117,22 @@ export constexpr void expect_ne(
 				    "expect_ne: {} != {} @ {}:{}",
 				    std::to_underlying<decltype(lhs)>(lhs),
 				    std::to_underlying<decltype(rhs)>(rhs),
+				    source_location.file_name(),
+				    source_location.line()
+				),
+			};
+		}
+	}
+	// TODO(Light): ensure that rhs type can't cause trouble
+	else if constexpr (std::is_pointer_v<decltype(lhs)>)
+	{
+		if (lhs == rhs)
+		{
+			throw std::runtime_error {
+				std::format(
+				    "expect_eq: 0x{:x} != 0x{:x} @ {}:{}",
+				    std::bit_cast<size_t>(lhs),
+				    std::bit_cast<size_t>(rhs),
 				    source_location.file_name(),
 				    source_location.line()
 				),
