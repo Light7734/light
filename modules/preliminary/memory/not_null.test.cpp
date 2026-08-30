@@ -22,7 +22,7 @@ Suite raii = "raii"_suite = [] {
 		auto value = i32 { 5 };
 
 		auto nonull = not_null<i32 *>(&value);
-		expect_true(nonull.get() == &value);
+		expect_eq(nonull.get(), &value);
 	};
 
 	Case { "constructing from a null raw pointer throws" } = [] {
@@ -45,7 +45,7 @@ Suite raii = "raii"_suite = [] {
 		}
 		catch (const std::exception &exp)
 		{
-			expect_true(std::string(exp.what()).contains("nullptr"));
+			expect_str_contains(exp.what(), "nullptr");
 		}
 	};
 
@@ -68,7 +68,7 @@ Suite access_and_conversion = "access and conversion"_suite = [] {
 		auto value = i32 { 7 };
 		auto nonull = not_null<i32 *> { &value };
 
-		expect_true((i32 *) { nonull } == &value);
+		expect_eq((i32 *) { nonull }, &value);
 	};
 
 	Case { "passing not_null where a raw T parameter is expected" } = [] {
@@ -79,7 +79,7 @@ Suite access_and_conversion = "access and conversion"_suite = [] {
 			return *p;
 		};
 
-		expect_true(takes_raw(nonull) == 9);
+		expect_eq(takes_raw(nonull), 9);
 	};
 
 	Case { "contextual boolean conversion is always true for a valid not_null" } = [] {
@@ -93,31 +93,31 @@ Suite access_and_conversion = "access and conversion"_suite = [] {
 		auto widget = Widget {};
 
 		auto nonull = not_null<Widget *> { &widget };
-		expect_true(nonull->get_value() == 42);
+		expect_eq(nonull->get_value(), 42);
 
 		nonull->set_value(100);
-		expect_true(widget.value == 100);
+		expect_eq(widget.value, 100);
 	};
 
 	Case { "operator* dereferences to the pointee and allows mutation" } = [] {
 		auto value = i32 { 3 };
 
 		auto nonull = not_null<i32 *> { &value };
-		expect_true(*nonull == 3);
+		expect_eq(*nonull, 3);
 
 		*nonull = 10;
-		expect_true(value == 10);
+		expect_eq(value, 10);
 	};
 
 	Case { "const not_null objects remain fully usable" } = [] {
 		auto widget = Widget {};
 
 		const auto nonull = not_null<Widget *> { &widget };
-		expect_true(nonull->get_value() == 42);
-		expect_true((*nonull).value == 42);
+		expect_eq(nonull->get_value(), 42);
+		expect_eq((*nonull).value, 42);
 
 		auto *raw_ptr = (Widget *) { nonull };
-		expect_true(raw_ptr == &widget);
+		expect_eq(raw_ptr, &widget);
 	};
 };
 
@@ -127,13 +127,13 @@ Suite copy_move_assignment = "copy, move, and assigment"_suite = [] {
 
 		auto ptr_a = not_null<i32 *>(&value_a_b);
 		auto ptr_b = not_null<i32 *>(ptr_a);
-		expect_true(ptr_b.get() == &value_a_b);
+		expect_eq(ptr_b.get(), &value_a_b);
 
 		auto value_c = i32 { 2 };
 		auto c = not_null<i32 *> { &value_c };
 
 		c = ptr_a;
-		expect_true(c.get() == &value_a_b);
+		expect_eq(c.get(), &value_a_b);
 	};
 
 	Case { "move construction and move assignment compile for move-only T" } = [] {
@@ -181,13 +181,10 @@ Suite pointers_and_containers = "interop with smart pointers and containers"_sui
 		auto shared_ptr = std::make_shared<Widget>();
 		auto nonull = not_null<std::shared_ptr<Widget>> { shared_ptr };
 
-		expect_true(nonull->get_value() == 42);
-		// use_count is 3, not 2: sp + nn's internal copy + the temporary that
-		// get() itself returns by value (another consequence of accessors
-		// returning T by value instead of by reference).
-		expect_true(nonull.get().use_count() == 3);
+		expect_eq(nonull->get_value(), 42);
+		expect_eq(nonull.get().use_count(), 2);
 		nonull->set_value(7);
-		expect_true(shared_ptr->value == 7);
+		expect_eq(shared_ptr->value, 7);
 	};
 
 	Case { "can be stored in standard containers" } = [] {
@@ -198,9 +195,9 @@ Suite pointers_and_containers = "interop with smart pointers and containers"_sui
 		vec.push_back(not_null<i32 *>(&nums[1])); // NOLINT(modernize-use-emplace)
 		vec.emplace_back(&nums[2]);
 
-		expect_true(vec.size() == 3);
-		expect_true(*vec[0] == 1);
-		expect_true(*vec[1] == 2);
-		expect_true(*vec[2] == 3);
+		expect_eq(vec.size(), 3);
+		expect_eq(*vec[0], 1);
+		expect_eq(*vec[1], 2);
+		expect_eq(*vec[2], 3);
 	};
 };
