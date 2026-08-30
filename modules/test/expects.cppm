@@ -1,6 +1,5 @@
 export module test.expects;
 
-
 import preliminary;
 
 namespace lt::test {
@@ -238,7 +237,7 @@ export constexpr void expect_not_nullptr(
 	{
 		throw std::runtime_error {
 			std::format(
-			    "expect_not_nullptr: @ {}:{}",
+			    "expect_not_nullptr @ {}:{}",
 			    source_location.file_name(),
 			    source_location.line()
 			),
