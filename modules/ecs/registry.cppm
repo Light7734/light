@@ -240,10 +240,7 @@ private:
 		}
 
 		auto *base_set = m_sparsed_sets[type_id].get();
-		auto *derived_set = dynamic_cast<SparseSet<T, EntityId> *>(base_set);
-		ensure(derived_set, "Failed to downcast to derived set");
-
-		return *derived_set;
+		return *(not_null { dynamic_cast<SparseSet<T, EntityId> *>(base_set) }.get());
 	}
 
 	EntityId m_current;
