@@ -13,7 +13,7 @@ namespace lt::input {
 export class System: public app::ISystem
 {
 public:
-	System(ref<ecs::Registry> registry);
+	System(const not_null<ref<ecs::Registry>> &registry);
 
 	void tick(app::TickInfo tick) override;
 
@@ -56,9 +56,8 @@ struct overloads: Ts...
 	using Ts::operator()...;
 };
 
-System::System(ref<ecs::Registry> registry): m_registry(std::move(registry))
+System::System(const not_null<ref<ecs::Registry>> &registry): m_registry(registry)
 {
-	ensure(m_registry, "Failed to initialize input system: null registry");
 }
 
 void System::tick(app::TickInfo tick)

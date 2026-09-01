@@ -49,16 +49,12 @@ public:
 private:
 	ref<lt::ecs::Registry> m_registry = create_ref<lt::ecs::Registry>();
 
-	lt::surface::System m_surface_system = lt::surface::System { m_registry };
+	lt::surface::System m_surface_system = lt::surface::System { not_null { m_registry } };
 };
 
 Suite raii = "raii"_suite = "raii"_suite = [] {
 	Case { "happy paths" } = [&] {
-		System { Fixture {}.registry() };
-	};
-
-	Case { "unhappy paths" } = [] {
-		expect_throw([] { ignore = System { {} }; });
+		System { not_null { Fixture {}.registry() } };
 	};
 
 	Case { "many" } = [&] {
@@ -66,7 +62,7 @@ Suite raii = "raii"_suite = "raii"_suite = [] {
 		for (auto idx : std::views::iota(0, 10'000))
 		{
 			ignore = idx;
-			ignore = System { fixture.registry() };
+			ignore = System { not_null { fixture.registry() } };
 		}
 	};
 };
@@ -75,7 +71,7 @@ Suite system_events = "system_events"_suite = [] {
 	Case { "on_register won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = System { registry };
+		auto system = System { not_null { registry } };
 
 		system.on_register();
 		expect_eq(registry->view<InputComponent>().get_size(), 0);
@@ -84,7 +80,7 @@ Suite system_events = "system_events"_suite = [] {
 	Case { "on_unregister won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = System { registry };
+		auto system = System { not_null { registry } };
 
 		system.on_register();
 		system.on_unregister();
@@ -96,7 +92,7 @@ Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_construct<InputComnent>" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = System { registry };
+		auto system = System { not_null { registry } };
 
 		fixture.add_input_component();
 		expect_eq(registry->view<InputComponent>().get_size(), 1);
@@ -105,7 +101,7 @@ Suite registry_events = "registry_events"_suite = [] {
 	Case { "on_destrroy<InputComponent>" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = create_scope<System>(registry);
+		auto system = create_scope<System>(not_null { registry });
 
 		auto entity_a = fixture.add_input_component();
 		auto entity_b = fixture.add_input_component();
@@ -126,7 +122,7 @@ Suite tick = "tick"_suite = [] {
 	Case { "Empty tick won't throw" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = System { fixture.registry() };
+		auto system = System { not_null { fixture.registry() } };
 
 		system.tick(tick_info());
 	};
@@ -134,7 +130,7 @@ Suite tick = "tick"_suite = [] {
 	Case { "Tick triggers input action" } = [] {
 		auto fixture = Fixture {};
 		auto registry = fixture.registry();
-		auto system = System { fixture.registry() };
+		auto system = System { not_null { fixture.registry() } };
 
 		auto surface_entity = fixture.add_surface_component();
 		auto &surface = registry->get<lt::surface::SurfaceComponent>(surface_entity);
