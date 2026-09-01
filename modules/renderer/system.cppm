@@ -30,8 +30,9 @@ export namespace lt::renderer {
 /** The main rendering engine.
  *
  * Responsible for:
- * - Creating a rendering backend context (vk/dx/mt)
- * - Connecting the context to the physical devices (select gpu, create surface, logical device)
+ * - Creating a rendering backend context (currently only Vulkan is supported)
+ * - Connecting the context to the physical devices (select gpu, creating surface (a window on a
+ * display/monitor), logical device (a driver))
  * - Rendering the scene represented in registry via lt::renderer::components.
  */
 class System: public app::ISystem
@@ -211,6 +212,7 @@ void System::handle_surface_resized_events()
 			) };
 
 			// No need to process multiple resize events
+			// TODO(Light): what am I reading here? can't there be other event types?
 			break;
 		}
 	}
