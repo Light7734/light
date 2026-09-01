@@ -83,7 +83,7 @@ public:
 private:
 	ref<lt::ecs::Registry> m_registry = create_ref<lt::ecs::Registry>();
 
-	ref<System> m_system = create_ref<System>(m_registry);
+	ref<System> m_system = create_ref<System>(not_null{m_registry});
 };
 
 Suite raii = "raii"_suite = [] {

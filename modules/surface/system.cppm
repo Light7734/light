@@ -27,7 +27,7 @@ export namespace lt::surface {
 class System: public app::ISystem
 {
 public:
-	[[nodiscard]] System(ref<ecs::Registry> registry);
+	[[nodiscard]] explicit System(const not_null<ref<ecs::Registry>> &registry);
 
 	~System() override;
 
@@ -486,7 +486,7 @@ catch (const std::exception &exp)
 	log::error("\twhat: {}", exp.what());
 }
 
-System::System(ref<ecs::Registry> registry)
+/* explicit */ System::System(const not_null<ref<ecs::Registry>> &registry)
     : m_wl_registry_listener(
           {
               .global = wayland_registry_listener,
@@ -499,7 +499,7 @@ System::System(ref<ecs::Registry> registry)
               .name = &seat_name_listener,
           }
       )
-    , m_registry(std::move(registry))
+    , m_registry(registry)
     , m_wl_pointer_listener(
           {
               .enter = &wayland_pointer_enter_listener,
@@ -518,14 +518,10 @@ System::System(ref<ecs::Registry> registry)
 		on_surface_destruct(registry, entity_id);
 	});
 
-	ensure(m_registry, "Failed to construct surface::System: null ecs::Registry");
-
-	m_wl_display = wl_display_connect({});
-	ensure(m_wl_display, "Failed to connect to Wayland display");
+	m_wl_display = not_null { wl_display_connect({}) }.get();
 
 	// NOLINTNEXTLINE
-	m_wl_registry = wl_display_get_registry(m_wl_display);
-	ensure(m_wl_registry, "Failed to get Wayland display's registry");
+	m_wl_registry = not_null { wl_display_get_registry(m_wl_display) };
 
 	// TODO(Light): "this" could be moved around... replace with a pointer to some heap allocation
 	wl_registry_add_listener(m_wl_registry, &m_wl_registry_listener, this);
@@ -655,15 +651,12 @@ try
 	const auto &position = surface.get_position();
 	surface.m_wl_display = m_wl_display;
 
-	surface.m_wl_surface = wl_compositor_create_surface(m_wl_compositor);
-	ensure(surface.m_wl_surface, "Failed to create Wayland surface");
+	surface.m_wl_surface = not_null { wl_compositor_create_surface(m_wl_compositor) };
 
-	surface.m_xdg_surface = xdg_wm_base_get_xdg_surface(m_shell, surface.m_wl_surface);
-	ensure(surface.m_xdg_surface, "Failed to get XDG-shell surface");
+	surface.m_xdg_surface = not_null { xdg_wm_base_get_xdg_surface(m_shell, surface.m_wl_surface) };
 	xdg_surface_add_listener(surface.m_xdg_surface, &shell_surface_listener, {});
 
-	surface.m_xdg_toplevel = xdg_surface_get_toplevel(surface.m_xdg_surface);
-	ensure(surface.m_xdg_toplevel, "Failed to get XDG-shell toplevel");
+	surface.m_xdg_toplevel = not_null { xdg_surface_get_toplevel(surface.m_xdg_surface) };
 	xdg_toplevel_add_listener(surface.m_xdg_toplevel, &toplevel_listener, {});
 
 	xdg_toplevel_set_title(surface.m_xdg_toplevel, info.title.c_str());
@@ -768,9 +761,7 @@ void System::handle_requests(SurfaceComponent &surface)
 
 void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &request)
 {
-	auto *toplevel = surface.m_xdg_toplevel;
-	ensure(toplevel, "Failed to modify surface title: null shell toplevel");
-	ensure(!request.title.empty(), "Failed to modify surface title: null titlle");
+	auto *toplevel = not_null { surface.m_xdg_toplevel }.get();
 
 	xdg_toplevel_set_title(toplevel, request.title.c_str());
 	wl_surface_commit(surface.m_wl_surface);
@@ -780,8 +771,8 @@ void System::modify_title(SurfaceComponent &surface, const ModifyTitleRequest &r
 void System::modify_resolution(SurfaceComponent &surface, const ModifyResolutionRequest &request)
 {
 	const auto [width, height] = request.resolution;
-	ensure(width, "Failed to modify resolution: invalid width: {}", width);
-	ensure(height, "Failed to modify resolution: invalid height: {}", height);
+	ensure(width != 0u, "Failed to modify resolution: invalid width: {}", width);
+	ensure(height != 0u, "Failed to modify resolution: invalid height: {}", height);
 
 	// Window size on Wayland is determined by the underlying swapchain's extent.
 	// Hence we only need to change the internal variables AND simply generate a resized event for
