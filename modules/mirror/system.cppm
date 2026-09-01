@@ -44,11 +44,11 @@ class MirrorSystem: public lt::app::ISystem
 {
 public:
 	MirrorSystem(
-	    ref<ecs::Registry> registry,
+	    const not_null<ref<ecs::Registry>> &registry,
 	    size_t quit_action_key,
 	    std::array<size_t, 4ul> debug_action_keys
 	)
-	    : m_registry(std::move(registry))
+	    : m_registry(registry)
 	    , m_quit_action_key(quit_action_key)
 	    , m_debug_action_keys(debug_action_keys)
 	{
@@ -162,7 +162,7 @@ public:
 	{
 		using lt::input::InputComponent;
 		using lt::surface::SurfaceComponent;
-		m_surface_system = create_ref<lt::surface::System>(m_editor_registry);
+		m_surface_system = create_ref<lt::surface::System>(not_null { m_editor_registry });
 
 		m_window = m_editor_registry->create_entity();
 		m_surface_system->create_surface_component(
@@ -212,9 +212,9 @@ public:
 		    }
 		);
 
-		m_input_system = create_ref<input::System>(m_editor_registry);
+		m_input_system = create_ref<input::System>(not_null { m_editor_registry });
 		m_mirror_system = create_ref<MirrorSystem>(
-		    m_editor_registry,
+		    not_null { m_editor_registry },
 		    quit_action_key,
 		    debug_action_keys
 		);
@@ -223,7 +223,7 @@ public:
 
 		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
 		    .config = { .max_frames_in_flight = 3u },
-		    .registry = m_editor_registry,
+		    .registry = not_null { m_editor_registry },
 		    .surface_entity = entity,
 		    .debug_callback_info = renderer::vkb::Debugger::CreateInfo {
 		        .severities = renderer::vkb::Debugger::MessageSeverity::all,
