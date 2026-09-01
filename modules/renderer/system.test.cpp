@@ -36,11 +36,6 @@ Suite raii = "system_raii"_suite = [] {
 		auto info = fixture.renderer_system_create_info();
 
 		expect_throw([=] mutable {
-			info.registry = nullptr;
-			ignore = lt::renderer::System { info };
-		});
-
-		expect_throw([=] mutable {
 			constexpr auto limit = lt::renderer::System::frames_in_flight_upper_limit;
 			info.config.max_frames_in_flight = limit + 1u;
 			ignore = lt::renderer::System { info };

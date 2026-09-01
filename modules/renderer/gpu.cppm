@@ -10,7 +10,7 @@ export namespace lt::renderer::vkb {
 class Gpu
 {
 public:
-	Gpu(Instance *instance);
+	Gpu(not_null<Instance *> instance);
 
 	[[nodiscard]] auto vk() -> vk::Gpu &;
 
@@ -28,7 +28,7 @@ private:
 
 namespace lt::renderer::vkb {
 
-Gpu::Gpu(Instance *instance)
+Gpu::Gpu(not_null<Instance *> instance)
 {
 	auto gpus = vk::Gpu::enumerate(instance->vk());
 

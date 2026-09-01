@@ -12,7 +12,7 @@ export namespace lt::renderer::vkb {
 class Device
 {
 public:
-	Device(Gpu *gpu, Surface *surface);
+	Device(not_null<Gpu *> gpu, not_null<Surface *> surface);
 
 	void wait_idle()
 	{
@@ -67,10 +67,8 @@ private:
 
 namespace lt::renderer::vkb {
 
-Device::Device(Gpu *gpu, Surface *surface): m_gpu(gpu), m_surface(surface)
+Device::Device(not_null<Gpu *> gpu, not_null<Surface *> surface): m_gpu(gpu), m_surface(surface)
 {
-	ensure(m_gpu, "Failed to initialize vkb::Device: null gpu");
-	ensure(m_surface, "Failed to initialize vkb::Device: null surface");
 	ensure(m_surface->vk(), "Failed to initialize vk::Device: null vulkan surface");
 
 	initialize_queue_indices();

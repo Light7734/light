@@ -14,7 +14,7 @@ export namespace lt::renderer::vkb {
 class Swapchain
 {
 public:
-	Swapchain(Surface *surface, Gpu *gpu, Device *device);
+	Swapchain(not_null<Surface *> surface, not_null<Gpu *> gpu, not_null<Device *> device);
 
 	[[nodiscard]] auto vk() -> vk::Swapchain &
 	{
@@ -73,7 +73,7 @@ private:
 
 namespace lt::renderer::vkb {
 
-Swapchain::Swapchain(Surface *surface, Gpu *gpu, Device *device)
+Swapchain::Swapchain(not_null<Surface *> surface, not_null<Gpu *> gpu, not_null<Device *> device)
     : m_surface(surface)
     , m_gpu(gpu)
     , m_device(device)

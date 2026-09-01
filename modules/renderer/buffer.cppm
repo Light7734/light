@@ -37,7 +37,7 @@ public:
 		size_t size;
 	};
 
-	Buffer(Device *device, Gpu *gpu, const CreateInfo &info);
+	Buffer(not_null<Device *> device, not_null<Gpu *> gpu, const CreateInfo &info);
 
 	[[nodiscard]] auto map() -> std::span<std::byte>;
 
@@ -84,7 +84,7 @@ private:
 
 namespace lt::renderer::vkb {
 
-Buffer::Buffer(Device *device, Gpu *gpu, const CreateInfo &info)
+Buffer::Buffer(not_null<Device *> device, not_null<Gpu *> gpu, const CreateInfo &info)
     : m_device(device)
     , m_gpu(gpu)
     , m_buffer(

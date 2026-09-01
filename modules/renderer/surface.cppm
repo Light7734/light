@@ -13,7 +13,7 @@ export namespace lt::renderer::vkb {
 class Surface
 {
 public:
-	Surface(not_null<Instance *> instance, ecs::Entity &surface_entity);
+	Surface(const not_null<Instance *> &instance, ecs::Entity &surface_entity);
 
 	[[nodiscard]] auto vk() -> vk::Surface &
 	{
@@ -32,19 +32,16 @@ private:
 
 namespace lt::renderer::vkb {
 
-Surface::Surface(not_null<Instance *> instance, ecs::Entity &surface_entity)
+Surface::Surface(const not_null<Instance *> &instance, ecs::Entity &surface_entity)
     : m_surface_entity(surface_entity)
 {
 	auto &component = surface_entity.get<surface::SurfaceComponent>();
 
-	ensure(component.get_wl_display(), "Failed to initialize vk::Surface: null Wayland display");
-	ensure(component.get_wl_surface(), "Failed to initialize vk::Surface: null Wayland surface");
-
 	m_surface = vk::Surface(
 	    instance->vk(),
 	    vk::Surface::CreateInfo {
-	        .display = component.get_wl_display(),
-	        .surface = component.get_wl_surface(),
+	        .display = not_null { component.get_wl_display() },
+	        .surface = not_null { component.get_wl_surface() },
 
 	    }
 	);

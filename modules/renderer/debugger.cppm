@@ -58,14 +58,14 @@ public:
 		std::any user_data;
 	};
 
-	Debugger(Instance *instance, CreateInfo info);
+	Debugger(not_null<Instance *> instance, CreateInfo info);
 
 private:
 	static void native_callback(
 	    vk::Flags severity,
 	    vk::Flags types,
 	    const vk::Messenger::MessageData &data,
-	    void *user_data
+	    not_null<void *> user_data
 	);
 
 	vk::Messenger m_messenger;
@@ -195,13 +195,11 @@ void Debugger::native_callback(
     vk::Flags severity,
     vk::Flags types,
     const vk::Messenger::MessageData &data,
-    void *user_data
+    not_null<void *> user_data
 )
 {
 	try
 	{
-		ensure(user_data, "Null vulkan_user_data received in messenger callback");
-
 		auto *messenger = std::bit_cast<Debugger *>(user_data);
 		messenger->m_user_callback(
 		    from_native_severity(severity),
@@ -219,14 +217,14 @@ void Debugger::native_callback(
 	}
 }
 
-Debugger::Debugger(Instance *instance, CreateInfo info)
+Debugger::Debugger(not_null<Instance *> instance, CreateInfo info)
     : m_user_data(std::move(info.user_data))
     , m_user_callback(std::move(info.callback))
     , m_messenger(
           instance->vk(),
           vk::Messenger::CreateInfo {
               .user_callback = &native_callback,
-              .user_data = this,
+              .user_data = not_null { static_cast<void *>(this) },
               .enabled_types = to_native_type(info.types),
               .enabled_severities = to_native_severity(info.severities),
           }

@@ -56,7 +56,7 @@ public:
 		        .config = lt::renderer::System::Configuration{
                     .max_frames_in_flight = constants::frames_in_flight,
                 },
-                .registry = registry(),
+                .registry = not_null{registry()},
 		        .surface_entity = surface_entity(),
                 .debug_callback_info = {
                     .severities = lt::renderer::vkb::Debugger::MessageSeverity::all,
@@ -89,7 +89,7 @@ private:
 	lt::ecs::Entity m_entity { not_null<ref<lt::ecs::Registry>>(m_registry),
 		                       m_registry->create_entity() };
 
-	lt::surface::System m_system = lt::surface::System(m_registry);
+	lt::surface::System m_system = lt::surface::System(not_null { m_registry });
 };
 
 export class Fixture_SurfaceGpu: public Fixture_SurfaceSystem
@@ -113,9 +113,8 @@ private:
 		surface_entity()
 	) };
 
-	scope<lt::renderer::vkb::Gpu> m_gpu {
-		create_scope<lt::renderer::vkb::Gpu>(lt::renderer::vkb::Instance::get())
-	};
+	scope<lt::renderer::vkb::Gpu> m_gpu { create_scope<lt::renderer::vkb::Gpu>(not_null {
+		lt::renderer::vkb::Instance::get() }) };
 };
 
 export class FixtureDeviceSwapchain: public Fixture_SurfaceGpu
@@ -137,7 +136,11 @@ public:
 	{
 		m_device->wait_idle();
 		m_swapchain.reset();
-		m_swapchain = create_scope<lt::renderer::vkb::Swapchain>(surface(), gpu(), m_device.get());
+		m_swapchain = create_scope<lt::renderer::vkb::Swapchain>(
+		    not_null { surface() },
+		    not_null { gpu() },
+		    not_null { m_device.get() }
+		);
 	}
 
 	[[nodiscard]] auto has_any_messages() const -> bool
@@ -181,7 +184,7 @@ private:
 	scope<UserData> m_user_data = create_scope<UserData>();
 
 	scope<lt::renderer::vkb::Debugger> m_messenger { create_scope<lt::renderer::vkb::Debugger>(
-		lt::renderer::vkb::Instance::get(),
+		not_null { lt::renderer::vkb::Instance::get() },
 		lt::renderer::vkb::Debugger ::CreateInfo {
 		    .severities = lt::renderer::vkb::Debugger::MessageSeverity::all,
 		    .types = lt::renderer::vkb::Debugger::MessageType::all,
@@ -191,12 +194,14 @@ private:
 	) };
 
 	scope<lt::renderer::vkb::Device> m_device {
-		create_scope<lt::renderer::vkb::Device>(gpu(), surface())
+		create_scope<lt::renderer::vkb::Device>(not_null { gpu() }, not_null { surface() })
 	};
 
-	scope<lt::renderer::vkb::Swapchain> m_swapchain {
-		create_scope<lt::renderer::vkb::Swapchain>(surface(), gpu(), m_device.get())
-	};
+	scope<lt::renderer::vkb::Swapchain> m_swapchain { create_scope<lt::renderer::vkb::Swapchain>(
+		not_null { surface() },
+		not_null { gpu() },
+		not_null { m_device.get() }
+	) };
 };
 
 export class Fixture_RendererSystem: public Fixture_SurfaceSystem
@@ -254,7 +259,7 @@ private:
 		.config = { 
             .max_frames_in_flight = constants::frames_in_flight,
         },
-		.registry = registry(),
+		.registry = not_null{registry()},
 		.surface_entity = surface_entity(),
         .debug_callback_info = lt::renderer::vkb::Debugger ::CreateInfo {
 		        .severities = lt::renderer::vkb::Debugger ::MessageSeverity::all,

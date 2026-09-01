@@ -811,9 +811,9 @@ public:
 
 	struct CreateInfo
 	{
-		wl_display *display;
+		not_null<wl_display *> display;
 
-		wl_surface *surface;
+		not_null<wl_surface *> surface;
 	};
 
 	Surface() = default;
@@ -2830,12 +2830,12 @@ public:
 		std::string message;
 	};
 
-	using Callback = std::function<void(Flags, Flags, MessageData, void *)>;
+	using Callback = std::function<void(Flags, Flags, MessageData, not_null<void *>)>;
 
 	struct CreateInfo
 	{
 		Callback user_callback;
-		void *user_data;
+		not_null<void *> user_data;
 		Flags enabled_types;
 		Flags enabled_severities;
 	};
@@ -5226,7 +5226,6 @@ Messenger::Messenger(Instance &instance, CreateInfo info)
 {
 	ensure(info.enabled_severities != Flags {}, "Failed to create vk::Messenger: empty severities");
 	ensure(info.enabled_types != Flags {}, "Failed to create vk::Messenger: empty types");
-	ensure(info.user_callback, "Failed to create vk::Messenger: null callback");
 
 	constexpr auto native_callback = [](VkDebugUtilsMessageSeverityFlagBitsEXT severity,
 	                                    VkDebugUtilsMessageTypeFlagsEXT types,
@@ -5238,7 +5237,7 @@ Messenger::Messenger(Instance &instance, CreateInfo info)
 		    severity,
 		    types,
 		    { .message = data->pMessage },
-		    messenger->m_user_data
+		    not_null { messenger->m_user_data }
 		);
 
 		return VK_FALSE;

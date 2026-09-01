@@ -16,9 +16,11 @@ Suite raii = "surface"_suite = [] {
 
 	Case { "unhappy paths" } = [&] {
 		auto registry = create_ref<lt::ecs::Registry>();
-		auto entity = lt::ecs::Entity { not_null<ref<lt::ecs::Registry>>(registry),
-			                            registry->create_entity() };
-		auto system = lt::surface::System(registry);
+		auto entity = lt::ecs::Entity {
+			not_null<ref<lt::ecs::Registry>>(registry),
+			registry->create_entity(),
+		};
+		auto system = lt::surface::System(not_null { registry });
 
 		expect_throw([&] {
 			ignore = lt::renderer::vkb::Surface(
