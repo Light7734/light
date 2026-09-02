@@ -2944,15 +2944,12 @@ constexpr auto to_string(VkResult result) noexcept -> std::string_view
 
 void vkc(VkResult result)
 {
-	if (result)
-	{
-		log::error("Checked vulkan call failed with result: {}", to_string(result));
-		throw std::runtime_error { std::format(
-			"Vulkan call failed with result: {} ({})",
-			to_string(result),
-			std::to_underlying(result)
-		) };
-	}
+	ensure(
+	    result == VK_SUCCESS,
+	    "Vulkan call failed with result: {} ({})",
+	    to_string(result),
+	    std::to_underlying(result)
+	);
 }
 
 template<typename T, typename... Args>
