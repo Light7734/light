@@ -11,4 +11,5 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/module.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/definitions.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/options.cmake)
 
+add_link_options(-rdynamic)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules)
