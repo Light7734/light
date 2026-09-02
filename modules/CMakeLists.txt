@@ -274,6 +274,8 @@ add_module(
 add_module(
     NAME
     mirror
+    ENTRYPOINT
+    entrypoint.cpp
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/mirror
     INTERFACES
