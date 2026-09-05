@@ -3,12 +3,23 @@ export module assets.model;
 import preliminary;
 import assets.metadata;
 import logger;
+import math.vec3;
+import math.vec2;
 
 export namespace lt::assets {
 
 class ModelAsset
 {
 public:
+	struct Vertex
+	{
+		math::vec3 position;
+
+		math::vec2 uv;
+
+		math::vec3 normal;
+	};
+
 	static constexpr auto asset_magic_bytes = Type_T { "MODEL__________" };
 
 	enum class BlobTag : Tag_T
