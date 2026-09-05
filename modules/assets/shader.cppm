@@ -82,12 +82,21 @@ private:
 
 namespace lt::assets {
 
-constexpr auto total_metadata_size =
-    // NOLINTNEXTLINE(bugprone-sizeof-container)
-    sizeof(AssetMetadata::type) + //
-    sizeof(AssetMetadata::version) + sizeof(ShaderAsset::Metadata::type) + sizeof(BlobMetadata::tag)
-    + sizeof(BlobMetadata::offset) + sizeof(BlobMetadata::compression_type)
-    + sizeof(BlobMetadata::compressed_size) + sizeof(BlobMetadata::uncompressed_size);
+// NOLINTNEXTLINE(bugprone-sizeof-container)
+constexpr auto asset_metadata_size = sizeof(AssetMetadata::type) //
+                                     + sizeof(AssetMetadata::version);
+
+constexpr auto shader_asset_metadata_size = sizeof(ShaderAsset::Metadata::type);
+
+constexpr auto blob_metadata_size = sizeof(BlobMetadata::tag)                //
+                                    + sizeof(BlobMetadata::offset)           //
+                                    + sizeof(BlobMetadata::compression_type) //
+                                    + sizeof(BlobMetadata::compressed_size)  //
+                                    + sizeof(BlobMetadata::uncompressed_size);
+
+constexpr auto total_metadata_size = asset_metadata_size          //
+                                     + shader_asset_metadata_size //
+                                     + blob_metadata_size;
 
 ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path, std::ios::binary)
 {
