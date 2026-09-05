@@ -116,9 +116,6 @@ add_module(
     logger
 )
 
-# add_executable(asset_baker entrypoint.cpp) target_link_libraries(asset_baker
-# PRIVATE libasset_baker)
-
 add_module(
     NAME
     camera
