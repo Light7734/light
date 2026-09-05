@@ -79,7 +79,6 @@ private:
 
 } // namespace lt::assets
 
-
 namespace lt::assets {
 
 // NOLINTNEXTLINE(bugprone-sizeof-container)
@@ -206,7 +205,7 @@ void ShaderAsset::unpack_to(BlobTag tag, std::span<byte> destination) const
 	ensure(
 	    destination.size() >= m_code_blob_metadata.uncompressed_size,
 	    "Failed to unpack shader blob {} to destination ({}) of size {} since it's smaller "
-	    "than the blobl's uncompressed size: {}",
+	    "than the blob's uncompressed size: {}",
 	    std::to_underlying(tag),
 	    std::bit_cast<size_t>(destination.data()),
 	    destination.size(),
