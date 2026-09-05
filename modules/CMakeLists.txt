@@ -104,7 +104,7 @@ add_module(
     ROOT_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/asset_baker
     INTERFACES
-    bakers.cppm
+    bakers/glsl.cppm
     ENTRYPOINT
     entrypoint.cpp
     DEPENDENCIES

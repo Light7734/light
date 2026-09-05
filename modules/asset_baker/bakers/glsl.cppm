@@ -52,15 +52,16 @@ export void bake_shader(
 	stream.close();
 	std::filesystem::remove(spv_path);
 
-	ShaderAsset::pack(
-	    out_path,
-	    lt::assets::AssetMetadata {
-	        .version = lt::assets::current_version,
-	        .type = ShaderAsset::asset_type_identifier,
-	    },
-	    ShaderAsset::Metadata {
-	        .type = type,
-	    },
-	    std::move(bytes)
+	ShaderAsset::pack(ShaderAsset::PackData {
+        .destination = out_path,
+        .asset_metadata = lt::assets::AssetMetadata {
+            .version = lt::assets::current_version,
+            .type = ShaderAsset::asset_type_identifier,
+        },
+        .metadata = ShaderAsset::Metadata {
+            .type = type,
+        },
+        .code_blob = std::move(bytes)
+    }
 	);
 }
