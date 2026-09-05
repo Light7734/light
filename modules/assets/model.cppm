@@ -39,7 +39,7 @@ public:
 
 	ModelAsset(const std::filesystem::path &path);
 
-	static void pack(std::filesystem::path destination, const PackData &data);
+	static void pack(const std::filesystem::path &destination, const PackData &data);
 
 	ModelAsset();
 
@@ -173,7 +173,7 @@ ModelAsset::ModelAsset(const std::filesystem::path &path): m_stream(path, std::i
 	);
 }
 
-/* static */ void ModelAsset::pack(std::filesystem::path destination, const PackData &data)
+/* static */ void ModelAsset::pack(const std::filesystem::path &destination, const PackData &data)
 {
 	auto stream = std::ofstream {
 		destination,
