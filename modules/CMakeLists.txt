@@ -90,10 +90,12 @@ add_module(
     assets
     INTERFACES
     shader.cppm
+    model.cppm
     metadata.cppm
     DEPENDENCIES
     preliminary
     logger
+    math
     TESTS
     shader.test.cpp
 )
