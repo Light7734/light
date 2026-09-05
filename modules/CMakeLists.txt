@@ -105,6 +105,7 @@ add_module(
     ${CMAKE_CURRENT_SOURCE_DIR}/asset_baker
     INTERFACES
     parsers/glsl.cppm
+    parsers/obj.cppm
     ENTRYPOINT
     entrypoint.cpp
     DEPENDENCIES
