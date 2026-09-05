@@ -32,9 +32,9 @@ public:
 	{
 		AssetMetadata asset_metadata;
 
-		Blob vertices;
+		std::vector<Vertex> vertices;
 
-		Blob indices;
+		std::vector<u32> indices;
 	};
 
 	ModelAsset(const std::filesystem::path &path);
