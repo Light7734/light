@@ -3,6 +3,8 @@ import assets.shader;
 import logger;
 import bakers;
 
+using lt::assets::ShaderAsset;
+
 auto main(i32 argc, char *argv[]) -> i32
 try
 {
@@ -23,13 +25,15 @@ try
 		const std::string in_path_str = in_path.generic_string();
 		const auto out_path = std::format("{}.asset", in_path_str);
 
+		using enum lt::assets::ShaderAsset::Type;
+
 		if (in_path.extension() == ".vert")
 		{
-			bake_shader(in_path, out_path, lt::assets::ShaderAsset::Type::vertex);
+			ShaderAsset::pack(out_path, parse_shader(in_path, vertex));
 		}
 		else if (in_path.extension() == ".frag")
 		{
-			bake_shader(in_path, out_path, lt::assets::ShaderAsset::Type::fragment);
+			ShaderAsset::pack(out_path, parse_shader(in_path, fragment));
 		}
 	}
 

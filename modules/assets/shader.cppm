@@ -29,12 +29,16 @@ public:
 		Type type;
 	};
 
-	static void pack(
-	    const std::filesystem::path &destination,
-	    AssetMetadata asset_metadata,
-	    Metadata metadata,
-	    Blob code_blob
-	);
+	struct PackData
+	{
+		AssetMetadata asset_metadata;
+
+		Metadata metadata;
+
+		Blob code_blob;
+	};
+
+	static void pack(const std::filesystem::path &destination, const PackData &data);
 
 	ShaderAsset(const std::filesystem::path &path);
 
@@ -153,12 +157,7 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path, std:
 	);
 }
 
-/* static */ void ShaderAsset::pack(
-    const std::filesystem::path &destination,
-    AssetMetadata asset_metadata,
-    Metadata metadata,
-    Blob code_blob
-)
+/* static */ void ShaderAsset::pack(const std::filesystem::path &destination, const PackData &data)
 {
 	auto stream = std::ofstream {
 		destination,
@@ -169,23 +168,26 @@ ShaderAsset::ShaderAsset(const std::filesystem::path &path): m_stream(path, std:
 		.tag = std::to_underlying(BlobTag::code),
 		.offset = total_metadata_size,
 		.compression_type = CompressionType::none,
-		.compressed_size = code_blob.size(),
-		.uncompressed_size = code_blob.size(),
+		.compressed_size = data.code_blob.size(),
+		.uncompressed_size = data.code_blob.size(),
 	};
 
 	ensure(stream.is_open(), "Failed to pack shader asset to {}", destination.string());
 	const auto write = [&stream](auto &field) {
 		stream.write(std::bit_cast<char *>(&field), sizeof(field));
 	};
-	write(asset_metadata.type);
-	write(asset_metadata.version);
-	write(metadata.type);
+	write(data.asset_metadata.type);
+	write(data.asset_metadata.version);
+	write(data.metadata.type);
 	write(code_blob_metadata.tag);
 	write(code_blob_metadata.offset);
 	write(code_blob_metadata.compression_type);
 	write(code_blob_metadata.compressed_size);
 	write(code_blob_metadata.uncompressed_size);
-	stream.write(std::bit_cast<char *>(code_blob.data()), static_cast<long long>(code_blob.size()));
+	stream.write(
+	    std::bit_cast<char *>(data.code_blob.data()),
+	    static_cast<long long>(data.code_blob.size())
+	);
 }
 
 void ShaderAsset::unpack_to(BlobTag tag, std::span<byte> destination) const

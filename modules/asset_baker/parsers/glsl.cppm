@@ -5,15 +5,12 @@ import assets.metadata;
 import assets.shader;
 import logger;
 
-export void bake_shader(
-    const std::filesystem::path &in_path,
-    const std::filesystem::path &out_path,
-    lt::assets::ShaderAsset::Type type
-)
-{
-	using lt::assets::ShaderAsset;
-	using enum lt::assets::ShaderAsset::Type;
+using lt::assets::ShaderAsset;
+using enum lt::assets::ShaderAsset::Type;
 
+export auto parse_shader(const std::filesystem::path &in_path, lt::assets::ShaderAsset::Type type)
+    -> ShaderAsset::PackData
+{
 	auto glsl_path = std::string { in_path.string() };
 	auto spv_path = std::format("{}.spv", glsl_path);
 	lt::log::trace(
@@ -52,8 +49,7 @@ export void bake_shader(
 	stream.close();
 	std::filesystem::remove(spv_path);
 
-	ShaderAsset::pack(ShaderAsset::PackData {
-        .destination = out_path,
+	return ShaderAsset::PackData {
         .asset_metadata = lt::assets::AssetMetadata {
             .version = lt::assets::current_version,
             .type = ShaderAsset::asset_type_identifier,
@@ -62,6 +58,5 @@ export void bake_shader(
             .type = type,
         },
         .code_blob = std::move(bytes)
-    }
-	);
+    };
 }

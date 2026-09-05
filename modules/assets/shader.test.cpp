@@ -75,14 +75,16 @@ Suite packing = "shader_pack"_suite = [] {
 
 		ShaderAsset::pack(
 		    out_path,
-		    lt::assets::AssetMetadata {
-		        .version = lt::assets::current_version,
-		        .type = ShaderAsset::asset_type_identifier,
-		    },
-		    ShaderAsset::Metadata {
-		        .type = ShaderAsset::Type::vertex,
-		    },
-		    std::move(blob)
+		    ShaderAsset::PackData {
+		        .asset_metadata = lt::assets::AssetMetadata {
+		            .version = lt::assets::current_version,
+		            .type = ShaderAsset::asset_type_identifier,
+		        },
+		        .metadata = ShaderAsset::Metadata {
+		            .type = ShaderAsset::Type::vertex,
+		        },
+		        .code_blob= std::move(blob),
+		    }
 		);
 
 		auto stream = std::ifstream {
