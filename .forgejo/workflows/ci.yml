@@ -32,7 +32,7 @@ jobs:
         run: ./tools/ci/valgrind.sh
 
   static-analysis:
-    runs-on: host
+    runs-on: lina
     steps:
       - uses: actions/checkout@v4
 
