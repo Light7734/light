@@ -6,47 +6,74 @@ on:
       - main
 
 jobs:
-  amd64-clang:
+  code-coverage:
     runs-on: lina
     steps:
       - uses: actions/checkout@v4
-
       - name: code coverage
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: ./tools/ci/coverage.sh
 
-      - name: undefined behavior sanitizer
-        run: ./tools/ci/ubsan.sh
-
-      - name: address sanitizer
-        run: ./tools/ci/asan.sh
-
-      - name: memory sanitizer
-        run: ./tools/ci/msan.sh
-
-      - name: thread sanitizer
-        run: ./tools/ci/tsan.sh
-
-      - name: valgrind
-        run: ./tools/ci/valgrind.sh
-
-  static-analysis:
+  ubsan:
     runs-on: lina
     steps:
       - uses: actions/checkout@v4
+      - name: undefined behavior sanitizer
+        run: ./tools/ci/ubsan.sh
 
+  asan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: address sanitizer
+        run: ./tools/ci/asan.sh
+
+  msan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: memory sanitizer
+        run: ./tools/ci/msan.sh
+
+  tsan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: thread sanitizer
+        run: ./tools/ci/tsan.sh
+
+  clang-format:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
       - name: clang format
         run: ./tools/ci/clang_format.sh
 
+  cmake-format:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
       - name: cmake format
         run: ./tools/ci/cmake_format.sh
 
+  shell-format:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
       - name: shell format
         run: ./tools/ci/shell_format.sh
 
+  shell-check:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
       - name: shell check
         run: ./tools/ci/shell_check.sh
 
+  clang-tidy:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
       - name: clang tidy
         run: ./tools/ci/clang_tidy.sh
