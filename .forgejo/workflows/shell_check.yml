@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  shell-check:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: shell check
+        run: ./tools/ci/shell_check.sh

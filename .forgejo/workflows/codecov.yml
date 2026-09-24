@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  code-coverage:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: code coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: ./tools/ci/coverage.sh

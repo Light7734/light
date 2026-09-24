@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  asan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: address sanitizer
+        run: ./tools/ci/asan.sh

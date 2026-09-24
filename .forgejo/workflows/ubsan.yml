@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ubsan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: undefined behavior sanitizer
+        run: ./tools/ci/ubsan.sh

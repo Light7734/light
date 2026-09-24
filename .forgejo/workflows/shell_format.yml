@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  shell-format:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: shell format
+        run: ./tools/ci/shell_format.sh

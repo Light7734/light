@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tsan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: thread sanitizer
+        run: ./tools/ci/tsan.sh

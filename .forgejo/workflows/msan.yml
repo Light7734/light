@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  msan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: memory sanitizer
+        run: ./tools/ci/msan.sh

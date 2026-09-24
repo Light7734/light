@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  clang-format:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: clang format
+        run: ./tools/ci/clang_format.sh
