@@ -18,13 +18,13 @@ cmake \
     -D CMAKE_EXPORT_COMPILE_COMMANDS=TRUE \
     -D ENABLE_UNIT_TESTS=ON \
     -D ENABLE_LLVM_COVERAGE=ON \
-    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_BUILD_TYPE=Debug
 
 cmake --build ./build -j"$(nproc)"
 
 mkdir -p ./build/coverage/
 while IFS= read -r -d '' test; do
-    LLVM_PROFILE_FILE="./build/coverage/$(basename "$(dirname "$test")").profraw"
+    LLVM_PROFILE_FILE="./build/coverage/$(basename "$test").profraw"
     export LLVM_PROFILE_FILE
 
     echo "${LLVM_PROFILE_FILE}" >>./build/coverage/list
