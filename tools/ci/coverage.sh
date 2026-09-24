@@ -24,7 +24,7 @@ cmake --build ./build -j"$(nproc)"
 
 mkdir -p ./build/coverage/
 while IFS= read -r -d '' test; do
-    LLVM_PROFILE_FILE="./build/coverage/$(basename "$test").profraw"
+    LLVM_PROFILE_FILE="$(pwd)/build/coverage/$(basename "$test").profraw"
     export LLVM_PROFILE_FILE
 
     echo "${LLVM_PROFILE_FILE}" >>./build/coverage/list
