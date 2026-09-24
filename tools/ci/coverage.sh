@@ -48,7 +48,8 @@ find ./build/modules -type f -name "*.profraw" -exec rm -fv {} +
 #
 # shellcheck disable=SC2046
 LLVM_COV_SHOW=$(
-    llvm-cov show \
+    llvm-cov export \
+        -format=lcov \
         -instr-profile='./build/coverage/merged.profdata' \
         $(find ./build -type f -name '*_tests' -executable -exec printf -- '--object=%s ' {} \;) \
         $(find ./build -type f -name '*\.a' -exec printf -- '--object=%s ' {} \;) \
