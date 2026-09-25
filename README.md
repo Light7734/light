@@ -5,6 +5,8 @@
 [![codecov](https://codecov.io/github/light7734/light/graph/badge.svg?token=4LDCR7T2S1)](https://codecov.io/github/light7734/light)
 [![CI](https://forge.light7734.com/light/light/actions/workflows/codecov.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 
+[![CI](https://forge.light7734.com/light/light/actions/workflows/valgrind.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
+
 [![CI](https://forge.light7734.com/light/light/actions/workflows/address-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 [![CI](https://forge.light7734.com/light/light/actions/workflows/memory-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 [![CI](https://forge.light7734.com/light/light/actions/workflows/thread-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
