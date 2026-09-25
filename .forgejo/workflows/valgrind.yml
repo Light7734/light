@@ -1,0 +1,14 @@
+name: valgrind
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ubsan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: valgrind
+        run: ./tools/ci/valgrind.sh
