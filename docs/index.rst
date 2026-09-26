@@ -18,6 +18,7 @@
    :maxdepth: 2
    :caption: Development Guidelines
 
+   guidelines/code_of_conduct.rst
    guidelines/philosophy.rst
    guidelines/development.rst
    guidelines/conventions.rst
