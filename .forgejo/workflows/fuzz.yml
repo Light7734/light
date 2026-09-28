@@ -1,0 +1,16 @@
+# Fuzz testing should run every Sunday, 12:00 PM Tehran time, for 1 hour.
+
+name: weekly-fuzz
+
+on:
+  schedule:
+    - cron: "0 12 * * 0"
+      timezone: Asia/Tehran
+
+jobs:
+  code-coverage:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: weekly-fuzz
+        run: ./tools/ci/fuzz.sh

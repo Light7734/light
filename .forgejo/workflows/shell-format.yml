@@ -1,4 +1,4 @@
-name: CI
+name: shell format
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: CI
+name: address sanitizer
 
 on:
   push:
@@ -10,5 +10,5 @@ jobs:
     runs-on: lina
     steps:
       - uses: actions/checkout@v4
-      - name: address sanitizer
+      - name: address-sanitizer
         run: ./tools/ci/asan.sh

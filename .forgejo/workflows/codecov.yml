@@ -1,4 +1,4 @@
-name: CI
+name: codecov
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  code-coverage:
+  codecov:
     runs-on: lina
     steps:
       - uses: actions/checkout@v4
-      - name: code coverage
+      - name: codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: ./tools/ci/coverage.sh
