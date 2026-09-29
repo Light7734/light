@@ -1,0 +1,18 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docs:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: docs
+        run: |
+          sphinx-build -M html . .
+
+          ssh rylai "rm -rf /home/light/nginx-reverse-proxy-manager/sites_2/light_engine_docs_dev/*"
+          scp -r './html/*' 'rylai:/home/light/nginx-reverse-proxy-manager/sites_2/light_engine_docs_dev/'
