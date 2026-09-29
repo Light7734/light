@@ -16,4 +16,5 @@ jobs:
           sphinx-build -M html . .
 
           ssh rylai "rm -rf /home/light/nginx-reverse-proxy-manager/sites_2/light_engine_docs_dev/*"
-          scp -r './html/*' 'rylai:/home/light/nginx-reverse-proxy-manager/sites_2/light_engine_docs_dev/'
+          ls -la
+          scp -r './html/.' 'rylai:/home/light/nginx-reverse-proxy-manager/sites_2/light_engine_docs_dev/'
