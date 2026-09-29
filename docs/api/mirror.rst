@@ -1,8 +1,11 @@
-renderer
+mirror
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: mirror
 
-.. doxygenclass:: lt::renderer::System
+.. doxygenclass:: lt::Mirror
+   :members:
+
+.. doxygenclass:: lt::MirrorSystem
    :members:

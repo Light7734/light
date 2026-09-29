@@ -1,8 +1,12 @@
-renderer
+input
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: input
 
-.. doxygenclass:: lt::renderer::System
+.. doxygenclass:: lt::input::System
    :members:
+
+.. doxygenclass:: lt::input::InputComponent
+   :members:
+

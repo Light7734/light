@@ -1,17 +1,17 @@
-app
+math
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: app
+   :caption: math
 
-.. doxygenclass:: lt::app::Application
+.. doxygenstruct:: lt::math::mat4_impl
    :members:
 
-.. doxygenclass:: lt::app::ISystem
+.. doxygenstruct:: lt::math::vec2_impl
    :members:
 
-.. doxygenstruct:: lt::app::TickInfo
+.. doxygenstruct:: lt::math::vec3_impl
    :members:
 
-.. doxygenstruct:: lt::app::TickResult
+.. doxygenstruct:: lt::math::vec4_impl
    :members:

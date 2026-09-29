@@ -1,8 +1,8 @@
-renderer
+time
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: time
 
-.. doxygenclass:: lt::renderer::System
+.. doxygenclass:: lt::time::Timer
    :members:

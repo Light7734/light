@@ -1,8 +1,7 @@
-renderer
+camera
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: camera
 
-.. doxygenclass:: lt::renderer::System
-   :members:
+.. doxygenstruct:: lt::camera::components::PerspectiveCamera

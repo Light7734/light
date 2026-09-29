@@ -1,8 +1,9 @@
-renderer
+input_codes
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: input_codes
 
-.. doxygenclass:: lt::renderer::System
-   :members:
+.. doxygenenum:: lt::Key
+
+.. doxygenfunction:: lt::to_string

@@ -1,8 +1,8 @@
-renderer
+surface
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: surface
 
-.. doxygenclass:: lt::renderer::System
+.. doxygenclass:: lt::surface::System
    :members:

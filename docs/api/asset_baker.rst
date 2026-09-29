@@ -1,8 +1,9 @@
-renderer
+asset_baker
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: asset_baker
 
-.. doxygenclass:: lt::renderer::System
-   :members:
+.. doxygenfunction:: parse_glsl
+.. doxygenfunction:: parse_obj
+

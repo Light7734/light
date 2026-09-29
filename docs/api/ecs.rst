@@ -1,8 +1,11 @@
-renderer
+ecs
 ===================================================================================================
 .. toctree::
    :maxdepth: 3
-   :caption: renderer
+   :caption: ecs
 
-.. doxygenclass:: lt::renderer::System
+.. doxygenclass:: lt::ecs::Registry
+   :members:
+
+.. doxygenclass:: lt::ecs::Entity
    :members:
