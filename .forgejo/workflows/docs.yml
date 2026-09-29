@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: docs
         run: |
+          cd ./docs/
           sphinx-build -M html . .
 
           ssh rylai "rm -rf /home/light/nginx-reverse-proxy-manager/sites_2/light_engine_docs_dev/*"
