@@ -60,143 +60,15 @@ private:
 class Mirror: public app::Application
 {
 public:
-	Mirror()
-	{
-		m_editor_registry = create_ref<ecs::Registry>();
+	Mirror();
 
-		setup_window_system();
-		setup_input_system();
+	void on_window_close();
 
-		register_systems();
-	}
+	void setup_window_system();
 
-	void on_window_close()
-	{
-		log::info("Window close requested...");
+	void setup_input_system();
 
-		unregister_system(m_input_system);
-		unregister_system(m_surface_system);
-		unregister_system(m_renderer_system);
-		unregister_system(m_mirror_system);
-	}
-
-	void setup_window_system()
-	{
-		using lt::input::InputComponent;
-		using lt::surface::SurfaceComponent;
-		m_surface_system = create_ref<lt::surface::System>(not_null { m_editor_registry });
-
-		m_window = m_editor_registry->create_entity();
-		m_surface_system->create_surface_component(
-		    m_window,
-		    SurfaceComponent::CreateInfo {
-		        .title = "Editor Window",
-		        .resolution = { 400u, 400u },
-		        .vsync = true,
-		        .visible = true,
-		    }
-		);
-
-		auto &input = m_editor_registry->add<InputComponent>(m_window, {});
-		auto quit_action_key = input.add_action(
-		    input::InputAction {
-		        .name = "quit",
-		        .trigger = input::Trigger { .mapped_keycode = Key::q },
-		    }
-		);
-
-		auto debug_action_keys = std::array<size_t, 4ul> {};
-		debug_action_keys[0] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_1",
-		        .trigger = input::Trigger { .mapped_keycode = Key::digit_1 },
-		    }
-		);
-
-		debug_action_keys[1] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_2",
-		        .trigger = input::Trigger { .mapped_keycode = Key::digit_2 },
-		    }
-		);
-
-		debug_action_keys[2] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_3",
-		        .trigger = input::Trigger { .mapped_keycode = Key::digit_3 },
-		    }
-		);
-
-		debug_action_keys[3] = input.add_action(
-		    input::InputAction {
-		        .name = "debug_4",
-		        .trigger = input::Trigger { .mapped_keycode = Key::digit_4 },
-		    }
-		);
-
-		m_input_system = create_ref<input::System>(not_null { m_editor_registry });
-		m_mirror_system = create_ref<MirrorSystem>(
-		    not_null { m_editor_registry },
-		    quit_action_key,
-		    debug_action_keys
-		);
-
-		auto entity = ecs::Entity { not_null<ref<lt::ecs::Registry>>(m_editor_registry), m_window };
-
-		m_renderer_system = std::make_shared<renderer::System>(renderer::System::CreateInfo {
-		    .config = { .max_frames_in_flight = 3u },
-		    .registry = not_null { m_editor_registry },
-		    .surface_entity = entity,
-		    .debug_callback_info = renderer::vkb::Debugger::CreateInfo {
-		        .severities = renderer::vkb::Debugger::MessageSeverity::all,
-		        .types = renderer::vkb::Debugger::MessageType::all,
-		        .callback = &renderer_callback,
-		        .user_data = this,
-		    } });
-
-		m_sprite_id = m_editor_registry->create_entity();
-
-		m_editor_registry->add(
-		    m_sprite_id,
-		    renderer::components::Sprite {
-		        .color = lt::math::vec3 { 1.0f, 0.0f, 0.0f },
-		    }
-		);
-		m_editor_registry->add(
-		    m_sprite_id,
-		    math::components::Transform {
-		        .translation = { -5.0, -5.0, 0.5 },
-		        .scale = { 5.0, 5.0, 1.0 },
-		        .rotation = {},
-		    }
-		);
-
-		m_camera_id = m_editor_registry->create_entity();
-
-		m_editor_registry->add(
-		    m_camera_id,
-		    camera::components::PerspectiveCamera {
-		        .vertical_fov = math::to_radians(90.0f),
-		        .near_plane = 0.1f,
-		        .far_plane = 30.0,
-		        .aspect_ratio = 1.0f,
-		        .background_color = math::vec4(1.0, 0.0, 0.0, 1.0),
-		        .is_primary = true,
-		    }
-		);
-	}
-
-	void setup_input_system()
-	{
-	}
-
-	void register_systems()
-	{
-		register_system(m_surface_system);
-		register_system(m_input_system);
-		register_system(m_renderer_system);
-		register_system(m_mirror_system);
-	}
+	void register_systems();
 
 private:
 	ref<ecs::Registry> m_editor_registry;
