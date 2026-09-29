@@ -13,7 +13,7 @@ import preliminary;
 
 export namespace lt {
 
-// NOLINTNEXTLINE(performance-enum-size)
+/** The (e)numeric codes for hardware keys used for input. */ // NOLINTNEXTLINE(performance-enum-size)
 enum class Key : u16
 {
 	none = 0,
@@ -177,6 +177,7 @@ enum class Key : u16
 	unknown,
 };
 
+/** Converts lt::Key enum value to string representation, eg lt::Key::alt -> "alt". */
 [[nodiscard]] constexpr auto to_string(Key key) -> std::string
 {
 	using enum Key;

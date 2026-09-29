@@ -24,6 +24,17 @@ import time;
 
 export namespace lt::surface {
 
+/** The main windowing system.
+ *
+ * Responsible for:
+ * - Creating and destroying surfaces.
+ * - Handling low-level input logic before it reaches the input system.
+ * - Handling windowing events like resize, minimize, etc.
+ *
+ * @note Currently only native Wayland is supported, maybe forever.
+ *
+ * @todo Implement the rest...
+ */
 class System: public app::ISystem
 {
 public:

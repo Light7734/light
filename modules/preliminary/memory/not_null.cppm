@@ -12,24 +12,26 @@ using value_or_reference_return_t = std::conditional_t<
     const T,
     const T &>;
 
-/** Makes your code crash when using nullptrs on bind-point instead of dereference point.
- * Which should make debugging easier in case of a logical error.
- * Also removes the "is this a nullptr?" checks as it is now implied through construction.
- * Has 0 zero-size-overhead over Underlying_T.
- *
- * The constructor is explicit so that when T* changes to not_null<T*>, the call-sites that used the
- * old T* form stop compiling and require explicitly specifying that they indeed understand the
- * passed point should not be null
- *
- * ALLOWS construction from Underlying_T (which MUST be nullptr_t assignable)
- * ALLOWS implicit conversion to Underlying_T
- * DISALLOWS default construction
- * DISALLOWS construction from nullptr_t
- * DISALLOWS pointer arithmetics
- * FORCES explicit construction when passing pointers around
- * THROWS when constructing an Underlying_T with a null value
- *
- * @tparam Underlying_T The underlying pointer type
+/** Makes your code crash when using `nullptr`s on the @a bind-point instead of the @a dereference
+ point. Which should make debugging easier in case of a logical error.
+
+ Removes the <em> is this a nullptr?</em> checks as it is now implied through construction.
+
+ Has @a zero-size-overhead over `Underlying_T`.
+
+ The constructor is `explicit` so that when `T*` changes to `not_null<T*>`, the call-sites that used
+ the old `T*` form stop compiling and require explicitly specifying that they indeed understand the
+ passed pointer should not be null.
+
+ - @a ALLOWS construction from `Underlying_T` (which MUST be `nullptr_t` assignable)
+ - @a ALLOWS implicit conversion to `Underlying_T`
+ - @a DISALLOWS default construction
+ - @a DISALLOWS construction from `nullptr_t`
+ - @a DISALLOWS pointer arithmetics
+ - @a FORCES explicit construction when passing pointers around
+ - @a THROWS when constructing an `Underlying_T` with a null value
+
+ @tparam Underlying_T The underlying pointer type
  */
 export template<typename Underlying_T>
     requires(std::is_assignable_v<Underlying_T &, std::nullptr_t>)

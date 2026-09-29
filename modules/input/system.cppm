@@ -8,9 +8,13 @@ import surface.events;
 import math.vec2;
 import std;
 
-namespace lt::input {
+export namespace lt::input {
 
-export class System: public app::ISystem
+/** Handles input.
+ *
+ * @see lt::input::InputComponent
+ */
+class System: public app::ISystem
 {
 public:
 	System(const not_null<ref<ecs::Registry>> &registry);

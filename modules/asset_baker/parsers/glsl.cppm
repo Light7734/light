@@ -8,7 +8,11 @@ import logger;
 using lt::assets::ShaderAsset;
 using enum lt::assets::ShaderAsset::Type;
 
-export auto parse_shader(const std::filesystem::path &in_path, lt::assets::ShaderAsset::Type type)
+/** Parses a .glsl file, and returns a `ShaderAsset::PackData` from of it.
+ *
+ * Compiles it using `glslc`.
+ */
+export auto parse_glsl(const std::filesystem::path &in_path, lt::assets::ShaderAsset::Type type)
     -> ShaderAsset::PackData
 {
 	auto glsl_path = std::string { in_path.string() };

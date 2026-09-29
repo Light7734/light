@@ -9,24 +9,19 @@ enum class Platform : u8
 {
 	/** The GNU/Linux platform.
 	 * Tested on the following distros: arch-x86_64
-	 * @note: Named like so because `linux` is a built-in identifier.
-	 * */
+	 *
+	 * @note: Named like so because `linux` is a built-in identifier, not because of the memes.
+	 */
 	gnu_linux,
 
-	/**
-	 * The Microsoft Windows(tm) platform.
-	 * Tested on the following architectures: x86_64
-	 */
+	/** The Microsoft Windows(tm) platform. Currently not supported. */
 	windows,
 
-	/**
-	 * The apple's macOS platform.
-	 * Currently not supported.
-	 */
+	/** The apple's macOS platform. Currently not supported. */
 	mac,
 };
 
-/** The compiler that was used for compiling the project. */
+/** The compiler that was used for compiling the project. Currently ONLY clang is supported. */
 enum class Compiler : u8
 {
 	clang,
@@ -35,6 +30,10 @@ enum class Compiler : u8
 	apple_clang,
 };
 
+/** For what purpose we are building for.
+ *
+ * @todo: Implement @a distribution build type.
+ */
 enum class BuildType : u8
 {
 	debug,

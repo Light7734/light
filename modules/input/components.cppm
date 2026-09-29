@@ -27,6 +27,7 @@ struct InputAction
 	Trigger trigger;
 };
 
+/** The component to register input actions for the input system. */
 class InputComponent
 {
 public:

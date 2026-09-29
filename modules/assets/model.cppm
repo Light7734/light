@@ -8,6 +8,7 @@ import math.vec2;
 
 export namespace lt::assets {
 
+/** An asset class representing a 3d game model. */
 class ModelAsset
 {
 public:

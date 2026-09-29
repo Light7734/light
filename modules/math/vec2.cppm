@@ -4,10 +4,9 @@ import preliminary;
 
 export namespace lt::math {
 
-
-/** A vector of TWO @a `T`s.
+/** A vector of TWO `T`s.
  *
- * @warn Does not defualt initialize to zero.
+ * @warning Does not defualt initialize to zero.
  */
 template<typename T = f32>
     requires(std::is_arithmetic_v<T>)

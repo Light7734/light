@@ -10,8 +10,10 @@ export namespace lt::app {
  */
 struct TickInfo
 {
+	/** Timepoint type */
 	using Timepoint_T = std::chrono::time_point<std::chrono::steady_clock>;
 
+	/** Duration type */
 	using Duration_T = std::chrono::duration<f64>;
 
 	/** Duration since previous tick's end_time to current tick's start_time. */
@@ -19,71 +21,39 @@ struct TickInfo
 
 	/** Maximum duration the system is expected to finish ticking in.
 	 *
-	 * if end_time - start_time > budget -> the system exceeded its ticking budget.
-	 * else end_time - start_time < budget -> the system ticked properly.
+	 * - if `end_time - start_time > budget` -> the system exceeded its ticking budget.
+	 * - else `end_time - start_time < budget` -> the system ticked properly.
 	 *
-	 * In other words, end_time is expected to be less than start_time + budget.
+	 * In other words, `end_time` is expected to be less than `start_time + budget`.
+	 *
+	 * @note `end_time` comes from TickResult
 	 */
 	Duration_T budget {};
 
-	/** Exact time which ticking started. */
+	/** Exact time when ticking started. */
 	Timepoint_T start_time;
 };
 
 /** Information about how a system's tick performed */
 struct TickResult
 {
+	/** Timepoint type */
 	using Timepoint_T = std::chrono::time_point<std::chrono::steady_clock>;
 
+	/** Duration type */
 	using Duration_T = std::chrono::duration<f64>;
 
 	/** The info supplied to the system for ticking. */
 	TickInfo info;
 
-	/** Equivalent to end_time - info.start_time. */
+	/** Equivalent to `end_time - info.start_time`. */
 	Duration_T duration {};
 
-	/** Exact time which ticking ended. */
+	/** Exact timepoint when ticking ended. */
 	Timepoint_T end_time;
 };
 
-struct SystemDiagnosis
-{
-	enum class Severity : u8
-	{
-		verbose,
-		info,
-		warning,
-		error,
-		fatal,
-	};
-
-	std::string message;
-
-	std::string code;
-
-	Severity severity;
-};
-
-class SystemStats
-{
-public:
-	void push_diagnosis(SystemDiagnosis &&diagnosis)
-	{
-		auto &diag = m_diagnosis.emplace_back(std::move(diagnosis));
-
-		log::info("message: {}", std::string { diag.message });
-	}
-
-	[[nodiscard]] auto empty_diagnosis() const -> bool
-	{
-		return m_diagnosis.empty();
-	}
-
-private:
-	std::vector<SystemDiagnosis> m_diagnosis;
-};
-
+/** The base, pure-virtual class for creating systems. */
 class ISystem
 {
 public:

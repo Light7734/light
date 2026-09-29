@@ -7,6 +7,16 @@ import logger;
 
 namespace lt::test {
 
+/** A test case to be used in a test suite.
+ *
+ * Minimal exmaple of defining a test suite with 2 test cases:
+@code{.cpp}
+Suite variable_name = "suite_name"_suite = []() {
+    Case { "Case A" } = [] { ... };
+    Case { "Case B" } = [] { ... };
+};
+@endcode
+ */
 class TestCase
 {
 public:
@@ -99,16 +109,12 @@ void TestCase::run_normal(std::invocable auto test) const
 
 TestSuite::TestSuite(auto body)
 {
-#ifndef LIGHT_SKIP_TESTS
 	Registry::register_suite(+body);
-#endif
 }
 
 constexpr TestFuzzHarness::TestFuzzHarness(auto body)
 {
-#ifndef LIGHT_SKIP_FUZZ_TESTS
 	Registry::register_fuzz_harness(+body);
-#endif
 };
 
 auto operator""_suite(const char *name, size_t size) -> TestSuite

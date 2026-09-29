@@ -29,11 +29,11 @@ try
 
 		if (in_path.extension() == ".vert")
 		{
-			ShaderAsset::pack(out_path, parse_shader(in_path, vertex));
+			ShaderAsset::pack(out_path, parse_glsl(in_path, vertex));
 		}
 		else if (in_path.extension() == ".frag")
 		{
-			ShaderAsset::pack(out_path, parse_shader(in_path, fragment));
+			ShaderAsset::pack(out_path, parse_glsl(in_path, fragment));
 		}
 	}
 

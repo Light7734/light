@@ -7,6 +7,7 @@ import math.vec2;
 import math.vec3;
 import logger;
 
+/** Parses a .obj file, and returns a `ModelAsset::PackData` from it. */
 export auto parse_obj(const std::filesystem::path &in_path) -> lt::assets::ModelAsset::PackData
 {
 	using lt::assets::ModelAsset;

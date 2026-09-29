@@ -2,8 +2,6 @@ export module test.expects;
 
 import preliminary;
 
-namespace lt::test {
-
 template<typename T>
 concept Formattable = requires(T &v, std::format_context ctx) {
 	std::formatter<std::remove_cvref_t<T>>().format(v, ctx);
@@ -17,8 +15,79 @@ concept Printable = Formattable<T> || requires(std::ostream &stream, T value) {
 template<typename T>
 concept Testable = (Printable<T> || std::is_pointer_v<T>) && std::equality_comparable<T>;
 
-export void expect_unreachable(
+export namespace lt::test {
+
+/** Fails the test case when gets called. */
+void expect_unreachable(std::source_location source_location = std::source_location::current());
+
+/** Fails the test case when no exceptions are thrown in @a invocable.
+ *
+ * @todo: Check exception type.
+ */
+void expect_throw(
+    std::invocable auto invocable,
     std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when `lhs != rhs`. */
+void expect_eq(
+    Testable auto lhs,
+    Testable auto rhs,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when `lhs == rhs`. */
+void expect_ne(
+    Testable auto lhs,
+    Testable auto rhs,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when `lhs > rhs`. */
+void expect_le(
+    Testable auto lhs,
+    Testable auto rhs,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when `lhs < rhs`. */
+void expect_ge(
+    Testable auto lhs,
+    Testable auto rhs,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when @a expression is `false`. */
+void expect_true(
+    bool expression,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when @a expression is `true`. */
+void expect_false(
+    bool expression,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when `pointer == nullptr`. */
+void expect_not_nullptr(
+    auto *pointer,
+    std::source_location source_location = std::source_location::current()
+);
+
+/** Fails the test case when @a string does not contain @a token. */
+void expect_str_contains(
+    const std::string &string,
+    const std::string &token,
+    std::source_location source_location = std::source_location::current()
+);
+
+} // namespace lt::test
+
+namespace lt::test {
+
+void expect_unreachable(
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	throw std::runtime_error {
@@ -30,10 +99,9 @@ export void expect_unreachable(
 	};
 };
 
-/** @todo(Light7734): Check exception type. */
-export constexpr void expect_throw(
+void expect_throw(
     std::invocable auto invocable,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	try
@@ -50,10 +118,11 @@ export constexpr void expect_throw(
 	};
 }
 
-export constexpr void expect_eq(
+/** Fails the test case when `lhs != rhs`. */
+void expect_eq(
     Testable auto lhs,
     Testable auto rhs,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if constexpr (std::is_enum_v<decltype(lhs)>)
@@ -101,10 +170,10 @@ export constexpr void expect_eq(
 	}
 }
 
-export constexpr void expect_ne(
+void expect_ne(
     Testable auto lhs,
     Testable auto rhs,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if constexpr (std::is_enum_v<decltype(lhs)>)
@@ -152,10 +221,10 @@ export constexpr void expect_ne(
 	}
 }
 
-export constexpr void expect_le(
+void expect_le(
     Testable auto lhs,
     Testable auto rhs,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if (lhs > rhs)
@@ -172,10 +241,10 @@ export constexpr void expect_le(
 	}
 }
 
-export constexpr void expect_ge(
+void expect_ge(
     Testable auto lhs,
     Testable auto rhs,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if (lhs < rhs)
@@ -192,9 +261,9 @@ export constexpr void expect_ge(
 	}
 }
 
-export constexpr void expect_true(
+void expect_true(
     bool expression,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if (!expression)
@@ -210,9 +279,9 @@ export constexpr void expect_true(
 	}
 }
 
-export constexpr void expect_false(
+void expect_false(
     bool expression,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if (expression)
@@ -228,9 +297,9 @@ export constexpr void expect_false(
 	}
 }
 
-export constexpr void expect_not_nullptr(
+void expect_not_nullptr(
     auto *pointer,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if (pointer == nullptr)
@@ -245,10 +314,10 @@ export constexpr void expect_not_nullptr(
 	}
 }
 
-export constexpr void expect_str_contains(
+void expect_str_contains(
     const std::string &string,
     const std::string &token,
-    std::source_location source_location = std::source_location::current()
+    std::source_location source_location /* = std::source_location::current() */
 )
 {
 	if (!string.contains(token))
@@ -264,5 +333,6 @@ export constexpr void expect_str_contains(
 		};
 	}
 }
+
 
 } // namespace lt::test

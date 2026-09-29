@@ -6,6 +6,7 @@ import logger;
 
 export namespace lt::assets {
 
+/** An asset class representing a graphics shader. */
 class ShaderAsset
 {
 public:

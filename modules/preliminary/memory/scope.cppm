@@ -6,7 +6,7 @@ import preliminary.assertions;
 import preliminary.build_constants;
 import std;
 
-/** @brief Wrapper around std::unique_ptr.
+/** @brief Wrapper around `std::unique_ptr`.
  *
  * @note Currently just an alias, might turn into an implementation later.
  * @ref https://en.cppreference.com/w/cpp/memory/unique_ptr.html
@@ -16,7 +16,7 @@ using scope = std::unique_ptr<t>;
 
 /** Allocates memory for an `Underlying_T` and directly constructs it there.
  *
- * @return A scope<Underlying_T> to the constructed object.
+ * @return A `scope<Underlying_T>` to the constructed object.
  */
 export template<typename Underlying_T, typename... Args>
 constexpr scope<Underlying_T> create_scope(Args &&...args)

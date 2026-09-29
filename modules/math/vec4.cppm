@@ -6,9 +6,9 @@ import math.vec3;
 
 export namespace lt::math {
 
-/** A vector of THREE @a `T`s.
+/** A vector of FOUR `T`s.
  *
- * @warn Does not defualt initialize to zero.
+ * @warning Does not defualt initialize to zero.
  */
 template<typename T = f32>
     requires(std::is_arithmetic_v<T>)

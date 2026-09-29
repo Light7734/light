@@ -6,7 +6,7 @@ import preliminary.assertions;
 import preliminary.build_constants;
 import std;
 
-/** Wrapper around std::shared_ptr.
+/** Wrapper around `std::shared_ptr`.
  *
  * @note Currently just an alias, might turn into an implementation later.
  * @ref https://en.cppreference.com/w/cpp/memory/shared_ptr.html
@@ -16,7 +16,7 @@ using ref = std::shared_ptr<T>;
 
 /** Allocates memory for an `Underlying_T` and directly constructs it there.
  *
- * @return A ref<Underlying_T> to the constructed object.
+ * @return A `ref<Underlying_T>` to the constructed object.
  */
 export template<typename Underlying_T, typename... Args>
 constexpr ref<Underlying_T> create_ref(Args &&...args)

@@ -7,9 +7,12 @@ import math.vec4;
 
 export namespace lt::math {
 
-/** A 4 by 4 matrix, column major order
+/** A 4 by 4 matrix, column major order.
  *
- * @todo(Light): Use std::simd when it's implemented. */
+ * @warning Does not defualt initialize to zero.
+ *
+ * @todo Use std::simd when it's implemented.
+ */
 template<typename T = f32>
     requires(std::is_arithmetic_v<T>)
 struct mat4_impl
@@ -169,6 +172,7 @@ struct mat4_impl
 	std::array<Column_T, 4u> values;
 };
 
+/**... */
 using mat4 = mat4_impl<f32>;
 
 using mat4_f32 = mat4;

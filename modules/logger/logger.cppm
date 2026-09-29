@@ -131,11 +131,13 @@ auto Logger::s_min_severity = Level::trace;
 
 export namespace lt::log {
 
+/** Limits the severity so that severities lower than @a level won't get logged. */
 void set_severity(Level level)
 {
 	Logger::set_severity(level);
 }
 
+/** Returns the current severity level. */
 auto get_severity() -> Level
 {
 	return Logger::get_severity();
@@ -154,6 +156,7 @@ struct [[maybe_unused]] trace
 	}
 };
 
+/** Prints a log message with trace severity level. */
 template<typename... Args>
 trace(std::format_string<Args...>, Args &&...) noexcept -> trace<Args...>;
 
@@ -170,6 +173,7 @@ struct [[maybe_unused]] debug
 	}
 };
 
+/** Prints a log message with debug severity level. */
 template<typename... Args>
 debug(std::format_string<Args...>, Args &&...) noexcept -> debug<Args...>;
 
@@ -187,6 +191,7 @@ struct [[maybe_unused]] info
 	}
 };
 
+/** Prints a log message with info severity level. */
 template<typename... Args>
 info(std::format_string<Args...>, Args &&...) noexcept -> info<Args...>;
 
@@ -203,6 +208,7 @@ struct [[maybe_unused]] warn
 	}
 };
 
+/** Prints a log message with warn severity level. */
 template<typename... Args>
 warn(std::format_string<Args...>, Args &&...) noexcept -> warn<Args...>;
 
@@ -219,6 +225,7 @@ struct [[maybe_unused]] error
 	}
 };
 
+/** Prints a log message with error severity level. */
 template<typename... Args>
 error(std::format_string<Args...>, Args &&...) noexcept -> error<Args...>;
 
@@ -235,6 +242,7 @@ struct [[maybe_unused]] critical
 	}
 };
 
+/** Prints a log message with critical severity level. */
 template<typename... Args>
 critical(std::format_string<Args...>, Args &&...) noexcept -> critical<Args...>;
 
@@ -247,6 +255,9 @@ struct [[maybe_unused]] test
 	}
 };
 
+/** Prints a specially formatted log message for tests.
+ *
+ * @warning Intended for use by the testing framework, do not use as the end-user! */
 template<typename... Args>
 test(std::format_string<Args...>, Args &&...) noexcept -> test<Args...>;
 

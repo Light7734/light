@@ -30,20 +30,23 @@ export namespace lt::renderer {
 /** The main rendering engine.
  *
  * Responsible for:
- * - Creating a rendering backend context (currently only Vulkan is supported)
- * - Connecting the context to the physical devices (select gpu, creating surface (a window on a
- * display/monitor), logical device (a driver))
- * - Rendering the scene represented in registry via lt::renderer::components.
+ * - Creating a rendering backend context.
+ * - Connecting the context to the physical devices:
+ *   - select optimal gpu.
+ *   - create surface (something on a display screen).
+ *   - create logical device (driver selection).
+ * - Rendering the scene represented in the registry via renderer components.
+ *
+ * @note Currently only the Vulkan API is supported, maybe forever.
+ *
+ * @todo Design the @a high-level architecture of the renderer
+ *
  */
 class System: public app::ISystem
 {
 public:
-	// TODO(Light): this is some horrible design... fix it :(
-
-	/** config.max_frames_in_flight should not be higher than this value. */
 	static constexpr auto frames_in_flight_upper_limit = 5u;
 
-	/** config.max_frames_in_flight should not be lower than this value. */
 	static constexpr auto frames_in_flight_lower_limit = 1u;
 
 	struct Configuration

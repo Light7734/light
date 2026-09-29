@@ -1,3 +1,6 @@
+// @note: "Camera" is not in the renderer since camera logic can get extremely complex once we add
+// all the bells and whistles.
+
 export module camera.components;
 
 import preliminary;
@@ -5,6 +8,7 @@ import math.vec4;
 
 export namespace lt::camera::components {
 
+/** A component holding perspective camera information */
 struct PerspectiveCamera
 {
 	f32 vertical_fov;
