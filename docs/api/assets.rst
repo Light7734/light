@@ -4,11 +4,10 @@ assets
    :maxdepth: 3
    :caption: assets
 
-.. doxygenstypedef:: lt::assets::Type_T
-.. doxygenstypedef:: lt::assets::Tag_T
-.. doxygenstypedef:: lt::assets::Version
-.. doxygenstypedef:: lt::assets::Blob
-
+.. doxygentypedef:: lt::assets::Type_T
+.. doxygentypedef:: lt::assets::Tag_T
+.. doxygentypedef:: lt::assets::Version
+.. doxygentypedef:: lt::assets::Blob
 
 .. doxygenclass:: lt::assets::ModelAsset
 
