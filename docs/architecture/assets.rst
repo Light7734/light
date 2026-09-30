@@ -1,72 +1,143 @@
 Asset Management
 ===================================================================================================
 
-On Disk (file) Layout
+On Disk Layout
 ---------------------------------------------------------------------------------------------------
 
 .. code-block:: md
 
-    {version}              | 4 bytes, ie. uint32_t
-    {general metadata}     | sizeof(AssetMetadata)
-    {specialized metadata} | sizeof(XXXAssetMetadata), eg. TextureAssetMetadata
-    {n}                    | 4 bytes, ie. uint32_t
-    {blob_0...n metadata}  | n * sizeof(BlobMetadata)
-    {blob_0...n data}      | variable size based on actual data
-    {end marker}           | 8 byte, ie size_t for marking the END
+    {general metadata}     | `AssetMetadata`
+    {specialized metadata} | eg. `TextureAssetMetadata`, `ShaderAssetMetadata`
+    {blob count}           | `u32`
+    {blob_0...n metadata}  | {blob count} number of `BlobMetadata`s
+    {blob_0...n data}      | {blob count} number of binary data
 
-Sections
+Baking
 ---------------------------------------------------------------------------------------------------
+Parsers are functions that are responsible for reading raw asset files (eg, :code:`.png`, :code:`.obj`, :code:`.gltf`, :code:`.ogg` files) from disk,
+and constructing a common :code:`XXXAsset::PackData` (eg. :code:`ModelAsset::PackData`) structure out of them.
+
+Example parser signature: 
+
+.. code:: cpp
+
+    auto parse_obj(const std::filesystem::path& path) -> lt::assets::ModelAsset::PackData;
+
+It is then the responsibility of the :code:`XXXAsset` class to implement a :code:`pack` method to save this data into disk,
+in a way that the :code:`XXXAsset` class can later :code:`unpack` the data from disk in an efficient way.
+
+All raw asset files will be packed into a ready-to-use format. 
+Which means, when baking a :code:`.jpg` or :code:`.png` or :code:`.bmp` file, 
+regardless of their original format, they'll be baked into a common, ready-to-use by the engine format.
+
+
+General Metadata
+---------------------------------------------------------------------------------------------------
+.. code-block:: md
+
+    {vesrion} | `u8`
+    {type}    | `std::array<const char, 16>`
+
+:code:`version` is used to keep backward-compatibility in case there's a breaking change, so future versions
+can have a special code for converting old baked asset files into new baked asset files.
+
+However, :code:`version` is currently useless as we are in the *beta* phase of the engine. So breaking changes
+are expected and backward-compatibility is a waste of effort (maybe once we have some users?).
+
+:code:`type` is a *16 character long* identifier for the type of the asset (we do not rely on the filename extension).
+It's pretty much the same concept as *magic bytes*.
+
+An example of an asset type identifier:
+
+.. code:: cpp
+
+
+    class ShaderAsset
+    {
+    public:
+        // using Type_T = std::array<const char, 16>;  (imported symbol)
+        static constexpr auto asset_type_identifier = Type_T { "SHADER_________" };
+    // ...
+    };
+
+
+Specialized Metadata
+---------------------------------------------------------------------------------------------------
+Metadata for the specific asset type, for example:
+
+.. code:: cpp
+
+    class ShaderAsset
+    {
+        //...
+        enum class Type : u8
+        {
+            vertex,
+            fragment,
+            geometry,
+            compute,
+        };
+
+        struct Metadata
+        {
+            Type type;
+        };
+        //...
+    };
+
+Very simple exmaple, expect much more complicated metadatas for more complicated assets like models which
+require textures, vertices, indices, LoDs, etc; or textures which require dimensions, bits per pixel, etc.
+
+Blob Metadata
+---------------------------------------------------------------------------------------------------
+The metadata of a blob of data, eg. the pixels of an image, or the normals of a model.
 
 .. code-block:: md
 
-    version              -> The version of the asset for forward compatibility
-    general metadata     -> Common asset metadata such as file-path, asset-type, creator, etc.
-    specialized metadata -> Metadata specific to the asset, eg. texture dimensions for Textures.
-    n                    -> The number of blobs.
-    blob_0...n metadata  -> Metadata specifying how the actual data is packed, required for unpacking.
-    blob_0...n data      -> The actual data, packed and compressed to be reacdy for direct engine consumption.
+    {tag}               | `u8`
+    {offset}            | `size_t`
+    {compression_type}  | `CompressionType`
+    {compressed_size}   | `size_t`
+    {uncompressed_size} | `size_t`
 
-Loading
----------------------------------------------------------------------------------------------------
-Loading pre-baked asset files (like .png files) for baking:
+:code:`tag` is an enum identifier (of type u8) for programmers to quickly access (unpack) the desired binary data,
+it's like indexing into a :code:`map` with :code:`tag`\ s as keys and the binary data as values.
 
+For exmaple:
 
-Each **Loader** has ONE OR MORE supported input file types (detected via the file extension): eg. StbLoader -> Can read in .jpg, .png, .bmp, etc.... files
+.. code:: cpp
 
-Each **Loader** has ONLY ONE supported output asset type:
-eg. StbLoader -> outputs TextureAsset
+    class ModelAsset
+    {
+    //...
+        enum class BlobTag : Tag_T /* u8 */
+        {
+            vertices,
+            indices,
+        };
 
-Multiple **Loader**\s MAY have as output the same asset type:
-eg. StbLoader -> outputs TextureAsset
-eg. SomeOtherImgLoader -> outputs TextureAsset
+        auto unpack(BlobTag tag) const -> Blob /* std::vector<byte> */;
 
-Multiple **Loader**\s SHOULD NOT have as input same extension types
-eg. .jpg, .png -> if supported, should only be supported by 1 **Loader** class
+        void unpack_to(BlobTag tag, std::span<byte> destination) const;
+    //...
+    };
 
-Each **Loader** SHOULD read and turn the data from a file (eg. .png for textures) into something
-understandable by a **Packer** (not the engine itself).
+:code:`offset` is the byte offset, from the beginning of the file, to the first byte of the binary data.
 
-A **Loader** SHOULD NOT be responsible for packing the parsed file data into asset data,
-as that implies direct understanding of the layout required by the engine. 
+:code:`compression_type` is the type of compression used on the raw binary data before being saved to disk, 
+so the existing on-disk binary data should be decompressed according to this type. Current list of compression types include:
 
-And if that layout changes, ALL **Loader**s should change accordingly; 
-which makes a class that's responsible for reading files dependant on the engine's (potentially frequent) internal changes.
-The logic is to reduce many-to-one dependency into a one-to-one dependency by redirecting the packing process to **Packer** classes
+.. code:: cpp
 
-Packing
----------------------------------------------------------------------------------------------------
-Each **Packer** is responsible for packing ONLY ONE asset type:
-eg. TexturePacker for packing texture assets from parsed image files.
-eg. ModelPacker for packing model assets from parsed model files.
+    enum class CompressionType : u8
+    {
+        none,
+        lz4,
+        lz4_hc,
+    };
 
-Each **Packer** will output ONE OR MORE blobs of data, 
-and for EACH blob of data, it'll write a BlobMetadata, AFTER the specialized metadata (eg. TextureAssetMetadata)
+:code:`compressed_size` is the size of the blob's binary data on disk,
+basically how many bytes one should read from the file on disk.
 
-A **Packer** will make use of the **Compressor** classes to compress the data,
-and lay it out in a way that is suitable for the engine's consumption.
-
-Unpacking
----------------------------------------------------------------------------------------------------
-A **Parser** is responsible for parsing ONLY ONE asset type:
-eg. TextureParser for parsing texture assets for direct engine consumption.
-eg. ModelParser  for parsing model assets for direct engine consumption.
+:code:`uncompressed_size` is the expected size of the blob's binary data after decompression, 
+in case of :code:`CompressionType::none`, it should be equals to :code:`compressed_size`.
