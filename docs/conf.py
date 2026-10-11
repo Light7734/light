@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'light'
-copyright = '2025, light7734'
-author = 'light7734'
+copyright = '2026, Light Wiens'
+author = 'light wiens'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -31,5 +31,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
+
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['static']
+
+html_favicon="static/favicon.svg"
+html_css_files = ["custom.css"]

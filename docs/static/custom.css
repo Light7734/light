@@ -1,0 +1,17 @@
+.wy-side-nav-search {
+  background-color: #e21a41;
+}
+
+/* Sidebar category headings */
+.wy-menu-vertical p.caption {
+  color: #e21a41;
+}
+
+/* Sidebar links */
+.wy-menu-vertical a {
+}
+
+/* Active sidebar item */
+.wy-menu-vertical li.current > a {
+  color: #e21a41;
+}
