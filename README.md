@@ -7,6 +7,7 @@
 
 [![valgrind](https://forge.light7734.com/light/light/actions/workflows/valgrind.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 
+[![leak-sanitizer](https://forge.light7734.com/light/light/actions/workflows/leak-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 [![address-sanitizer](https://forge.light7734.com/light/light/actions/workflows/address-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 [![memory-sanitizer](https://forge.light7734.com/light/light/actions/workflows/memory-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
 [![thread-sanitizer](https://forge.light7734.com/light/light/actions/workflows/thread-sanitizer.yml/badge.svg?branch=main)](https://forge.light7734.com/light/light/actions)
