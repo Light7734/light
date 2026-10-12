@@ -19,6 +19,7 @@
    :caption: Development Guidelines
 
    guidelines/sanitization.rst
+   guidelines/llm_policy.rst
    guidelines/code_of_conduct.rst
    guidelines/philosophy.rst
    guidelines/development.rst
