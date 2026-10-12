@@ -17,7 +17,7 @@ performance-inefficient-string-concatenation,
 performance-inefficient-algorithm,
 performance-implicit-conversion-in-loop,
 performance-for-range-copy,
-performance-faster-string-find,
+performance-prefer-single-char-overloads,
 performance-enum-size,
 performance-avoid-endl,
 
