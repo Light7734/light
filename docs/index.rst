@@ -18,6 +18,7 @@
    :maxdepth: 2
    :caption: Development Guidelines
 
+   guidelines/sanitization.rst
    guidelines/code_of_conduct.rst
    guidelines/philosophy.rst
    guidelines/development.rst
