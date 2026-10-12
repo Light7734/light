@@ -1,0 +1,14 @@
+name: leak sanitizer
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  asan:
+    runs-on: lina
+    steps:
+      - uses: actions/checkout@v4
+      - name: leak-sanitizer
+        run: ./tools/ci/lsan.sh
