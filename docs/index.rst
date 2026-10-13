@@ -1,11 +1,10 @@
-.. light engine documentations
+Light Engine
+===================================================================================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Light Engine
 
-   light/showcase.rst
-   light/features.rst
+   light/engine.rst
    
 .. toctree::
    :maxdepth: 2
@@ -19,6 +18,7 @@
    :caption: Development Guidelines
 
    guidelines/sanitization.rst
+   guidelines/fuzzing.rst
    guidelines/llm_policy.rst
    guidelines/code_of_conduct.rst
    guidelines/philosophy.rst
