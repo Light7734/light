@@ -1,6 +1,5 @@
 export module renderer.system;
 
-
 import renderer.vk.device;
 import renderer.vk.pass;
 import renderer.vk.instance;
